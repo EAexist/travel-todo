@@ -43,7 +43,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-  TRIP TODO is a mobile todolist application that assists you with planning a trip. This repository builds app frontend for TRIP TODO. Build with react native and supports builds for web, android and iOS.
+  TRIP TODO is a mobile todolist application that assists you with planning a trip. This repository builds app frontend for TRIP TODO. Built with react native and supports builds for web, android and iOS.
   
 
 
@@ -135,7 +135,7 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 EAexist: hyeon.expression@gmail.com
 
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/EAexist/trip-todo)
+Project Link: [https://github.com/EAexist/trip-todo](https://github.com/EAexist/trip-todo)
 
 
 
