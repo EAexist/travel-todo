@@ -23,14 +23,14 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/EAexist/trip-todo">
+    <img src="assets/images/app/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">TRIP TODO</h3>
 
   <p align="center">
-    Mobile Todolist Application that assists you with planning a trip 
+    Mobile todolist application that assists you with planning a trip 
   </p>
 </div>
 
@@ -43,18 +43,15 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`, `project_license`
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+  TRIP TODO is a mobile todolist application that assists you with planning a trip. This repository builds app frontend for TRIP TODO. Build with react native and supports builds for web, android and iOS.
+  
 
 
 ### Built With
 
 * [![React][React.js]][React-url]
 * [![React-Native][React-Native]][React-Native-url]
+  
 
 
 <!-- GETTING STARTED -->
@@ -66,19 +63,28 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
   ```sh
   npm install npm@latest -g
   ```
-* API Keys
-  A. Get Google Places API Key
-  ```sh
-  npm install npm@latest -g
-  ```
-  B. Get Google Oauth Client Id
-  ```sh
-  npm install npm@latest -g
-  ```
+  
+* Get API Keys
+  
+  A.  Google Places API Key : [Use API Keys with Places API](https://developers.google.com/maps/documentation/places/web-service/get-api-key?hl=ko)
+
+  
+  B.  Google Oauth Client Id: [Get your Google API client ID](https://developers.google.com/identity/oauth2/web/guides/get-google-api-clientid)
+
+    *Create Client Id for Web Service, not android or iOS.
+
+  
+* Run Backend API server
+
+  
+  You can run the development server of this this project without API server. However, API server is required if you want to run any business logics other than the static welcome page. To run the backend api server, please refer to [trip-todo-api](https://github.com/EAexist/trip-todo-api).
+  
+
+
 
 ### Installation
 
-1. Get **A. Get Google Places API Key** and **B. Get Google Oauth Client Id**. Refer to **Prerequisites**.
+1. Get **A. Google Places API Key** and **B. Google Oauth Client Id**. Refer to **Prerequisites**.
 2. Clone the repo
    ```sh
    git clone https://github.com/EAexist/trip-todo.git
@@ -88,51 +94,61 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
    npm install
    ```
 5. Create a new file `.env.development` at project root and enter following environment variables.
-   ```env
+   ```sh
    API_URL=http://localhost:5000 (or the url you're running trip-todo-api server)
-  GOOGLE_PLACES_API_KEY='YOUR GOOGLE PLACES API KEY'
-  GOOGLE_OAUTH_CLIENT_ID_WEB='YOUR GOOGLE OAUTH CLIENT ID (*WEB)'
+   GOOGLE_PLACES_API_KEY='YOUR GOOGLE PLACES API KEY'
+   GOOGLE_OAUTH_CLIENT_ID_WEB='YOUR GOOGLE OAUTH CLIENT ID'
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh
    git remote set-url origin github_username/repo_name
    git remote -v # confirm the changes
    ```
-6. Run the development & web version of app.
+6. Run the dev server for web version of app. 
    ```sh
    npm run start
    ```
+7. Your app will run in `http://localhost:8081` or on other port if 8081 is occupied. Check the console output for detailed information about the running dev server.  
+   
+
+
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
-We do not approve any code contribution to this repository. However, we welcome any feedbacks and suggestions. If you have a suggestion that would make this better, please feel free to contact us by hyeon.expression@gmail.com. Thanks.
+We do not approve any code contribution to this repository. However, we welcome any feedbacks and suggestions. If you have a suggestion that would make this better, please feel free to contact us by hyeon.expression@gmail.com. Thanks.  
+
+
+
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the project_license. See `LICENSE.txt` for more information.
+Distributed under the project_license. See `LICENSE.txt` for more information.  
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- CONTACT -->
 ## Contact
 
-EAexist - hyeon.expression@gmail.com
-Project Link:  [https://github.com/github_username/repo_name](https://github.com/EAexist/trip-todo)
+EAexist: hyeon.expression@gmail.com
+
+
+Project Link: [https://github.com/github_username/repo_name](https://github.com/EAexist/trip-todo)
+
+
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [https://github.com/infinitered/ignite](https://github.com/infinitered/ignite)
-* [https://expo.dev/](https://expo.dev/)
-* [https://mobx.js.org/README.html](https://mobx.js.org/README.html)
-* [https://reactnativeelements.com/](https://reactnativeelements.com/)
-* [https://github.com/gorhom/react-native-bottom-sheet](https://github.com/gorhom/react-native-bottom-sheet)
-* [https://github.com/EAexist/Best-README-Template](https://github.com/EAexist/Best-README-Template)
+* [Ignite](https://github.com/infinitered/ignite)
+* [Expo](https://expo.dev/)
+* [Mobx](https://mobx.js.org/README.html)
+* [ReactNativeElements](https://reactnativeelements.com/)
+* [react-native-bottom-sheet](https://github.com/gorhom/react-native-bottom-sheet)
+* [Best-README-Template](https://github.com/EAexist/Best-README-Template)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -157,8 +173,8 @@ Project Link:  [https://github.com/github_username/repo_name](https://github.com
 [Next-url]: https://nextjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
-[React-Native]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-Native-url]: https://reactjs.org/
+[React-Native]: https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-Native-url]: https://reactnative.dev/
 [Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
 [Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
