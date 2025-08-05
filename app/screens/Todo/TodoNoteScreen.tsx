@@ -28,7 +28,7 @@ export const TodoNoteScreen = withTodo<'TodoNote'>(({todo}) => {
     <Screen>
       <Title>
         <ListItem containerStyle={$listItemContainerStyle}>
-          <Avatar iconId={todo.iconId} size="xlarge" />
+          <Avatar icon={todo.icon} size="xlarge" fontSize={28} />
           <ListItem.Content>
             {true && (
               <ListItem.Subtitle>

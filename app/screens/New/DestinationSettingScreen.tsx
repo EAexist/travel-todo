@@ -1,18 +1,19 @@
-import { Avatar } from '@/components/Avatar'
+import {Avatar} from '@/components/Avatar'
 import * as Fab from '@/components/Fab'
 import * as Input from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
-import { Screen } from '@/components/Screen'
-import { useStores } from '@/models'
-import { Destination, DestinationSnapshotIn } from '@/models/Destination'
-import { useNavigate } from '@/navigators'
-import { getFlagEmoji } from '@/utils/nation'
-import { Trans, useLingui } from '@lingui/react/macro'
-import { ListItem } from '@rneui/themed'
-import { observer } from 'mobx-react-lite'
-import { FC, ReactNode, useCallback } from 'react'
-import { FlatList, ListRenderItem, TouchableOpacity, View } from 'react-native'
+import {Screen} from '@/components/Screen'
+import {useStores} from '@/models'
+import {Destination, DestinationSnapshotIn} from '@/models/Destination'
+import {useNavigate} from '@/navigators'
+import {getFlagEmoji} from '@/utils/nation'
+import {useHeader} from '@/utils/useHeader'
+import {Trans, useLingui} from '@lingui/react/macro'
+import {ListItem} from '@rneui/themed'
+import {observer} from 'mobx-react-lite'
+import {FC, ReactNode, useCallback} from 'react'
+import {FlatList, ListRenderItem, TouchableOpacity, View} from 'react-native'
 
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
@@ -31,107 +32,118 @@ import { FlatList, ListRenderItem, TouchableOpacity, View } from 'react-native'
 // }
 
 export interface DestinationListItemBaseProps {
-    item: Omit<DestinationSnapshotIn, 'id' | 'description'>
-    rightContent?: ReactNode
-    onPress?: () => void
+  item: Omit<DestinationSnapshotIn, 'id' | 'description'>
+  rightContent?: ReactNode
+  onPress?: () => void
 }
 
 export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
-    item,
-    rightContent,
-    onPress,
+  item,
+  rightContent,
+  onPress,
 }) => {
-    //   const [flag, setFlag] = useState<string>()
-    //   useEffect(() => {
-    //     console.log(getFlagEmoji(item.nation))
-    //     setFlag(getFlagEmoji(item.nation))
-    //   }, [getFlagEmoji, item.nation])
+  //   const [flag, setFlag] = useState<string>()
+  //   useEffect(() => {
+  //     console.log(getFlagEmoji(item.nation))
+  //     setFlag(getFlagEmoji(item.nation))
+  //   }, [getFlagEmoji, item.nation])
 
-    return (
-        <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
-            <Avatar iconId={getFlagEmoji(item.nation)} size={35} iconStyle={{}} />
-            {/* <Avatar title={flag} size={35} /> */}
-            <ListItem.Content>
-                <ListItem.Title>
-                    <Trans>{item.title}</Trans>
-                </ListItem.Title>
-                <ListItem.Subtitle>
-                    {/* <Trans>{`${regionNames.of(item.nation.toUpperCase())}ㆍ${item.state}`}</Trans> */}
-                    <Trans>{`${item.region}`}</Trans>
-                </ListItem.Subtitle>
-            </ListItem.Content>
-            {rightContent}
-        </ListItem>
-    )
+  return (
+    <ListItem onPress={onPress} containerStyle={{height: 60}}>
+      <Avatar
+        icon={{name: getFlagEmoji(item.nation)}}
+        size={35}
+        iconStyle={{}}
+      />
+      {/* <Avatar title={flag} size={35} /> */}
+      <ListItem.Content>
+        <ListItem.Title>
+          <Trans>{item.title}</Trans>
+        </ListItem.Title>
+        <ListItem.Subtitle>
+          {/* <Trans>{`${regionNames.of(item.nation.toUpperCase())}ㆍ${item.state}`}</Trans> */}
+          <Trans>{`${item.region}`}</Trans>
+        </ListItem.Subtitle>
+      </ListItem.Content>
+      {rightContent}
+    </ListItem>
+  )
 }
 
 interface DestinationListItemProps {
-    destination: Destination
+  destination: Destination
 }
 
-const DestinationListItem: FC<DestinationListItemProps> = ({ destination }) => {
-    const { tripStore } = useStores()
-    const handleClosePress = useCallback(() => {
-        tripStore.deleteDestination(destination)
-    }, [])
-    return (
-        <DestinationListItemBase
-            key={destination.id}
-            item={destination}
-            rightContent={
-                <ListItem.Chevron
-                    onPress={handleClosePress}
-                    iconProps={{ name: 'close' }}
-                />
-            }
+const DestinationListItem: FC<DestinationListItemProps> = ({destination}) => {
+  const {tripStore} = useStores()
+  const handleClosePress = useCallback(() => {
+    tripStore.deleteDestination(destination)
+  }, [])
+  return (
+    <DestinationListItemBase
+      key={destination.id}
+      item={destination}
+      rightContent={
+        <ListItem.Chevron
+          onPress={handleClosePress}
+          iconProps={{name: 'close'}}
         />
-    )
+      }
+    />
+  )
 }
 export const DestinationSettingScreen: FC = observer(() => {
-    const { tripStore } = useStores()
-    const { t } = useLingui()
+  const {tripStore} = useStores()
+  const {t} = useLingui()
 
-    const renderDestinationListItem: ListRenderItem<Destination> = useCallback(
-        ({ item }) => <DestinationListItem key={item.id} destination={item} />,
-        [],
-    )
+  const renderDestinationListItem: ListRenderItem<Destination> = useCallback(
+    ({item}) => <DestinationListItem key={item.id} destination={item} />,
+    [],
+  )
 
-    const { navigateWithTrip } = useNavigate()
+  const {navigateWithTrip} = useNavigate()
 
-    const handleSearchPress = useCallback(() => {
-        navigateWithTrip('DestinationSearch')
-    }, [])
-    //   const handleNextPress = useCallback(async () => {
-    //     tripStore.patch()
-    //   }, [])
+  const handleSearchPress = useCallback(() => {
+    navigateWithTrip('DestinationSearch')
+  }, [])
+  //   const handleNextPress = useCallback(async () => {
+  //     tripStore.patch()
+  //   }, [])
 
-    const { titleText, subtitlteText } = tripStore.isDestinationSet
-        ? {
-            titleText: `다른 도시도 방문할 예정인가요?`,
-            subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
-        }
-        : {
-            titleText: `어디로 떠나시나요?`,
-            subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
-        }
+  const {titleText, subtitlteText} = tripStore.isDestinationSet
+    ? {
+        titleText: `다른 도시도 방문할 예정인가요?`,
+        subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
+      }
+    : {
+        titleText: `어디로 떠나시나요?`,
+        subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
+      }
 
-    return (
-        <Screen>
-            <ContentTitle title={titleText} subtitle={subtitlteText} />
-            <View>
-                {tripStore.isDestinationSet && (
-                    <View>
-                        <ListSubheader
-                            title={`선택한 여행지 (${tripStore.destination.length})`}
-                        />
-                        <FlatList
-                            data={tripStore.destination}
-                            renderItem={renderDestinationListItem}
-                            keyExtractor={item => item.id}
-                        />
-                    </View>
-                )}
-                {/* <DestinationListItem
+  const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
+
+  useHeader({
+    backNavigateProps: {name: 'Login'},
+    onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
+  })
+
+  return (
+    <Screen>
+      <ContentTitle title={titleText} subtitle={subtitlteText} />
+      <View>
+        {tripStore.isDestinationSet && (
+          <View>
+            <ListSubheader
+              title={`선택한 여행지 (${tripStore.destination.length})`}
+            />
+            <FlatList
+              data={tripStore.destination}
+              renderItem={renderDestinationListItem}
+              keyExtractor={item => item.id}
+            />
+          </View>
+        )}
+        {/* <DestinationListItem
           destination={{
             nation: 'jp',
             title: '도쿠시마',
@@ -139,20 +151,20 @@ export const DestinationSettingScreen: FC = observer(() => {
           }}
             
         /> */}
-                <View style={{ paddingVertical: 16 }}>
-                    <TouchableOpacity onPress={handleSearchPress}>
-                        <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <Fab.Container>
-                <Fab.NextButton
-                    title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}
-                    navigateProps={{
-                        name: 'ScheduleSetting',
-                    }}
-                />
-            </Fab.Container>
-        </Screen>
-    )
+        <View style={{paddingVertical: 16}}>
+          <TouchableOpacity onPress={handleSearchPress}>
+            <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Fab.Container>
+        <Fab.NextButton
+          title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}
+          navigateProps={{
+            name: 'ScheduleSetting',
+          }}
+        />
+      </Fab.Container>
+    </Screen>
+  )
 })
