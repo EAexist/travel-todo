@@ -16,52 +16,52 @@ export const AccomodationStoreModel = types
   })
   .actions(withSetPropAction)
   .actions(store => ({
-    async fetchAccomodation() {
-      const response = await api.getAccomodationItem()
-      if (response.kind === 'ok') {
-        // store.setProp('id', response.id)
-        // console.log(
-        //   response.items.map((item) => [item.checkinDate, item.checkoutDate]),
-        // )
-        const accomodation = Object.fromEntries(
-          response.items.map(
-            ({
-              // checkinDate,
-              // checkoutDate,
-              // checkinStartTime,
-              // checkinEndTime,
-              // checkoutTime,
-              ...item
-            }) => [
-              item.id,
-              {
-                // checkinDate: new Date(checkinDate),
-                // checkoutDate: new Date(checkoutDate),
-                // checkinStartTime: checkinStartTime
-                //   ? new Date(checkinStartTime)
-                //   : undefined,
-                // checkinEndTime: checkinEndTime
-                //   ? new Date(checkinEndTime)
-                //   : undefined,
-                // checkoutTime: checkoutTime ? new Date(checkoutTime) : undefined,
-                ...item,
-              },
-            ],
-          ),
-        )
-        store.setProp('accomodation', accomodation)
-        // console.log(
-        //   Object.values(accomodation).map((item) => [
-        //     item.checkinDate,
-        //     item.checkoutDate,
-        //   ]),
-        // )
-      } else {
-        console.error(
-          `Error fetching Accomodation: ${JSON.stringify(response)}`,
-        )
-      }
-    },
+    // async fetchAccomodation() {
+    //   const response = await api.getAccomodationItem()
+    //   if (response.kind === 'ok') {
+    //     // store.setProp('id', response.id)
+    //     // console.log(
+    //     //   response.items.map((item) => [item.checkinDate, item.checkoutDate]),
+    //     // )
+    //     const accomodation = Object.fromEntries(
+    //       response.items.map(
+    //         ({
+    //           // checkinDate,
+    //           // checkoutDate,
+    //           // checkinStartTime,
+    //           // checkinEndTime,
+    //           // checkoutTime,
+    //           ...item
+    //         }) => [
+    //           item.id,
+    //           {
+    //             // checkinDate: new Date(checkinDate),
+    //             // checkoutDate: new Date(checkoutDate),
+    //             // checkinStartTime: checkinStartTime
+    //             //   ? new Date(checkinStartTime)
+    //             //   : undefined,
+    //             // checkinEndTime: checkinEndTime
+    //             //   ? new Date(checkinEndTime)
+    //             //   : undefined,
+    //             // checkoutTime: checkoutTime ? new Date(checkoutTime) : undefined,
+    //             ...item,
+    //           },
+    //         ],
+    //       ),
+    //     )
+    //     store.setProp('accomodation', accomodation)
+    //     // console.log(
+    //     //   Object.values(accomodation).map((item) => [
+    //     //     item.checkinDate,
+    //     //     item.checkoutDate,
+    //     //   ]),
+    //     // )
+    //   } else {
+    //     console.error(
+    //       `Error fetching Accomodation: ${JSON.stringify(response)}`,
+    //     )
+    //   }
+    // },
     // add(item: AccomodationItem) {
     //   store.accomodation.push(item)
     // },
