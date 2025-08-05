@@ -34,6 +34,7 @@ import './utils/gestureHandler'
 import * as storage from './utils/storage'
 import {useFonts} from 'expo-font'
 import {Platform} from 'react-native'
+import {messages} from './locale/locales/ko/messages'
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
@@ -152,7 +153,7 @@ export function App() {
   }
 
   // https://lingui.dev/tutorials/react-native#internationalization-in-react-native
-  i18n.loadAndActivate({locale: 'ko', messages: {}})
+  i18n.loadAndActivate({locale: 'ko', messages})
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

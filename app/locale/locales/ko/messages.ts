@@ -1,0 +1,1 @@
+/*eslint-disable*/import type{Messages}from"@lingui/core";export const messages=JSON.parse("{\"BuijXr\":[\"<0>\",[\"0\"],\"</0>\"],\"I7haOH\":[\"공항 또는 도시 이름 검색\"],\"J/hVSQ\":[[\"0\"]],\"LIdPyd\":[\"도시 또는 국가 검색\"],\"VQ0e+v\":[[\"children\"]],\"c6vKFf\":[[\"subtitle\"]],\"j+TebR\":[\"도시 또는 나라 이름 검색\"],\"pDgeaz\":[[\"title\"]]}")as Messages;

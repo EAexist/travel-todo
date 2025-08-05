@@ -4,8 +4,8 @@ module.exports = {
   locales: ['ko'],
   catalogs: [
     {
-      path: '<rootDir>/src/locale/locales/{locale}/messages',
-      include: ['src'],
+      path: '<rootDir>/app/locale/locales/{locale}/messages',
+      include: ['app'],
     },
   ],
   format: 'po',

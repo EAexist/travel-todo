@@ -1,0 +1,54 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-08-05 20:54+0900\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ko\n"
+
+#. placeholder {0}: todo.categoryTitle
+#. placeholder {0}: item.title
+#. placeholder {0}: item.region
+#: app/components/ThirdpartyAvatar.tsx:63
+#: app/screens/Accomodation/AccomodationNoteScreen.tsx:44
+#: app/screens/New/DestinationSettingScreen.tsx:56
+#: app/screens/New/DestinationSettingScreen.tsx:60
+#: app/screens/Todo/TodoNoteScreen.tsx:35
+msgid "{0}"
+msgstr "{0}"
+
+#: app/components/TransText.tsx:8
+msgid "{children}"
+msgstr "{children}"
+
+#: app/components/ListItem.tsx:28
+#: app/components/TextInfoListItem.tsx:43
+#: app/components/Todo/index.tsx:55
+msgid "{subtitle}"
+msgstr "{subtitle}"
+
+#: app/components/Button.tsx:8
+#: app/components/ListItem.tsx:25
+#: app/components/TextInfoListItem.tsx:38
+#: app/components/Todo/index.tsx:50
+#: app/screens/Main/TodolistScreen.tsx:204
+msgid "{title}"
+msgstr "{title}"
+
+#. placeholder {0}: props.title
+#: app/components/ListSubheader.tsx:22
+msgid "<0>{0}</0>"
+msgstr "<0>{0}</0>"
+
+#: app/screens/Todo/Flight/AirportAutocomplete.tsx:107
+msgid "공항 또는 도시 이름 검색"
+msgstr "공항 또는 도시 이름 검색"
+
+#: app/screens/New/DestinationSettingScreen.tsx:144
+msgid "도시 또는 국가 검색"
+msgstr "도시 또는 국가 검색"
+
+#: app/screens/New/DestinationSearchScreen.tsx:85
+msgid "도시 또는 나라 이름 검색"
+msgstr "도시 또는 나라 이름 검색"
