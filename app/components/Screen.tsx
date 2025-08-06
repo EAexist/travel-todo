@@ -289,7 +289,6 @@ export function Screen(props: ScreenProps) {
         style={statusBarStyle || (themeContext === 'dark' ? 'light' : 'dark')}
         {...StatusBarProps}
       />
-
       <KeyboardAvoidingView
         behavior={isIos ? 'padding' : 'height'}
         keyboardVerticalOffset={keyboardOffset}

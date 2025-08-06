@@ -1,17 +1,17 @@
-import { useEffect, useLayoutEffect } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import { Platform } from 'react-native'
-import { Header, HeaderProps as RNEHeaderProps } from '@rneui/themed'
-import { BackButton, RightActionButton } from '@/components/Header'
-import { NavigateProps } from '@/navigators'
+import {useEffect, useLayoutEffect} from 'react'
+import {useNavigation} from '@react-navigation/native'
+import {Platform} from 'react-native'
+import {Header, HeaderProps as RNEHeaderProps} from '@rneui/themed'
+import {BackButton, RightActionButton} from '@/components/Header'
+import {NavigateProps} from '@/navigators'
 
 interface HeaderProps extends RNEHeaderProps {
-    headerShown?: boolean
-    backButtonShown?: boolean
-    rightActionTitle?: string
-    onRightPress?: () => void
-    backNavigateProps?: NavigateProps
-    onBackPressBeforeNavigate?: () => Promise<any>
+  headerShown?: boolean
+  backButtonShown?: boolean
+  rightActionTitle?: string
+  onRightPress?: () => void
+  backNavigateProps?: NavigateProps
+  onBackPressBeforeNavigate?: () => Promise<any>
 }
 
 /**
@@ -21,56 +21,57 @@ interface HeaderProps extends RNEHeaderProps {
  * @param {any[]} deps - The dependencies to watch for changes to update the header.
  */
 export function useHeader(
-    {
-        headerShown = true,
-        backButtonShown = true,
-        rightActionTitle,
-        onRightPress,
-        backNavigateProps,
-        onBackPressBeforeNavigate,
-        leftComponent,
-        ...props
-    }: HeaderProps,
-    deps: Parameters<typeof useLayoutEffect>[1] = [],
+  {
+    headerShown = true,
+    backButtonShown = true,
+    rightActionTitle,
+    onRightPress,
+    backNavigateProps,
+    onBackPressBeforeNavigate,
+    leftComponent,
+    ...props
+  }: HeaderProps,
+  deps: Parameters<typeof useLayoutEffect>[1] = [],
 ) {
-    const navigation = useNavigation()
+  const navigation = useNavigation()
 
-    /**
-     * We need to have multiple implementations of this hook for web and mobile.
-     * Web needs to use useEffect to avoid a rendering loop.
-     * In mobile and also to avoid a visible header jump when navigating between screens, we use
-     * `useLayoutEffect`, which will apply the settings before the screen renders.
-     */
-    const usePlatformEffect = Platform.OS === 'web' ? useEffect : useLayoutEffect
+  /**
+   * We need to have multiple implementations of this hook for web and mobile.
+   * Web needs to use useEffect to avoid a rendering loop.
+   * In mobile and also to avoid a visible header jump when navigating between screens, we use
+   * `useLayoutEffect`, which will apply the settings before the screen renders.
+   */
+  const usePlatformEffect = Platform.OS === 'web' ? useEffect : useLayoutEffect
 
-    // To avoid a visible header jump when navigating between screens, we use
-    // `useLayoutEffect`, which will apply the settings before the screen renders.
-    usePlatformEffect(() => {
-        navigation.setOptions({
-            headerShown,
-            header: () => (
-                <Header
-                    leftComponent={
-                        backButtonShown ? (
-                            <BackButton
-                                navigateProps={backNavigateProps}
-                                onBackPressBeforeNavigate={onBackPressBeforeNavigate}
-                            />
-                        ) : (
-                            leftComponent
-                        )
-                    }
-                    rightComponent={
-                        <RightActionButton
-                            onPress={onRightPress}
-                            title={rightActionTitle}
-                        />
-                    }
-                    {...props}
-                />
-            ),
-        })
-        // intentionally created API to have user set when they want to update the header via `deps`
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [...deps, navigation])
+  // To avoid a visible header jump when navigating between screens, we use
+  // `useLayoutEffect`, which will apply the settings before the screen renders.
+  usePlatformEffect(() => {
+    navigation.setOptions({
+      headerShown,
+      header: () => (
+        <Header
+          containerStyle={{marginTop: '8%'}}
+          leftComponent={
+            backButtonShown ? (
+              <BackButton
+                navigateProps={backNavigateProps}
+                onBackPressBeforeNavigate={onBackPressBeforeNavigate}
+              />
+            ) : (
+              leftComponent
+            )
+          }
+          rightComponent={
+            <RightActionButton
+              onPress={onRightPress}
+              title={rightActionTitle}
+            />
+          }
+          {...props}
+        />
+      ),
+    })
+    // intentionally created API to have user set when they want to update the header via `deps`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...deps, navigation])
 }
