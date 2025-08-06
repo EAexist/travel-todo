@@ -120,11 +120,12 @@ export const DestinationSettingScreen: FC = observer(() => {
         subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
       }
 
-  const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
+  //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
 
   useHeader({
-    backNavigateProps: {name: 'Login'},
-    onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
+    backButtonShown: false,
+    // backNavigateProps: {name: 'Login', ignoreTrip: true},
+    // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
   })
 
   return (

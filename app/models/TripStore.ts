@@ -81,6 +81,7 @@ export const TripStoreModel = types
       store.todolist.get(todo.category)?.push(todo.id)
     },
     set(trip: TripStoreSnapshot) {
+      console.log('[Tripstore.set]')
       store.setProp('id', trip.id)
       store.setProp('title', trip.title)
       store.setProp('destination', trip.destination)
@@ -153,6 +154,7 @@ export const TripStoreModel = types
       store.destination.push(destination)
     },
     async fetchPreset() {
+      console.log('[Tripstore.fetchPreset]')
       api.getTodoPreset(store.id).then(response => {
         if (response.kind == 'ok') {
           const map = new Map<string, PresetSnapshotIn[]>()
@@ -166,7 +168,7 @@ export const TripStoreModel = types
             })
           })
           store.setProp('preset', Object.fromEntries(map.entries()))
-          store.updatePreset()
+          //   store.updatePreset()
         }
       })
     },
@@ -197,6 +199,7 @@ export const TripStoreModel = types
      * Fetch a trip with given id.
      */
     async fetch(id: string) {
+      console.log('[Tripstore.fetch]')
       const response = await api.getTrip(id)
       if (response.kind === 'ok') {
         store.set(response.data as TripStoreSnapshot)
@@ -209,9 +212,11 @@ export const TripStoreModel = types
      * Patch(update) a trip.
      */
     async patch() {
+      console.log('[Tripstore.patch]')
       const response = await api.patchTrip(store as TripStore)
       if (response.kind == 'ok') {
         store.set(response.data as TripStoreSnapshot)
+        console.log('[Tripstore.patch] returns')
       }
     },
 
@@ -391,14 +396,16 @@ export const TripStoreModel = types
         }))
     },
     get sections() {
-      return [
-        ...new Set([
-          ...Array.from(store.todoMap.values()).map(item => item.category),
-          ...(Array.from(store.preset.values()).flat() as Preset[]).map(
-            preset => preset.todo.category,
-          ),
-        ]),
-      ]
+      //   const activeSections = [
+      //     ...Array.from(store.todoMap.values()).map(item => item.category),
+      //     ...(Array.from(store.preset.values()).flat() as Preset[]).map(
+      //       preset => preset.todo.category,
+      //     ),
+      //   ]
+      //   return ['reservation', 'foreign', 'goods'].filter(section =>
+      //     activeSections.includes(section),
+      //   )
+      return ['reservation', 'foreign', 'goods']
     },
     get sectionedTrip() {
       return Array.from(store.todolist.entries()).map(([category, data]) => ({
@@ -516,7 +523,7 @@ export const TripStoreModel = types
   .actions(store => ({
     async initialize() {
       store.setProp('isInitialized', true)
-      store.patch()
+      await store.patch()
     },
     async completeAndPatchTodo(todo: Todo) {
       todo.complete()
