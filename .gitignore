@@ -102,3 +102,5 @@ web-build/
 vercel.json
 
 dist/
+
+app/.deprecated
