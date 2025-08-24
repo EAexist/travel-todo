@@ -103,4 +103,4 @@ vercel.json
 
 dist/
 
-app/.deprecated
+app/.deprecated/
