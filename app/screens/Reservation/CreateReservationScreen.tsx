@@ -3,11 +3,13 @@ import ContentTitle from '@/components/Layout/Content'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
 import {useStores} from '@/models'
-import {usePickIamge} from '@/utils/image'
 import {withTodo} from '@/utils/withTodo'
 import {useCallback} from 'react'
+import {launchImageLibraryAsync} from 'expo-image-picker'
+import * as storage from '../../utils/storage'
+import {usePickIamge} from '@/utils/image'
 
-export const ConfirmFlightTicketScreen = withTodo<'ConfirmFlightTicket'>(
+export const CreateReservationScreen = withTodo<'CreateReservation'>(
   ({todo}) => {
     const {
       tripStore: {completeAndPatchTodo},

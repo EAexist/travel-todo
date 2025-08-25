@@ -43,6 +43,7 @@
         "**/*.ts",
         "**/*.tsx",
         "app/.deprecated/TodoModal.tsx",
+        "app/.deprecated/amadeusApi.ts",
     ],
     "exclude": [
         "node_modules",

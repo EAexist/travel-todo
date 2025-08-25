@@ -12,9 +12,7 @@ import {useStores} from '@/models'
 import {CATEGORY_TO_TITLE, Icon, Todo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {useHeader} from '@/utils/useHeader'
-import {withTodo} from '@/utils/withTodo'
-import {useFocusEffect} from '@react-navigation/native'
-import {Input, ListItem} from '@rneui/themed'
+import {ListItem} from '@rneui/themed'
 import {observer} from 'mobx-react-lite'
 import {FC, useCallback, useRef, useState} from 'react'
 import {
@@ -23,78 +21,6 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from 'react-native'
-import {
-  FlightTicketTodoEditScreen,
-  FlightTodoEditScreen,
-} from './Flight/FlightTodoEditScreen'
-
-export const TodoCreateScreen = withTodo<'TodoCreate'>(({todo, params}) => {
-  const {navigateWithTrip} = useNavigate()
-  const [isInitializing, setIsInitializing] = useState(params?.isInitializing)
-  const {
-    tripStore: {deleteTodo},
-  } = useStores()
-
-  useFocusEffect(
-    useCallback(() => {
-      console.log(`[TodoCreateScreen] isInitialized=${isInitializing}`)
-      if (todo?.type === 'flight') {
-        if (isInitializing) {
-          setIsInitializing(false)
-          if (todo?.departure === null) {
-            console.log('[TodoCreateScreen] todo?.departure === null')
-            navigateWithTrip('DepartureAirportSetting', {
-              todoId: todo.id,
-              callerName: params.callerName,
-            })
-          }
-        } else {
-          deleteTodo(todo).then(() => goBack())
-        }
-      }
-    }, [todo?.departure, isInitializing]),
-  )
-
-  // const handleBackPressBeforeNavigate = useCallback(async () => {
-  //     if (!isConfirmed && isBeforeInitialization) await tripStore.deleteTodo(todo)
-  // }, [tripStore, todo])
-
-  return todo.type === 'custom' ? (
-    <TodoEditScreenBase todo={todo} isBeforeInitialization={true} />
-  ) : todo.type === 'flight' ? (
-    <></>
-  ) : (
-    <TodoEditScreenBase todo={todo} isBeforeInitialization={true} />
-  )
-})
-
-export const TodoEditScreen = withTodo<'TodoEdit'>(({todo}) => {
-  return todo.type === 'custom' ? (
-    <CustomTodoEditScreen todo={todo} />
-  ) : todo.type === 'flight' ? (
-    <FlightTodoEditScreen todo={todo} />
-  ) : todo.type === 'flightTicket' ? (
-    <FlightTicketTodoEditScreen todo={todo} />
-  ) : (
-    <CustomTodoEditScreen todo={todo} />
-  )
-})
-
-interface TodoEditScreenProps {
-  todo: Todo
-  isBeforeInitialization?: boolean
-}
-
-const TodoEditScreenBase: FC<TodoEditScreenProps> = props => {
-  switch (props.todo.type) {
-    case 'flight':
-      return <FlightTodoEditScreen {...props} />
-    // case 'train':
-    //   return <FlightTodoEditScreen {...props} />
-    default:
-      return <CustomTodoEditScreen {...props} />
-  }
-}
 
 export const CustomTodoEditScreen: FC<{
   todo: Todo

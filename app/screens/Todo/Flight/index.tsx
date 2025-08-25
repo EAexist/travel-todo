@@ -55,16 +55,16 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
       todo.setDeparture({
         name: flight.departure.airportName,
         title: flight.departure.cityName,
-        nation: flight.departure.ISONationCode2Digit,
+        countryISO: flight.departure.ISONationCode2Digit,
         region: flight.departure.cityName,
-        iataCode: flight.departure.iataCode,
+        IATACode: flight.departure.IATACode,
       })
       todo.setArrival({
         name: flight.arrival.airportName,
         title: flight.arrival.cityName,
-        nation: flight.arrival.ISONationCode2Digit,
+        countryISO: flight.arrival.ISONationCode2Digit,
         region: flight.arrival.cityName,
-        iataCode: flight.arrival.iataCode,
+        IATACode: flight.arrival.IATACode,
       })
       tripStore.patchTodo(todo).then(() => {
         navigateWithTrip('RoundTripSetting', {todoId: todo.id, callerName})
@@ -73,7 +73,7 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
     const renderRecommendationChip: ListRenderItem<Flight> = useCallback(
       ({item}) => (
         <Chip
-          title={`${item.departure?.cityName}(${item.departure?.iataCode}) → ${item.arrival?.cityName}(${item.arrival?.iataCode})`}
+          title={`${item.departure?.cityName}(${item.departure?.IATACode}) → ${item.arrival?.cityName}(${item.arrival?.IATACode})`}
           onPress={() => handlePressRecommendationChip(item)}
         />
       ),
@@ -154,7 +154,7 @@ const ArrivalAirportSettingScreen = withTodo<'ArrivalAirportSetting'>(
       <Screen>
         <ContentTitle
           title={'도착지를 선택해주세요'}
-          subtitle={`출발: ${todo.departure?.title}${todo.departure?.iataCode ? `(${todo.departure?.iataCode})` : ''}`}
+          subtitle={`출발: ${todo.departure?.title}${todo.departure?.IATACode ? `(${todo.departure?.IATACode})` : ''}`}
         />
         <AirportAutocomplete
           handlePressSearchResult={handlePressSearchResult}
@@ -261,7 +261,7 @@ const ArrivalAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
     <Screen>
       <ContentTitle
         title={'도착지를 선택해주세요'}
-        subtitle={`출발: ${todo.departure?.title}${todo.departure?.iataCode ? `(${todo.departure?.iataCode})` : ''}`}
+        subtitle={`출발: ${todo.departure?.title}${todo.departure?.IATACode ? `(${todo.departure?.IATACode})` : ''}`}
       />
       <AirportAutocomplete handlePressSearchResult={handlePressSearchResult} />
     </Screen>
