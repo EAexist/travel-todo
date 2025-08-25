@@ -66,6 +66,7 @@
         "i18next": "^23.14.0",
         "intl-pluralrules": "^2.0.1",
         "mobx": "^6.13.7",
+        "mobx-persist-store": "^1.1.8",
         "mobx-react-lite": "^4.1.0",
         "mobx-state-tree": "^7.0.2",
         "react": "19.0.0",
