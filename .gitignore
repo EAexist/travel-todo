@@ -104,3 +104,4 @@ vercel.json
 dist/
 
 app/.deprecated
+package-lock.json
