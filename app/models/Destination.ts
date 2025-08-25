@@ -1,25 +1,16 @@
 import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from './helpers/withSetPropAction'
 
-/**
- * This represents a Trip
- */
-
 export const DestinationModel = types
   .model('Destination')
   .props({
     id: types.identifier,
     description: types.string,
-    nation: types.string,
+    countryISO: types.string,
     title: types.string,
     region: types.string,
   })
   .actions(withSetPropAction)
-  .actions(item => ({
-    // removeFavorite(Destination: Destination) {
-    //   store.favorites.remove(todo)
-    // },
-  }))
   .views(item => ({
     get parsedTitleAndSubtitle() {
       const defaultValue = {title: item.title?.trim(), subtitle: ''}

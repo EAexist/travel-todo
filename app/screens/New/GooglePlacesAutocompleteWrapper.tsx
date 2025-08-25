@@ -71,7 +71,7 @@
 //       .createDestination({
 //         title: data.structured_formatting.main_text,
 //         state: data.structured_formatting.secondary_text,
-//         nation:
+//         countryISO:
 //           countryNameKrToISO[
 //             data.structured_formatting.secondary_text.split(',')[0]
 //           ] || '',
@@ -86,7 +86,7 @@
 //       .createDestination({
 //         title: data.structuredFormat.mainText.text,
 //         state: data.structuredFormat.secondaryText?.text || '',
-//         nation: data.structuredFormat.secondaryText?.text.split(',')
+//         countryISO: data.structuredFormat.secondaryText?.text.split(',')
 //           ? countryNameKrToISO[
 //               data.structuredFormat.secondaryText?.text.split(',')[0]
 //             ]
@@ -104,7 +104,7 @@
 //         item={{
 //           title: data.structured_formatting.main_text,
 //           state: data.structured_formatting.secondary_text,
-//           nation:
+//           countryISO:
 //             countryNameKrToISO[
 //               data.structured_formatting.secondary_text.split(' ')[0]
 //             ] || '',

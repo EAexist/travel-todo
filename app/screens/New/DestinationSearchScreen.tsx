@@ -1,13 +1,16 @@
 import {googlePlacesAutocompleteConfig} from '@/components/GooglePlacesAutocompleteConfig'
 import {GooglePlacesSearchBarInput} from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
+import {LoadingScreen} from '@/components/LoadingScreen'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
 import {useStores} from '@/models'
+import {DestinationSnapshotIn} from '@/models/Destination'
 import {goBack} from '@/navigators'
+import {rtrim} from '@/utils'
 import {countryNameKrToISO} from '@/utils/nation'
 import {useLingui} from '@lingui/react/macro'
-import {FC, useCallback, useRef, useState} from 'react'
+import {FC, useCallback, useRef} from 'react'
 import {
   AutocompleteRequestType,
   GooglePlaceData,
@@ -27,6 +30,22 @@ const PlacesAutoCompleteQuery: Query<AutocompleteRequestType> = {
   type: '(cities)',
 }
 
+const mapGooglePlaceDataToDestination: (
+  data: GooglePlaceData,
+) => Omit<DestinationSnapshotIn, 'id'> = data => {
+  const ISO =
+    countryNameKrToISO[data.structured_formatting.secondary_text.split(' ')[0]]
+  return {
+    title:
+      ISO == 'JP'
+        ? rtrim(data.structured_formatting.main_text, '시')
+        : data.structured_formatting.main_text, // 일본 지명의 경우 -시 suffix 제거: 아카시시 > 아카시, 교토시 > 교토
+    region: data.structured_formatting.secondary_text,
+    description: data.description,
+    countryISO: ISO,
+  }
+}
+
 const GooglePlacesSearchBar = () => {
   const ref = useRef<GooglePlacesAutocompleteRef>(null)
 
@@ -40,32 +59,17 @@ const GooglePlacesSearchBar = () => {
   const handlePress = useCallback((data: GooglePlaceData) => {
     console.log(JSON.stringify(data))
     tripStore
-      .createDestination({
-        description: data.description,
-        title: data.structured_formatting.main_text,
-        region: data.structured_formatting.secondary_text,
-        nation:
-          countryNameKrToISO[
-            data.structured_formatting.secondary_text.split(' ')[0]
-          ] || '',
-      })
+      .createDestination(mapGooglePlaceDataToDestination(data))
       .then(() => {
         goBack()
       })
   }, [])
 
-  const renderRow = useCallback((data: GooglePlaceData, index: number) => {
+  const renderRow = useCallback((data: GooglePlaceData) => {
     return (
       <DestinationListItemBase
         key={data.id}
-        item={{
-          title: data.structured_formatting.main_text,
-          region: data.structured_formatting.secondary_text,
-          nation:
-            countryNameKrToISO[
-              data.structured_formatting.secondary_text.split(' ')[0]
-            ] || '',
-        }}
+        item={mapGooglePlaceDataToDestination(data)}
       />
     )
   }, [])
@@ -94,18 +98,20 @@ export const DestinationSearchScreen: FC = () => {
   const titleText = tripStore.isDestinationSet ? (
     <TransText h2>
       <TransText h2 primary>
-        {tripStore.destinationTitles.map(title => title).join('')}
+        {tripStore.destinationTitles.map(title => title).join(', ')}
       </TransText>
-      {'와\n함께 방문할 도시를 검색해주세요'}
+      {'와\n함께 여행할 도시를 검색해주세요'}
     </TransText>
   ) : (
-    '방문할 도시를 검색해주세요'
+    '여행할 도시를 검색해주세요'
   )
 
   return (
-    <Screen>
-      <ContentTitle title={titleText} />
-      <GooglePlacesSearchBar />
-    </Screen>
+    <LoadingScreen>
+      <Screen>
+        <ContentTitle title={titleText} />
+        <GooglePlacesSearchBar />
+      </Screen>
+    </LoadingScreen>
   )
 }

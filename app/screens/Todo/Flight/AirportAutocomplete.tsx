@@ -61,11 +61,11 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
       data.structured_formatting.main_text.match(/(\S+)\s*$/)
     const lastToken = lastTokenMatch ? lastTokenMatch[1] : ''
 
-    const iataCode = /\(([A-Z]+)\)/.test(lastToken)
+    const IATACode = /\(([A-Z]+)\)/.test(lastToken)
       ? lastToken.replace(/[()]/g, '').trim()
       : undefined
     const name = (
-      !!iataCode
+      !!IATACode
         ? data.structured_formatting.main_text.replace(/\(.*?\)/g, '')
         : data.structured_formatting.main_text
     ).trim()
@@ -77,8 +77,8 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
         .replace(' ', '')
         .trim(),
       name: name,
-      iataCode: iataCode || undefined,
-      nation:
+      IATACode: IATACode || undefined,
+      countryISO:
         countryNameKrToISO[
           data.structured_formatting.secondary_text.split(',')[0]
         ] || '',

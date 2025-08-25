@@ -22,9 +22,9 @@ export const CATEGORY_TO_TITLE: {[key: string]: string} = {
 export interface Location {
   name: string
   title: string
-  nation: string
+  countryISO: string
   region?: string
-  iataCode?: string
+  IATACode?: string
 }
 
 export interface LocationPair {
@@ -35,23 +35,42 @@ export interface LocationPair {
 export const LocationModel = types.model('Location').props({
   name: types.string,
   title: types.string,
-  nation: types.string,
+  countryISO: types.string,
   region: types.maybe(types.string),
-  iataCode: types.maybe(types.string),
+  IATACode: types.maybe(types.string),
 })
 
 export const AirportModel = types.model('Airport').props({
   airportName: types.string,
   cityName: types.string,
   ISONationCode2Digit: types.string,
-  iataCode: types.string,
+  IATACode: types.string,
 })
 
 export interface Airport {
+  IATACode: string
   airportName: string
   cityName: string
   ISONationCode2Digit: string
-  iataCode: string
+}
+
+export interface Airline {
+  IATACode: string
+  title: string
+}
+
+export interface ReservationLink {
+  name: string
+  title: string
+  subtitle: string
+  href: string
+}
+
+export interface FlightRoute {
+  departureAirport: Airport
+  arrivalAirport: Airport
+  airlines: Airline[]
+  reservationLinks: ReservationLink[]
 }
 
 export interface Flight {
@@ -102,23 +121,8 @@ export const TodoModel = types
     isFlaggedToDelete: false,
     orderKey: types.number,
     presetId: types.maybeNull(types.number),
-    departure: types.maybeNull(LocationModel),
-    arrival: types.maybeNull(LocationModel),
-    // isFlaggedToAdd: false,
   })
   .actions(withSetPropAction)
-  .views(item => ({
-    get flightTitle() {
-      return item.departure
-        ? `${item.departure?.title} → ${item.arrival?.title || '목적지'}`
-        : ''
-    },
-    get flightTitleWithCode() {
-      return item.departure
-        ? `${item.departure?.title}${item.departure?.iataCode ? ` (${item.departure?.iataCode})` : ''} → ${item.arrival?.title || '목적지'}${item.arrival?.iataCode ? ` (${item.arrival?.iataCode})` : ''}`
-        : ''
-    },
-  }))
   .actions(item => ({
     complete() {
       item.setProp('completeDateISOString', new Date().toISOString())
@@ -128,14 +132,6 @@ export const TodoModel = types
     },
     toggleDeleteFlag() {
       item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
-    },
-    setDeparture(departure: Location) {
-      item.setProp('departure', departure)
-      //   item.setProp('title', item.flightTitle)
-    },
-    setArrival(arrival: Location) {
-      item.setProp('arrival', arrival)
-      //   item.setProp('title', item.flightTitle)
     },
   }))
   .views(item => ({
@@ -158,6 +154,46 @@ export const TodoModel = types
     },
   }))
 
+export const FlightTodoModel = types.compose(
+  'FlightTodo',
+  TodoModel,
+  types
+    .model({
+      isRouteFixed: types.boolean,
+      departure: types.maybeNull(LocationModel),
+      arrival: types.maybeNull(LocationModel),
+    })
+    .views(item => ({
+      get flightTitle() {
+        return item.departure
+          ? `${item.departure?.title} → ${item.arrival?.title || '목적지'}`
+          : ''
+      },
+      get flightTitleWithCode() {
+        return item.departure
+          ? `${item.departure?.title}${item.departure?.IATACode ? ` (${item.departure?.IATACode})` : ''} → ${item.arrival?.title || '목적지'}${item.arrival?.IATACode ? ` (${item.arrival?.IATACode})` : ''}`
+          : ''
+      },
+    }))
+    .actions(withSetPropAction)
+    .actions(item => ({
+      setDeparture(departure: Location) {
+        item.setProp('departure', departure)
+        //   item.setProp('title', item.flightTitle)
+      },
+      setArrival(arrival: Location) {
+        item.setProp('arrival', arrival)
+        //   item.setProp('title', item.flightTitle)
+      },
+    })),
+)
+
 export interface Todo extends Instance<typeof TodoModel> {}
 export interface TodoSnapshotOut extends SnapshotOut<typeof TodoModel> {}
 export interface TodoSnapshotIn extends SnapshotIn<typeof TodoModel> {}
+
+export interface FlightTodo extends Instance<typeof FlightTodoModel> {}
+export interface FlightTodoSnapshotOut
+  extends SnapshotOut<typeof FlightTodoModel> {}
+export interface FlightTodoSnapshotIn
+  extends SnapshotIn<typeof FlightTodoModel> {}

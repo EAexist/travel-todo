@@ -44,16 +44,16 @@ export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
 }) => {
   //   const [flag, setFlag] = useState<string>()
   //   useEffect(() => {
-  //     console.log(getFlagEmoji(item.nation))
-  //     setFlag(getFlagEmoji(item.nation))
-  //   }, [getFlagEmoji, item.nation])
+  //     console.log(getFlagEmoji(item.countryISO))
+  //     setFlag(getFlagEmoji(item.countryISO))
+  //   }, [getFlagEmoji, item.countryISO])
 
   return (
     <ListItem onPress={onPress} containerStyle={{height: 60}}>
       <Avatar
-        icon={{name: getFlagEmoji(item.nation)}}
+        icon={{name: getFlagEmoji(item.countryISO)}}
         size={35}
-        iconStyle={{}}
+        fontSize={20}
       />
       {/* <Avatar title={flag} size={35} /> */}
       <ListItem.Content>
@@ -61,7 +61,7 @@ export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
           <Trans>{item.title}</Trans>
         </ListItem.Title>
         <ListItem.Subtitle>
-          {/* <Trans>{`${regionNames.of(item.nation.toUpperCase())}ㆍ${item.state}`}</Trans> */}
+          {/* <Trans>{`${regionNames.of(item.countryISO.toUpperCase())}ㆍ${item.state}`}</Trans> */}
           <Trans>{`${item.region}`}</Trans>
         </ListItem.Subtitle>
       </ListItem.Content>
@@ -112,12 +112,12 @@ export const DestinationSettingScreen: FC = observer(() => {
 
   const {titleText, subtitlteText} = tripStore.isDestinationSet
     ? {
-        titleText: `다른 도시도 방문할 예정인가요?`,
-        subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
+        titleText: `다른 도시도 여행할 예정인가요?`,
+        subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
       }
     : {
         titleText: `어디로 떠나시나요?`,
-        subtitlteText: `여행 중 방문할 도시를 모두 추가해주세요.`,
+        subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
       }
 
   //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
@@ -131,33 +131,23 @@ export const DestinationSettingScreen: FC = observer(() => {
   return (
     <Screen>
       <ContentTitle title={titleText} subtitle={subtitlteText} />
-      <View>
-        {tripStore.isDestinationSet && (
-          <View>
-            <ListSubheader
-              title={`선택한 여행지 (${tripStore.destination.length})`}
-            />
-            <FlatList
-              data={tripStore.destination}
-              renderItem={renderDestinationListItem}
-              keyExtractor={item => item.id}
-            />
-          </View>
-        )}
-        {/* <DestinationListItem
-          destination={{
-            nation: 'jp',
-            title: '도쿠시마',
-            state: '시코쿠',
-          }}
-            
-        /> */}
-        <View style={{paddingVertical: 16}}>
-          <TouchableOpacity onPress={handleSearchPress}>
-            <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
-          </TouchableOpacity>
-        </View>
+      <View style={{paddingVertical: 16, flex: 1}}>
+        <TouchableOpacity onPress={handleSearchPress}>
+          <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
+        </TouchableOpacity>
       </View>
+      {tripStore.isDestinationSet && (
+        <View>
+          <ListSubheader
+            title={`선택한 여행지 (${tripStore.destination.length})`}
+          />
+          <FlatList
+            data={tripStore.destination}
+            renderItem={renderDestinationListItem}
+            keyExtractor={item => item.id}
+          />
+        </View>
+      )}
       <Fab.Container>
         <Fab.NextButton
           title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}

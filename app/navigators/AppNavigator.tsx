@@ -94,10 +94,15 @@ export type TodoAppStackParamList = {
   ConfirmPassport: TodoStackProps
   ConfirmFlight: TodoStackProps
   ConfirmFlightTicket: TodoStackProps
+
+  /* Create Todo */
+  CreateCustomTodo: FlightSettingStackProps & {isInitializing: boolean}
+  CreateFlightTodo: FlightSettingStackProps & {isInitializing: boolean}
+  CreateFlightTicketTodo: FlightSettingStackProps & {isInitializing: boolean}
+
   /* Edit Todo */
   TodoTitle: TodoStackProps
   TodoNote: TodoStackProps
-  TodoCreate: FlightSettingStackProps & {isInitializing: boolean}
   TodoEdit: TodoStackProps
 
   /* Flight */
@@ -210,7 +215,18 @@ const AppStack = observer(function AppStack() {
             name="CreateAccomodation"
             component={Screens.Accomodation.Create}
           />
-          <Stack.Screen name="TodoCreate" component={Screens.Todo.Create} />
+          <Stack.Screen
+            name="CreateCustomTodo"
+            component={Screens.Todo.Create.Custom}
+          />
+          <Stack.Screen
+            name="CreateFlightTodo"
+            component={Screens.Todo.Create.Flight}
+          />
+          <Stack.Screen
+            name="CreateFlightTicketTodo"
+            component={Screens.Todo.Create.FlightTicket}
+          />
           <Stack.Screen name="TodoEdit" component={Screens.Todo.Edit} />
           <Stack.Screen name="TodoNote" component={Screens.Todo.Note} />
           <Stack.Screen name="TodoTitle" component={Screens.Todo.Title} />
@@ -244,6 +260,7 @@ const AppStack = observer(function AppStack() {
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
+          {/* <Stack.Screen name="Flight" component={LoginScreen} /> */}
         </>
       )}
 

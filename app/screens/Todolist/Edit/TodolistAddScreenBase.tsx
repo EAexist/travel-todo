@@ -25,6 +25,7 @@ import {
 import TodolistEditScreenBase, {
   TodolistEditScreenBaseProps,
 } from './TodolistEditScreenBase'
+import {LoadingScreen} from '@/components/LoadingScreen'
 
 interface TodolistAddScreenBaseProps
   extends Pick<TodolistEditScreenBaseProps, 'title' | 'instruction'> {
@@ -51,12 +52,26 @@ export const useHandleAddTodo = ({
   const handleAddTodo = useCallback(
     async (todo: Partial<TodoSnapshotIn>) => {
       await tripStore.createCustomTodo(todo).then(todo => {
-        if (todo)
+        if (todo) {
+          let path = ''
+          switch (todo.type) {
+            case 'flight':
+              path = 'FlightTodoCreate'
+              break
+            case 'flightTicket':
+              path = 'FlightTicketTodoCreate'
+              break
+            default:
+              path = 'TodoCreate'
+              break
+          }
+
           navigateWithTrip('TodoCreate', {
             todoId: todo?.id,
             isInitializing: true,
             callerName,
           })
+        }
       })
     },
     [tripStore.createCustomTodo],
@@ -146,19 +161,21 @@ export const TodolistAddScreenBase = observer(
 
     return (
       <GestureHandlerRootViewWrapper>
-        <TodolistEditScreenBase
-          title={title}
-          instruction={instruction}
-          renderItem={renderItem}
-          renderSectionHeader={renderSectionHeader}
-          sections={tripStore.todolistWithPreset}
-          keyExtractor={keyExtractor}>
-          {fab}
-          <ReservationTypeDropDownBottomSheet
-            ref={bottomSheetRef}
-            callerName={callerName}
-          />
-        </TodolistEditScreenBase>
+        <LoadingScreen>
+          <TodolistEditScreenBase
+            title={title}
+            instruction={instruction}
+            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
+            sections={tripStore.todolistWithPreset}
+            keyExtractor={keyExtractor}>
+            {fab}
+            <ReservationTypeDropDownBottomSheet
+              ref={bottomSheetRef}
+              callerName={callerName}
+            />
+          </TodolistEditScreenBase>
+        </LoadingScreen>
       </GestureHandlerRootViewWrapper>
     )
   },

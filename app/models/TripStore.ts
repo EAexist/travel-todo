@@ -21,6 +21,7 @@ import {
   TodoModel,
   TodoSnapshotIn,
 } from './Todo'
+import withLoading from './withLoading'
 
 export const PresetItemModel = types
   .model('Preset')
@@ -51,6 +52,7 @@ export const TripStoreModel = types
     title: '',
     startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    // destination: types.array(withLoading(DestinationModel)),
     destination: types.array(DestinationModel),
     todoMap: types.map(TodoModel),
     todolist: types.map(types.array(types.reference(TodoModel))),
@@ -58,9 +60,16 @@ export const TripStoreModel = types
     accomodation: types.map(AccomodationItemModel),
     preset: types.map(types.array(PresetItemModel)),
     recommendedFlight: types.array(FlightModel),
+    isPending: false,
   })
   .actions(withSetPropAction)
   .actions(store => ({
+    pend() {
+      store.setProp('isPending', true)
+    },
+    rest() {
+      store.setProp('isPending', false)
+    },
     syncOrderInCategory(category: string) {
       store.todolist.get(category)?.sort((a, b) => a.orderKey - b.orderKey)
     },
@@ -155,6 +164,7 @@ export const TripStoreModel = types
     },
     async fetchPreset() {
       console.log('[Tripstore.fetchPreset]')
+      store.pend()
       api.getTodoPreset(store.id).then(response => {
         if (response.kind == 'ok') {
           const map = new Map<string, PresetSnapshotIn[]>()
@@ -168,7 +178,7 @@ export const TripStoreModel = types
             })
           })
           store.setProp('preset', Object.fromEntries(map.entries()))
-          //   store.updatePreset()
+          store.rest()
         }
       })
     },
@@ -290,9 +300,12 @@ export const TripStoreModel = types
      * Create an empty destination and fetch it with backend-generated id.
      */
     async createDestination(destination: DestinationContent) {
+      // store.addDestination({id: "0", ...destination})
+      store.pend()
       const response = await api.createDestination(store.id, destination)
       if (response.kind === 'ok') {
         store.addDestination(response.data)
+        store.rest()
       }
     },
     /**
@@ -346,9 +359,9 @@ export const TripStoreModel = types
     // },
   }))
   .views(store => ({
-    // get preset() {
-    //   return Array.from(store.preset.values())
-    // },
+    /*
+     * Trip Metadata
+     */
     get startDate() {
       return store.startDateISOString
         ? new Date(store.startDateISOString)
@@ -386,6 +399,9 @@ export const TripStoreModel = types
         ? `${date} ${monthLocale && `${monthLocale}/`}${month} ${year}`
         : '여행이 끝나는 날'
     },
+    /*
+     * Todolist
+     */
     get nonEmptysections() {
       return Array.from(store.todolist.entries())
         .filter(([category, data]) => data.length > 0)
@@ -432,6 +448,9 @@ export const TripStoreModel = types
         })
         .filter(({data}) => data.length > 0)
     },
+    /*
+     * Delete Todo
+     */
     get deleteFlaggedCompletedTrip() {
       return this.completedTrip.map(({title, data}) => {
         return {
@@ -460,6 +479,9 @@ export const TripStoreModel = types
         }
       })
     },
+    /*
+     * Add Todo Preset
+     */
     get todolistWithPreset() {
       return this.sections.map(category => {
         const addedItems = store.todolist.get(category)

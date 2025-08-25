@@ -71,7 +71,9 @@ const config = {
     TodolistReorder: 'trip/:tripId?/reorder',
 
     /*  */
-    TodoCreate: 'trip/:tripId?/todo/:todoId?/create',
+    CreateCustomTodo: 'trip/:tripId?/todo/:todoId?/createCustom',
+    CreateFlightTodo: 'trip/:tripId?/todo/:todoId?/createFlight',
+    CreateFlightTicketTodo: 'trip/:tripId?/todo/:todoId?/createFlightTicket',
     TodoEdit: 'trip/:tripId?/todo/:todoId?/edit',
     TodoTitle: 'trip/:tripId?/todo/:todoId?/title',
     TodoNote: 'trip/:tripId?/todo/:todoId?/note',
