@@ -1,18 +1,15 @@
 import {toCalendarString} from '@/utils/date'
 import {eachDayOfInterval} from 'date-fns'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {api} from '../services/api'
-import {
-  AccomodationItemModel,
-  AccomodationItemSnapshotIn,
-} from './AccomodationItem'
+import {api} from '@/services/api'
+import {AccomodationModel, AccomodationSnapshotIn} from '@/models/Accomodation'
 import {
   Destination,
   DestinationContent,
   DestinationModel,
   DestinationSnapshotIn,
-} from './Destination'
-import {withSetPropAction} from './helpers/withSetPropAction'
+} from '@/models/Destination'
+import {withSetPropAction} from '@/models/helpers/withSetPropAction'
 import {
   CATEGORY_TO_TITLE,
   FlightModel,
@@ -20,8 +17,10 @@ import {
   Todo,
   TodoModel,
   TodoSnapshotIn,
-} from './Todo'
-import withLoading from './withLoading'
+} from '@/models/Todo'
+import withLoading from '@/models/withLoading'
+import {v4 as uuidv4} from 'uuid'
+import {Accomodation} from '../Accomodation'
 
 export const PresetItemModel = types
   .model('Preset')
@@ -47,7 +46,7 @@ export const TodolistModel = types
 export const TripStoreModel = types
   .model('TripStore')
   .props({
-    id: types.identifier,
+    id: types.optional(types.identifier, () => uuidv4()),
     isInitialized: false,
     title: '',
     startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
@@ -57,7 +56,7 @@ export const TripStoreModel = types
     todoMap: types.map(TodoModel),
     todolist: types.map(types.array(types.reference(TodoModel))),
     activeItem: types.maybeNull(types.reference(TodoModel)),
-    accomodation: types.map(AccomodationItemModel),
+    accomodation: types.map(AccomodationModel),
     preset: types.map(types.array(PresetItemModel)),
     recommendedFlight: types.array(FlightModel),
     isPending: false,
@@ -82,12 +81,14 @@ export const TripStoreModel = types
     },
   }))
   .actions(store => ({
-    addTodo(todo: TodoSnapshotIn) {
+    addTodo(todoContent: Partial<Todo>) {
+      const todo = TodoModel.create(todoContent as Todo)
       store.todoMap.put(todo)
       if (!store.todolist.has(todo.category)) {
         store.todolist.set(todo.category, [])
       }
       store.todolist.get(todo.category)?.push(todo.id)
+      return todo
     },
     set(trip: TripStoreSnapshot) {
       console.log('[Tripstore.set]')
@@ -114,7 +115,7 @@ export const TripStoreModel = types
       /* Nested Object: UseSetProps */
       store.setProp('preset', trip.preset)
     },
-    setTodo(todo: TodoSnapshotIn) {
+    setTodo(todo: Todo) {
       store.todoMap.set(todo.id, todo)
     },
     /* Active Item Actions */
@@ -236,13 +237,15 @@ export const TripStoreModel = types
     /**
      * Create an empty todo and fetch it with backend-generated id.
      */
-    async createCustomTodo(todo: Partial<TodoSnapshotIn>) {
-      const response = await api.createTodo({tripId: store.id, todo})
-      if (response.kind === 'ok') {
-        const todo = response.data
-        store.addTodo(todo)
-        return store.todoMap.get(todo.id)
-      }
+    createCustomTodo(todo: Partial<Todo>) {
+      return store.addTodo(todo)
+      //   return store.todoMap.get(todo.id)
+      //   const response = await api.createTodo({tripId: store.id, todo})
+      //   if (response.kind === 'ok') {
+      //     const todo = response.data
+      //     store.addTodo(todo)
+      //     return store.todoMap.get(todo.id)
+      //   }
     },
     /**
      * Create an empty todo and fetch it with backend-generated id.
@@ -258,23 +261,26 @@ export const TripStoreModel = types
      * Patch(update) a trip.
      */
     async patchTodo(todo: Todo) {
-      const response = await api.patchTodo(store.id, todo)
-      if (response.kind === 'ok') {
-        console.log(`[patchTodo] todo=${JSON.stringify(todo)}`)
-        store.setTodo(todo)
-        return todo
-      }
+      store.setTodo(todo)
+      return todo
+      //   const response = await api.patchTodo(store.id, todo)
+      //   if (response.kind === 'ok') {
+      //     console.log(`[patchTodo] todo=${JSON.stringify(todo)}`)
+      //     store.setTodo(todo)
+      //     return todo
+      //   }
     },
     /**
      * Delete a trip.
      */
     async deleteTodo(todo: Todo) {
-      await api.deleteTodo(store.id, todo.id).then(({kind}) => {
-        if (kind == 'ok') {
-          store._deleteTodo(todo)
-          console.log('[deleteTodo]', todo)
-        }
-      })
+      store._deleteTodo(todo)
+      //   await api.deleteTodo(store.id, todo.id).then(({kind}) => {
+      //     if (kind == 'ok') {
+      //       store._deleteTodo(todo)
+      //       console.log('[deleteTodo]', todo)
+      //     }
+      //   })
     },
 
     /* Preset Actions */
@@ -300,13 +306,13 @@ export const TripStoreModel = types
      * Create an empty destination and fetch it with backend-generated id.
      */
     async createDestination(destination: DestinationContent) {
-      // store.addDestination({id: "0", ...destination})
-      store.pend()
-      const response = await api.createDestination(store.id, destination)
-      if (response.kind === 'ok') {
-        store.addDestination(response.data)
-        store.rest()
-      }
+      store.addDestination(destination)
+      //   store.pend()
+      //   const response = await api.createDestination(store.id, destination)
+      //   if (response.kind === 'ok') {
+      //     store.addDestination(response.data)
+      //     store.rest()
+      //   }
     },
     /**
      * Delete a destination.
@@ -323,34 +329,37 @@ export const TripStoreModel = types
      * Create an empty accomodation and fetch it with backend-generated id.
      */
     async createAccomodation() {
-      const response = await api.createAccomodation(store.id)
-      if (response.kind === 'ok') {
-        const accomodation = response.data as AccomodationItemSnapshotIn
-        store.accomodation.put(accomodation)
-      }
+      store.accomodation.put(AccomodationModel.create())
+      //   const response = await api.createAccomodation(store.id)
+      //   if (response.kind === 'ok') {
+      //     const accomodation = response.data as AccomodationSnapshotIn
+      //     store.accomodation.put(accomodation)
+      //   }
     },
     /**
      * Patch(update) a accomodation.
      */
-    async patchAccomodation(accomodation: AccomodationItemSnapshotIn) {
-      const response = await api.patchAccomodation(store.id, accomodation)
-      if (response.kind === 'ok')
-        store.accomodation.set(accomodation.id, accomodation)
+    async patchAccomodation(accomodation: AccomodationSnapshotIn) {
+      store.accomodation.set((accomodation as Accomodation).id, accomodation)
+      //   const response = await api.patchAccomodation(store.id, accomodation)
+      //   if (response.kind === 'ok')
+      //     store.accomodation.set(accomodation.id, accomodation)
     },
     /**
      * Delete a accomodation.
      */
-    async deleteAccomodation(item: AccomodationItemSnapshotIn) {
-      api.deleteAccomodation(store.id, item.id).then(({kind}) => {
-        if (kind == 'ok') {
-          store.accomodation.delete(item.id)
-        }
-      })
+    async deleteAccomodation(accomodation: AccomodationSnapshotIn) {
+      store.accomodation.delete((accomodation as Accomodation).id)
+      //   api.deleteAccomodation(store.id, item.id).then(({kind}) => {
+      //     if (kind == 'ok') {
+      //       store.accomodation.delete(item.id)
+      //     }
+      //   })
     },
     /**
      * Delete a accomodation.
      */
-    // async uploadReservation(item: AccomodationItemSnapshotIn) {
+    // async uploadReservation(item: AccomodationSnapshotIn) {
     //   api.deleteAccomodation(store.id, item.id).then(({kind}) => {
     //     if (kind == 'ok') {
     //       store.accomodation.delete(item.id)
@@ -545,7 +554,7 @@ export const TripStoreModel = types
   .actions(store => ({
     async initialize() {
       store.setProp('isInitialized', true)
-      await store.patch()
+      //   await store.patch()
     },
     async completeAndPatchTodo(todo: Todo) {
       todo.complete()
@@ -571,19 +580,25 @@ export const TripStoreModel = types
         (Array.from(store.preset.values()).flat() as Preset[])
           .filter(preset => preset.isFlaggedToAdd)
           .map(async preset => {
-            const response = await api.createTodo({
-              tripId: store.id,
-              todo: {
-                ...preset.todo,
-                id: undefined,
-                presetId: Number(preset.todo.id),
-              },
+            store.addTodo({
+              ...preset.todo,
+              presetId: Number(preset.todo.id),
             })
-            if (response.kind === 'ok') {
-              const todo = response.data
-              store.addTodo(todo)
-            }
             preset.setProp('isFlaggedToAdd', false)
+
+            // const response = await api.createTodo({
+            //   tripId: store.id,
+            //   todo: {
+            //     ...preset.todo,
+            //     id: undefined,
+            //     presetId: Number(preset.todo.id),
+            //   },
+            // })
+            // if (response.kind === 'ok') {
+            //   const todo = response.data
+            //   store.addTodo(todo)
+            // }
+            // preset.setProp('isFlaggedToAdd', false)
           }),
       )
       store.syncOrder()

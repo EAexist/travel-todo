@@ -1,5 +1,5 @@
 // import {GooglePlacesSearchBarInput} from '@/components/Input'
-// import {useStores} from '@/models'
+// import {useStores, useTripStore} from '@/models'
 // import {goBack} from '@/navigators'
 // import {useLingui} from '@lingui/react/macro'
 // import countryNameKrToISOJSON from 'app/utils/countryNameKrToISO.json'
@@ -63,7 +63,7 @@
 //   const {t} = useLingui()
 //   const countryNameKrToISO = countryNameKrToISOJSON as {[key: string]: string}
 
-//   const {tripStore} = useStores()
+//   const tripStore = useTripStore()
 //   //   const {navigateWithTrip} = useNavigate()
 
 //   const handlePress_ = useCallback((data: GooglePlaceData) => {

@@ -2,7 +2,7 @@ import * as Fab from '@/components/Fab'
 import {Title} from '@/components/Layout/Content'
 import {Note} from '@/components/Note'
 import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {useHeader} from '@/utils/useHeader'
 import {withTodo} from '@/utils/withTodo'
 import {Trans} from '@lingui/react/macro'
@@ -13,7 +13,7 @@ import {Avatar} from '../../components/Avatar'
 import {TransText} from '../../components/TransText'
 
 export const TodoNoteScreen = withTodo<'TodoNote'>(({todo}) => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const onBackPressBeforeNavigate = useCallback(async () => {
     tripStore.patchTodo(todo)

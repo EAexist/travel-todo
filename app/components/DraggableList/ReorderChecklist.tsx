@@ -1,4 +1,4 @@
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Todo} from '@/models/Todo'
 import {useCallback} from 'react'
 import {StyleSheet, View} from 'react-native'
@@ -14,7 +14,7 @@ import {Text} from '@rneui/themed'
 export const ReorderTrip = () => {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>()
 
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const DATA = tripStore.todolist
   const renderItem = useCallback<SortableGridRenderItem<Todo>>(

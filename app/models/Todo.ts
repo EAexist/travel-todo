@@ -1,5 +1,6 @@
 import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from './helpers/withSetPropAction'
+import {v4 as uuidv4} from 'uuid'
 
 export const CATEGORY_TO_TITLE: {[key: string]: string} = {
   reservation: '예약',
@@ -111,15 +112,16 @@ export interface PresetTodoContentSnapshotIn
 export const TodoModel = types
   .model('Todo')
   .props({
-    id: types.identifier,
+    id: types.optional(types.identifier, () => uuidv4()),
+    // id: types.identifier,
     type: types.string,
     category: types.string,
     title: types.string,
     icon: IconModel,
-    note: types.string,
+    note: types.optional(types.string, ''),
     completeDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     isFlaggedToDelete: false,
-    orderKey: types.number,
+    orderKey: types.optional(types.number, 0),
     presetId: types.maybeNull(types.number),
   })
   .actions(withSetPropAction)

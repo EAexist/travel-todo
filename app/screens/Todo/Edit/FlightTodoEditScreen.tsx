@@ -7,7 +7,7 @@ import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Airline, FlightTodo, ReservationLink} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {api} from '@/services/api'
@@ -113,7 +113,7 @@ export const FlightTodoEditScreen: FC<{
   //   const [isConfirmed, setIsConfirmed] = useState(false)
   //   const [isCompleted, setIsCompleted] = useState(false)
   const {navigateWithTrip} = useNavigate()
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   //   const [isCompleted, setIsCompleted] = useState(false)
 

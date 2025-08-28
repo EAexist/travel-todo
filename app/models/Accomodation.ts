@@ -1,14 +1,15 @@
 import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from './helpers/withSetPropAction'
 import {getNightsParsed} from '@/utils/date'
+import {v4 as uuidv4} from 'uuid'
 
 /**
  * This represents a Accomodation
  */
-export const AccomodationItemModel = types
-  .model('AccomodationItem')
+export const AccomodationModel = types
+  .model('Accomodation')
   .props({
-    id: types.identifier,
+    id: types.optional(types.identifier, () => uuidv4()),
     title: '',
     roomTitle: '',
     numberofClient: 1,
@@ -39,7 +40,7 @@ export const AccomodationItemModel = types
     toggleAddFlag() {
       item.setProp('isFlaggedToAdd', !item.isFlaggedToAdd)
     },
-    // removeFavorite(AccomodationItem: AccomodationItem) {
+    // removeFavorite(Accomodation: Accomodation) {
     //   store.favorites.remove(accomodationItem)
     // },
   }))
@@ -101,9 +102,8 @@ const timeFormatter = new Intl.DateTimeFormat('kr', {
 })
 export type AccomodationInfoProvider = string
 
-export interface AccomodationItem
-  extends Instance<typeof AccomodationItemModel> {}
-export interface AccomodationItemSnapshotOut
-  extends SnapshotOut<typeof AccomodationItemModel> {}
-export interface AccomodationItemSnapshotIn
-  extends SnapshotIn<typeof AccomodationItemModel> {}
+export interface Accomodation extends Instance<typeof AccomodationModel> {}
+export interface AccomodationSnapshotOut
+  extends SnapshotOut<typeof AccomodationModel> {}
+export interface AccomodationSnapshotIn
+  extends SnapshotIn<typeof AccomodationModel> {}

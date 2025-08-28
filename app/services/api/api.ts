@@ -5,19 +5,19 @@
  * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
  * documentation for more details.
  */
-import {AccomodationItemSnapshotIn} from '@/models/AccomodationItem'
-import {DestinationSnapshotIn} from '@/models/Destination'
+import {AccomodationSnapshotIn} from '@/models/Accomodation'
+import {Destination, DestinationSnapshotIn} from '@/models/Destination'
 import {
   ReservationSnapshot,
   ReservationStoreSnapshot,
-} from '@/models/ReservationStore'
+} from '@/models/stores/ReservationStore'
 import {Flight, FlightRoute, LocationPair, TodoSnapshotIn} from '@/models/Todo'
 import {
   PresetSnapshotIn,
   TripStore,
   TripStoreSnapshot,
-} from '@/models/TripStore'
-import {UserStoreSnapshot} from '@/models/UserStore'
+} from '@/models/stores/TripStore'
+import {UserStoreSnapshot} from '@/models/stores/UserStore'
 import {KakaoProfile} from '@react-native-seoul/kakao-login'
 import {ApiResponse, ApisauceInstance, create} from 'apisauce'
 import {
@@ -43,6 +43,7 @@ import {
 import {GeneralApiProblem, getGeneralApiProblem} from './apiProblem'
 
 type ApiResult<T> = {kind: 'ok'; data: T} | GeneralApiProblem
+export type ApiStatus = {kind: 'ok'} | GeneralApiProblem
 
 function handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
   if (!response.ok) {
@@ -520,13 +521,15 @@ export class Api {
    */
   async createDestination(
     tripId: string,
-    destination: Partial<DestinationSnapshotIn>,
-  ): Promise<ApiResult<DestinationSnapshotIn>> {
+    destination: Partial<Destination>,
+  ): Promise<ApiResult<Destination>> {
     // make the api call
-    const response: ApiResponse<DestinationSnapshotIn> =
-      await this.apisauce.post(`trip/${tripId}/destination`, destination)
+    const response: ApiResponse<Destination> = await this.apisauce.post(
+      `trip/${tripId}/destination`,
+      destination,
+    )
 
-    const handledResponse = handleResponse<DestinationSnapshotIn>(response)
+    const handledResponse = handleResponse<Destination>(response)
     console.log(JSON.stringify(handledResponse))
     return handledResponse.kind === 'ok'
       ? {
@@ -558,12 +561,12 @@ export class Api {
   /**
    * Gets a list of recent React Native Radio episodes.
    */
-  //   async getAccomodationItem(): Promise<ApiResult<AccomodationItemSnapshotIn[]>> {
-  //     const response: ApiResponse<AccomodationItemSnapshotIn[]> =
+  //   async getAccomodation(): Promise<ApiResult<AccomodationSnapshotIn[]>> {
+  //     const response: ApiResponse<AccomodationSnapshotIn[]> =
   //       await this.apisauce.get(`trip/1/accomodation`)
 
   //     const accomodationDTO =
-  //       handleResponse<AccomodationItemSnapshotIn[]>(response)
+  //       handleResponse<AccomodationSnapshotIn[]>(response)
   //     return accomodationDTO
   //   }
 
@@ -572,12 +575,12 @@ export class Api {
    */
   async createAccomodation(
     id: string,
-  ): Promise<ApiResult<Partial<AccomodationItemSnapshotIn>>> {
+  ): Promise<ApiResult<Partial<AccomodationSnapshotIn>>> {
     // make the api call
-    const response: ApiResponse<Partial<AccomodationItemSnapshotIn>> =
+    const response: ApiResponse<Partial<AccomodationSnapshotIn>> =
       await this.apisauce.get(`trip/${id}/accomodation`)
 
-    return handleResponse<Partial<AccomodationItemSnapshotIn>>(response)
+    return handleResponse<Partial<AccomodationSnapshotIn>>(response)
   }
 
   /**
@@ -587,16 +590,16 @@ export class Api {
    */
   async patchAccomodation(
     tripId: string,
-    accomodation: AccomodationItemSnapshotIn,
-  ): Promise<ApiResult<Partial<AccomodationItemSnapshotIn>>> {
-    const response: ApiResponse<Partial<AccomodationItemSnapshotIn>> =
+    accomodation: AccomodationSnapshotIn,
+  ): Promise<ApiResult<Partial<AccomodationSnapshotIn>>> {
+    const response: ApiResponse<Partial<AccomodationSnapshotIn>> =
       await this.apisauce.patch(
         `/trip/${tripId}/accomodation/${accomodation.id}`,
         accomodation,
       )
 
     const accomodationDTO =
-      handleResponse<Partial<AccomodationItemSnapshotIn>>(response)
+      handleResponse<Partial<AccomodationSnapshotIn>>(response)
     return accomodationDTO
   }
   /**

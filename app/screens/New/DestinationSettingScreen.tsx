@@ -4,7 +4,7 @@ import * as Input from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Destination, DestinationSnapshotIn} from '@/models/Destination'
 import {useNavigate} from '@/navigators'
 import {getFlagEmoji} from '@/utils/nation'
@@ -75,7 +75,7 @@ interface DestinationListItemProps {
 }
 
 const DestinationListItem: FC<DestinationListItemProps> = ({destination}) => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   const handleClosePress = useCallback(() => {
     tripStore.deleteDestination(destination)
   }, [])
@@ -93,7 +93,7 @@ const DestinationListItem: FC<DestinationListItemProps> = ({destination}) => {
   )
 }
 export const DestinationSettingScreen: FC = observer(() => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   const {t} = useLingui()
 
   const renderDestinationListItem: ListRenderItem<Destination> = useCallback(

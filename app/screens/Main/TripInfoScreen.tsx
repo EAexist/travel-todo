@@ -8,7 +8,7 @@ import {
 //
 import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {useNavigate} from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
 import {ListItemBase} from '@/components/ListItem'

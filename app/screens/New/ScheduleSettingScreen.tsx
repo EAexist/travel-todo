@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import * as Layout from '../../components/Layout'
 import {Calendar} from '@/components/Calendar'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {
   Dispatch,
   FC,
@@ -135,7 +135,7 @@ const ScheduleSettingCalendar = ({
 }
 
 export const ScheduleSettingScreen: FC = () => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   const {
     theme: {colors},
   } = useTheme()
@@ -189,7 +189,7 @@ export const ScheduleSettingScreen: FC = () => {
       dateInterval.start?.toISOString() || '',
     )
     tripStore.setProp('endDateISOString', dateInterval.end?.toISOString() || '')
-    await tripStore.patch()
+    // await tripStore.patch()
   }, [tripStore, dateInterval.start, dateInterval.end])
 
   return (

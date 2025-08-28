@@ -1,5 +1,5 @@
 import * as Fab from '@/components/Fab'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {AppStackScreenProps, useNavigate} from '@/navigators'
 import {useHeader} from '@/utils/useHeader'
 import {observer} from 'mobx-react-lite'
@@ -11,7 +11,7 @@ import {
 
 export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
   observer(({route, navigation}) => {
-    const {tripStore} = useStores()
+    const tripStore = useTripStore()
     const {navigateWithTrip} = useNavigate()
     const addFlaggedPreset = useAddFlaggedPreset()
 

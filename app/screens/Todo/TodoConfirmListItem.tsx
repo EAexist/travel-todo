@@ -1,6 +1,6 @@
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Todo} from '@/models/Todo'
 import {AppStackParamList, goBack, useNavigate} from '@/navigators'
 import {ListItem} from '@rneui/themed'

@@ -1,6 +1,9 @@
 import {createContext, useContext, useEffect, useState} from 'react'
-import {RootStore, RootStoreModel} from '../RootStore'
+import {ApiStatus, RootStore, RootStoreModel} from '@/models/stores/RootStore'
 import {setupRootStore} from './setupRootStore'
+import {configurePersistable, makePersistable} from 'mobx-persist-store'
+import {load, remove, save} from '@/utils/storage'
+import {TripStore} from '@/models/stores/TripStore'
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -14,7 +17,10 @@ import {setupRootStore} from './setupRootStore'
  * very large), you may want to use a different strategy than immediately
  * instantiating it, although that should be rare.
  */
-const _rootStore = RootStoreModel.create({})
+
+const defaultRootStore = {apiStatus: ApiStatus.IDLE}
+
+const _rootStore = RootStoreModel.create(defaultRootStore)
 
 /**
  * The RootStoreContext provides a way to access
@@ -41,6 +47,7 @@ export const RootStoreProvider = RootStoreContext.Provider
  * const { someStore, someOtherStore } = useStores()
  */
 export const useStores = () => useContext(RootStoreContext)
+export const useTripStore = () => useStores().tripStore as TripStore
 
 /**
  * Used only in the app.tsx file, this hook sets up the RootStore
@@ -84,3 +91,21 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
 
   return {rootStore, rehydrated}
 }
+
+/* Persist */
+makePersistable(_rootStore, {
+  name: 'RootStore',
+  properties: ['userStore', 'tripStore', 'reservationStore'],
+})
+
+configurePersistable({
+  storage: {
+    setItem: (key, data) => {
+      save(key, data)
+    },
+    getItem: key => load(key),
+    removeItem: key => {
+      remove(key)
+    },
+  },
+})

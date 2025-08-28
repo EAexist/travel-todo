@@ -11,7 +11,7 @@ import {useIsMounted} from '../utils/useIsMounted'
 import type {AppStackParamList, NavigationProps} from './AppNavigator'
 
 import * as storage from '../utils/storage'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {MainTabParamList} from './MainTabNavigator'
 
 type Storage = typeof storage
@@ -197,7 +197,8 @@ export function navigate(name: unknown, params?: unknown) {
   console.log(`[navigate] ${name} ${JSON.stringify(params)}`)
   if (navigationRef.isReady()) {
     // @ts-expect-error
-    navigationRef.navigate(name as never, params as never)
+    // navigationRef.navigate(name as never, params as never)
+    navigationRef.navigate(name, params)
   }
 }
 
@@ -228,10 +229,10 @@ export function useNavigate(todoId?: string) {
       ignoreTrip?: boolean,
     ) => {
       console.log(
-        `[navigateWithTrip] ${JSON.stringify(name)} ${rootStore.tripStore.id} ${JSON.stringify(params)}`,
+        `[navigateWithTrip] ${JSON.stringify(name)} ${rootStore.tripStore?.id} ${JSON.stringify(params)}`,
       )
       const _params = {
-        tripId: ignoreTrip ? undefined : rootStore.tripStore.id,
+        tripId: ignoreTrip ? undefined : rootStore.tripStore?.id,
         todoId,
       }
       const _navigate = () =>

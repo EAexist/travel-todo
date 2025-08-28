@@ -20,7 +20,7 @@ import {Header, ThemeProvider, useTheme} from '@rneui/themed'
 import {observer} from 'mobx-react-lite'
 import {ComponentProps} from 'react'
 import Config from '../config'
-import {useStores} from '../models'
+import {useStores, useTripStore} from '../models'
 import {navigationRef, useBackButtonHandler} from './navigationUtilities'
 import {FabProvider} from '@/components/Fab'
 import {LoginScreen} from '@/screens/Login/LoginScreen'
@@ -50,13 +50,12 @@ export type FlightSettingStackProps = TodoStackProps & {
 }
 
 export type AppStackParamList = {
-  // 🔥 Your screens go here
-
   /* Login */
   Login: {}
+  Welcome: {}
+  Loading: {texts?: string[]}
 
   /* Create Trip */
-  Welcome: {}
   DestinationSetting: TripStackProps
   DestinationSearch: TripStackProps
   ScheduleSetting: TripStackProps
@@ -150,120 +149,114 @@ const AppStack = observer(function AppStack() {
         },
       }}
       initialRouteName={isAuthenticated ? 'Welcome' : 'Login'}>
-      {isAuthenticated ? (
-        <>
-          <Stack.Group>
-            <Stack.Screen name="Welcome" component={Screens.New.Welcome} />
-            <Stack.Screen
-              name="DestinationSetting"
-              component={Screens.New.DestinationSetting}
-            />
-            <Stack.Screen
-              name="ScheduleSetting"
-              component={Screens.New.ScheduleSetting}
-            />
-            <Stack.Screen
-              name="DestinationSearch"
-              component={Screens.New.DestinationSearch}
-            />
-            <Stack.Screen
-              name="TitleSetting"
-              component={Screens.New.TitleSetting}
-            />
-            <Stack.Screen
-              name="TodolistSetting"
-              component={Screens.New.TodolistSetting}
-            />
-          </Stack.Group>
-          <Stack.Screen name="Main" component={MainTabNavigator} />
-          <Stack.Group>
-            <Stack.Screen name="TodolistAdd" component={Screens.Todolist.Add} />
-            <Stack.Screen
-              name="TodolistReorder"
-              component={Screens.Todolist.Reorder}
-            />
-            <Stack.Screen
-              name="TodolistDelete"
-              component={Screens.Todolist.Delete}
-            />
-          </Stack.Group>
-          <Stack.Screen
-            name="ConfirmPassport"
-            component={Screens.Confirm.Passport}
-          />
-          <Stack.Screen
-            name="ConfirmFlight"
-            component={Screens.Confirm.Flight}
-          />
-          <Stack.Screen
-            name="ConfirmFlightTicket"
-            component={Screens.Confirm.FlightTicket}
-          />
-          <Stack.Screen
-            name="AccomodationPlan"
-            component={Screens.Accomodation.Plan}
-          />
-          <Stack.Screen
-            name="Accomodation"
-            component={Screens.Accomodation.Detail}
-          />
-          <Stack.Screen
-            name="AccomodationNote"
-            component={Screens.Accomodation.Note}
-          />
-          <Stack.Screen
-            name="CreateAccomodation"
-            component={Screens.Accomodation.Create}
-          />
-          <Stack.Screen
-            name="CreateCustomTodo"
-            component={Screens.Todo.Create.Custom}
-          />
-          <Stack.Screen
-            name="CreateFlightTodo"
-            component={Screens.Todo.Create.Flight}
-          />
-          <Stack.Screen
-            name="CreateFlightTicketTodo"
-            component={Screens.Todo.Create.FlightTicket}
-          />
-          <Stack.Screen name="TodoEdit" component={Screens.Todo.Edit} />
-          <Stack.Screen name="TodoNote" component={Screens.Todo.Note} />
-          <Stack.Screen name="TodoTitle" component={Screens.Todo.Title} />
-          <Stack.Screen
-            name="DepartureAirportSetting"
-            component={Screens.Todo.Flight.DepartureAirportSetting}
-          />
-          <Stack.Screen
-            name="ArrivalAirportSetting"
-            component={Screens.Todo.Flight.ArrivalAirportSetting}
-          />
-          <Stack.Screen
-            name="DepartureAirportEdit"
-            component={Screens.Todo.Flight.DepartureAirportEdit}
-          />
-          <Stack.Screen
-            name="ArrivalAirportEdit"
-            component={Screens.Todo.Flight.ArrivalAirportEdit}
-          />
-          <Stack.Screen
-            name="RoundTripSetting"
-            component={Screens.Todo.Flight.RoundTripSetting}
-          />
-          <>
-            <Stack.Screen
-              name="FullScreenImage"
-              component={Screens.Reservation.FullScreenImage}
-            />
-          </>
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          {/* <Stack.Screen name="Flight" component={LoginScreen} /> */}
-        </>
-      )}
-
+      <Stack.Screen name="Loading" component={Screens.Loading} />
+      <Stack.Group>
+        <Stack.Screen name="Welcome" component={Screens.New.Welcome} />
+        <Stack.Screen
+          name="DestinationSetting"
+          component={Screens.New.DestinationSetting}
+        />
+        <Stack.Screen
+          name="ScheduleSetting"
+          component={Screens.New.ScheduleSetting}
+        />
+        <Stack.Screen
+          name="DestinationSearch"
+          component={Screens.New.DestinationSearch}
+        />
+        <Stack.Screen
+          name="TitleSetting"
+          component={Screens.New.TitleSetting}
+        />
+        <Stack.Screen
+          name="TodolistSetting"
+          component={Screens.New.TodolistSetting}
+        />
+      </Stack.Group>
+      <Stack.Group>
+        <Stack.Screen name="Main" component={MainTabNavigator} />
+      </Stack.Group>
+      <Stack.Group>
+        <Stack.Screen name="TodolistAdd" component={Screens.Todolist.Add} />
+        <Stack.Screen
+          name="TodolistReorder"
+          component={Screens.Todolist.Reorder}
+        />
+        <Stack.Screen
+          name="TodolistDelete"
+          component={Screens.Todolist.Delete}
+        />
+      </Stack.Group>
+      <Stack.Screen
+        name="ConfirmPassport"
+        component={Screens.Confirm.Passport}
+      />
+      <Stack.Screen name="ConfirmFlight" component={Screens.Confirm.Flight} />
+      <Stack.Screen
+        name="ConfirmFlightTicket"
+        component={Screens.Confirm.FlightTicket}
+      />
+      <Stack.Screen
+        name="AccomodationPlan"
+        component={Screens.Accomodation.Plan}
+      />
+      <Stack.Screen
+        name="Accomodation"
+        component={Screens.Accomodation.Detail}
+      />
+      <Stack.Screen
+        name="AccomodationNote"
+        component={Screens.Accomodation.Note}
+      />
+      <Stack.Screen
+        name="CreateAccomodation"
+        component={Screens.Accomodation.Create}
+      />
+      <Stack.Screen
+        name="CreateCustomTodo"
+        component={Screens.Todo.Create.Custom}
+      />
+      <Stack.Screen
+        name="CreateFlightTodo"
+        component={Screens.Todo.Create.Flight}
+      />
+      <Stack.Screen
+        name="CreateFlightTicketTodo"
+        component={Screens.Todo.Create.FlightTicket}
+      />
+      <Stack.Screen name="TodoEdit" component={Screens.Todo.Edit} />
+      <Stack.Screen name="TodoNote" component={Screens.Todo.Note} />
+      <Stack.Screen name="TodoTitle" component={Screens.Todo.Title} />
+      <Stack.Screen
+        name="DepartureAirportSetting"
+        component={Screens.Todo.Flight.DepartureAirportSetting}
+      />
+      <Stack.Screen
+        name="ArrivalAirportSetting"
+        component={Screens.Todo.Flight.ArrivalAirportSetting}
+      />
+      <Stack.Screen
+        name="DepartureAirportEdit"
+        component={Screens.Todo.Flight.DepartureAirportEdit}
+      />
+      <Stack.Screen
+        name="ArrivalAirportEdit"
+        component={Screens.Todo.Flight.ArrivalAirportEdit}
+      />
+      <Stack.Screen
+        name="RoundTripSetting"
+        component={Screens.Todo.Flight.RoundTripSetting}
+      />
+      <Stack.Screen
+        name="FullScreenImage"
+        component={Screens.Reservation.FullScreenImage}
+      />
+      {/* Loading
+      <Stack.Screen name="Loading" component={Screens.Loading} /> */}
+      <>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        {/* <Stack.Screen name="Flight" component={LoginScreen} /> */}
+      </>
       {/** 🔥 Your screens go here */}
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>

@@ -5,7 +5,7 @@
 // import {Screen} from '@/components/Screen'
 // import {TextInfoListItem} from '@/components/TextInfoListItem'
 // import {TransText} from '@/components/TransText'
-// import {useStores} from '@/models'
+// import {useStores, useTripStore} from '@/models'
 // import {Todo} from '@/models/Todo'
 // import {AppStackParamList, goBack, useNavigate} from '@/navigators'
 // import {useHeader} from '@/utils/useHeader'
@@ -91,7 +91,7 @@
 //   //   const [isConfirmed, setIsConfirmed] = useState(false)
 //   //   const [isCompleted, setIsCompleted] = useState(false)
 //   const {navigateWithTrip} = useNavigate()
-//   const {tripStore} = useStores()
+//   const tripStore = useTripStore()
 
 //   //   const [isCompleted, setIsCompleted] = useState(false)
 
@@ -214,7 +214,7 @@
 //   //   const [isConfirmed, setIsConfirmed] = useState(false)
 //   //   const [isCompleted, setIsCompleted] = useState(false)
 //   const {navigateWithTrip} = useNavigate()
-//   const {tripStore} = useStores()
+//   const tripStore = useTripStore()
 
 //   //   const [isCompleted, setIsCompleted] = useState(false)
 

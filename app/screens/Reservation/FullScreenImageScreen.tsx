@@ -2,7 +2,7 @@ import {FC} from 'react'
 import {ScrollView} from 'react-native'
 //
 import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {AppStackScreenProps} from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
 import {Image} from '@rneui/themed'

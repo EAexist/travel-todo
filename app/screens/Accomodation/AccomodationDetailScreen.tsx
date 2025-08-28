@@ -4,8 +4,8 @@ import SectionHeader from '@/components/SectionHeader'
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {ThirdpartyAvatar} from '@/components/ThirdpartyAvatar'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
-import {AccomodationInfoProvider} from '@/models/AccomodationItem'
+import {useStores, useTripStore} from '@/models'
+import {AccomodationInfoProvider} from '@/models/Accomodation'
 import {AppStackScreenProps, useNavigate} from '@/navigators'
 import {ListItemChevron} from '@rneui/base/dist/ListItem/ListItem.Chevron'
 import {Divider, Text} from '@rneui/themed'
@@ -18,7 +18,7 @@ interface AccomodationDetailScreenProps
 
 export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
   observer(({route}) => {
-    const {tripStore} = useStores()
+    const tripStore = useTripStore()
     // useEffect(() => {
     //   tripStore.fetchAccomodation().then(() => {
     //     console.log(tripStore)

@@ -6,9 +6,9 @@ import BottomSheetModal, {
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import {AddPresetTodo, AddTodo, TodoBase} from '@/components/Todo'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Todo, TodoSnapshotIn} from '@/models/Todo'
-import {Preset} from '@/models/TripStore'
+import {Preset} from '@/models/stores/TripStore'
 import {useNavigate} from '@/navigators'
 import BottomSheet from '@gorhom/bottom-sheet'
 import {ListItem} from '@rneui/themed'
@@ -25,7 +25,7 @@ import {
 import TodolistEditScreenBase, {
   TodolistEditScreenBaseProps,
 } from './TodolistEditScreenBase'
-import {LoadingScreen} from '@/components/LoadingScreen'
+import {LoadingScreen} from '@/screens/LoadingScreen'
 
 interface TodolistAddScreenBaseProps
   extends Pick<TodolistEditScreenBaseProps, 'title' | 'instruction'> {
@@ -35,7 +35,7 @@ interface TodolistAddScreenBaseProps
 }
 
 export const useAddFlaggedPreset = () => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   const addFlaggedPreset = useCallback(async () => {
     await tripStore.addFlaggedPreset()
   }, [tripStore])
@@ -47,32 +47,31 @@ export const useHandleAddTodo = ({
 }: {
   callerName?: 'TodolistSetting' | 'TodolistAdd'
 }) => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   const {navigateWithTrip} = useNavigate()
   const handleAddTodo = useCallback(
-    async (todo: Partial<TodoSnapshotIn>) => {
-      await tripStore.createCustomTodo(todo).then(todo => {
-        if (todo) {
-          let path = ''
-          switch (todo.type) {
-            case 'flight':
-              path = 'FlightTodoCreate'
-              break
-            case 'flightTicket':
-              path = 'FlightTicketTodoCreate'
-              break
-            default:
-              path = 'TodoCreate'
-              break
-          }
-
-          navigateWithTrip('TodoCreate', {
-            todoId: todo?.id,
-            isInitializing: true,
-            callerName,
-          })
+    (todo: Partial<TodoSnapshotIn>) => {
+      todo = tripStore.createCustomTodo(todo)
+      if (todo) {
+        let path = ''
+        switch (todo.type) {
+          case 'flight':
+            path = 'FlightTodoCreate'
+            break
+          case 'flightTicket':
+            path = 'FlightTicketTodoCreate'
+            break
+          default:
+            path = 'TodoCreate'
+            break
         }
-      })
+
+        navigateWithTrip('TodoCreate', {
+          todoId: todo?.id,
+          isInitializing: true,
+          callerName,
+        })
+      }
     },
     [tripStore.createCustomTodo],
   )
@@ -89,14 +88,13 @@ export const TodolistAddScreenBase = observer(
     tripId,
     callerName,
   }: TodolistAddScreenBaseProps) => {
-    const rootStore = useStores()
-    const {tripStore} = rootStore
+    const tripStore = useTripStore()
 
     useEffect(() => {
       async function fetchPreset() {
-        if (tripStore.id === '') {
-          await rootStore.fetchTrip(tripId)
-        }
+        // if (tripStore.id === '') {
+        //   await rootStore.fetchTrip(tripId)
+        // }
         await tripStore.fetchPreset()
       }
       fetchPreset().then(() => {

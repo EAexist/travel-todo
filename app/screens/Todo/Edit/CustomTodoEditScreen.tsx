@@ -8,7 +8,7 @@ import ContentTitle, {Title} from '@/components/Layout/Content'
 import {Screen} from '@/components/Screen'
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {CATEGORY_TO_TITLE, Icon, Todo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {useHeader} from '@/utils/useHeader'
@@ -31,7 +31,7 @@ export const CustomTodoEditScreen: FC<{
   const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
   const iconBottomSheetModalRef = useRef<BottomSheetModal>(null)
   const {navigateWithTrip} = useNavigate()
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const handleCompletePress = useCallback(() => {
     if (!todo.isCompleted) todo.complete()

@@ -1,10 +1,10 @@
 import {googlePlacesAutocompleteConfig} from '@/components/GooglePlacesAutocompleteConfig'
 import {GooglePlacesSearchBarInput} from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import {LoadingScreen} from '@/components/LoadingScreen'
+import {LoadingScreen} from '@/screens/LoadingScreen'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {DestinationSnapshotIn} from '@/models/Destination'
 import {goBack} from '@/navigators'
 import {rtrim} from '@/utils'
@@ -53,7 +53,7 @@ const GooglePlacesSearchBar = () => {
 
   const {t} = useLingui()
 
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
   //   const {navigateWithTrip} = useNavigate()
 
   const handlePress = useCallback((data: GooglePlaceData) => {
@@ -93,7 +93,7 @@ const GooglePlacesSearchBar = () => {
   )
 }
 export const DestinationSearchScreen: FC = () => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const titleText = tripStore.isDestinationSet ? (
     <TransText h2>
