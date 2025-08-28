@@ -105,3 +105,4 @@ dist/
 
 app/.deprecated
 package-lock.json
+*.pem
