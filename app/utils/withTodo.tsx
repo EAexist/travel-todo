@@ -1,4 +1,4 @@
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {FlightTodo, Todo} from '@/models/Todo'
 import {
   AppStackParamList,
@@ -14,7 +14,7 @@ export const withTodo = <T extends keyof TodoAppStackParamList>(
   }>,
 ) => {
   const Component: FC<AppStackScreenProps<T>> = ({route: {params}}) => {
-    const {tripStore} = useStores()
+    const tripStore = useTripStore()
     const todo = params?.todoId
       ? tripStore.todoMap.get(params?.todoId)
       : undefined
@@ -34,7 +34,7 @@ export const withFlightTodo = <T extends keyof TodoAppStackParamList>(
   }>,
 ) => {
   const Component: FC<AppStackScreenProps<T>> = ({route: {params}}) => {
-    const {tripStore} = useStores()
+    const tripStore = useTripStore()
     const todo = params?.todoId
       ? tripStore.todoMap.get(params?.todoId)
       : undefined

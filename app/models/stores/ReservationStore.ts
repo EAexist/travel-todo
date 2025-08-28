@@ -1,19 +1,20 @@
 import {api} from '@/services/api'
 import {copyImageToLocalStorage} from '@/utils/storage'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {withSetPropAction} from './helpers/withSetPropAction'
-import {TripStoreModel} from './TripStore'
-import {AccomodationItemModel} from './AccomodationItem'
+import {TripStoreModel} from '@/models/stores/TripStore'
+import {AccomodationModel} from '@/models/Accomodation'
+import {withSetPropAction} from '@/models/helpers/withSetPropAction'
+import {v4 as uuidv4} from 'uuid'
 
 export const ReservationModel = types.model('Reservation').props({
-  id: types.identifier,
+  id: types.optional(types.identifier, () => uuidv4()),
   dateTimeISOString: types.string,
   type: types.string,
   title: types.string,
   link: types.maybeNull(types.string),
   localAppStorageFileUri: types.maybeNull(types.string),
   serverFileUri: types.maybeNull(types.string),
-  accomodation: types.maybeNull(types.reference(AccomodationItemModel)),
+  accomodation: types.maybeNull(types.reference(AccomodationModel)),
 })
 export interface Reservation extends Instance<typeof ReservationModel> {}
 export interface ReservationSnapshot

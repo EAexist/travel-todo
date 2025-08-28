@@ -1,13 +1,13 @@
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {FC, useCallback} from 'react'
 import {TitleSettingScreenBase} from './TitleSettingScreenBase'
 
 export const TripTitleSettingScreen: FC = () => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const handleNextPress = useCallback(async (value: string) => {
     tripStore.setProp('title', value)
-    await tripStore.patch()
+    // await tripStore.patch()
   }, [])
 
   return (

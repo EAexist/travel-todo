@@ -1,4 +1,4 @@
-import {AccomodationInfoProvider} from '@/models/AccomodationItem'
+import {AccomodationInfoProvider} from '@/models/Accomodation'
 import {Avatar, AvatarProps, ListItem} from '@rneui/themed'
 import {useCallback} from 'react'
 import {

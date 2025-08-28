@@ -3,7 +3,7 @@ import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {Flight, Location, LocationPair, Todo} from '@/models/Todo'
 import {AppStackScreenProps, goBack, useNavigate} from '@/navigators'
 import {useTodo} from '@/utils/useTodo'
@@ -44,7 +44,7 @@ import {Observer} from 'mobx-react-lite'
 
 const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
   ({todo, params: {callerName}}) => {
-    const {tripStore} = useStores()
+    const tripStore = useTripStore()
     const {navigateWithTrip} = useNavigate()
 
     useEffect(() => {

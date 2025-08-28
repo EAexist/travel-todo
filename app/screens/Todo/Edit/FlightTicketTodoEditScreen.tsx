@@ -5,7 +5,7 @@ import {Title} from '@/components/Layout/Content'
 import {Screen} from '@/components/Screen'
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {FlightTodo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {ListItem} from '@rneui/themed'
@@ -22,7 +22,7 @@ export const FlightTicketTodoEditScreen: FC<{
   isBeforeInitialization?: boolean
 }> = observer(({todo, isBeforeInitialization = false}) => {
   const {navigateWithTrip} = useNavigate()
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   useEffect(() => {
     console.log('Hello [FlightTicketTodoEditScreen]')

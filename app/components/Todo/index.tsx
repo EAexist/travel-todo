@@ -1,4 +1,4 @@
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {PresetTodoContent, Todo} from '@/models/Todo'
 import {Preset} from '@/models/TripStore'
 import {useNavigate} from '@/navigators'
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
 export const CompleteTodo: FC<{todo: Todo}> = observer(({todo}) => {
   const displayDelay = 500
   const {navigateWithTrip} = useNavigate()
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const [displayComplete, setDisplayComplete] = useState(todo.isCompleted)
 
@@ -238,7 +238,7 @@ export const CompleteTodo: FC<{todo: Todo}> = observer(({todo}) => {
 })
 
 // export const PassportTodo: FC<{todo: Todo}> = ({todo}) => {
-//   const {tripStore} = useStores()
+//   const tripStore = useTripStore()
 
 //   const handleCompletePress = useCallback(() => {
 //     if(todo.isCompleted)

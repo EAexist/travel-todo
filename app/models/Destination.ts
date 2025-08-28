@@ -1,10 +1,11 @@
 import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from './helpers/withSetPropAction'
+import {v4 as uuidv4} from 'uuid'
 
 export const DestinationModel = types
   .model('Destination')
   .props({
-    id: types.identifier,
+    id: types.optional(types.identifier, () => uuidv4()),
     description: types.string,
     countryISO: types.string,
     title: types.string,

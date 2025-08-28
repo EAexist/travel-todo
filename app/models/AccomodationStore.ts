@@ -3,21 +3,18 @@ import {eachDayOfInterval} from 'date-fns'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
 import {MarkedDates} from 'react-native-calendars/src/types'
 import {api} from '../services/api'
-import {
-  AccomodationItemModel,
-  AccomodationItemSnapshotIn,
-} from './AccomodationItem'
+import {AccomodationModel, AccomodationSnapshotIn} from './Accomodation'
 import {withSetPropAction} from './helpers/withSetPropAction'
 
 export const AccomodationStoreModel = types
   .model('AccomodationStore')
   .props({
-    accomodation: types.map(AccomodationItemModel),
+    accomodation: types.map(AccomodationModel),
   })
   .actions(withSetPropAction)
   .actions(store => ({
     // async fetchAccomodation() {
-    //   const response = await api.getAccomodationItem()
+    //   const response = await api.getAccomodation()
     //   if (response.kind === 'ok') {
     //     // store.setProp('id', response.id)
     //     // console.log(
@@ -62,10 +59,10 @@ export const AccomodationStoreModel = types
     //     )
     //   }
     // },
-    // add(item: AccomodationItem) {
+    // add(item: Accomodation) {
     //   store.accomodation.push(item)
     // },
-    // remove(item: AccomodationItem) {
+    // remove(item: Accomodation) {
     //   store.accomodation.remove(item)
     // },
   }))
@@ -172,7 +169,7 @@ export const AccomodationStoreModel = types
     // get AccomodationForList() {
     //   return store.favoritesOnly ? store.favorites : store.Accomodation
     // },
-    // hasFavorite(item: AccomodationItem) {
+    // hasFavorite(item: Accomodation) {
     //   return store.favorites.includes(accomodationItem)
     // },
   }))
@@ -180,7 +177,7 @@ export const AccomodationStoreModel = types
     // setPreset() {
     //   store.setProp('_presets', [])
     // },
-    // toggleFavorite(item: AccomodationItem) {
+    // toggleFavorite(item: Accomodation) {
     //   if (store.hasFavorite(accomodationItem)) {
     //     store.removeFavorite(accomodationItem)
     //   } else {

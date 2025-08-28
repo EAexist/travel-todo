@@ -2,12 +2,12 @@ import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
-import {useStores} from '@/models'
+import {useStores, useTripStore} from '@/models'
 import {withTodo} from '@/utils/withTodo'
 import {useCallback} from 'react'
 
 export const ConfirmPassportScreen = withTodo<'ConfirmPassport'>(({todo}) => {
-  const {tripStore} = useStores()
+  const tripStore = useTripStore()
 
   const confirmCompleteTodo = useCallback(async () => {
     tripStore.completeAndPatchTodo(todo)
