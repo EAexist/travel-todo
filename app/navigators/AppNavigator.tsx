@@ -55,6 +55,8 @@ export type AppStackParamList = {
   Welcome: {}
   Loading: {texts?: string[]}
 
+  EditTrip: TripStackProps
+
   /* Create Trip */
   DestinationSetting: TripStackProps
   DestinationSearch: TripStackProps

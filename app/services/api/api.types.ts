@@ -1,12 +1,12 @@
-import {AccomodationSnapshotIn} from '@/models/Accomodation'
-import {DestinationSnapshotIn} from '@/models/Destination'
-import {PresetTodoContentSnapshotIn, Todo, TodoSnapshotIn} from '@/models/Todo'
+import {Accomodation, AccomodationSnapshotIn} from '@/models/Accomodation'
+import {Destination, DestinationSnapshotIn} from '@/models/Destination'
 import {
-  TripStoreSnapshot,
-  Preset,
-  TripStore,
-  PresetSnapshotIn,
-} from '@/models/stores/TripStore'
+  PresetTodoContentSnapshotIn,
+  Todo,
+  TodoPreset,
+  TodoSnapshotIn,
+} from '@/models/Todo'
+import {TripStoreSnapshot, TripStore} from '@/models/stores/TripStore'
 import {UserStoreSnapshot} from '@/models/stores/UserStore'
 import {User} from '@react-native-google-signin/google-signin'
 import {ApisauceConfig} from 'apisauce'
@@ -50,10 +50,9 @@ import {getSnapshot} from 'mobx-state-tree'
 // }
 // export type GoogleUserDTO = Omit<User, 'scopes' | 'serverAuthCode'>
 
-
 export type GoogleUserDTO = User['user']
 
-export interface DestinationDTO extends Omit<DestinationSnapshotIn, 'id'> {
+export interface DestinationDTO extends Omit<Destination, 'id'> {
   id?: number
 }
 
@@ -75,7 +74,7 @@ export const mapToUserAccount: (
 }
 
 export const mapToDestinationDTO: (
-  destination: DestinationSnapshotIn,
+  destination: Destination,
 ) => DestinationDTO = destination => ({
   ...destination,
   id: destination.id ? Number(destination.id) : undefined,
@@ -83,7 +82,7 @@ export const mapToDestinationDTO: (
 
 export const mapToDestination: (
   destination: DestinationDTO,
-) => DestinationSnapshotIn = destination => {
+) => Destination = destination => {
   if (destination.id)
     return {
       ...destination,
@@ -92,8 +91,7 @@ export const mapToDestination: (
   else throw Error
 }
 
-export interface TodoDTO
-  extends Omit<TodoSnapshotIn, 'id' | 'isFlaggedToDelete'> {
+export interface TodoDTO extends Omit<Todo, 'id' | 'isFlaggedToDelete'> {
   id?: number
 }
 
@@ -102,7 +100,7 @@ export interface CreateTodoDTO extends Omit<TodoDTO, 'id'> {
 }
 
 export const mapToTodoDTO: (
-  todo: TodoSnapshotIn,
+  todo: Todo,
   //   orderKey?: number,
   //   trip_id?: number,
 ) => TodoDTO = todo => ({
@@ -116,9 +114,7 @@ export const mapToTodoDTO: (
 export const mapToTodo: (todo: TodoDTO) => Partial<TodoSnapshotIn> = todo => ({
   ...todo,
   id: todo.id?.toString(),
-  title: todo.title || '',
   note: todo.note || '',
-  icon: todo.icon || '',
   isFlaggedToDelete: false,
 })
 
@@ -129,7 +125,7 @@ export interface TripDTO
   > {
   id: number
   todolist: TodoDTO[]
-  accomodation: AccomodationSnapshotIn[]
+  accomodation: Accomodation[]
   destination: DestinationDTO[]
 }
 
@@ -139,7 +135,7 @@ export const mapToTripDTO: (trip: TripStore) => TripDTO = trip => ({
   todolist: Array.from(trip.todolist.values())
     .map(todolist => {
       return todolist.map((todo, index) =>
-        mapToTodoDTO(trip.todoMap.get(todo.id) as TodoSnapshotIn),
+        mapToTodoDTO(trip.todoMap.get(todo.id) as Todo),
       )
     })
     .flat(),
@@ -148,7 +144,9 @@ export const mapToTripDTO: (trip: TripStore) => TripDTO = trip => ({
 })
 
 export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
-  const categories = [...new Set(tripDTO.todolist.map(todo => todo.category))]
+  const categories = [
+    ...new Set(tripDTO.todolist.map(todo => todo.content.category)),
+  ]
   return {
     ...tripDTO,
     id: tripDTO.id.toString(),
@@ -159,7 +157,7 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
     }, {}),
     todolist: categories.reduce((acc: {[key: string]: any}, category) => {
       acc[category] = tripDTO.todolist
-        .filter(todo => todo.category === category)
+        .filter(todo => todo.content.category === category)
         .toSorted((a, b) => (a.orderKey as number) - (b.orderKey as number))
         .map(todo => todo.id?.toString())
       return acc
@@ -176,12 +174,11 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
       .map(dest => mapToDestination(dest)),
   }
 }
-
-export const mapToPreset: (preset: PresetDTO) => PresetSnapshotIn = preset => ({
+export const mapToPreset: (preset: PresetDTO) => TodoPreset = preset => ({
   ...preset,
-  todo: {
-    ...preset.todo,
-    id: preset.todo.id.toString(),
+  todoContent: {
+    ...preset.todoContent,
+    id: preset.todoContent.id.toString(),
   },
 })
 
@@ -189,11 +186,11 @@ export type WithStatus<T> = T & {
   status: string
 }
 
-export interface PresetDTO extends Omit<PresetSnapshotIn, 'todo'> {
-  todo: PresetTodoConentDTO
+export interface PresetDTO extends Omit<TodoPreset, 'todoContent'> {
+  todoContent: PresetTodoContentDTO
 }
 
-export interface PresetTodoConentDTO
+export interface PresetTodoContentDTO
   extends Omit<PresetTodoContentSnapshotIn, 'id'> {
   id: number
 }

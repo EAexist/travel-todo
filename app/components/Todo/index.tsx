@@ -1,8 +1,8 @@
-import {useStores, useTripStore} from '@/models'
-import {PresetTodoContent, Todo} from '@/models/Todo'
-import {Preset} from '@/models/TripStore'
+import {useTripStore} from '@/models'
+import {Todo, TodoPreset} from '@/models/Todo'
 import {useNavigate} from '@/navigators'
 import {Trans} from '@lingui/react/macro'
+import {useFocusEffect} from '@react-navigation/native'
 import {Icon, ListItem, ListItemProps, useTheme} from '@rneui/themed'
 import {observer} from 'mobx-react-lite'
 import {FC, ReactNode, useCallback, useEffect, useState} from 'react'
@@ -15,7 +15,6 @@ import {
 } from 'react-native'
 import {Avatar, AvatarProps} from '../Avatar'
 import {ListItemCaption} from '../ListItemCaption'
-import {useFocusEffect} from '@react-navigation/native'
 
 interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
   title: string
@@ -81,13 +80,14 @@ export const AddTodo: FC<{todo: Todo}> = ({todo}) => {
           : undefined
       }
       onPress={handlePress}
+      title={todo.title}
+      icon={todo.icon}
       // useDisabledStyle
-      {...todo}
     />
   )
 }
 
-export const AddPresetTodo: FC<{preset: Preset}> = observer(({preset}) => {
+export const AddPresetTodo: FC<{preset: TodoPreset}> = observer(({preset}) => {
   const handlePress = useCallback(() => {
     preset.toggleAddFlag()
   }, [preset])
@@ -112,7 +112,8 @@ export const AddPresetTodo: FC<{preset: Preset}> = observer(({preset}) => {
         avatarProps: {avatarStyle: styles.disabled},
         contentStyle: styles.disabled,
       })}
-      {...preset.todo}
+      title={preset.todoContent.title}
+      icon={preset.todoContent.icon}
     />
   )
 })
@@ -232,7 +233,8 @@ export const CompleteTodo: FC<{todo: Todo}> = observer(({todo}) => {
             : undefined
       }
       onPress={handlePress}
-      {...todo}
+      title={todo.title}
+      icon={todo.icon}
     />
   )
 })
@@ -278,7 +280,8 @@ export const AccomodationTodo: FC<{todo: Todo}> = ({todo}) => {
     <TodoBase
       rightContent={<ListItem.Chevron size={32} onPress={handlePress} />}
       onPress={handlePress}
-      {...todo}
+      title={todo.title}
+      icon={todo.icon}
     />
   )
 }
@@ -294,7 +297,8 @@ export const ReorderTodo: FC<{todo: Todo}> = ({todo}) => {
             : undefined
       }
       rightContent={<ListItem.Chevron name="drag-handle" type="material" />}
-      {...todo}
+      title={todo.title}
+      icon={todo.icon}
     />
   )
 }
@@ -344,7 +348,8 @@ export const DeleteTodo: FC<{todo: Todo}> = observer(({todo}) => {
         avatarStyle: styles.disabled,
         contentStyle: styles.disabled,
       })}
-      {...todo}
+      title={todo.title}
+      icon={todo.icon}
     />
   )
 })

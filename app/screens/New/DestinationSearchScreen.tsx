@@ -107,11 +107,9 @@ export const DestinationSearchScreen: FC = () => {
   )
 
   return (
-    <LoadingScreen>
-      <Screen>
-        <ContentTitle title={titleText} />
-        <GooglePlacesSearchBar />
-      </Screen>
-    </LoadingScreen>
+    <Screen>
+      <ContentTitle title={titleText} />
+      <GooglePlacesSearchBar />
+    </Screen>
   )
 }

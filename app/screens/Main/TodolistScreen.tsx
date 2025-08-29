@@ -1,30 +1,28 @@
-import {Trans} from '@lingui/react/macro'
-import {Divider, Icon, ListItem, Text} from '@rneui/themed'
-import {FC, RefObject, useCallback, useEffect, useRef} from 'react'
+import {Divider} from '@rneui/themed'
+import {FC, useCallback, useRef} from 'react'
 import {
   DefaultSectionT,
-  FlatList,
-  ListRenderItem,
   ScrollView,
   SectionList,
   SectionListRenderItem,
-  StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
 //
-import {
-  BottomSheetModal,
-  useNavigationBottomSheet,
-} from '@/components/BottomSheetModal'
+import {BottomSheetModal} from '@/components/BottomSheetModal'
+import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
 import ListSubheader from '@/components/ListSubheader'
+import {
+  NavigateMenuBottomSheet,
+  NavigateMenuData,
+} from '@/components/NavigateMenuBottomSheet'
 import {Screen} from '@/components/Screen'
+import SectionHeader from '@/components/SectionHeader'
 import {AccomodationTodo, CompleteTodo} from '@/components/Todo'
-import {useStores, useTripStore} from '@/models'
+import {useTripStore} from '@/models'
 import {Todo} from '@/models/Todo'
-import {useNavigate} from '@/navigators'
 import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
-import {useHeader} from '@/utils/useHeader'
+import {useMainScreenHeader} from '@/utils/useHeader'
 import {Observer, observer} from 'mobx-react-lite'
 
 // const SettingsDialog: FC = ({ visible6: boolean }) => {
@@ -54,9 +52,8 @@ import {Observer, observer} from 'mobx-react-lite'
 // }
 
 export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
-  ({route}) => {
-    const rootStore = useStores()
-    const {tripStore} = rootStore
+  ({}) => {
+    const tripStore = useTripStore()
 
     // const { tripId } = route.params
 
@@ -88,40 +85,30 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
       [],
     )
 
-    /* SettingList */
-
-    const settingsDropDownBottomSheetRef = useRef<BottomSheetModal>(null)
+    /* Settings Menu */
+    const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
     const handleSettingsButtonPress = useCallback(() => {
-      settingsDropDownBottomSheetRef.current?.present()
-    }, [settingsDropDownBottomSheetRef])
+      settingsMenuBottomSheetRef.current?.present()
+    }, [settingsMenuBottomSheetRef])
 
-    useHeader({
-      backButtonShown: false,
-      leftComponent: (
-        <TouchableOpacity style={{flexDirection: 'row'}}>
-          <Text
-            ellipsizeMode="tail"
-            numberOfLines={1}
-            h2
-            h2Style={{lineHeight: 40}}>
-            {tripStore.title}
-          </Text>
-          <View style={styles.headerRightButton}>
-            <Icon name="arrow-drop-down" color="#333d4b" size={24} />
-          </View>
-        </TouchableOpacity>
-      ),
+    useMainScreenHeader({
+      title: tripStore.title,
       rightComponent: (
         <TouchableOpacity
           onPress={handleSettingsButtonPress}
-          style={styles.headerRightButton}>
-          <Icon name="settings" color="#333d4b" size={24} />
+          style={$headerRightButtonStyle}>
+          <HeaderIcon name="settings" />
         </TouchableOpacity>
       ),
-      leftContainerStyle: styles.headerLeftContainer,
-      rightContainerStyle: styles.headerRightContainer,
     })
+
+    const settingsOption: NavigateMenuData[] = [
+      {title: '할 일 추가', path: 'TodolistAdd', primary: true},
+      {title: '목록 순서 변경', path: 'TodolistReorder'},
+      {title: '목록에서 할 일 삭제', path: 'TodolistDelete'},
+    ]
+
     return (
       //   <GestureHandlerRootViewWrapper>
       <Screen>
@@ -137,7 +124,7 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
           {tripStore.completedTrip.length > 0 && (
             <View>
               <Divider />
-              <SectionTitle title={'완료했어요'} />
+              <SectionHeader>완료했어요</SectionHeader>
               <SectionList
                 sections={tripStore.completedTrip}
                 keyExtractor={item => item.id}
@@ -147,90 +134,77 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
             </View>
           )}
         </ScrollView>
-        <SettingsDropDownBottomSheet ref={settingsDropDownBottomSheetRef} />
+        <NavigateMenuBottomSheet
+          data={settingsOption}
+          ref={settingsMenuBottomSheetRef}
+        />
       </Screen>
       //   </GestureHandlerRootViewWrapper>
     )
   },
 )
 
-const SettingsDropDownBottomSheet = ({
-  ref,
-}: {
-  ref: RefObject<BottomSheetModal | null>
-}) => {
-  const {useActiveKey, handleBottomSheetModalChange, activate} =
-    useNavigationBottomSheet(ref)
-  const {navigateWithTrip} = useNavigate()
-  useActiveKey(activeKey => navigateWithTrip(activeKey))
-  type SettingsListItemData = {title: string; path: string; primary?: boolean}
+// const SettingsMenuBottomSheet = ({
+//   ref,
+// }: {
+//   ref: RefObject<BottomSheetModal | null>
+// }) => {
+//   const {useActiveKey, handleBottomSheetModalChange, activate} =
+//     useNavigationBottomSheet(ref)
+//   const {navigateWithTrip} = useNavigate()
+//   useActiveKey(activeKey => navigateWithTrip(activeKey))
+//   type NavigateMenuData = {title: string; path: string; primary?: boolean}
 
-  const settingsMenu: SettingsListItemData[] = [
-    {title: '할 일 추가', path: 'TodolistAdd', primary: true},
-    {title: '목록 순서 변경', path: 'TodolistReorder'},
-    {title: '목록에서 할 일 삭제', path: 'TodolistDelete'},
-  ]
+//   const settingsMenu: NavigateMenuData[] = [
+//     {title: '할 일 추가', path: 'TodolistAdd', primary: true},
+//     {title: '목록 순서 변경', path: 'TodolistReorder'},
+//     {title: '목록에서 할 일 삭제', path: 'TodolistDelete'},
+//   ]
 
-  const renderSettingsListItem: ListRenderItem<SettingsListItemData> =
-    useCallback(
-      ({item}) => {
-        const handlePress = () => activate(item.path)
+//   const renderSettingsListItem: ListRenderItem<NavigateMenuData> =
+//     useCallback(
+//       ({item}) => {
+//         const handlePress = () => activate(item.path)
 
-        return (
-          <ListItem onPress={handlePress}>
-            <ListItem.Content>
-              <ListItem.Title primary={item.primary}>
-                {item.title}
-              </ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron onPress={handlePress} />
-          </ListItem>
-        )
-      },
-      [activate],
-    )
+//         return (
+//           <ListItem onPress={handlePress}>
+//             <ListItem.Content>
+//               <ListItem.Title primary={item.primary}>
+//                 {item.title}
+//               </ListItem.Title>
+//             </ListItem.Content>
+//             <ListItem.Chevron onPress={handlePress} />
+//           </ListItem>
+//         )
+//       },
+//       [activate],
+//     )
 
-  return (
-    <BottomSheetModal ref={ref} onChange={handleBottomSheetModalChange}>
-      <FlatList
-        data={settingsMenu}
-        renderItem={renderSettingsListItem}
-        keyExtractor={item => item.title}
-      />
-    </BottomSheetModal>
-  )
-}
+//   return (
+//     <BottomSheetModal ref={ref} onChange={handleBottomSheetModalChange}>
+//       <FlatList
+//         data={settingsMenu}
+//         renderItem={renderSettingsListItem}
+//         keyExtractor={item => item.title}
+//       />
+//     </BottomSheetModal>
+//   )
+// }
 
-export const SectionTitle = ({title}: {title: string}) => (
-  <View style={styles.sectionHeaderContainer}>
-    <Text h3 style={styles.sectionHeaderText}>
-      <Trans>{title}</Trans>
-    </Text>
-  </View>
-)
+// // export const SectionTitle = ({title}: {title: string}) => (
+// //   <View style={styles.sectionHeaderContainer}>
+// //     <Text h3 style={styles.sectionHeaderText}>
+// //       <Trans>{title}</Trans>
+// //     </Text>
+// //   </View>
+// // )
 
-const styles = StyleSheet.create({
-  headerLeftContainer: {
-    flexGrow: 1,
-    paddingLeft: 16,
-    paddingRight: 24,
-  },
-  headerRightButton: {
-    alignItems: 'center',
-    borderRadius: 100, // 6.25rem converted to 100 for full circle
-    justifyContent: 'center',
-    padding: 8, // 0.5rem converted to px,
-  },
-  headerRightContainer: {
-    flexBasis: 'auto',
-    flexGrow: 0,
-    paddingRight: 8,
-  },
-  sectionHeaderContainer: {
-    paddingTop: 20,
-  },
-  sectionHeaderText: {
-    paddingHorizontal: 20, // 1.25rem converted to px
-    paddingVertical: 6, // 0.375rem converted to px
-  },
-})
+// // const styles = StyleSheet.create({
+// //   sectionHeaderContainer: {
+// //     paddingTop: 20,
+// //   },
+// //   sectionHeaderText: {
+// //     paddingHorizontal: 20, // 1.25rem converted to px
+// //     paddingVertical: 6, // 0.375rem converted to px
+// //   },
+// // })

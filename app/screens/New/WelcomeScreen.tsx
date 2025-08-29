@@ -1,37 +1,38 @@
 import {LoadingScreen, useLoadingScreen} from '@/screens/LoadingScreen'
-import {ApiStatus, useStores} from '@/models'
+import {ApiStatus, useStores, useTripStore} from '@/models'
 import {AppStackScreenProps, useNavigate} from '@/navigators'
 import {observer} from 'mobx-react-lite'
 import {FC, useEffect} from 'react'
 
 export const WelcomeScreen: FC<AppStackScreenProps<'Welcome'>> = observer(
   () => {
-    const rootStore = useStores()
+    const {createTrip, withApiStatus} = useStores()
+    const tripStore = useTripStore()
     const {navigateWithTrip} = useNavigate()
 
     useEffect(() => {
       const redirect = async () => {
-        if (rootStore.tripStore != null && rootStore.tripStore?.isInitialized) {
+        if (tripStore != null && tripStore?.isInitialized) {
           navigateWithTrip('Main', {screen: 'Todolist'})
         } else {
-          if (rootStore.tripStore != null) {
-            await rootStore.tripStore.patch()
+          if (tripStore != null) {
+            await withApiStatus(tripStore.patch)
           } else {
-            await rootStore.createTrip()
+            await withApiStatus(createTrip)
           }
         }
       }
       redirect()
     }, [])
 
-    useEffect(() => {
-      if (rootStore.apiStatus === ApiStatus.SUCCESS) {
-        rootStore.setProp('apiStatus', ApiStatus.IDLE)
-        navigateWithTrip('DestinationSetting')
-      }
-    }, [rootStore.apiStatus])
+    // useEffect(() => {
+    //   if (rootStore.apiStatus === ApiStatus.SUCCESS) {
+    //     rootStore.setProp('apiStatus', ApiStatus.IDLE)
+    //     navigateWithTrip('DestinationSetting')
+    //   }
+    // }, [rootStore.apiStatus])
 
-    useLoadingScreen()
+    useLoadingScreen({onSuccess: () => navigateWithTrip('DestinationSetting')})
 
     return false
   },

@@ -8,10 +8,12 @@ import {
   TodolistAddScreenBase,
   useAddFlaggedPreset,
 } from '../Todolist/Edit/TodolistAddScreenBase'
+import {useLoadingScreen} from '../LoadingScreen'
 
 export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
   observer(({route, navigation}) => {
     const tripStore = useTripStore()
+    const {withApiStatus} = useStores()
     const {navigateWithTrip} = useNavigate()
     const addFlaggedPreset = useAddFlaggedPreset()
 
@@ -33,6 +35,17 @@ export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
         navigation.pop(1)
       },
     })
+
+    useEffect(() => {
+      async function fetchPreset() {
+        await withApiStatus(tripStore.fetchPreset)
+      }
+      fetchPreset().then(() => {
+        console.log('[TodolistAddScreenBase] fetchPreset()')
+      })
+    }, [])
+
+    useLoadingScreen({onSuccess: () => {}})
 
     return (
       <TodolistAddScreenBase

@@ -24,15 +24,9 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
       goBack()
     }, [])
 
-    useEffect(() => {
-      if (apiStatus === ApiStatus.SUCCESS) {
-        goBack()
-      }
-    }, [apiStatus])
-
-    useEffect(() => {
-      if (!isConnected) setProp('apiStatus', ApiStatus.NO_CONNECTION)
-    }, [isConnected])
+    // useEffect(() => {
+    //   if (!isConnected) setProp('apiStatus', ApiStatus.NO_CONNECTION)
+    // }, [isConnected])
 
     useHeader({backButtonShown: false})
 
@@ -67,7 +61,7 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
         ) : apiStatus === ApiStatus.ERROR ? (
           <>
             <View style={$statusViewStyle}>
-              <Text>😓</Text>
+              <Text style={{fontFamily: 'tossface', fontSize: 36}}>😓</Text>
               <TransText style={$statusMessageStyle}>
                 오류가 발생했어요.
                 <br />
@@ -97,12 +91,20 @@ const $statusViewStyle: ViewStyle = {
   justifyContent: 'center',
 }
 
-export const useLoadingScreen = () => {
-  const {apiStatus} = useStores()
+export const useLoadingScreen = ({onSuccess}: {onSuccess?: () => void}) => {
+  const {apiStatus, setApiStatusIdle} = useStores()
   useEffect(() => {
     switch (apiStatus) {
       case ApiStatus.PENDING:
         navigate('Loading')
+        break
+      case ApiStatus.SUCCESS:
+        if (onSuccess) {
+          goBack()
+          onSuccess()
+        }
+        setApiStatusIdle()
+        break
     }
   }, [apiStatus])
 }

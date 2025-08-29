@@ -6,14 +6,12 @@ import BottomSheetModal, {
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import {AddPresetTodo, AddTodo, TodoBase} from '@/components/Todo'
-import {useStores, useTripStore} from '@/models'
-import {Todo, TodoSnapshotIn} from '@/models/Todo'
-import {Preset} from '@/models/stores/TripStore'
+import {useTripStore} from '@/models'
+import {Todo, TodoContent, TodoPreset} from '@/models/Todo'
 import {useNavigate} from '@/navigators'
-import BottomSheet from '@gorhom/bottom-sheet'
 import {ListItem} from '@rneui/themed'
 import {Observer, observer} from 'mobx-react-lite'
-import {ReactNode, RefObject, useCallback, useEffect, useRef} from 'react'
+import {ReactNode, RefObject, useCallback, useRef} from 'react'
 import {
   DefaultSectionT,
   FlatList,
@@ -25,7 +23,6 @@ import {
 import TodolistEditScreenBase, {
   TodolistEditScreenBaseProps,
 } from './TodolistEditScreenBase'
-import {LoadingScreen} from '@/screens/LoadingScreen'
 
 interface TodolistAddScreenBaseProps
   extends Pick<TodolistEditScreenBaseProps, 'title' | 'instruction'> {
@@ -50,8 +47,8 @@ export const useHandleAddTodo = ({
   const tripStore = useTripStore()
   const {navigateWithTrip} = useNavigate()
   const handleAddTodo = useCallback(
-    (todo: Partial<TodoSnapshotIn>) => {
-      todo = tripStore.createCustomTodo(todo)
+    (todoCreateDTO: Partial<Todo>) => {
+      const todo = tripStore.createCustomTodo(todoCreateDTO)
       if (todo) {
         let path = ''
         switch (todo.type) {
@@ -90,28 +87,16 @@ export const TodolistAddScreenBase = observer(
   }: TodolistAddScreenBaseProps) => {
     const tripStore = useTripStore()
 
-    useEffect(() => {
-      async function fetchPreset() {
-        // if (tripStore.id === '') {
-        //   await rootStore.fetchTrip(tripId)
-        // }
-        await tripStore.fetchPreset()
-      }
-      fetchPreset().then(() => {
-        console.log('[TodolistAddScreenBase] fetchPreset()')
-      })
-    }, [])
-
     const {handleAddTodo} = useHandleAddTodo({})
 
     const renderItem: SectionListRenderItem<
-      {todo?: Todo; preset?: Preset},
+      {todo?: Todo; preset?: TodoPreset},
       DefaultSectionT
     > = ({item: {preset, todo}}) => (
       <Observer
         render={() =>
           preset ? (
-            <AddPresetTodo preset={preset} key={preset?.todo.id} />
+            <AddPresetTodo preset={preset} key={preset?.todoContent.id} />
           ) : (
             <AddTodo todo={todo as Todo} key={todo?.id} />
           )
@@ -153,27 +138,27 @@ export const TodolistAddScreenBase = observer(
 
     const keyExtractor = useCallback(
       (item: any) =>
-        item.todo ? `todo-${item.todo.id}` : `preset-${item.preset.todo.id}`,
+        item.todo
+          ? `todo-${item.todo.id}`
+          : `preset-${item.preset.todoContent.id}`,
       [],
     )
 
     return (
       <GestureHandlerRootViewWrapper>
-        <LoadingScreen>
-          <TodolistEditScreenBase
-            title={title}
-            instruction={instruction}
-            renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-            sections={tripStore.todolistWithPreset}
-            keyExtractor={keyExtractor}>
-            {fab}
-            <ReservationTypeDropDownBottomSheet
-              ref={bottomSheetRef}
-              callerName={callerName}
-            />
-          </TodolistEditScreenBase>
-        </LoadingScreen>
+        <TodolistEditScreenBase
+          title={title}
+          instruction={instruction}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          sections={tripStore.todolistWithPreset}
+          keyExtractor={keyExtractor}>
+          {fab}
+          <ReservationTypeDropDownBottomSheet
+            ref={bottomSheetRef}
+            callerName={callerName}
+          />
+        </TodolistEditScreenBase>
       </GestureHandlerRootViewWrapper>
     )
   },
@@ -195,7 +180,7 @@ const ReservationTypeDropDownBottomSheet = ({
     handleAddTodo({category: 'reservation', type: activeKey}),
   )
 
-  interface ReservationTypeOptionData extends Pick<TodoSnapshotIn, 'type'> {
+  interface ReservationTypeOptionData extends Pick<TodoContent, 'type'> {
     title: string
     avatarProps: AvatarProps
     isManaged?: boolean

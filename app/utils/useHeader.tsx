@@ -1,8 +1,13 @@
-import {useEffect, useLayoutEffect} from 'react'
+import {FC, ReactElement, useEffect, useLayoutEffect} from 'react'
 import {useNavigation} from '@react-navigation/native'
-import {Platform} from 'react-native'
-import {Header, HeaderProps as RNEHeaderProps} from '@rneui/themed'
-import {BackButton, RightActionButton} from '@/components/Header'
+import {Platform, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native'
+import {
+  Header,
+  HeaderProps as RNEHeaderProps,
+  Text,
+  TextProps,
+} from '@rneui/themed'
+import {BackButton, HeaderIcon, RightActionButton} from '@/components/Header'
 import {NavigateProps} from '@/navigators'
 
 interface HeaderProps extends RNEHeaderProps {
@@ -75,3 +80,50 @@ export function useHeader(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, navigation])
 }
+
+export const useMainScreenHeader = ({
+  title,
+  rightComponent,
+}: {
+  title: string
+  rightComponent: ReactElement<{}>
+}) => {
+  useHeader({
+    backButtonShown: false,
+    leftComponent: (
+      <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
+        h2
+        h2Style={{lineHeight: 40}}>
+        {title}
+      </Text>
+    ),
+    rightComponent: rightComponent,
+    leftContainerStyle: styles.headerLeftContainer,
+    rightContainerStyle: styles.headerRightContainer,
+  })
+}
+
+export const HeaderTitle: FC<TextProps> = props => (
+  <Text
+    ellipsizeMode="tail"
+    numberOfLines={1}
+    h2
+    h2Style={{lineHeight: 40}}
+    {...props}
+  />
+)
+
+const styles = StyleSheet.create({
+  headerLeftContainer: {
+    flexGrow: 1,
+    paddingLeft: 16,
+    paddingRight: 24,
+  },
+  headerRightContainer: {
+    flexBasis: 'auto',
+    flexGrow: 0,
+    paddingRight: 8,
+  },
+})

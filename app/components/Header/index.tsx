@@ -3,7 +3,8 @@ import {FC, useCallback, useState} from 'react'
 import {StyleSheet, TouchableOpacity, TouchableOpacityProps} from 'react-native'
 import {Button} from '../Button'
 import {goBack, NavigateProps, useNavigate} from '@/navigators'
-import {DialogProps} from '@rneui/base'
+import {DialogProps, IconProps} from '@rneui/base'
+import {ViewStyle} from 'react-native'
 
 export const BackButton: FC<
   TouchableOpacityProps & {
@@ -82,6 +83,17 @@ export const ConfirmBackDialog: FC<DialogProps> = props => {
       </Dialog.Actions>
     </Dialog>
   )
+}
+
+export const HeaderIcon = (props: IconProps) => {
+  return <Icon color="#333d4b" size={24} {...props} />
+}
+
+export const $headerRightButtonStyle: ViewStyle = {
+  alignItems: 'center',
+  borderRadius: 100, // 6.25rem converted to 100 for full circle
+  justifyContent: 'center',
+  padding: 8, // 0.5rem converted to px,
 }
 
 const styles = StyleSheet.create({

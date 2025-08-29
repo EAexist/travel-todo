@@ -23,7 +23,7 @@ import {useHeader} from '@/utils/useHeader'
 import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
 
 export type MainTabParamList = {
-  TripInfo: TripStackProps
+  TripDashboard: TripStackProps
   Todolist: TripStackProps
   Reservation: TripStackProps
 }

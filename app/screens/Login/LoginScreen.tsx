@@ -5,7 +5,7 @@ import {GoogleLoginButton} from '@/components/Login/GoogleLoginButton'
 import {LoginButton} from '@/components/Login/LoginButton'
 import {Screen} from '@/components/Screen'
 import {useStores} from '@/models'
-import {AppStackScreenProps} from '@/navigators'
+import {AppStackScreenProps, navigate} from '@/navigators'
 import {useLoadingScreen} from '@/screens/LoadingScreen'
 import {loadString, saveString} from '@/utils/storage'
 import {useHeader} from '@/utils/useHeader'
@@ -36,7 +36,7 @@ export const LoginScreen: FC<AppStackScreenProps<'Login'>> = observer(() => {
   }, [])
 
   useHeader({backButtonShown: false})
-  useLoadingScreen()
+  useLoadingScreen({onSuccess: () => navigate('Welcome')})
 
   return (
     <GoogleOAuthProvider clientId={process.env.GOOGLE_OAUTH_CLIENT_ID_WEB}>
