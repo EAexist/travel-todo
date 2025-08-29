@@ -200,7 +200,8 @@ export const TodoModel = types
       item.setProp('completeDateISOString', new Date().toISOString())
     },
     setIncomplete() {
-      item.setProp('completeDateISOString', '')
+      //   item.setProp('completeDateISOString', '')
+      item.setProp('completeDateISOString', null)
     },
     toggleDeleteFlag() {
       item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
@@ -211,7 +212,8 @@ export const TodoModel = types
       return CATEGORY_TO_TITLE[item.category]
     },
     get isCompleted() {
-      return item.completeDateISOString !== ''
+      //   return item.completeDateISOString !== ''
+      return item.completeDateISOString !== null
     },
     get parsedTitleAndSubtitle() {
       const defaultValue = {title: item.title?.trim(), subtitle: ''}

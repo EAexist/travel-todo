@@ -427,7 +427,7 @@ export const TripStoreModel = types
     },
     get incompleteTrip() {
       return this.sectionedNonEmptyTrip.map(({title, data}) => {
-        return {title, data: data.filter(item => !item.completeDateISOString)}
+        return {title, data: data.filter(item => !item.isCompleted)}
       })
     },
     get completedTrip() {
@@ -435,7 +435,7 @@ export const TripStoreModel = types
         .map(({title, data}) => {
           return {
             title,
-            data: data.filter(item => !!item.completeDateISOString),
+            data: data.filter(item => item.isCompleted),
           }
         })
         .filter(({data}) => data.length > 0)
