@@ -13,7 +13,11 @@ import {api} from '@/services/api'
 import {autorun, reaction} from 'mobx'
 import {applySnapshot, IDisposer, onSnapshot} from 'mobx-state-tree'
 import * as storage from '../../utils/storage'
-import {RootStore, RootStoreSnapshot} from '@/models/stores/RootStore'
+import {
+  ApiStatus,
+  RootStore,
+  RootStoreSnapshot,
+} from '@/models/stores/RootStore'
 import {RootStoreModel} from '@/models/stores/RootStore'
 import {UserStoreModel} from '@/models/stores/UserStore'
 import {TripStoreModel} from '@/models/stores/TripStore'
@@ -32,7 +36,7 @@ export async function setupRootStore(rootStore: RootStore) {
   let restoredState: RootStoreSnapshot | undefined | null
 
   try {
-    // storage.clear()
+    storage.clear()
 
     /**
      * !!Test Only
@@ -65,8 +69,9 @@ export async function setupRootStore(rootStore: RootStore) {
     // )
 
     // load the last known state from AsyncStorage
-    restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ??
-      {}) as RootStoreSnapshot
+    restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {
+      apiStatus: ApiStatus.IDLE,
+    }) as RootStoreSnapshot
     applySnapshot(rootStore, restoredState)
     if (rootStore.userStore.id) api.authenticate(rootStore.userStore.id)
 
@@ -90,6 +95,15 @@ export async function setupRootStore(rootStore: RootStore) {
     _disposer?.()
     _disposer = undefined
   }
+  autorun(() => {
+    console.log('[ApiStatus changed:]', JSON.stringify(rootStore.apiStatus))
+  })
+  autorun(() => {
+    console.log(
+      '[todolistWithPreset changed:]',
+      JSON.stringify(rootStore.tripStore?.todolistWithPreset),
+    )
+  })
   autorun(() => {
     console.log('[UserStore changed:]', JSON.stringify(rootStore.userStore))
   })

@@ -1,7 +1,3 @@
-import {toCalendarString} from '@/utils/date'
-import {eachDayOfInterval} from 'date-fns'
-import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {api} from '@/services/api'
 import {AccomodationModel, AccomodationSnapshotIn} from '@/models/Accomodation'
 import {
   Destination,
@@ -13,30 +9,18 @@ import {withSetPropAction} from '@/models/helpers/withSetPropAction'
 import {
   CATEGORY_TO_TITLE,
   FlightModel,
-  PresetTodoContentModel,
   Todo,
   TodoModel,
+  TodoPreset,
+  TodoPresetModel,
   TodoSnapshotIn,
 } from '@/models/Todo'
-import withLoading from '@/models/withLoading'
+import {api} from '@/services/api'
+import {toCalendarString} from '@/utils/date'
+import {eachDayOfInterval} from 'date-fns'
+import {Instance, SnapshotOut, types} from 'mobx-state-tree'
 import {v4 as uuidv4} from 'uuid'
 import {Accomodation} from '../Accomodation'
-
-export const PresetItemModel = types
-  .model('Preset')
-  .props({
-    isFlaggedToAdd: types.boolean,
-    todo: PresetTodoContentModel,
-  })
-  .actions(withSetPropAction)
-  .actions(presetItem => ({
-    toggleAddFlag() {
-      presetItem.setProp('isFlaggedToAdd', !presetItem.isFlaggedToAdd)
-    },
-  }))
-
-export interface Preset extends Instance<typeof PresetItemModel> {}
-export interface PresetSnapshotIn extends SnapshotOut<typeof PresetItemModel> {}
 
 export const TodolistModel = types
   .model('Preset')
@@ -57,18 +41,11 @@ export const TripStoreModel = types
     todolist: types.map(types.array(types.reference(TodoModel))),
     activeItem: types.maybeNull(types.reference(TodoModel)),
     accomodation: types.map(AccomodationModel),
-    preset: types.map(types.array(PresetItemModel)),
+    preset: types.map(types.array(TodoPresetModel)),
     recommendedFlight: types.array(FlightModel),
-    isPending: false,
   })
   .actions(withSetPropAction)
   .actions(store => ({
-    pend() {
-      store.setProp('isPending', true)
-    },
-    rest() {
-      store.setProp('isPending', false)
-    },
     syncOrderInCategory(category: string) {
       store.todolist.get(category)?.sort((a, b) => a.orderKey - b.orderKey)
     },
@@ -82,7 +59,10 @@ export const TripStoreModel = types
   }))
   .actions(store => ({
     addTodo(todoContent: Partial<Todo>) {
-      const todo = TodoModel.create(todoContent as Todo)
+      const todo = TodoModel.create({
+        ...todoContent,
+        content: todoContent.content?.id as string,
+      })
       store.todoMap.put(todo)
       if (!store.todolist.has(todo.category)) {
         store.todolist.set(todo.category, [])
@@ -105,7 +85,8 @@ export const TripStoreModel = types
         // ),
       )
       store.setProp('todolist', {reservation: [], foreign: [], goods: []})
-      Object.values(trip.todoMap).forEach(todo => {
+      //   Object.values(trip.todoMap).forEach(todo => {
+      Object.values(store.todoMap).forEach(todo => {
         if (!store.todolist.has(todo.category)) {
           store.todolist.set(todo.category, [])
         }
@@ -133,30 +114,30 @@ export const TripStoreModel = types
     _deleteDestination(destination: Destination) {
       store.destination.remove(destination)
     },
-    updatePreset() {
-      const usedPresetIds = [
-        ...new Set(
-          Array.from(store.todoMap.values()).map(todo => todo.presetId),
-        ),
-      ]
-        .filter(presetId => presetId != null)
-        .map(presetId => presetId.toString())
-      store.setProp(
-        'preset',
-        Object.fromEntries(
-          Array.from(store.preset.entries())
-            .map(([category, presets]) => [
-              category,
-              presets.filter(preset => !usedPresetIds.includes(preset.todo.id)),
-            ])
-            .filter(([category, presets]) => presets.length > 0),
-        ),
-      )
-      console.log('updatePreset')
-    },
+    // updatePreset() {
+    //   const usedPresetIds = [
+    //     ...new Set(
+    //       Array.from(store.todoMap.values()).map(todo => todo.presetId),
+    //     ),
+    //   ]
+    //     .filter(presetId => presetId != null)
+    //     .map(presetId => presetId.toString())
+    //   store.setProp(
+    //     'preset',
+    //     Object.fromEntries(
+    //       Array.from(store.preset.entries())
+    //         .map(([category, presets]) => [
+    //           category,
+    //           presets.filter(preset => !usedPresetIds.includes(preset.content.id)),
+    //         ])
+    //         .filter(([category, presets]) => presets.length > 0),
+    //     ),
+    //   )
+    //   console.log('updatePreset')
+    // },
   }))
   .actions(store => ({
-    add(todo: TodoSnapshotIn) {
+    add(todo: Todo) {
       store.todoMap.put(todo)
       store.addTodo(todo)
     },
@@ -165,22 +146,23 @@ export const TripStoreModel = types
     },
     async fetchPreset() {
       console.log('[Tripstore.fetchPreset]')
-      store.pend()
-      api.getTodoPreset(store.id).then(response => {
+      return api.getTodoPreset(store.id).then(response => {
         if (response.kind == 'ok') {
-          const map = new Map<string, PresetSnapshotIn[]>()
-          response.data.forEach(({isFlaggedToAdd, todo}) => {
-            if (!map.has(todo.category)) {
-              map.set(todo.category, [])
+          const map = new Map<string, TodoPreset[]>()
+          response.data.forEach(({isFlaggedToAdd, todoContent}) => {
+            if (!map.has(todoContent.category)) {
+              map.set(todoContent.category, [])
             }
-            map.get(todo.category)?.push({
-              isFlaggedToAdd,
-              todo: todo,
-            })
+            map.get(todoContent.category)?.push(
+              TodoPresetModel.create({
+                isFlaggedToAdd,
+                todoContent: todoContent,
+              }),
+            )
           })
           store.setProp('preset', Object.fromEntries(map.entries()))
-          store.rest()
         }
+        return response.kind
       })
     },
     async fetchRecommendedFlight() {
@@ -229,6 +211,7 @@ export const TripStoreModel = types
         store.set(response.data as TripStoreSnapshot)
         console.log('[Tripstore.patch] returns')
       }
+      return response.kind
     },
 
     /**
@@ -283,7 +266,7 @@ export const TripStoreModel = types
       //   })
     },
 
-    /* Preset Actions */
+    /* TodoPreset Actions */
 
     // async fetchPreset() {
     //   const response = await api.getPreset('1')
@@ -424,7 +407,7 @@ export const TripStoreModel = types
       //   const activeSections = [
       //     ...Array.from(store.todoMap.values()).map(item => item.category),
       //     ...(Array.from(store.preset.values()).flat() as Preset[]).map(
-      //       preset => preset.todo.category,
+      //       preset => preset.content.category,
       //     ),
       //   ]
       //   return ['reservation', 'foreign', 'goods'].filter(section =>
@@ -501,7 +484,7 @@ export const TripStoreModel = types
           data: [
             ...((addedItems?.map(item => ({
               todo: item,
-            })) as {todo?: Todo; preset?: Preset}[]) || []),
+            })) as {todo?: Todo; preset?: TodoPreset}[]) || []),
             ...(store.preset.get(category)?.map(preset => ({
               preset,
             })) || []),
@@ -577,21 +560,21 @@ export const TripStoreModel = types
     },
     async addFlaggedPreset() {
       await Promise.all(
-        (Array.from(store.preset.values()).flat() as Preset[])
+        (Array.from(store.preset.values()).flat() as TodoPreset[])
           .filter(preset => preset.isFlaggedToAdd)
           .map(async preset => {
             store.addTodo({
-              ...preset.todo,
-              presetId: Number(preset.todo.id),
+              content: preset.todoContent,
+              isPreset: true,
             })
             preset.setProp('isFlaggedToAdd', false)
 
             // const response = await api.createTodo({
             //   tripId: store.id,
             //   todo: {
-            //     ...preset.todo,
+            //     ...preset.content,
             //     id: undefined,
-            //     presetId: Number(preset.todo.id),
+            //     presetId: Number(preset.content.id),
             //   },
             // })
             // if (response.kind === 'ok') {

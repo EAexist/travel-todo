@@ -82,7 +82,7 @@ export const RootStoreModel = types
       if (store.apiStatus == ApiStatus.PENDING)
         switch (kind) {
           case 'ok':
-            store.setProp('apiStatus', ApiStatus.IDLE)
+            store.setProp('apiStatus', ApiStatus.SUCCESS)
             break
           case 'timeout':
           case 'cannot-connect':
@@ -125,9 +125,8 @@ export const RootStoreModel = types
             foreign: [],
             goods: [],
           })
-          //   await store.userStore.fetchUserAccount()
         }
-        store.handleResponseStatus(response.kind)
+        return response.kind
       })
     },
     async withApiStatus(action: () => Promise<string>) {

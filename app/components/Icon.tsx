@@ -7,5 +7,3 @@ export const Icon = (props: IconProps) => {
 
   return <RNEIcon type={'tossface'} {...props} />
 }
-
-// export default withTheme<IconProps>(Icon, 'Icon')

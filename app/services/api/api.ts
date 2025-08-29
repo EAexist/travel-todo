@@ -11,12 +11,15 @@ import {
   ReservationSnapshot,
   ReservationStoreSnapshot,
 } from '@/models/stores/ReservationStore'
-import {Flight, FlightRoute, LocationPair, TodoSnapshotIn} from '@/models/Todo'
 import {
-  PresetSnapshotIn,
-  TripStore,
-  TripStoreSnapshot,
-} from '@/models/stores/TripStore'
+  Flight,
+  FlightRoute,
+  LocationPair,
+  Todo,
+  TodoPresetSnapshotIn,
+  TodoSnapshotIn,
+} from '@/models/Todo'
+import {TripStore, TripStoreSnapshot} from '@/models/stores/TripStore'
 import {UserStoreSnapshot} from '@/models/stores/UserStore'
 import {KakaoProfile} from '@react-native-seoul/kakao-login'
 import {ApiResponse, ApisauceInstance, create} from 'apisauce'
@@ -409,7 +412,7 @@ export class Api {
   }): Promise<ApiResult<TodoSnapshotIn>> {
     const response: ApiResponse<TodoDTO> = await this.apisauce.post(
       `/trip/${tripId}/todo`,
-      mapToTodoDTO({...todo, completeDateISOString: ''} as TodoSnapshotIn),
+      mapToTodoDTO({...todo, completeDateISOString: ''} as Todo),
     )
 
     const todoDTOResponse = handleResponse<TodoDTO>(response)
@@ -428,7 +431,7 @@ export class Api {
    */
   async patchTodo(
     tripId: string,
-    todo: TodoSnapshotIn,
+    todo: Todo,
   ): Promise<ApiResult<TodoSnapshotIn>> {
     const response: ApiResponse<TodoDTO> = await this.apisauce.patch(
       `/trip/${tripId}/todo/${todo.id}`,
@@ -459,9 +462,11 @@ export class Api {
   /**
    * Gets a list of recent React Native Radio episodes.
    */
-  async getTodoPreset(id: string): Promise<ApiResult<PresetSnapshotIn[]>> {
+  async getTodoPreset(
+    tripId: string,
+  ): Promise<ApiResult<TodoPresetSnapshotIn[]>> {
     const response: ApiResponse<PresetDTO[]> = await this.apisauce.get(
-      `/trip/${id}/todoPreset`,
+      `/trip/${tripId}/todoPreset`,
     )
     const presetResponse = handleResponse<PresetDTO[]>(response)
     return presetResponse.kind === 'ok'

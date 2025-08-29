@@ -91,10 +91,23 @@ export const IconModel = types.model('Icon').props({
 
 export interface Icon extends SnapshotOut<typeof IconModel> {}
 
+/**
+ * PresetTodo
+ */
+export const TodoContentModel = types.model('TodoContent').props({
+  id: types.identifier,
+  category: types.string,
+  type: types.string,
+  title: types.string,
+  icon: IconModel,
+})
+
+export interface TodoContent extends Instance<typeof TodoContentModel> {}
+
 export const PresetTodoContentModel = types.model('PresetTodoContent').props({
   id: types.identifier,
-  type: types.string,
   category: types.string,
+  type: types.string,
   title: types.string,
   icon: IconModel,
 })
@@ -107,23 +120,80 @@ export interface PresetTodoContentSnapshotIn
   extends SnapshotIn<typeof PresetTodoContentModel> {}
 
 /**
- * This represents a Trip
+ * TodoPreset
+ */
+export const TodoPresetModel = types
+  .model('Preset')
+  .props({
+    isFlaggedToAdd: types.boolean,
+    todoContent: TodoContentModel,
+  })
+  .actions(withSetPropAction)
+  .actions(presetItem => ({
+    toggleAddFlag() {
+      presetItem.setProp('isFlaggedToAdd', !presetItem.isFlaggedToAdd)
+    },
+  }))
+
+export interface TodoPreset extends Instance<typeof TodoPresetModel> {}
+export interface TodoPresetSnapshotIn
+  extends SnapshotOut<typeof TodoPresetModel> {}
+
+/**
+ * Todo
  */
 export const TodoModel = types
   .model('Todo')
   .props({
     id: types.optional(types.identifier, () => uuidv4()),
-    // id: types.identifier,
-    type: types.string,
-    category: types.string,
-    title: types.string,
-    icon: IconModel,
+    // category: types.string,
+    // type: types.string,
+    // title: types.string,
+    // icon: IconModel,
     note: types.optional(types.string, ''),
     completeDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     isFlaggedToDelete: false,
     orderKey: types.optional(types.number, 0),
-    presetId: types.maybeNull(types.number),
+    isPreset: types.optional(types.boolean, false),
+    content: types.reference(TodoContentModel),
+    // presetId: types.maybeNull(types.number),
+    // customTodoContent: types.maybeNull(types.reference(TodoContentModel)),
+    // presetTodoContent: types.maybeNull(types.reference(PresetTodoContentModel)),
   })
+  .views(item => ({
+    get category() {
+      return item.content.category
+      //       return item.presetTodoContent !== null
+      // ? item.presetTodoContent.category
+      // : item.customTodoContent?.category
+    },
+    get type() {
+      return item.content.type
+      //   return item.presetTodoContent !== null
+      //     ? item.presetTodoContent.type
+      //     : item.customTodoContent?.type
+    },
+    get title() {
+      return item.content.title
+      //   return item.presetTodoContent !== null
+      //     ? item.presetTodoContent.title
+      //     : item.customTodoContent?.title
+    },
+    get icon() {
+      return item.content.icon
+      //   return item.presetTodoContent !== null
+      //     ? item.presetTodoContent.icon
+      //     : item.customTodoContent?.icon
+    },
+  }))
+  .views(item => ({
+    get categoryTitle() {
+      return CATEGORY_TO_TITLE[item.category]
+    },
+    get isCompleted() {
+      return item.completeDateISOString !== ''
+    },
+  }))
   .actions(withSetPropAction)
   .actions(item => ({
     complete() {

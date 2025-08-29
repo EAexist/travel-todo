@@ -32,7 +32,7 @@ type DateInterval = {
   start?: Date
   end?: Date
 }
-const ScheduleSettingCalendar = ({
+const ScheduleSettingCalendarBase = ({
   dateInterval,
   setDateInterval,
 }: {
@@ -63,37 +63,6 @@ const ScheduleSettingCalendar = ({
 
   const start = dateInterval.start
   const end = dateInterval.end
-  // const intervalDays =
-  //   start && end && eachDayOfInterval({start, end}).slice(1, -1)
-  // const markedDates_ = Object.fromEntries([
-  //   start ? [toCalendarString(start), {startingDay: true, color: 'red'}] : [],
-  //   end ? [toCalendarString(end), {endingDay: true, color: 'red'}] : [],
-  //   ...(intervalDays
-  //     ? intervalDays.map((date, index) => [
-  //         toCalendarString(date),
-  //         {
-  //           selected: true,
-  //           color: 'red',
-  //         },
-  //       ])
-  //     : [[]]),
-  // ])
-
-  // const markedDates = [
-  //   start ? [toCalendarString(start), {startingDay: true, color: 'red'}] : [],
-  //   end ? [toCalendarString(end), {endingDay: true, color: 'red'}] : [],
-  //   ...(intervalDays
-  //     ? intervalDays.map((date, index) => [
-  //         toCalendarString(date),
-  //         {
-  //           selected: true,
-  //           color: 'red',
-  //         },
-  //       ])
-  //     : [[]]),
-  // ].reduce((o, curr)=>>{
-  //   return o
-  // })
 
   const [markedDates, setMarkedDates] = useState<MarkedDates>()
 
@@ -131,6 +100,79 @@ const ScheduleSettingCalendar = ({
       onDayPress={handleDayPress}
       hideArrows={false}
     />
+  )
+}
+
+export const ScheduleSettingCalendar: FC = () => {
+  const tripStore = useTripStore()
+  const {
+    theme: {colors},
+  } = useTheme()
+
+  const [dateInterval, setDateInterval] = useState<DateInterval>({
+    start: tripStore.startDateISOString
+      ? new Date(tripStore.startDateISOString)
+      : undefined,
+    end: tripStore.endDateISOString
+      ? new Date(tripStore.endDateISOString)
+      : undefined,
+  })
+
+  const isScheduleSet = dateInterval.start !== undefined
+
+  const toLocaleDateMonthString = (date?: Date) =>
+    date
+      ? `${date?.toLocaleDateString(undefined, {
+          month: 'short',
+        })} ${date?.toLocaleDateString(undefined, {
+          day: 'numeric',
+        })}`
+      : undefined
+
+  const scheduleText = (
+    <>
+      {
+        <TransText style={$dateTextStyle} disabled={!dateInterval.start}>
+          {toLocaleDateMonthString(dateInterval.start) || '떠나는 날'}
+        </TransText>
+      }
+      {' - '}
+      {
+        <TransText style={$dateTextStyle} disabled={!dateInterval.end}>
+          {toLocaleDateMonthString(dateInterval.end) || '돌아오는 날'}
+        </TransText>
+      }
+      {'  '}
+      <TransText
+        style={{...$nightsTextStyle, color: colors.text.secondary}}
+        disabled={!dateInterval.end}>
+        {dateInterval.start &&
+          dateInterval.end &&
+          getNightsParsed(dateInterval.start, dateInterval.end)}
+      </TransText>
+    </>
+  )
+  const handleNextPress = useCallback(async () => {
+    tripStore.setProp(
+      'startDateISOString',
+      dateInterval.start?.toISOString() || '',
+    )
+    tripStore.setProp('endDateISOString', dateInterval.end?.toISOString() || '')
+    // await tripStore.patch()
+  }, [tripStore, dateInterval.start, dateInterval.end])
+
+  return (
+    <View>
+      <View style={$dateContainerStyle}>
+        <TransText style={{...$dateTextStyle}}>{scheduleText}</TransText>
+      </View>
+      <View style={$calendarContainerStyle}>
+        <ScheduleSettingCalendarBase
+          dateInterval={dateInterval}
+          setDateInterval={setDateInterval}
+        />
+      </View>
+    </View>
   )
 }
 
@@ -220,7 +262,7 @@ export const ScheduleSettingScreen: FC = () => {
           </TransText>
         }
       </TextInfoListItem> */}
-      <View style={$dateContainerStyle}>
+      {/* <View style={$dateContainerStyle}>
         <TransText style={{...$dateTextStyle}}>{scheduleText}</TransText>
       </View>
       <View style={$calendarContainerStyle}>
@@ -228,7 +270,8 @@ export const ScheduleSettingScreen: FC = () => {
           dateInterval={dateInterval}
           setDateInterval={setDateInterval}
         />
-      </View>
+      </View> */}
+      <ScheduleSettingCalendar />
       <Fab.Container>
         <Fab.NextButton
           promiseBeforeNavigate={handleNextPress}

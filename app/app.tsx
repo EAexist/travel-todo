@@ -56,6 +56,8 @@ const config = {
     //   },
     // },
 
+    Loading: 'loading',
+
     Login: 'login',
     Welcome: 'welcome',
     DestinationSetting: 'new/:tripId/destination',
