@@ -65,7 +65,7 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
         ) : apiStatus === ApiStatus.ERROR ? (
           <>
             <View style={$statusViewStyle}>
-              <Text style={{fontFamily: 'tossface', fontSize: 36}}>😓</Text>
+              <Text style={{fontFamily: 'Tossface', fontSize: 36}}>😓</Text>
               <TransText style={$statusMessageStyle}>
                 오류가 발생했어요.
                 <br />

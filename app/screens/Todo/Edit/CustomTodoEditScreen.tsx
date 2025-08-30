@@ -158,9 +158,7 @@ export const CustomTodoEditScreen: FC<{
           <ListItem containerStyle={$listItemContainerStyle}>
             <TouchableOpacity onPress={handleIconPress}>
               <Observer
-                render={() => (
-                  <Avatar icon={todo.icon} fontSize={28} size={'xlarge'} />
-                )}
+                render={() => <Avatar icon={todo.icon} size={'xlarge'} />}
               />
             </TouchableOpacity>
             <ListItem.Content>

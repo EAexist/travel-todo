@@ -21,10 +21,27 @@ export const Avatar = ({
       {...(!icon?.type || icon?.type === 'tossface'
         ? {
             renderCustomContent: (
-              <Text style={{...styles.titleStyle, fontSize}}>{icon?.name}</Text>
+              <Text
+                style={{
+                  ...styles.titleStyle,
+                  fontSize:
+                    props.size === 'small'
+                      ? 20
+                      : props.size === 'medium'
+                        ? 24
+                        : props.size === 'large'
+                          ? 28
+                          : props.size === 'xlarge'
+                            ? 32
+                            : 36,
+                }}>
+                {icon?.name}
+              </Text>
             ),
           }
-        : {icon})}
+        : {
+            icon,
+          })}
       {...props}>
       {children}
     </RNEAvatar>
@@ -35,7 +52,7 @@ const styles = StyleSheet.create({
   titleStyle: {
     fontFamily: 'Tossface',
     textAlign: 'center',
-    overflow: 'hidden',
+    // overflow: 'hidden',
   },
 })
 
