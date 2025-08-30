@@ -111,7 +111,7 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
   useHeader({
     centerComponent: (
       <View style={$headerTitleStyle}>
-        <Text style={{fontFamily: 'tossface', paddingRight: 8}}>🛌</Text>
+        <Text style={{fontFamily: 'Tossface', paddingRight: 8}}>🛌</Text>
         <TransText>숙소 예약</TransText>
       </View>
     ),

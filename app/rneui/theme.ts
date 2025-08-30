@@ -194,30 +194,37 @@ const theme = createTheme({
     Avatar: (props, {colors}) => ({
       containerStyle: {
         backgroundColor: '#F5F5F7',
+        alignItems: 'center',
+        justifyContent: 'center',
         ...(props.rounded
           ? {}
           : {
               borderRadius: 10,
             }),
-        ...(props.size === 'medium'
+        ...(props.size === 'small'
           ? {
-              width: 40,
-              height: 40,
+              width: 32,
+              height: 32,
             }
-          : props.size === 'large'
+          : props.size === 'medium'
             ? {
                 width: 40,
                 height: 40,
               }
-            : props.size === 'xlarge'
+            : props.size === 'large'
               ? {
-                  width: 60,
-                  height: 60,
+                  width: 40,
+                  height: 40,
                 }
-              : {
-                  width: 32,
-                  height: 32,
-                }),
+              : props.size === 'xlarge'
+                ? {
+                    width: 60,
+                    height: 60,
+                  }
+                : {
+                    width: 32,
+                    height: 32,
+                  }),
         // min-width: 32,
         // min-height: 32,
       },
@@ -225,25 +232,34 @@ const theme = createTheme({
         ? {
             icon: {
               color: colors.primary,
+              size:
+                props.size === 'small'
+                  ? 24
+                  : props.size === 'medium'
+                    ? 30
+                    : props.size === 'large'
+                      ? 36
+                      : props.size === 'xlarge'
+                        ? 40
+                        : 44,
             },
           }
         : {}),
       iconStyle: {
-        borderRadius: 10,
-        ...(props.size === 'medium'
-          ? {
-              width: 20,
-              height: 20,
-            }
-          : props.size === 'xlarge'
-            ? {
-                width: 40,
-                height: 40,
-              }
-            : {
-                // width: 32,
-                // height: 32,
-              }),
+        // ...(props.size === 'medium'
+        //   ? {
+        //       width: 20,
+        //       height: 20,
+        //     }
+        //   : props.size === 'xlarge'
+        //     ? {
+        //         width: 40,
+        //         height: 40,
+        //       }
+        //     : {
+        //         // width: 32,
+        //         // height: 32,
+        //       }),
         // min-width: 32,
         // min-height: 32,
       },
