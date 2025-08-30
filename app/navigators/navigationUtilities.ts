@@ -196,6 +196,9 @@ export function useNavigationPersistence(
 export function navigate(name: unknown, params?: unknown) {
   console.log(`[navigate] ${name} ${JSON.stringify(params)}`)
   if (navigationRef.isReady()) {
+    console.log(
+      `[navigate/navigationRef.isReady] ${name} ${JSON.stringify(params)}`,
+    )
     // @ts-expect-error
     // navigationRef.navigate(name as never, params as never)
     navigationRef.navigate(name, params)

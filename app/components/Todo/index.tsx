@@ -21,7 +21,7 @@ interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
   subtitle?: string
   caption?: string
   rightContent?: ReactNode
-  // avatarStyle?: StyleProp<ViewStyle>
+  avatarStyle?: StyleProp<ViewStyle>
   contentStyle?: StyleProp<ViewStyle>
   avatarProps?: AvatarProps
   titleStyle?: TextStyle
@@ -343,10 +343,12 @@ export const DeleteTodo: FC<{todo: Todo}> = observer(({todo}) => {
         />
       }
       onPress={handlePress}
-      caption={todo.isFlaggedToDelete ? '삭제함' : undefined}
-      {...(todo.isFlaggedToDelete && {
-        avatarStyle: styles.disabled,
+      caption={displayComplete ? '삭제함' : undefined}
+      {...(displayComplete && {
         contentStyle: styles.disabled,
+        avatarProps: {
+          containerStyle: styles.disabled,
+        },
       })}
       title={todo.title}
       icon={todo.icon}

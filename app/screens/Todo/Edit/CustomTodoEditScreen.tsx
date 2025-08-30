@@ -13,7 +13,7 @@ import {CATEGORY_TO_TITLE, Icon, Todo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {useHeader} from '@/utils/useHeader'
 import {ListItem} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
+import {Observer, observer} from 'mobx-react-lite'
 import {FC, useCallback, useRef, useState} from 'react'
 import {
   FlatList,
@@ -40,7 +40,7 @@ export const CustomTodoEditScreen: FC<{
 
   const handleConfirmPress = useCallback(() => {
     setIsConfirmed(true)
-    todo.setProp('title', title)
+    todo.setTitle(title)
     tripStore.patchTodo(todo).then(() => {
       goBack()
     })
@@ -92,9 +92,9 @@ export const CustomTodoEditScreen: FC<{
 
   const iconMenu: {icon: Icon}[] = ICONS.map(icon => ({icon}))
 
-  const handlePress = useCallback(
+  const handlePressNewIcon = useCallback(
     (icon: Icon) => {
-      todo.setProp('icon', icon)
+      todo.setIcon(icon)
       iconBottomSheetModalRef.current?.close()
     },
     [iconBottomSheetModalRef, todo],
@@ -102,7 +102,7 @@ export const CustomTodoEditScreen: FC<{
   const renderIconListItem: ListRenderItem<{icon: Icon}> = useCallback(
     ({item}) => {
       return (
-        <TouchableOpacity onPress={() => handlePress(item.icon)}>
+        <TouchableOpacity onPress={() => handlePressNewIcon(item.icon)}>
           <Avatar
             icon={item.icon}
             fontSize={28}
@@ -127,7 +127,7 @@ export const CustomTodoEditScreen: FC<{
           console.log(
             `[bottomSheetModalRef.current] ${categoryBottomSheetModalRef.current}`,
           )
-          todo.setProp('category', item.category)
+          todo.setCategory(item.category)
           categoryBottomSheetModalRef.current?.close()
         }
         return (
@@ -157,7 +157,11 @@ export const CustomTodoEditScreen: FC<{
         <Title>
           <ListItem containerStyle={$listItemContainerStyle}>
             <TouchableOpacity onPress={handleIconPress}>
-              <Avatar icon={todo.icon} fontSize={28} size={'xlarge'} />
+              <Observer
+                render={() => (
+                  <Avatar icon={todo.icon} fontSize={28} size={'xlarge'} />
+                )}
+              />
             </TouchableOpacity>
             <ListItem.Content>
               <ControlledListItemInput
