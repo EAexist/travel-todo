@@ -10,6 +10,8 @@ import {
   CATEGORY_TO_TITLE,
   FlightModel,
   Todo,
+  TodoContent,
+  TodoContentModel,
   TodoModel,
   TodoPreset,
   TodoPresetModel,
@@ -39,6 +41,7 @@ export const TripStoreModel = types
     destination: types.array(DestinationModel),
     todoMap: types.map(TodoModel),
     todolist: types.map(types.array(types.reference(TodoModel))),
+    customTodoContent: types.array(TodoContentModel),
     activeItem: types.maybeNull(types.reference(TodoModel)),
     accomodation: types.map(AccomodationModel),
     preset: types.map(types.array(TodoPresetModel)),
@@ -58,11 +61,36 @@ export const TripStoreModel = types
     },
   }))
   .actions(store => ({
-    addTodo(todoContent: Partial<Todo>) {
-      const todo = TodoModel.create({
+    createCustomTodoContent(todoContent: TodoContent) {
+      let title = ''
+      let icon = {}
+
+      switch (todoContent.category) {
+        case 'reservation':
+          title = '새 예약'
+          icon = {name: '🎫', type: 'tossface'}
+          break
+        case 'foreign':
+          title = '새 할 일'
+          icon = {name: '⭐️', type: 'tossface'}
+          break
+        case 'goods':
+          title = '새 짐'
+          icon = {name: '🧳', type: 'tossface'}
+          break
+        default:
+          break
+      }
+
+      const newTodoContent = TodoContentModel.create({
         ...todoContent,
-        content: todoContent.content?.id as string,
+        title: todoContent.title || title,
+        icon: todoContent.icon || icon,
       })
+      store.customTodoContent.push(newTodoContent)
+      return newTodoContent
+    },
+    addTodo(todo: Todo) {
       store.todoMap.put(todo)
       if (!store.todolist.has(todo.category)) {
         store.todolist.set(todo.category, [])
@@ -95,6 +123,11 @@ export const TripStoreModel = types
       store.syncOrder()
       /* Nested Object: UseSetProps */
       store.setProp('preset', trip.preset)
+    },
+    resetAllDeleteFlag() {
+      ;[...store.todoMap.values()].forEach(todo =>
+        todo.setProp('isFlaggedToDelete', false),
+      )
     },
     setTodo(todo: Todo) {
       store.todoMap.set(todo.id, todo)
@@ -220,8 +253,13 @@ export const TripStoreModel = types
     /**
      * Create an empty todo and fetch it with backend-generated id.
      */
-    createCustomTodo(todo: Partial<Todo>) {
-      return store.addTodo(todo)
+    createCustomTodo(todoContent: TodoContent) {
+      return store.addTodo(
+        TodoModel.create({
+          content: store.createCustomTodoContent(todoContent),
+          isPreset: false,
+        }),
+      )
       //   return store.todoMap.get(todo.id)
       //   const response = await api.createTodo({tripId: store.id, todo})
       //   if (response.kind === 'ok') {
@@ -444,6 +482,7 @@ export const TripStoreModel = types
      * Delete Todo
      */
     get deleteFlaggedCompletedTrip() {
+      return this.completedTrip
       return this.completedTrip.map(({title, data}) => {
         return {
           title,
@@ -458,6 +497,7 @@ export const TripStoreModel = types
       })
     },
     get deleteFlaggedIncompleteTrip() {
+      return this.incompleteTrip
       return this.incompleteTrip.map(({title, data}) => {
         return {
           title,
@@ -477,6 +517,9 @@ export const TripStoreModel = types
     get todolistWithPreset() {
       return this.sections.map(category => {
         const addedItems = store.todolist.get(category)
+        const addedRresetIds = addedItems
+          ?.filter(item => item.isPreset)
+          .map(item => item.content.id)
         // const addedItemIds = addedItems?.map(item => item.id) as string[]
         return {
           category,
@@ -485,9 +528,14 @@ export const TripStoreModel = types
             ...((addedItems?.map(item => ({
               todo: item,
             })) as {todo?: Todo; preset?: TodoPreset}[]) || []),
-            ...(store.preset.get(category)?.map(preset => ({
-              preset,
-            })) || []),
+            ...(store.preset
+              .get(category)
+              ?.filter(
+                preset => !addedRresetIds?.includes(preset.todoContent.id),
+              )
+              .map(preset => ({
+                preset,
+              })) || []),
           ],
         }
       })
@@ -563,10 +611,12 @@ export const TripStoreModel = types
         (Array.from(store.preset.values()).flat() as TodoPreset[])
           .filter(preset => preset.isFlaggedToAdd)
           .map(async preset => {
-            store.addTodo({
-              content: preset.todoContent,
-              isPreset: true,
-            })
+            store.addTodo(
+              TodoModel.create({
+                content: preset.todoContent,
+                isPreset: true,
+              }),
+            )
             preset.setProp('isFlaggedToAdd', false)
 
             // const response = await api.createTodo({

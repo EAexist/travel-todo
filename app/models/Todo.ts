@@ -94,30 +94,30 @@ export interface Icon extends SnapshotOut<typeof IconModel> {}
 /**
  * PresetTodo
  */
-export const TodoContentModel = types.model('TodoContent').props({
-  id: types.identifier,
-  category: types.string,
-  type: types.string,
-  title: types.string,
-  icon: IconModel,
-})
+export const TodoContentModel = types
+  .model('TodoContent')
+  .props({
+    id: types.optional(types.identifier, () => uuidv4()),
+    category: types.string,
+    type: types.string,
+    title: types.string,
+    icon: IconModel,
+  })
+  .actions(withSetPropAction)
 
 export interface TodoContent extends Instance<typeof TodoContentModel> {}
+export interface TodoContentSnapshotOut
+  extends SnapshotOut<typeof TodoContentModel> {}
+export interface TodoContentSnapshotIn
+  extends SnapshotIn<typeof TodoContentModel> {}
 
-export const PresetTodoContentModel = types.model('PresetTodoContent').props({
-  id: types.identifier,
-  category: types.string,
-  type: types.string,
-  title: types.string,
-  icon: IconModel,
-})
-
-export interface PresetTodoContent
-  extends Instance<typeof PresetTodoContentModel> {}
-export interface PresetTodoContentSnapshotOut
-  extends SnapshotOut<typeof PresetTodoContentModel> {}
-export interface PresetTodoContentSnapshotIn
-  extends SnapshotIn<typeof PresetTodoContentModel> {}
+// export const PresetTodoContentModel = types.model('PresetTodoContent').props({
+//   id: types.identifier,
+//   category: types.string,
+//   type: types.string,
+//   title: types.string,
+//   icon: IconModel,
+// })
 
 /**
  * TodoPreset
@@ -195,6 +195,17 @@ export const TodoModel = types
     },
   }))
   .actions(withSetPropAction)
+  .actions(item => ({
+    setTitle(title: string) {
+      item.content.setProp('title', title)
+    },
+    setIcon(icon: Icon) {
+      item.content.setProp('icon', icon)
+    },
+    setCategory(category: string) {
+      item.content.setProp('category', category)
+    },
+  }))
   .actions(item => ({
     complete() {
       item.setProp('completeDateISOString', new Date().toISOString())

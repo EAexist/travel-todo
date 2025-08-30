@@ -1,19 +1,20 @@
 import {LoadingScreen, useLoadingScreen} from '@/screens/LoadingScreen'
 import {ApiStatus, useStores, useTripStore} from '@/models'
-import {AppStackScreenProps, useNavigate} from '@/navigators'
+import {AppStackScreenProps, navigationRef, useNavigate} from '@/navigators'
 import {observer} from 'mobx-react-lite'
-import {FC, useEffect} from 'react'
+import {FC, useEffect, useState} from 'react'
 
 export const WelcomeScreen: FC<AppStackScreenProps<'Welcome'>> = observer(
   () => {
     const {createTrip, withApiStatus} = useStores()
     const tripStore = useTripStore()
     const {navigateWithTrip} = useNavigate()
+    const [isTripStoreInitialized, setIsTripStoreInitialized] = useState(false)
 
     useEffect(() => {
       const redirect = async () => {
         if (tripStore != null && tripStore?.isInitialized) {
-          navigateWithTrip('Main', {screen: 'Todolist'})
+          setIsTripStoreInitialized(true)
         } else {
           if (tripStore != null) {
             await withApiStatus(tripStore.patch)
@@ -24,6 +25,11 @@ export const WelcomeScreen: FC<AppStackScreenProps<'Welcome'>> = observer(
       }
       redirect()
     }, [])
+
+    useEffect(() => {
+      if (isTripStoreInitialized && navigationRef.isReady())
+        navigateWithTrip('Main', {screen: 'Todolist'})
+    }, [isTripStoreInitialized, navigationRef.isReady()])
 
     // useEffect(() => {
     //   if (rootStore.apiStatus === ApiStatus.SUCCESS) {

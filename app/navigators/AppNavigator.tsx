@@ -152,8 +152,8 @@ const AppStack = observer(function AppStack() {
       }}
       initialRouteName={isAuthenticated ? 'Welcome' : 'Login'}>
       <Stack.Screen name="Loading" component={Screens.Loading} />
+      <Stack.Screen name="Welcome" component={Screens.New.Welcome} />
       <Stack.Group>
-        <Stack.Screen name="Welcome" component={Screens.New.Welcome} />
         <Stack.Screen
           name="DestinationSetting"
           component={Screens.New.DestinationSetting}
@@ -255,10 +255,8 @@ const AppStack = observer(function AppStack() {
       />
       {/* Loading
       <Stack.Screen name="Loading" component={Screens.Loading} /> */}
-      <>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        {/* <Stack.Screen name="Flight" component={LoginScreen} /> */}
-      </>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      {/* <Stack.Screen name="Flight" component={LoginScreen} /> */}
       {/** 🔥 Your screens go here */}
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>

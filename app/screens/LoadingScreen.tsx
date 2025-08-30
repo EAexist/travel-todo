@@ -30,20 +30,24 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
 
     useHeader({backButtonShown: false})
 
+    useEffect(() => {}, [apiStatus])
+
     return (
       <Screen>
         {apiStatus === ApiStatus.PENDING ? (
-          <View style={$statusViewStyle}>
-            <ActivityIndicator />
-            {texts && (
-              <TransText numberOfLines={1} style={$statusMessageStyle}>
-                {texts.length > 0 && texts[0]}
-              </TransText>
-            )}
+          <>
+            <View style={$statusViewStyle}>
+              <ActivityIndicator />
+              {texts && (
+                <TransText numberOfLines={1} style={$statusMessageStyle}>
+                  {texts.length > 0 && texts[0]}
+                </TransText>
+              )}
+            </View>
             <Fab.Container>
               <Fab.Button title={'돌아가기'} onPress={handleNoConnection} />
             </Fab.Container>
-          </View>
+          </>
         ) : apiStatus === ApiStatus.NO_CONNECTION ? (
           <>
             <View style={$statusViewStyle}>

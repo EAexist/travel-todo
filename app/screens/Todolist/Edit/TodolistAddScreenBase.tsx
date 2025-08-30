@@ -7,11 +7,16 @@ import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import {AddPresetTodo, AddTodo, TodoBase} from '@/components/Todo'
 import {useTripStore} from '@/models'
-import {Todo, TodoContent, TodoPreset} from '@/models/Todo'
+import {
+  Todo,
+  TodoContent,
+  TodoContentSnapshotIn,
+  TodoPreset,
+} from '@/models/Todo'
 import {useNavigate} from '@/navigators'
 import {ListItem} from '@rneui/themed'
 import {Observer, observer} from 'mobx-react-lite'
-import {ReactNode, RefObject, useCallback, useRef} from 'react'
+import {ReactNode, RefObject, useCallback, useEffect, useRef} from 'react'
 import {
   DefaultSectionT,
   FlatList,
@@ -39,41 +44,42 @@ export const useAddFlaggedPreset = () => {
   return addFlaggedPreset
 }
 
-export const useHandleAddTodo = ({
+export const useHandleAddCutomTodo = ({
   callerName,
 }: {
   callerName?: 'TodolistSetting' | 'TodolistAdd'
 }) => {
-  const tripStore = useTripStore()
+  const {createCustomTodo} = useTripStore()
   const {navigateWithTrip} = useNavigate()
-  const handleAddTodo = useCallback(
-    (todoCreateDTO: Partial<Todo>) => {
-      const todo = tripStore.createCustomTodo(todoCreateDTO)
+  const handleAddCutomTodo = useCallback(
+    (todoContent: TodoContent) => {
+      const todo = createCustomTodo(todoContent)
+      console.log(`useHandleAddCutomTodo] todo: ${JSON.stringify(todo)}`)
       if (todo) {
         let path = ''
         switch (todo.type) {
           case 'flight':
-            path = 'FlightTodoCreate'
+            path = 'CreateFlightTodo'
             break
           case 'flightTicket':
-            path = 'FlightTicketTodoCreate'
+            path = 'CreateFlightTicketTodo'
             break
           default:
-            path = 'TodoCreate'
+            path = 'CreateCustomTodo'
             break
         }
 
-        navigateWithTrip('TodoCreate', {
+        navigateWithTrip(path, {
           todoId: todo?.id,
           isInitializing: true,
           callerName,
         })
       }
     },
-    [tripStore.createCustomTodo],
+    [createCustomTodo],
   )
   return {
-    handleAddTodo,
+    handleAddCutomTodo,
   }
 }
 
@@ -87,7 +93,7 @@ export const TodolistAddScreenBase = observer(
   }: TodolistAddScreenBaseProps) => {
     const tripStore = useTripStore()
 
-    const {handleAddTodo} = useHandleAddTodo({})
+    const {handleAddCutomTodo} = useHandleAddCutomTodo({})
 
     const renderItem: SectionListRenderItem<
       {todo?: Todo; preset?: TodoPreset},
@@ -128,12 +134,16 @@ export const TodolistAddScreenBase = observer(
                       ? '해외여행 할 일 추가하기'
                       : '짐 추가하기',
                   subtitle: '',
-                  onPress: () => handleAddTodo({category, type: 'custom'}),
+                  onPress: () =>
+                    handleAddCutomTodo({
+                      category,
+                      type: 'custom',
+                    } as TodoContent),
                 })}
           />
         </View>
       ),
-      [handleAddTodo, bottomSheetRef.current],
+      [handleAddCutomTodo, bottomSheetRef.current],
     )
 
     const keyExtractor = useCallback(
@@ -143,6 +153,12 @@ export const TodolistAddScreenBase = observer(
           : `preset-${item.preset.todoContent.id}`,
       [],
     )
+
+    useEffect(() => {
+      console.log(
+        `tripStore.todolistWithPreset: ${JSON.stringify(tripStore.todolistWithPreset)}`,
+      )
+    }, [tripStore.todolistWithPreset])
 
     return (
       <GestureHandlerRootViewWrapper>
@@ -171,13 +187,16 @@ const ReservationTypeDropDownBottomSheet = ({
   ref: RefObject<BottomSheetModal | null>
   callerName: 'TodolistSetting' | 'TodolistAdd'
 }) => {
-  const {handleAddTodo} = useHandleAddTodo({callerName})
+  const {handleAddCutomTodo} = useHandleAddCutomTodo({callerName})
 
   const {useActiveKey, handleBottomSheetModalChange, activate} =
     useNavigationBottomSheet(ref)
 
   useActiveKey(activeKey =>
-    handleAddTodo({category: 'reservation', type: activeKey}),
+    handleAddCutomTodo({
+      category: 'reservation',
+      type: activeKey,
+    } as TodoContent),
   )
 
   interface ReservationTypeOptionData extends Pick<TodoContent, 'type'> {
