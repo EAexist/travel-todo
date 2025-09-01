@@ -1,6 +1,7 @@
 export * from './ErrorScreen/ErrorBoundary'
 // export other screens here
-export * as New from './New'
+export * as CreateTrip from './CreateTrip'
+export * as EditTrip from './EditTrip'
 export * as Todolist from './Todolist'
 export * as Todo from './Todo'
 export * as Confirm from './ConfirmTodoComplete'

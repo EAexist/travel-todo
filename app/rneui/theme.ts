@@ -170,6 +170,7 @@ const colorTheme = createTheme({
     light0: '#2272EB',
     light1: '#E2EEFF',
     secondary: '#F2F3F5',
+    secondaryBg: '#F6F4F2',
     black: '#333D4B',
     active: '#191E28',
     inactive: '#AFB8C1',
@@ -191,6 +192,14 @@ const colorTheme = createTheme({
 const theme = createTheme({
   ...colorTheme,
   components: {
+    SectionCard: () => ({
+      containerStyle: {
+        borderWidth: 0,
+        boxShadow: 'none',
+        borderRadius: 16,
+        paddingHorizontal: 0,
+      },
+    }),
     Avatar: (props, {colors}) => ({
       containerStyle: {
         backgroundColor: '#F5F5F7',
@@ -347,7 +356,7 @@ const theme = createTheme({
     Header: (props, {colors}) => ({
       elevated: false,
       containerStyle: {
-        backgroundColor: colors.white,
+        backgroundColor: colors.transparent,
         // backgroundColor: 'bisque',
         borderBottomWidth: 0,
         height: 48,
@@ -413,14 +422,24 @@ const theme = createTheme({
             color: colors.text?.secondary,
           },
     }),
-    Divider: (_, {colors}) => ({
-      width: 16,
-      color: colors.divider,
-      style: {
-        height: 28,
-        paddingHorizontal: 20,
-      },
-    }),
+    Divider: ({inset}, {colors}) =>
+      inset
+        ? {
+            insetType: 'middle',
+            color: colors.black,
+            width: 1,
+            style: {
+              opacity: 0.5,
+            },
+          }
+        : {
+            width: 16,
+            color: colors.divider,
+            style: {
+              height: 28,
+              paddingHorizontal: 20,
+            },
+          },
     Input: ({primary, label}, {colors}) => ({
       containerStyle: {
         paddingHorizontal: 20,

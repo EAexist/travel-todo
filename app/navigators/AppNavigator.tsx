@@ -29,6 +29,7 @@ import {MainTabNavigator, MainTabParamList} from './MainTabNavigator'
 import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet'
 import {Platform, View, ViewStyle} from 'react-native'
+import {EditTripScreen} from '@/screens/EditTrip/EditTripScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -50,12 +51,17 @@ export type FlightSettingStackProps = TodoStackProps & {
 }
 
 export type AppStackParamList = {
-  /* Login */
-  Login: {}
-  Welcome: {}
+  /* Common */
   Loading: {texts?: string[]}
 
+  Login: {}
+  Welcome: {}
+
+  /* Eidt Trip */
   EditTrip: TripStackProps
+  EditTripDestination: TripStackProps
+  EditTripSchedule: TripStackProps
+  EditTripTitle: TripStackProps
 
   /* Create Trip */
   DestinationSetting: TripStackProps
@@ -152,31 +158,46 @@ const AppStack = observer(function AppStack() {
       }}
       initialRouteName={isAuthenticated ? 'Welcome' : 'Login'}>
       <Stack.Screen name="Loading" component={Screens.Loading} />
-      <Stack.Screen name="Welcome" component={Screens.New.Welcome} />
+      <Stack.Screen name="Welcome" component={Screens.CreateTrip.Welcome} />
       <Stack.Group>
         <Stack.Screen
           name="DestinationSetting"
-          component={Screens.New.DestinationSetting}
+          component={Screens.CreateTrip.DestinationSetting}
         />
         <Stack.Screen
           name="ScheduleSetting"
-          component={Screens.New.ScheduleSetting}
+          component={Screens.CreateTrip.ScheduleSetting}
         />
         <Stack.Screen
           name="DestinationSearch"
-          component={Screens.New.DestinationSearch}
+          component={Screens.CreateTrip.DestinationSearch}
         />
         <Stack.Screen
           name="TitleSetting"
-          component={Screens.New.TitleSetting}
+          component={Screens.CreateTrip.TitleSetting}
         />
         <Stack.Screen
           name="TodolistSetting"
-          component={Screens.New.TodolistSetting}
+          component={Screens.CreateTrip.TodolistSetting}
         />
       </Stack.Group>
       <Stack.Group>
         <Stack.Screen name="Main" component={MainTabNavigator} />
+      </Stack.Group>
+      <Stack.Group>
+        <Stack.Screen name="EditTrip" component={EditTripScreen} />
+        <Stack.Screen
+          name="EditTripDestination"
+          component={Screens.EditTrip.EditTripDestination}
+        />
+        <Stack.Screen
+          name="EditTripSchedule"
+          component={Screens.EditTrip.EditTripSchedule}
+        />
+        <Stack.Screen
+          name="EditTripTitle"
+          component={Screens.EditTrip.EditTripTitle}
+        />
       </Stack.Group>
       <Stack.Group>
         <Stack.Screen name="TodolistAdd" component={Screens.Todolist.Add} />
@@ -324,8 +345,8 @@ const $innerContainerStyle: ViewStyle = {
         width: '100%',
         // maxWidth: 480,
         flex: 1,
-        backgroundColor: 'white',
-        boxShadow: '0 0 20px #0000000d',
+        // backgroundColor: 'red',
+        // boxShadow: '0 0 20px #0000000d',
       }
     : {}),
 }

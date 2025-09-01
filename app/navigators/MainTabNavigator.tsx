@@ -7,20 +7,17 @@ import {CompositeScreenProps} from '@react-navigation/native'
 import {TextStyle, ViewStyle} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {useAppTheme} from '@/utils/useAppTheme'
-
+import {Icon} from '@/components/Icon'
+import {typography} from '@/rneui/theme'
+import * as MainScreens from '@/screens/Main'
+import {useHeader} from '@/utils/useHeader'
+import {Button, useTheme} from '@rneui/themed'
+import {FC} from 'react'
 import {
   AppStackParamList,
   AppStackScreenProps,
   TripStackProps,
 } from './AppNavigator'
-import {Icon} from '@/components/Icon'
-import * as MainScreens from '@/screens/Main'
-import {FC} from 'react'
-import {Button, useTheme} from '@rneui/themed'
-import {typography} from '@/rneui/theme'
-import {useHeader} from '@/utils/useHeader'
-import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
 
 export type MainTabParamList = {
   TripDashboard: TripStackProps
@@ -85,7 +82,24 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
         tabBarInactiveTintColor: theme.colors.inactive,
         tabBarLabelStyle: $tabBarLabel,
         tabBarItemStyle: $tabBarItemStyle,
+        // sceneStyle: $sceneStyle,
       }}>
+      <Tab.Screen
+        name="TripDashboard"
+        initialParams={{tripId: tripId}}
+        component={MainScreens.TripDashboard}
+        options={{
+          tabBarLabel: '여행',
+          tabBarIcon: ({focused}) => (
+            <Icon
+              type="material"
+              name="card-travel"
+              color={focused ? theme.colors.active : theme.colors.inactive}
+              size={24}
+            />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Todolist"
         initialParams={{tripId: tripId}}
@@ -94,14 +108,14 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
           tabBarLabel: '할 일',
           tabBarIcon: ({focused}) => (
             <Icon
+              type="material"
               name="checklist"
               color={focused ? theme.colors.active : theme.colors.inactive}
-              size={28}
+              size={24}
             />
           ),
         }}
       />
-
       <Tab.Screen
         name="Reservation"
         initialParams={{tripId: tripId}}
@@ -110,9 +124,10 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
           tabBarLabel: '예약',
           tabBarIcon: ({focused}) => (
             <Icon
+              type="material"
               name="qr-code"
               color={focused ? theme.colors.active : theme.colors.inactive}
-              size={28}
+              size={24}
             />
           ),
         }}
@@ -122,8 +137,13 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
   )
 }
 
+const $tabBarHeight = 68
+
+// const $sceneStyle: ViewStyle = {
+//   //   paddingBottom: $tabBarHeight,
+// }
 const $tabBarStyle: ViewStyle = {
-  height: 68,
+  height: $tabBarHeight,
   borderTopLeftRadius: 24,
   borderTopRightRadius: 24,
 }

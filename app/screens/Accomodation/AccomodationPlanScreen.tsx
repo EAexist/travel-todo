@@ -7,7 +7,11 @@ import {useStores, useTripStore} from '@/models'
 import {Accomodation} from '@/models/Accomodation'
 import {useNavigate} from '@/navigators'
 import {toCalendarString} from '@/utils/date'
-import {useHeader} from '@/utils/useHeader'
+import {
+  $headerCenterTitleContainerStyle,
+  HeaderCenterTitle,
+  useHeader,
+} from '@/utils/useHeader'
 import {Trans} from '@lingui/react/macro'
 import {ListItem, Text, useTheme} from '@rneui/themed'
 import {observer} from 'mobx-react-lite'
@@ -110,12 +114,12 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
 
   useHeader({
     centerComponent: (
-      <View style={$headerTitleStyle}>
-        <Text style={{fontFamily: 'Tossface', paddingRight: 8}}>🛌</Text>
-        <TransText>숙소 예약</TransText>
-      </View>
+      <HeaderCenterTitle
+        title="숙소 예약"
+        //   icon={{name: '🛌'}}
+      />
     ),
-    centerContainerStyle: {flexGrow: 1, flexBasis: 1, justifyContent: 'center'},
+    centerContainerStyle: $headerCenterTitleContainerStyle,
   })
   return (
     <Screen>
@@ -154,17 +158,3 @@ const $palette = [
   '#FDFFB6',
   '#CAFFBF',
 ]
-
-const $titleContainerstyle: ViewStyle = {
-  // flexShrink: 0,
-  // flexGrow: 0,
-  // flexBasis: 'auto',
-}
-const $contentTextStyle: TextStyle = {
-  textAlign: 'right',
-}
-
-const $headerTitleStyle: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-}
