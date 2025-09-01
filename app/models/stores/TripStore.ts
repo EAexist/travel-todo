@@ -545,6 +545,44 @@ export const TripStoreModel = types
     },
   }))
   .views(store => ({
+    get dDay() {
+      const dday = store.startDate
+        ? store.startDate?.getDate() - new Date().getDate()
+        : null
+      return dday !== null
+        ? dday > 0
+          ? `D-${dday}`
+          : dday === 0
+            ? 'D-day'
+            : '여행 중'
+        : null
+    },
+    get reservedNights() {
+      return [...store.accomodation.values()]
+        .map(acc => acc.checkoutDate.getDate() - acc.checkinDate.getDate())
+        .reduce((accumulator, currentValue) => {
+          return accumulator + currentValue
+        }, 0)
+    },
+    get accomodationTodoStatusText() {
+      return store.endDate && store.startDate
+        ? `${store.endDate?.getDate() - store.startDate?.getDate()}박 중 ${this.reservedNights}박`
+        : null
+    },
+    get reservationTodoStatusText() {
+      const todos = store.todolist
+        .get('reservation')
+        ?.filter(todo => todo.type !== 'accomodation')
+      return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
+    },
+    get foreignTodoStatusText() {
+      const todos = store.todolist.get('foreign')
+      return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
+    },
+    get goodsTodoStatusText() {
+      const todos = store.todolist.get('goods')
+      return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
+    },
     get orderedItems() {
       console.log(store.accomodation.values())
       return [...store.accomodation.values()].sort(

@@ -93,7 +93,8 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
     }, [settingsMenuBottomSheetRef])
 
     useMainScreenHeader({
-      title: tripStore.title,
+      //   title: tripStore.title,
+      title: '할 일',
       rightComponent: (
         <TouchableOpacity
           onPress={handleSettingsButtonPress}

@@ -13,7 +13,7 @@ export interface AvatarProps extends RNEAvatarProps {
 export const Avatar = ({
   children,
   icon,
-  fontSize,
+  size = 'small',
   ...props
 }: PropsWithChildren<AvatarProps>) => {
   return (
@@ -25,13 +25,13 @@ export const Avatar = ({
                 style={{
                   ...styles.titleStyle,
                   fontSize:
-                    props.size === 'small'
-                      ? 20
-                      : props.size === 'medium'
+                    size === 'small'
+                      ? 18
+                      : size === 'medium'
                         ? 24
-                        : props.size === 'large'
+                        : size === 'large'
                           ? 28
-                          : props.size === 'xlarge'
+                          : size === 'xlarge'
                             ? 32
                             : 36,
                 }}>
@@ -42,6 +42,7 @@ export const Avatar = ({
         : {
             icon,
           })}
+      size={size}
       {...props}>
       {children}
     </RNEAvatar>

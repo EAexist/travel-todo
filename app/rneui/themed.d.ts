@@ -1,53 +1,55 @@
 import '@rneui/themed'
-import { ListSubheaderProps } from '@/components/ListSubheader'
-import { SectionHeaderProps } from '@/components/SectionHeader'
+import {ListSubheaderProps} from '@/components/ListSubheader'
+import {SectionHeaderProps} from '@/components/SectionHeader'
 
 declare module '@rneui/themed' {
-    export interface Colors {
-        text: {
-            primary: string
-            secondary: string
-        }
-        contrastText: {
-            primary: string
-            secondary: string
-        }
-        transparent: string
-        light0: string
-        light1: string
-        active: string
-        inactive: string
+  export interface Colors {
+    text: {
+      primary: string
+      secondary: string
     }
-    export interface ListItemProps {
-        useDisabledStyle?: boolean
+    contrastText: {
+      primary: string
+      secondary: string
     }
-    export interface IconProps {
-        primary?: boolean
-    }
-    export interface TextProps {
-        primary?: boolean
-    }
-    export interface InputProps {
-        primary?: boolean
-    }
-    // export interface ListItemInputProps {
-    //     primary?: boolean
+    transparent: string
+    light0: string
+    light1: string
+    active: string
+    inactive: string
+    secondaryBg: string
+  }
+  export interface ListItemProps {
+    useDisabledStyle?: boolean
+  }
+  export interface IconProps {
+    primary?: boolean
+  }
+  export interface TextProps {
+    primary?: boolean
+  }
+  export interface InputProps {
+    primary?: boolean
+  }
+  // export interface ListItemInputProps {
+  //     primary?: boolean
+  // }
+  // export interface ListItemTitleProps extends Partial<TextProps> {
+  //     primary?: boolean
+  // }
+  export interface ComponentTheme {
+    ListSubheader: Partial<ListSubheaderProps>
+    SectionHeader: Partial<SectionHeaderProps>
+    // ListItem: Partial<ListItemProps> & {
+    //     Title: Partial<ListItemTitleProps>,
+    //     Input: Partial<ListItemInputProps>
     // }
-    // export interface ListItemTitleProps extends Partial<TextProps> {
-    //     primary?: boolean
-    // }
-    export interface ComponentTheme {
-        ListSubheader: Partial<ListSubheaderProps>
-        SectionHeader: Partial<SectionHeaderProps>
-        // ListItem: Partial<ListItemProps> & {
-        //     Title: Partial<ListItemTitleProps>,
-        //     Input: Partial<ListItemInputProps>
-        // }
-        Text: Partial<TextProps>
-        Input: Partial<InputProps>
-        Icon: Partial<IconProps>
-    }
-    // export interface ListItem {
-    //   Caption: Component
-    // }
+    Text: Partial<TextProps>
+    Input: Partial<InputProps>
+    Icon: Partial<IconProps>
+    SectionCard: Partial<CardProps>
+  }
+  // export interface ListItem {
+  //   Caption: Component
+  // }
 }

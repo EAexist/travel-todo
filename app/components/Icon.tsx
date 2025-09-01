@@ -1,9 +1,11 @@
-import {Icon as RNEIcon, IconProps as RNEIconProps} from '@rneui/themed'
+import {IconProps as RNEIconProps, Icon as RNEIcon, Text} from '@rneui/themed'
 
 export interface IconProps extends RNEIconProps {}
 
-export const Icon = (props: IconProps) => {
-  //   const { theme, updateTheme, replaceTheme } = props
-
-  return <RNEIcon type={'tossface'} {...props} />
+export const Icon = ({type = 'tossface', ...props}: IconProps) => {
+  return type === 'tossface' ? (
+    <Text>{props.name}</Text>
+  ) : (
+    <RNEIcon {...props} />
+  )
 }

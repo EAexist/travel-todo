@@ -280,9 +280,10 @@ export function Screen(props: ScreenProps) {
     <View
       style={[
         $containerStyle,
-        backgroundColor === 'secondary' && {
-          backgroundColor: theme.colors.grey0,
-        },
+        {backgroundColor},
+        // backgroundColor === 'secondary' && {
+        //   backgroundColor: theme.colors.grey0,
+        // },
         $containerInsets,
       ]}>
       <StatusBar
@@ -314,6 +315,7 @@ const $containerStyle: ViewStyle = {
   flex: 1,
   height: '100%',
   width: '100%',
+  backgroundColor: 'transparent',
 }
 
 const $outerStyle: ViewStyle = {

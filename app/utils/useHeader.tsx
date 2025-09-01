@@ -1,14 +1,26 @@
 import {FC, ReactElement, useEffect, useLayoutEffect} from 'react'
 import {useNavigation} from '@react-navigation/native'
-import {Platform, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native'
+import {
+  Platform,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native'
 import {
   Header,
   HeaderProps as RNEHeaderProps,
   Text,
   TextProps,
+  useTheme,
 } from '@rneui/themed'
 import {BackButton, HeaderIcon, RightActionButton} from '@/components/Header'
 import {NavigateProps} from '@/navigators'
+import {TransText} from '@/components/TransText'
+import {Icon} from '@/models/Todo'
+import {IconProps} from '@/components/Icon'
+import {BlurView} from 'expo-blur'
 
 interface HeaderProps extends RNEHeaderProps {
   headerShown?: boolean
@@ -34,6 +46,7 @@ export function useHeader(
     backNavigateProps,
     onBackPressBeforeNavigate,
     leftComponent,
+    containerStyle,
     ...props
   }: HeaderProps,
   deps: Parameters<typeof useLayoutEffect>[1] = [],
@@ -48,32 +61,41 @@ export function useHeader(
    */
   const usePlatformEffect = Platform.OS === 'web' ? useEffect : useLayoutEffect
 
+  const {
+    theme: {colors},
+  } = useTheme()
+
   // To avoid a visible header jump when navigating between screens, we use
   // `useLayoutEffect`, which will apply the settings before the screen renders.
   usePlatformEffect(() => {
     navigation.setOptions({
       headerShown,
       header: () => (
-        <Header
-          containerStyle={{marginTop: '8%'}}
-          leftComponent={
-            backButtonShown ? (
-              <BackButton
-                navigateProps={backNavigateProps}
-                onBackPressBeforeNavigate={onBackPressBeforeNavigate}
+        <BlurView intensity={1}>
+          <Header
+            leftComponent={
+              backButtonShown ? (
+                <BackButton
+                  navigateProps={backNavigateProps}
+                  onBackPressBeforeNavigate={onBackPressBeforeNavigate}
+                />
+              ) : (
+                leftComponent
+              )
+            }
+            rightComponent={
+              <RightActionButton
+                onPress={onRightPress}
+                title={rightActionTitle}
               />
-            ) : (
-              leftComponent
-            )
-          }
-          rightComponent={
-            <RightActionButton
-              onPress={onRightPress}
-              title={rightActionTitle}
-            />
-          }
-          {...props}
-        />
+            }
+            containerStyle={[
+              containerStyle,
+              // {backgroundColor: colors.transparent},
+            ]}
+            {...props}
+          />
+        </BlurView>
       ),
     })
     // intentionally created API to have user set when they want to update the header via `deps`
@@ -84,7 +106,8 @@ export function useHeader(
 export const useMainScreenHeader = ({
   title,
   rightComponent,
-}: {
+  ...props
+}: HeaderProps & {
   title: string
   rightComponent: ReactElement<{}>
 }) => {
@@ -102,6 +125,7 @@ export const useMainScreenHeader = ({
     rightComponent: rightComponent,
     leftContainerStyle: styles.headerLeftContainer,
     rightContainerStyle: styles.headerRightContainer,
+    ...props,
   })
 }
 
@@ -115,6 +139,22 @@ export const HeaderTitle: FC<TextProps> = props => (
   />
 )
 
+export const HeaderCenterTitle: FC<{icon?: IconProps; title: string}> = ({
+  icon,
+  title,
+}) => {
+  return (
+    <>
+      {icon && (
+        <Text style={{fontFamily: 'Tossface', paddingRight: 8}}>
+          {icon.name}
+        </Text>
+      )}
+      <TransText style={$headerCenterTitleStyle}>{title}</TransText>
+    </>
+  )
+}
+
 const styles = StyleSheet.create({
   headerLeftContainer: {
     flexGrow: 1,
@@ -127,3 +167,15 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
 })
+
+export const $headerCenterTitleContainerStyle: ViewStyle = {
+  flexGrow: 1,
+  flexBasis: 'auto',
+  justifyContent: 'center',
+  flexDirection: 'row',
+  alignItems: 'center',
+}
+
+const $headerCenterTitleStyle: TextStyle = {
+  fontSize: 15,
+}
