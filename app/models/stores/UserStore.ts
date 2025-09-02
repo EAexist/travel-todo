@@ -2,6 +2,7 @@ import {api, GoogleUserDTO} from '@/services/api'
 import {KakaoProfile} from '@react-native-seoul/kakao-login'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from '../helpers/withSetPropAction'
+import {TripStoreModel} from './TripStore'
 
 export const UserStoreModel = types
   .model('UserStore')
@@ -9,7 +10,7 @@ export const UserStoreModel = types
     // authToken: types.maybe(types.string),
     id: types.maybeNull(types.string),
     nickname: types.maybe(types.string),
-    trip: types.array(types.string),
+    trip: types.array(TripStoreModel),
   })
   .actions(withSetPropAction)
   .views(store => ({

@@ -46,6 +46,7 @@ export const TripStoreModel = types
     accomodation: types.map(AccomodationModel),
     preset: types.map(types.array(TodoPresetModel)),
     recommendedFlight: types.array(FlightModel),
+    isReservationPinned: types.optional(types.boolean, false),
   })
   .actions(withSetPropAction)
   .actions(store => ({
@@ -546,16 +547,19 @@ export const TripStoreModel = types
   }))
   .views(store => ({
     get dDay() {
+      const today = new Date()
+      today.setMilliseconds(0)
+      today.setSeconds(0)
+      today.setMinutes(0)
+      today.setHours(0)
+      console.log('today: ', today, store.startDate)
       const dday = store.startDate
-        ? store.startDate?.getDate() - new Date().getDate()
+        ? Math.floor(
+            (store.startDate.getTime() - today.getTime()) /
+              (1000 * 60 * 60 * 24),
+          )
         : null
-      return dday !== null
-        ? dday > 0
-          ? `D-${dday}`
-          : dday === 0
-            ? 'D-day'
-            : '여행 중'
-        : null
+      return dday
     },
     get reservedNights() {
       return [...store.accomodation.values()]
@@ -566,7 +570,7 @@ export const TripStoreModel = types
     },
     get accomodationTodoStatusText() {
       return store.endDate && store.startDate
-        ? `${store.endDate?.getDate() - store.startDate?.getDate()}박 중 ${this.reservedNights}박`
+        ? `${this.reservedNights}박 / ${store.endDate?.getDate() - store.startDate?.getDate()}박`
         : null
     },
     get reservationTodoStatusText() {

@@ -85,8 +85,12 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
       [],
     )
 
-    /* Settings Menu */
+    /* Menu */
     const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
+
+    const handlePinButtonPress = useCallback(() => {
+      settingsMenuBottomSheetRef.current?.present()
+    }, [settingsMenuBottomSheetRef])
 
     const handleSettingsButtonPress = useCallback(() => {
       settingsMenuBottomSheetRef.current?.present()
@@ -96,11 +100,18 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
       //   title: tripStore.title,
       title: '할 일',
       rightComponent: (
-        <TouchableOpacity
-          onPress={handleSettingsButtonPress}
-          style={$headerRightButtonStyle}>
-          <HeaderIcon name="settings" />
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={handlePinButtonPress}
+            style={$headerRightButtonStyle}>
+            <HeaderIcon name="gear" type="octicon" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleSettingsButtonPress}
+            style={$headerRightButtonStyle}>
+            <HeaderIcon name="pin" type="octicon" />
+          </TouchableOpacity>
+        </View>
       ),
     })
 

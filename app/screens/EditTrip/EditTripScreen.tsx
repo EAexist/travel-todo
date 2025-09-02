@@ -1,7 +1,11 @@
 import {FC, useCallback} from 'react'
-import {ListRenderItem, ScrollView} from 'react-native'
+import {ListRenderItem, ScrollView, View} from 'react-native'
 //
-import {ScheduleText} from '@/components/Calendar/index'
+import {
+  $calendarContainerStyle,
+  ScheduleText,
+  ScheduleViewerCalendar,
+} from '@/components/Calendar/index'
 import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
 import {useTripStore} from '@/models'
@@ -22,21 +26,6 @@ import {DestinationListItemBase} from '../CreateTrip/DestinationSettingScreen'
 
 export const EditTripScreen: FC<{}> = observer(({}) => {
   const tripStore = useTripStore()
-
-  useHeader({
-    headerShown: true,
-    leftComponent: (
-      <Text numberOfLines={1} h2>
-        내 여행
-      </Text>
-    ),
-    leftContainerStyle: {
-      flexGrow: 1,
-      paddingLeft: 16,
-      paddingRight: 24,
-    },
-  })
-
   const renderDestinationText: ListRenderItem<Destination> = ({item}) => (
     <DestinationListItemBase item={item} />
   )
@@ -104,21 +93,9 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
           </ListItem.Content>
           <ListItem.Chevron />
         </ListItem>
-        <CalendarProvider
-          date={toCalendarString(
-            tripStore.startDate ? tripStore.startDate : new Date(),
-          )}>
-          <ExpandableCalendar
-            // markedDates={markedDates}
-            initialPosition={Positions.CLOSED}
-            horizontal={false}
-            // ref={calendarRef}
-            // onCalendarToggled={onCalendarToggled}
-            // initialDate={toCalendarString(tripStore.startDate)}
-            // minDate={toCalendarString(tripStore.startDate)}
-            // maxDate={toCalendarString(tripStore.endDate)}
-          />
-        </CalendarProvider>
+        <View style={$calendarContainerStyle}>
+          <ScheduleViewerCalendar />
+        </View>
       </ScrollView>
     </Screen>
   )
