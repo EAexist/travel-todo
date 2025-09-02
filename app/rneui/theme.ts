@@ -334,19 +334,23 @@ const theme = createTheme({
         height: 56,
       },
     }),
-    Chip: (props, {colors}) => ({
+    Chip: ({color}, {colors}) => ({
       titleStyle: {
         ...typography.pretendard.semiBold,
-        color: colors.contrastText.secondary,
         fontSize: 14,
         letterSpacing: 0.16,
         lineHeight: 18,
+        color:
+          color === 'primary'
+            ? colors.contrastText.primary
+            : colors.contrastText.secondary,
       },
       containerStyle: {
         borderRadius: 0,
       },
       buttonStyle: {
-        backgroundColor: colors.secondary,
+        backgroundColor:
+          color === 'primary' ? colors.primary : colors.secondary,
         height: 36,
         padding: 4,
         borderRadius: 8,

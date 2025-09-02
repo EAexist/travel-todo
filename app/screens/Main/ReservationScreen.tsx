@@ -4,20 +4,23 @@ import {
   ScrollView,
   SectionList,
   SectionListRenderItem,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 //
 import ListSubheader from '@/components/ListSubheader'
 import {Screen} from '@/components/Screen'
-import {useStores, useTripStore} from '@/models'
+import {useStores} from '@/models'
 import {useNavigate} from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
+import * as Fab from '@/components/Fab'
+import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
 import {ListItemBase} from '@/components/ListItem'
-import {ReservationSnapshot} from '@/models/ReservationStore'
+import {ReservationSnapshot} from '@/models/stores/ReservationStore'
 import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
-import {useHeader} from '@/utils/useHeader'
+import {useMainScreenHeader} from '@/utils/useHeader'
 import {Text} from '@rneui/themed'
 import {Observer} from 'mobx-react-lite'
-import * as Fab from '@/components/Fab'
 
 const ReservationListItem: FC<{reservation: ReservationSnapshot}> = ({
   reservation,
@@ -66,29 +69,30 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
     [],
   )
 
-  useHeader({
-    headerShown: true,
-    backButtonShown: false,
-    leftComponent: (
-      <Text ellipsizeMode="tail" numberOfLines={1} h2>
-        내 예약
-      </Text>
+  /* Menu */
+  const handlePinButtonPress = useCallback(() => {}, [])
+
+  const handleSettingsButtonPress = useCallback(() => {}, [])
+
+  useMainScreenHeader({
+    //   title: tripStore.title,
+    title: '내 예약',
+    rightComponent: (
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={handlePinButtonPress}
+          style={$headerRightButtonStyle}>
+          <HeaderIcon name="gear" type="octicon" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSettingsButtonPress}
+          style={$headerRightButtonStyle}>
+          <HeaderIcon name="pin" type="octicon" />
+        </TouchableOpacity>
+      </View>
     ),
-    leftContainerStyle: {
-      flexGrow: 1,
-      paddingLeft: 16,
-      paddingRight: 24,
-    },
-    //   rightComponent: (
-    // <TouchableOpacity
-    //   onPress={handleSettingsButtonPress}
-    //   style={styles.headerRightButton}>
-    //   <Icon name="settings" color="#333d4b" size={24} />
-    // </TouchableOpacity>
-    //   ),
-    //   leftContainerStyle: styles.headerLeftContainer,
-    //   rightContainerStyle: styles.headerRightContainer,
   })
+
   return (
     <Screen>
       <ScrollView>

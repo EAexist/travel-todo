@@ -30,6 +30,7 @@ import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet'
 import {Platform, View, ViewStyle} from 'react-native'
 import {EditTripScreen} from '@/screens/EditTrip/EditTripScreen'
+import {TripListScreen} from '@/screens/TripList'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -56,6 +57,7 @@ export type AppStackParamList = {
 
   Login: {}
   Welcome: {}
+  TripList: {}
 
   /* Eidt Trip */
   EditTrip: TripStackProps
@@ -157,6 +159,7 @@ const AppStack = observer(function AppStack() {
         },
       }}
       initialRouteName={isAuthenticated ? 'Welcome' : 'Login'}>
+      <Stack.Screen name="TripList" component={TripListScreen} />
       <Stack.Screen name="Loading" component={Screens.Loading} />
       <Stack.Screen name="Welcome" component={Screens.CreateTrip.Welcome} />
       <Stack.Group>
