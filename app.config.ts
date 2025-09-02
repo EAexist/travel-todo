@@ -40,6 +40,7 @@ module.exports = ({config}: ConfigContext): Partial<ExpoConfig> => {
       ...existingPlugins,
       require('./plugins/withSplashScreen').withSplashScreen,
       require('./plugins/withComposeCompiler').withComposeCompiler,
+      'expo-background-task',
     ],
   }
 }
