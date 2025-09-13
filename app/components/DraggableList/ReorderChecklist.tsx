@@ -1,7 +1,7 @@
-import {useStores, useTripStore} from '@/models'
+import {useTripStore} from '@/models'
 import {Todo} from '@/models/Todo'
 import {useCallback} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet} from 'react-native'
 import Animated, {useAnimatedRef} from 'react-native-reanimated'
 import type {
   SortableGridDragEndParams,
@@ -9,7 +9,6 @@ import type {
 } from 'react-native-sortables'
 import Sortable from 'react-native-sortables'
 import {ReorderTodo} from '../Todo'
-import {Text} from '@rneui/themed'
 
 export const ReorderTrip = () => {
   const scrollableRef = useAnimatedRef<Animated.ScrollView>()

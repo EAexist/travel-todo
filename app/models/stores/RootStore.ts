@@ -1,11 +1,9 @@
-import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {UserStoreModel, UserStoreSnapshot} from './UserStore'
-import {TripStoreModel, TripStoreSnapshot} from './TripStore'
-import {TodoModel} from '@/models/Todo'
-import {ReservationStoreModel} from './ReservationStore'
-import {withSetPropAction} from '@/models/helpers/withSetPropAction'
-import {api} from '@/services/api'
-import {GeneralApiProblem} from '@/services/api/apiProblem'
+import { withSetPropAction } from '@/models/helpers/withSetPropAction'
+import { api } from '@/services/api'
+import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { ReservationStoreModel } from './ReservationStore'
+import { TripStoreModel, TripStoreSnapshot } from './TripStore'
+import { UserStoreModel } from './UserStore'
 
 // const GeneralApiProblemType = types.custom<
 //   GeneralApiProblem,
@@ -18,47 +16,20 @@ import {GeneralApiProblem} from '@/services/api/apiProblem'
 //     return value
 //   },
 // })
-
-export enum ApiStatus {
-  IDLE = 'idle',
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  ERROR = 'error',
-  NO_CONNECTION = 'no_connection',
-}
-
 /**
  * A RootStore model.
  */
 export const RootStoreModel = types
   .model('RootStore')
   .props({
-    userStore: types.optional(UserStoreModel, {id: null}),
+    userStore: types.optional(UserStoreModel, { id: null }),
     // userStore: types.optional(UserStoreModel, {id: '0'}),
     tripStore: types.maybeNull(TripStoreModel),
     reservationStore: types.optional(ReservationStoreModel, {}),
-    apiStatus: types.enumeration<ApiStatus>(
-      'ApiStatus',
-      Object.values(ApiStatus),
-    ),
-    //   reservationStore: types.maybe(ReservationStoreModel),
-    // roundTripStore: types.optional(TodoModel, {
-    //   id: '',
-    //   type: 'flight',
-    //   category: 'reservation',
-    //   title: '',
-    //   icon: {
-    //     name: '✈️',
-    //     type: 'tossface',
-    //   },
-    //   note: '',
-    //   isFlaggedToDelete: false,
-    //   orderKey: -1,
-    //   completeDateISOString: null,
-    //   presetId: null,
-    //   departure: null,
-    //   arrival: null,
-    // }),
+    // apiStatus: types.enumeration<ApiStatus>(
+    //   'ApiStatus',
+    //   Object.values(ApiStatus),
+    // ),
   })
   .actions(withSetPropAction)
   //   .actions(rootStore => ({
@@ -74,26 +45,7 @@ export const RootStoreModel = types
   //       }
   //     },
   //   }))
-  .actions(store => ({
-    setApiStatusIdle() {
-      store.setProp('apiStatus', ApiStatus.IDLE)
-    },
-    handleResponseStatus(kind: string) {
-      if (store.apiStatus == ApiStatus.PENDING)
-        switch (kind) {
-          case 'ok':
-            store.setProp('apiStatus', ApiStatus.SUCCESS)
-            break
-          case 'timeout':
-          case 'cannot-connect':
-            store.setProp('apiStatus', ApiStatus.NO_CONNECTION)
-            break
-          default:
-            store.setProp('apiStatus', ApiStatus.ERROR)
-            break
-        }
-    },
-  }))
+  .actions(store => ({}))
   .actions(store => ({
     fetchTrip: async (tripId: string) => {
       console.log(`[RootStore.fetchTrip] tripId=${tripId}`)
@@ -107,20 +59,14 @@ export const RootStoreModel = types
     },
     async createTrip() {
       return store.userStore.createTrip().then(kind => {
-        if (kind === 'ok' && store.userStore.trip[-1].id) {
-          return this.fetchTrip(store.userStore.trip[-1].id).then(kind => {
-            return kind
-          })
+        if (kind === 'ok') {
+          return this.fetchTrip(store.userStore.tripSummary[0].id).then(
+            kind => {
+              return kind
+            },
+          )
         } else return kind
       })
-    },
-    async withApiStatus<T>(action: (args: T) => Promise<string>) {
-      return (args: T) => {
-        store.setProp('apiStatus', ApiStatus.PENDING)
-        action(args).then((kind: string) => {
-          store.handleResponseStatus(kind)
-        })
-      }
     },
   }))
 

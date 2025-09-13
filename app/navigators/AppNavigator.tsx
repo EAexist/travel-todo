@@ -4,10 +4,18 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import {BackButton} from '@/components/Header'
+import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
+import { FabProvider } from '@/components/Fab'
+import { BackButton } from '@/components/Header'
 import theme from '@/rneui/theme'
 import * as Screens from '@/screens'
-import {useThemeProvider} from '@/utils/useAppTheme'
+import { EditTripScreen } from '@/screens/EditTrip/EditTripScreen'
+import { LoginScreen } from '@/screens/Login/LoginScreen'
+import { TripListScreen } from '@/screens/TripListScreen'
+import { ApiStatusProvider } from '@/utils/useApiStatus'
+import { useThemeProvider } from '@/utils/useAppTheme'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -16,21 +24,14 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack'
-import {Header, ThemeProvider, useTheme} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {ComponentProps} from 'react'
+import { Header, ThemeProvider, useTheme } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { ComponentProps } from 'react'
+import { Platform, View, ViewStyle } from 'react-native'
 import Config from '../config'
-import {useStores, useTripStore} from '../models'
-import {navigationRef, useBackButtonHandler} from './navigationUtilities'
-import {FabProvider} from '@/components/Fab'
-import {LoginScreen} from '@/screens/Login/LoginScreen'
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
-import {MainTabNavigator, MainTabParamList} from './MainTabNavigator'
-import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet'
-import {Platform, View, ViewStyle} from 'react-native'
-import {EditTripScreen} from '@/screens/EditTrip/EditTripScreen'
-import {TripListScreen} from '@/screens/TripListScreen'
+import { useStores } from '../models'
+import { MainTabNavigator, MainTabParamList } from './MainTabNavigator'
+import { navigationRef, useBackButtonHandler } from './navigationUtilities'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -45,16 +46,16 @@ import {TripListScreen} from '@/screens/TripListScreen'
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
-export type TripStackProps = {tripId: string}
-export type TodoStackProps = TripStackProps & {todoId: string}
+export type TripStackProps = { tripId: string }
+export type TodoStackProps = TripStackProps & { todoId: string }
 export type FlightSettingStackProps = TodoStackProps & {
   callerName: 'TodolistSetting' | 'TodolistAdd'
 }
 
 export type AppStackParamList = {
   /* Common */
-  Loading: {texts?: string[]; onSuccess?: () => void}
-  RequireConnection: {title?: string}
+  Loading: { texts?: string[]; onProblem?: () => void }
+  RequireConnection: { title?: string }
 
   Login: {}
   Welcome: {}
@@ -84,9 +85,9 @@ export type AppStackParamList = {
   TodolistReorder: TripStackProps
 
   /* Accomodation */
-  AccomodationPlan: TripStackProps & {accomodationId: string}
-  Accomodation: TripStackProps & {accomodationId: string}
-  AccomodationNote: TripStackProps & {accomodationId: string}
+  AccomodationPlan: TripStackProps & { accomodationId: string }
+  Accomodation: TripStackProps & { accomodationId: string }
+  AccomodationNote: TripStackProps & { accomodationId: string }
   CreateAccomodation: TripStackProps
 
   //   Reservation: TripStackProps & {reservationId: string}
@@ -106,9 +107,9 @@ export type TodoAppStackParamList = {
   ConfirmFlightTicket: TodoStackProps
 
   /* Create Todo */
-  CreateCustomTodo: FlightSettingStackProps & {isInitializing: boolean}
-  CreateFlightTodo: FlightSettingStackProps & {isInitializing: boolean}
-  CreateFlightTicketTodo: FlightSettingStackProps & {isInitializing: boolean}
+  CreateCustomTodo: FlightSettingStackProps & { isInitializing: boolean }
+  CreateFlightTodo: FlightSettingStackProps & { isInitializing: boolean }
+  CreateFlightTicketTodo: FlightSettingStackProps & { isInitializing: boolean }
 
   /* Edit Todo */
   TodoTitle: TodoStackProps
@@ -139,11 +140,11 @@ const Tab = createBottomTabNavigator()
 
 const AppStack = observer(function AppStack() {
   const {
-    userStore: {isAuthenticated},
+    userStore: { isAuthenticated },
   } = useStores()
 
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
 
   return (
@@ -152,7 +153,7 @@ const AppStack = observer(function AppStack() {
         header: () => (
           <Header
             leftComponent={<BackButton />}
-            containerStyle={{marginTop: '8%'}}
+            containerStyle={{ marginTop: '8%' }}
           />
         ),
         contentStyle: {
@@ -310,7 +311,7 @@ export const AppNavigator = observer(function AppNavigator(
   useBackButtonHandler(routeName => exitRoutes.includes(routeName))
 
   return (
-    <AppThemeProvider value={{themeScheme, setThemeContextOverride}}>
+    <AppThemeProvider value={{ themeScheme, setThemeContextOverride }}>
       <ThemeProvider theme={theme}>
         <View style={$outerContainerStyle}>
           <View style={$innerContainerStyle}>
@@ -326,11 +327,13 @@ export const AppNavigator = observer(function AppNavigator(
                     },
                   }}
                   {...props}>
-                  <FabProvider>
-                    <Screens.ErrorBoundary catchErrors={Config.catchErrors}>
-                      <AppStack />
-                    </Screens.ErrorBoundary>
-                  </FabProvider>
+                  <ApiStatusProvider>
+                    <FabProvider>
+                      <Screens.ErrorBoundary catchErrors={Config.catchErrors}>
+                        <AppStack />
+                      </Screens.ErrorBoundary>
+                    </FabProvider>
+                  </ApiStatusProvider>
                 </NavigationContainer>
               </BottomSheetModalProvider>
             </GestureHandlerRootViewWrapper>

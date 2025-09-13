@@ -1,16 +1,16 @@
-import {Accomodation, AccomodationSnapshotIn} from '@/models/Accomodation'
-import {Destination, DestinationSnapshotIn} from '@/models/Destination'
+import { Accomodation, AccomodationSnapshotIn } from '@/models/Accomodation'
+import { Destination, DestinationSnapshotIn } from '@/models/Destination'
 import {
   Todo,
   TodoPresetItem,
   TodoPresetItemSnapshotIn,
   TodoSnapshotIn,
 } from '@/models/Todo'
-import {TripStore, TripStoreSnapshot} from '@/models/stores/TripStore'
-import {UserStore, UserStoreSnapshot} from '@/models/stores/UserStore'
-import {User} from '@react-native-google-signin/google-signin'
-import {ApisauceConfig} from 'apisauce'
-import {getSnapshot} from 'mobx-state-tree'
+import { TripStore, TripStoreSnapshot } from '@/models/stores/TripStore'
+import { UserStore, UserStoreSnapshot } from '@/models/stores/UserStore'
+import { User } from '@react-native-google-signin/google-signin'
+import { ApisauceConfig } from 'apisauce'
+import { getSnapshot } from 'mobx-state-tree'
 
 /**
  * The options used to configure apisauce.
@@ -40,14 +40,17 @@ export type WithStatus<T> = T & {
 
 export type GoogleUserDTO = User['user']
 
-export interface UserAccountDTO extends Omit<UserStoreSnapshot, 'id'> {
-  id?: number
-}
+export interface UserAccountDTO extends UserStoreSnapshot {}
+// export interface UserAccountDTO extends Omit<UserStoreSnapshot, 'id'> {
+//   id?: number
+// }
 
 export interface TripDTO
-  extends Omit<
-    TripStoreSnapshot,
-    'id' | 'todoMap' | 'todolist' | 'accomodation' | 'destination'
+  extends Partial<
+    Omit<
+      TripStoreSnapshot,
+      'id' | 'todoMap' | 'todolist' | 'accomodation' | 'destination'
+    >
   > {
   id?: string
   todolist?: TodoDTO[]
@@ -64,16 +67,18 @@ export interface TodoDTO
 //   tripId: number
 // }
 
+// export interface DestinationDTO extends DestinationSnapshotIn {}
 export interface DestinationDTO extends Omit<DestinationSnapshotIn, 'id'> {
-  id?: number
+  id?: string
 }
-export interface PresetDTO
-  extends Omit<TodoPresetItemSnapshotIn, 'todoContent'> {
-  todoContent: PresetTodoContentDTO
-}
+export interface PresetDTO extends TodoPresetItemSnapshotIn {}
+//   extends Omit<TodoPresetItemSnapshotIn, 'todoContent'> {
+//   todoContent: PresetTodoContentDTO
+// }
 
+// export interface PresetTodoContentDTO extends TodoPresetItem {}
 export interface PresetTodoContentDTO extends Omit<TodoPresetItem, 'id'> {
-  id: number
+  id: string
 }
 
 export interface ApiPresetResponse {
@@ -160,12 +165,12 @@ export const mapToDestinationDTO: (
   destination: Destination,
 ) => DestinationDTO = destination => ({
   ...destination,
-  id: destination.id ? Number(destination.id) : undefined,
+  //   id: destination.id ? Number(destination.id) : undefined,
 })
 
 export const mapToDestination: (
   destination: DestinationDTO,
-) => Destination = destination => {
+) => DestinationSnapshotIn = destination => {
   if (destination.id)
     return {
       ...destination,
@@ -180,7 +185,7 @@ export const mapToTodoDTO: (
   //   trip_id?: number,
 ) => TodoDTO = todo => ({
   ...todo,
-  id: todo.id ? Number(todo.id) : undefined,
+  //   id: todo.id ? Number(todo.id) : undefined,
   //   isPreset: false,
   //   orderKey: orderKey,
   //   trip_id: trip_id,
@@ -197,7 +202,7 @@ export const mapToTripDTO: (
   trip: Partial<TripStore>,
 ) => Partial<TripDTO> = trip => ({
   ...getSnapshot(trip),
-  id: Number(trip.id),
+  //   id: Number(trip.id),
   todolist: trip.todolist?.values()
     ? Array.from(trip.todolist.values())
         .map(todolist => {
@@ -219,13 +224,13 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
   ].filter(c => c !== undefined)
   return {
     ...tripDTO,
-    id: tripDTO.id.toString(),
-    title: tripDTO.title || '',
-    todoMap: tripDTO.todolist.reduce((acc: {[key: string]: any}, todoDTO) => {
+    id: tripDTO.id?.toString(),
+    // title: tripDTO.title || '',
+    todoMap: tripDTO.todolist.reduce((acc: { [key: string]: any }, todoDTO) => {
       if (todoDTO.id) acc[todoDTO.id?.toString()] = mapToTodo(todoDTO)
       return acc
     }, {}),
-    todolist: categories.reduce((acc: {[key: string]: any}, category) => {
+    todolist: categories.reduce((acc: { [key: string]: any }, category) => {
       acc[category] = tripDTO.todolist
         .filter(todo => todo.content?.category === category)
         .toSorted((a, b) => (a.orderKey as number) - (b.orderKey as number))
@@ -233,7 +238,7 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
       return acc
     }, {}),
     accomodation: tripDTO.accomodation.reduce(
-      (acc: {[key: string]: any}, accomodation) => {
+      (acc: { [key: string]: any }, accomodation) => {
         acc[accomodation.id.toString()] = accomodation
         return acc
       },
@@ -244,11 +249,13 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
       .map(dest => mapToDestination(dest)),
   }
 }
-export const mapToPreset: (preset: PresetDTO) => TodoPresetItem = preset => ({
+export const mapToPreset: (
+  preset: PresetDTO,
+) => TodoPresetItemSnapshotIn = preset => ({
   ...preset,
   todoContent: {
     ...preset.todoContent,
-    id: preset.todoContent.id.toString(),
+    // id: preset.todoContent.id.toString(),
   },
 })
 

@@ -9,19 +9,12 @@
  *
  * @refresh reset
  */
-import {api} from '@/services/api'
-import {autorun, reaction} from 'mobx'
-import {applySnapshot, IDisposer, onSnapshot} from 'mobx-state-tree'
+import { RootStore, RootStoreSnapshot } from '@/models/stores/RootStore'
+import { api } from '@/services/api'
+import { autorun, reaction } from 'mobx'
+import { applySnapshot, IDisposer, onSnapshot } from 'mobx-state-tree'
 import * as storage from '../../utils/storage'
-import {
-  ApiStatus,
-  RootStore,
-  RootStoreSnapshot,
-} from '@/models/stores/RootStore'
-import {RootStoreModel} from '@/models/stores/RootStore'
-import {UserStoreModel} from '@/models/stores/UserStore'
-import {TripStoreModel} from '@/models/stores/TripStore'
-import {DestinationModel} from '../Destination'
+import { ApiStatus } from '@/utils/useApiStatus'
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -36,7 +29,7 @@ export async function setupRootStore(rootStore: RootStore) {
   let restoredState: RootStoreSnapshot | undefined | null
 
   try {
-    storage.clear()
+    // storage.clear()
 
     /**
      * !!Test Only
@@ -144,5 +137,5 @@ export async function setupRootStore(rootStore: RootStore) {
     },
   )
 
-  return {rootStore, restoredState, unsubscribe}
+  return { rootStore, restoredState, unsubscribe }
 }

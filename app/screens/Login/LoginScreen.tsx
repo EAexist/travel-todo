@@ -1,29 +1,31 @@
-import {FC, useCallback} from 'react'
+import { FC, useCallback } from 'react'
 //
-import {Container} from '@/components/Fab'
-import {GoogleLoginButton} from '@/components/Login/GoogleLoginButton'
-import {LoginButton} from '@/components/Login/LoginButton'
-import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
-import {AppStackScreenProps} from '@/navigators'
-import {useLoadingScreen} from '@/screens/Loading'
-import {loadString, saveString} from '@/utils/storage'
-import {useHeader} from '@/utils/useHeader'
+import { Container } from '@/components/Fab'
+import { GoogleLoginButton } from '@/components/Login/GoogleLoginButton'
+import { LoginButton } from '@/components/Login/LoginButton'
+import { Screen } from '@/components/Screen'
+import { useStores } from '@/models'
+import { AppStackScreenProps } from '@/navigators'
+import { useLoadingScreen } from '@/screens/Loading'
+import { loadString, saveString } from '@/utils/storage'
+import { useHeader } from '@/utils/useHeader'
 import {
   getProfile,
   KakaoOAuthToken,
   login,
 } from '@react-native-seoul/kakao-login'
-import {GoogleOAuthProvider} from '@react-oauth/google'
-import {Image, Text} from '@rneui/themed'
+import { StackActions } from '@react-navigation/native'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+import { Image, Text } from '@rneui/themed'
 import * as appLogo from 'assets/images/app/logo.png'
-import {observer} from 'mobx-react-lite'
-import {Platform, View} from 'react-native'
-import {StackActions} from '@react-navigation/native'
+import { observer } from 'mobx-react-lite'
+import { Platform, View } from 'react-native'
+import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 
 export const LoginScreen: FC<AppStackScreenProps<'Login'>> = observer(
-  ({navigation}) => {
-    const {userStore, withApiStatus} = useStores()
+  ({ navigation }) => {
+    const { userStore } = useStores()
+    const { guestLoginWithApiStatus } = useActionsWithApiStatus()
 
     const handleKakaoLoginPress = useCallback(async () => {
       console.log(`[handleKakaoLoginPress]`)
@@ -37,10 +39,15 @@ export const LoginScreen: FC<AppStackScreenProps<'Login'>> = observer(
       await userStore.kakaoLogin(token.idToken, profile)
     }, [])
 
-    useHeader({backButtonShown: false})
-    useLoadingScreen({
-      onSuccess: () => navigation.dispatch(StackActions.replace('Welcome', {})),
-    })
+    useHeader({ backButtonShown: false })
+    useLoadingScreen()
+
+    const handleGuest = useCallback(async () => {
+      await guestLoginWithApiStatus({
+        onSuccess: () =>
+          navigation.dispatch(StackActions.replace('Welcome', {})),
+      })
+    }, [guestLoginWithApiStatus])
 
     return (
       <GoogleOAuthProvider clientId={process.env.GOOGLE_OAUTH_CLIENT_ID_WEB}>
@@ -56,23 +63,21 @@ export const LoginScreen: FC<AppStackScreenProps<'Login'>> = observer(
             <Image
               source={appLogo}
               containerStyle={{}}
-              style={{width: 96, height: 96}}
+              style={{ width: 96, height: 96 }}
             />
-            <Text style={{fontWeight: 700, fontSize: 36, letterSpacing: -1}}>
+            <Text style={{ fontWeight: 700, fontSize: 36, letterSpacing: -1 }}>
               TRIP TODO
             </Text>
           </View>
           {/* </View> */}
-          <View style={{alignItems: 'center'}}>
-            <View style={{width: '100%', maxWidth: 440}}>
+          <View style={{ alignItems: 'center' }}>
+            <View style={{ width: '100%', maxWidth: 440 }}>
               <Container fixed={false}>
                 {/* <KakaoLoginButton onPress={handleKakaoLoginPress} /> */}
                 <GoogleLoginButton />
                 {Platform.OS === 'web' && (
                   <LoginButton
-                    onPress={async () => {
-                      await withApiStatus(userStore.guestLogin)
-                    }}
+                    onPress={handleGuest}
                     title="로그인 없이 사용해보기"
                   />
                 )}

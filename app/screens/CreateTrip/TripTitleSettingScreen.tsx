@@ -1,12 +1,12 @@
 import * as Fab from '@/components/Fab'
-import {ControlledInput} from '@/components/Input'
+import { ControlledInput } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import {Screen} from '@/components/Screen'
-import {useTripStore} from '@/models'
-import {FC, useCallback} from 'react'
-import {View} from 'react-native'
-import {useSetValueScreen} from './useSetValueScreen'
-import {EditScreenBaseProps} from '.'
+import { Screen } from '@/components/Screen'
+import { useTripStore } from '@/models'
+import { FC, useCallback } from 'react'
+import { View } from 'react-native'
+import { useSetValueScreen } from './useSetValueScreen'
+import { EditScreenBaseProps } from '.'
 
 export const TripTitleEditScreenBase: FC<EditScreenBaseProps> = ({
   isInitialSettingScreen,
@@ -17,13 +17,12 @@ export const TripTitleEditScreenBase: FC<EditScreenBaseProps> = ({
     tripStore.setProp('title', value)
   }, [])
 
-  const {value, setValue, promiseBeforeNavigate} = useSetValueScreen({
-    initialValue:
-      tripStore.title.length > 0
-        ? tripStore.title
-        : tripStore.isDestinationSet
-          ? `${tripStore.destination.map(dest => dest.title).join(', ')} 여행`
-          : '수고한 나를 위한 여행',
+  const { value, setValue, promiseBeforeNavigate } = useSetValueScreen({
+    initialValue: tripStore.title
+      ? tripStore.title
+      : tripStore.isDestinationSet
+        ? `${tripStore.destination.map(dest => dest.title).join(', ')} 여행`
+        : '수고한 나를 위한 여행',
     onConfirm: handleNextPress,
   })
 
