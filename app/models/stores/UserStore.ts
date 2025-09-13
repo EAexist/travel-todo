@@ -1,8 +1,8 @@
-import {api, GoogleUserDTO} from '@/services/api'
-import {KakaoProfile} from '@react-native-seoul/kakao-login'
-import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {withSetPropAction} from '../helpers/withSetPropAction'
-import {TripStoreModel, TripSummaryModel} from './TripStore'
+import { api, GoogleUserDTO } from '@/services/api'
+import { KakaoProfile } from '@react-native-seoul/kakao-login'
+import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { withSetPropAction } from '../helpers/withSetPropAction'
+import { TripSummaryModel } from './TripStore'
 
 export const UserStoreModel = types
   .model('UserStore')
@@ -10,7 +10,7 @@ export const UserStoreModel = types
     // authToken: types.maybe(types.string),
     id: types.maybeNull(types.string),
     nickname: types.maybe(types.string),
-    trip: types.array(TripSummaryModel),
+    tripSummary: types.array(TripSummaryModel),
   })
   .actions(withSetPropAction)
   .views(store => ({
@@ -23,7 +23,7 @@ export const UserStoreModel = types
     setUser(user: UserStoreSnapshot) {
       store.setProp('id', user.id)
       store.setProp('nickname', user.nickname)
-      store.setProp('trip', user.trip)
+      store.setProp('tripSummary', user.tripSummary || [])
     },
   }))
   .actions(store => ({
@@ -49,7 +49,7 @@ export const UserStoreModel = types
         )
         if (response.kind === 'ok') {
           console.log('changed')
-          store.setProp('trip', response.data.trip)
+          store.setProp('tripSummary', response.data.tripSummary)
         }
         return response.kind
       })
@@ -114,7 +114,7 @@ export const UserStoreModel = types
   }))
   .views(store => ({
     get currentTrip() {
-      return store.trip[store.trip.length - 1]
+      return store.tripSummary[store.tripSummary.length - 1]
     },
   }))
 

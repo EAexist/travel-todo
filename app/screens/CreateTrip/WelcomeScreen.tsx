@@ -1,17 +1,18 @@
-import {LoadingScreen, useLoadingScreen} from '@/screens/Loading'
-import {ApiStatus, useStores, useTripStore} from '@/models'
-import {AppStackScreenProps, navigationRef, useNavigate} from '@/navigators'
-import {observer} from 'mobx-react-lite'
-import {FC, useEffect, useState} from 'react'
-import {TripListScreen} from '../TripListScreen'
-import {HeaderTitle, useHeader} from '@/utils/useHeader'
-import {useTheme} from '@rneui/themed'
+import { useStores, useTripStore } from '@/models'
+import { AppStackScreenProps, navigationRef, useNavigate } from '@/navigators'
+import { useLoadingScreen } from '@/screens/Loading'
+import { useActionsWithApiStatus } from '@/utils/useApiStatus'
+import { HeaderTitle, useHeader } from '@/utils/useHeader'
+import { useTheme } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, useEffect, useState } from 'react'
+import { TripListScreen } from '../TripListScreen'
 
 export const WelcomeScreen: FC<AppStackScreenProps<'TripList'>> = observer(
   props => {
-    const {withApiStatus, createTrip} = useStores()
     const tripStore = useTripStore()
-    const {navigateWithTrip} = useNavigate()
+    const { createTripWithApiStatus } = useActionsWithApiStatus()
+    const { navigateWithTrip } = useNavigate()
     const [isTripStoreInitialized, setIsTripStoreInitialized] = useState(false)
 
     useEffect(() => {
@@ -20,9 +21,10 @@ export const WelcomeScreen: FC<AppStackScreenProps<'TripList'>> = observer(
           setIsTripStoreInitialized(true)
         } else {
           if (tripStore != null) {
-            await withApiStatus(tripStore.patch)
           } else {
-            await withApiStatus(createTrip)
+            await createTripWithApiStatus({
+              onSuccess: () => navigateWithTrip('DestinationSetting'),
+            })
           }
         }
       }
@@ -31,19 +33,19 @@ export const WelcomeScreen: FC<AppStackScreenProps<'TripList'>> = observer(
 
     useEffect(() => {
       if (isTripStoreInitialized && navigationRef.isReady())
-        navigateWithTrip('Main', {screen: 'Todolist'})
+        navigateWithTrip('Main', { screen: 'Todolist' })
     }, [isTripStoreInitialized, navigationRef.isReady()])
 
-    useLoadingScreen({onSuccess: () => navigateWithTrip('DestinationSetting')})
+    useLoadingScreen({})
 
     const {
-      theme: {colors},
+      theme: { colors },
     } = useTheme()
 
     useHeader({
       backButtonShown: false,
       leftComponent: <HeaderTitle>{'내 여행 목록'}</HeaderTitle>,
-      containerStyle: {backgroundColor: colors.secondaryBg},
+      containerStyle: { backgroundColor: colors.secondaryBg },
     })
 
     return <TripListScreen {...props} />

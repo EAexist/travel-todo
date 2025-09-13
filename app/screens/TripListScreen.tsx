@@ -1,39 +1,43 @@
-import {Avatar} from '@/components/Avatar'
+import { Avatar } from '@/components/Avatar'
 import * as Fab from '@/components/Fab'
-import {Icon} from '@/components/Icon'
-import {Screen} from '@/components/Screen'
+import { Icon } from '@/components/Icon'
+import { Screen } from '@/components/Screen'
 import SectionCard from '@/components/SectionCard'
-import {useStores, useTripStore} from '@/models'
-import {TripStore, TripSummary} from '@/models/stores/TripStore'
-import {AppStackScreenProps, useNavigate} from '@/navigators'
+import { useStores, useTripStore } from '@/models'
+import { TripSummary } from '@/models/stores/TripStore'
+import { AppStackScreenProps, useNavigate } from '@/navigators'
+import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import {
   $headerCenterTitleContainerStyle,
   HeaderCenterTitle,
   useHeader,
 } from '@/utils/useHeader'
-import {useLingui} from '@lingui/react/macro'
-import {ListItem} from '@rneui/themed'
-import {Chip} from '@rneui/themed'
-import {useTheme} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {FC, useCallback} from 'react'
-import {FlatList, ListRenderItem, TouchableOpacity} from 'react-native'
+import { useLingui } from '@lingui/react/macro'
+import { ListItem, useTheme } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, useCallback } from 'react'
+import { FlatList, ListRenderItem, TouchableOpacity } from 'react-native'
 
 export const TripListScreen: FC<AppStackScreenProps<'TripList'>> = observer(
-  ({navigation}) => {
-    const {userStore, fetchTrip} = useStores()
+  ({ navigation }) => {
+    const { userStore, fetchTrip } = useStores()
+    const { createTripWithApiStatus } = useActionsWithApiStatus()
     const tripStore = useTripStore()
-    const {navigateWithTrip} = useNavigate()
-    const {t} = useLingui()
+    const { navigateWithTrip } = useNavigate()
+    const { t } = useLingui()
 
     const handlePressTripListItem = useCallback(async (tripId: string) => {
       await fetchTrip(tripId).then(() => {
-        navigateWithTrip('Main', {screen: 'Todolist'})
+        navigateWithTrip('Main', { screen: 'Todolist' })
       })
     }, [])
 
+    const handlePressCreateTrip = useCallback(async () => {
+      await createTripWithApiStatus()
+    }, [])
+
     const renderTripListItem: ListRenderItem<TripSummary> = useCallback(
-      ({item}) =>
+      ({ item }) =>
         item.isInitialized ? (
           <TouchableOpacity onPress={() => handlePressTripListItem(item.id)}>
             <SectionCard>
@@ -79,11 +83,11 @@ export const TripListScreen: FC<AppStackScreenProps<'TripList'>> = observer(
     )
 
     const {
-      theme: {colors},
+      theme: { colors },
     } = useTheme()
 
     useHeader({
-      containerStyle: {backgroundColor: colors.secondaryBg},
+      containerStyle: { backgroundColor: colors.secondaryBg },
       centerComponent: <HeaderCenterTitle title="내 여행 목록" />,
       centerContainerStyle: $headerCenterTitleContainerStyle,
       // backNavigateProps: {name: 'Login', ignoreTrip: true},
@@ -98,12 +102,17 @@ export const TripListScreen: FC<AppStackScreenProps<'TripList'>> = observer(
           keyExtractor={item => item.id}
         />
         <Fab.Container>
-          <Fab.NextButton
+          <Fab.Button
             title={'새 여행 만들기'}
+            onPress={handlePressCreateTrip}
+          />
+          {/* <Fab.NextButton
+            title={'새 여행 만들기'}
+
             navigateProps={{
               name: 'ScheduleSetting',
             }}
-          />
+          /> */}
         </Fab.Container>
       </Screen>
     )

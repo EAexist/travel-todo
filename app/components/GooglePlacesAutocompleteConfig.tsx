@@ -1,30 +1,31 @@
 import { View } from 'react-native'
 import {
-    GooglePlacesAutocompleteProps,
-    Styles,
+  GooglePlacesAutocompleteProps,
+  Styles,
 } from 'react-native-google-places-autocomplete'
 
 const $googlePlaceSearchBarStyle: Partial<Styles> = {
-    listView: {},
-    textInputContainer: {},
-    row: {
-        padding: 0,
-    },
+  listView: {},
+  textInputContainer: {},
+  row: {
+    padding: 0,
+  },
 }
 
 export const googlePlacesAutocompleteConfig: Partial<GooglePlacesAutocompleteProps> =
-{
+  {
     requestUrl: {
-        useOnPlatform: 'web', // or "all"
-        url: `${process.env.API_URL}/proxy`, // or any proxy server that hits https://maps.googleapis.com/maps/api
-        //   headers: {
-        //     Accept: 'application/json',
-        //   },
+      useOnPlatform: 'web', // or "all"
+      url: `${process.env.API_URL}/proxy`, // or any proxy server that hits https://maps.googleapis.com/maps/api
+      //   headers: {
+      //     Accept: 'application/json',
+      //   },
     },
-    onFail: error => console.error(error),
-    onNotFound: () => console.log('No results found'),
+    onFail: error => console.error(`google places autocomplete: ${error}`),
+    onNotFound: () =>
+      console.log('google places autocomplete:No results found'),
     onTimeout: () =>
-        console.warn('google places autocomplete: request timeout'),
+      console.warn('google places autocomplete: request timeout'),
     enablePoweredByContainer: false,
     styles: $googlePlaceSearchBarStyle,
     listEmptyComponent: <View />,
@@ -32,15 +33,15 @@ export const googlePlacesAutocompleteConfig: Partial<GooglePlacesAutocompletePro
     autoFillOnNotFound: false,
     currentLocation: false,
     currentLocationLabel: 'Current location',
-    debounce: 1000,
+    debounce: 500,
     disableScroll: false,
     enableHighAccuracyLocation: true,
     fetchDetails: false,
     filterReverseGeocodingByTypes: [],
     GooglePlacesDetailsQuery: {},
     GooglePlacesSearchQuery: {
-        rankby: 'distance',
-        type: 'restaurant',
+      rankby: 'distance',
+      type: 'restaurant',
     },
     GoogleReverseGeocodingQuery: {},
     isRowScrollable: true,
@@ -55,13 +56,13 @@ export const googlePlacesAutocompleteConfig: Partial<GooglePlacesAutocompletePro
     placeholder: '',
     predefinedPlacesAlwaysVisible: false,
     query: {
-        key: 'missing api key',
-        language: 'en',
-        types: 'geocode',
+      key: 'missing api key',
+      language: 'en',
+      types: 'geocode',
     },
     suppressDefaultStyles: false,
     textInputHide: false,
     textInputProps: {},
-    timeout: 20000,
-    listLoaderComponent: <>LOADING</>
-}
+    timeout: 10000,
+    // listLoaderComponent: <>LOADING</>,
+  }

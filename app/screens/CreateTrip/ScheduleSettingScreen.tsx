@@ -1,4 +1,4 @@
-import {Screen} from '@/components'
+import { Screen } from '@/components'
 import {
   $calendarContainerStyle,
   ScheduleSettingCalendar,
@@ -6,12 +6,12 @@ import {
 } from '@/components/Calendar/index'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import {useTripStore} from '@/models'
-import {DateInterval} from '@/utils/date'
-import {FC, useCallback, useState} from 'react'
-import {EditScreenBaseProps} from '.'
-import {View} from 'react-native'
-import {APIAction, enqueueAction} from '@/tasks/BackgroundTask'
+import { useTripStore } from '@/models'
+import { DateInterval } from '@/utils/date'
+import { FC, useCallback, useState } from 'react'
+import { EditScreenBaseProps } from '.'
+import { View } from 'react-native'
+import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 
 export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
   isInitialSettingScreen,
@@ -42,7 +42,7 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     )
     tripStore.setProp('endDateISOString', dateInterval.end?.toISOString() || '')
 
-    tripStore.patchTrip({
+    tripStore.patch({
       id: tripStore.id,
       startDateISOString: tripStore.startDateISOString,
       endDateISOString: tripStore.endDateISOString,
@@ -86,7 +86,7 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
           setDateInterval={setDateInterval}
         />
       </View> */}
-      <View style={{paddingHorizontal: 24}}>
+      <View style={{ paddingHorizontal: 24 }}>
         <ScheduleText
           startDate={dateInterval.start}
           endDate={dateInterval.end}

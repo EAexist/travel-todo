@@ -1,16 +1,16 @@
-import {googlePlacesAutocompleteConfig} from '@/components/GooglePlacesAutocompleteConfig'
-import {GooglePlacesSearchBarInput} from '@/components/Input'
+import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
+import { GooglePlacesSearchBarInput } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import {LoadingScreen} from '@/screens/Loading'
-import {Screen} from '@/components/Screen'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {DestinationSnapshotIn} from '@/models/Destination'
-import {goBack} from '@/navigators'
-import {rtrim} from '@/utils'
-import {countryNameKrToISO} from '@/utils/nation'
-import {useLingui} from '@lingui/react/macro'
-import {FC, useCallback, useRef} from 'react'
+import { LoadingScreen } from '@/screens/Loading'
+import { Screen } from '@/components/Screen'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { DestinationSnapshotIn } from '@/models/Destination'
+import { goBack } from '@/navigators'
+import { rtrim } from '@/utils'
+import { countryNameKrToISO } from '@/utils/nation'
+import { useLingui } from '@lingui/react/macro'
+import { FC, useCallback, useRef } from 'react'
 import {
   AutocompleteRequestType,
   GooglePlaceData,
@@ -18,7 +18,7 @@ import {
   GooglePlacesAutocompleteRef,
   Query,
 } from 'react-native-google-places-autocomplete'
-import {DestinationListItemBase} from './DestinationSettingScreen'
+import { DestinationListItemBase } from './DestinationSettingScreen'
 
 /* https://github.com/FaridSafi/react-native-google-places-autocomplete */
 
@@ -51,7 +51,7 @@ const GooglePlacesSearchBar = () => {
 
   // const [debounce, setDebounce] = useState(1000)
 
-  const {t} = useLingui()
+  const { t } = useLingui()
 
   const tripStore = useTripStore()
   //   const {navigateWithTrip} = useNavigate()
@@ -89,6 +89,9 @@ const GooglePlacesSearchBar = () => {
       placeholder={t`도시 또는 나라 이름 검색`}
       query={PlacesAutoCompleteQuery}
       renderRow={renderRow}
+      onFail={() => {
+        console.log('FAIL')
+      }}
     />
   )
 }

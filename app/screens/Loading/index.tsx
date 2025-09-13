@@ -1,51 +1,50 @@
-import {ActivityIndicator} from '@/components/ActivityIndicator'
+import { ActivityIndicator } from '@/components/ActivityIndicator'
 import * as Fab from '@/components/Fab'
-import {Screen} from '@/components/Screen'
-import {TransText} from '@/components/TransText'
-import {ApiStatus, useStores} from '@/models'
-import {AppStackScreenProps, goBack, navigate} from '@/navigators'
+import { Screen } from '@/components/Screen'
+import { TransText } from '@/components/TransText'
+import { AppStackScreenProps, goBack, navigate } from '@/navigators'
+import {
+  ApiStatus,
+  useApiStatus,
+  useApiStatusDispatch,
+} from '@/utils/useApiStatus'
 import {
   $headerCenterTitleContainerStyle,
   HeaderCenterTitle,
   useHeader,
 } from '@/utils/useHeader'
-import {useNetInfo} from '@react-native-community/netinfo'
-import {StackActions, useNavigation} from '@react-navigation/native'
-import {Icon, Text} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {ifError} from 'node:assert'
-import {FC, useCallback, useEffect, useState} from 'react'
-import {TextStyle, View, ViewStyle} from 'react-native'
+import { useNetInfo } from '@react-native-community/netinfo'
+import { StackActions, useNavigation } from '@react-navigation/native'
+import { Icon, Text } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, useCallback, useEffect, useState } from 'react'
+import { TextStyle, View, ViewStyle } from 'react-native'
 
 export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
-  ({route: {params}}) => {
-    const {apiStatus, setProp, setApiStatusIdle} = useStores()
+  ({ route: { params } }) => {
+    const { apiStatus } = useApiStatus()
+    const dispatch = useApiStatusDispatch()
 
-    const {isConnected} = useNetInfo()
+    const { isConnected } = useNetInfo()
 
     const texts = params?.texts || undefined
-    const onSuccess = params?.onSuccess || undefined
+    const onProblem = params?.onProblem || undefined
 
     const handleNoConnection = useCallback(() => {
-      setApiStatusIdle()
+      dispatch({ type: 'set_IDLE' })
       goBack()
+      if (onProblem) onProblem()
     }, [])
 
     // useEffect(() => {
     //   if (!isConnected) setProp('apiStatus', ApiStatus.NO_CONNECTION)
     // }, [isConnected])
 
-    useHeader({backButtonShown: false})
-
     useEffect(() => {
-      if (apiStatus === ApiStatus.SUCCESS) {
-        goBack()
-        if (onSuccess) {
-          onSuccess()
-        }
-        setApiStatusIdle()
-      }
-    }, [apiStatus, onSuccess])
+      if (apiStatus === ApiStatus.SUCCESS) goBack()
+    }, [apiStatus])
+
+    useHeader({ backButtonShown: false })
 
     return (
       <Screen>
@@ -80,7 +79,7 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
         ) : apiStatus === ApiStatus.ERROR ? (
           <>
             <View style={$statusViewStyle}>
-              <Text style={{fontFamily: 'Tossface', fontSize: 36}}>😓</Text>
+              <Text style={{ fontFamily: 'Tossface', fontSize: 36 }}>😓</Text>
               <TransText style={$statusMessageStyle}>
                 오류가 발생했어요.
                 <br />
@@ -99,16 +98,18 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
   },
 )
 
-export const useLoadingScreen = ({onSuccess}: {onSuccess?: () => void}) => {
-  const {apiStatus, setApiStatusIdle} = useStores()
+export const useLoadingScreen = (props: { onProblem?: () => void }) => {
+  const { apiStatus } = useApiStatus()
+
   useEffect(() => {
-    if (apiStatus === ApiStatus.PENDING) navigate('Loading', {onSuccess})
+    console.log(`[useLoadingScreen] apiStatus=${apiStatus}`)
+    if (apiStatus === ApiStatus.PENDING) navigate('Loading', props)
   }, [apiStatus])
 }
 
 export const RequireConnectionScreen: FC<
   AppStackScreenProps<'RequireConnection'>
-> = observer(({route: {params}}) => {
+> = observer(({ route: { params } }) => {
   const handlePressFab = useCallback(() => {
     goBack()
   }, [])
@@ -139,15 +140,15 @@ export const RequireConnectionScreen: FC<
   )
 })
 
-export const useRequireConnection = ({title}: {title?: string}) => {
-  //   const {isConnected} = useNetInfo()
-  const isConnected = false
+export const useRequireConnection = ({ title }: { title?: string }) => {
+  //   const { isConnected } = useNetInfo()
+  const isConnected = true
   const navigation = useNavigation()
   const [showScreen, setShowScreen] = useState(false)
 
   useEffect(() => {
     if (!isConnected) {
-      navigation.dispatch(StackActions.replace('RequireConnection', {title}))
+      navigation.dispatch(StackActions.replace('RequireConnection', { title }))
     } else {
       setShowScreen(true)
     }

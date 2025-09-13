@@ -1,9 +1,13 @@
-import {createContext, useContext, useEffect, useState} from 'react'
-import {ApiStatus, RootStore, RootStoreModel} from '@/models/stores/RootStore'
-import {setupRootStore} from './setupRootStore'
-import {configurePersistable, makePersistable} from 'mobx-persist-store'
-import {load, remove, save} from '@/utils/storage'
-import {TripStore} from '@/models/stores/TripStore'
+import {
+  RootStore,
+  RootStoreModel,
+  RootStoreSnapshot,
+} from '@/models/stores/RootStore'
+import { TripStore } from '@/models/stores/TripStore'
+import { load, remove, save } from '@/utils/storage'
+import { configurePersistable, makePersistable } from 'mobx-persist-store'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { setupRootStore } from './setupRootStore'
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -18,7 +22,7 @@ import {TripStore} from '@/models/stores/TripStore'
  * instantiating it, although that should be rare.
  */
 
-const defaultRootStore = {apiStatus: ApiStatus.IDLE}
+const defaultRootStore: Partial<RootStoreSnapshot> = {}
 
 const _rootStore = RootStoreModel.create(defaultRootStore)
 
@@ -46,8 +50,13 @@ export const RootStoreProvider = RootStoreContext.Provider
  *
  * const { someStore, someOtherStore } = useStores()
  */
-export const useStores = () => useContext(RootStoreContext)
-export const useTripStore = () => useStores().tripStore as TripStore
+export const useStores = (): RootStore => {
+  return useContext(RootStoreContext)
+}
+
+export const useTripStore = (): TripStore => {
+  return useContext(RootStoreContext).tripStore as TripStore
+}
 
 /**
  * Used only in the app.tsx file, this hook sets up the RootStore
@@ -65,7 +74,7 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
     let _unsubscribe: () => void | undefined
     ;(async () => {
       // set up the RootStore (returns the state restored from AsyncStorage)
-      const {unsubscribe} = await setupRootStore(rootStore)
+      const { unsubscribe } = await setupRootStore(rootStore)
       _unsubscribe = unsubscribe
 
       // reactotron integration with the MST root store (DEV only)
@@ -89,7 +98,7 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return {rootStore, rehydrated}
+  return { rootStore, rehydrated }
 }
 
 /* Persist */

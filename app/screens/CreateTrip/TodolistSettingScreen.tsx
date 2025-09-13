@@ -1,20 +1,22 @@
 import * as Fab from '@/components/Fab'
-import {useStores, useTripStore} from '@/models'
-import {AppStackScreenProps, useNavigate} from '@/navigators'
-import {useHeader} from '@/utils/useHeader'
-import {observer} from 'mobx-react-lite'
-import {FC, useCallback, useEffect} from 'react'
+import { useStores, useTripStore } from '@/models'
+import { AppStackScreenProps, goBack, useNavigate } from '@/navigators'
+import { useActionsWithApiStatus } from '@/utils/useApiStatus'
+import { useHeader } from '@/utils/useHeader'
+import { observer } from 'mobx-react-lite'
+import { FC, useCallback, useEffect } from 'react'
+import { useLoadingScreen } from '../Loading'
 import {
   TodolistAddScreenBase,
   useAddFlaggedPreset,
 } from '../Todolist/Edit/TodolistAddScreenBase'
-import {useLoadingScreen} from '../Loading'
 
 export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
-  observer(({route, navigation}) => {
+  observer(({ route, navigation }) => {
+    // const { tripStore } = useStores()
     const tripStore = useTripStore()
-    const {withApiStatus} = useStores()
-    const {navigateWithTrip} = useNavigate()
+    const { fetchPresetWithApiStatus } = useActionsWithApiStatus()
+    const { navigateWithTrip } = useNavigate()
     const addFlaggedPreset = useAddFlaggedPreset()
 
     const handlePressNext = useCallback(() => {
@@ -25,12 +27,12 @@ export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
 
     useEffect(() => {
       if (tripStore.isInitialized) {
-        navigateWithTrip('Main', {screen: 'Todolist'})
+        navigateWithTrip('Main', { screen: 'Todolist' })
       }
     }, [tripStore.isInitialized])
 
     useHeader({
-      backNavigateProps: {name: 'TitleSetting'},
+      backNavigateProps: { name: 'TitleSetting' },
       onBackPressBeforeNavigate: async () => {
         navigation.pop(1)
       },
@@ -38,14 +40,14 @@ export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
 
     useEffect(() => {
       async function fetchPreset() {
-        await withApiStatus(tripStore.fetchPreset)
+        await fetchPresetWithApiStatus()
       }
       fetchPreset().then(() => {
         console.log('[TodolistAddScreenBase] fetchPreset()')
       })
     }, [])
 
-    useLoadingScreen({onSuccess: () => {}})
+    useLoadingScreen({ onProblem: () => goBack() })
 
     return (
       <TodolistAddScreenBase

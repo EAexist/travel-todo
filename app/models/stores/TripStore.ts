@@ -1,11 +1,14 @@
-import {AccomodationModel, AccomodationSnapshotIn} from '@/models/Accomodation'
+import {
+  AccomodationModel,
+  AccomodationSnapshotIn,
+} from '@/models/Accomodation'
 import {
   Destination,
   DestinationContent,
   DestinationModel,
   DestinationSnapshotIn,
 } from '@/models/Destination'
-import {withSetPropAction} from '@/models/helpers/withSetPropAction'
+import { withSetPropAction } from '@/models/helpers/withSetPropAction'
 import {
   CATEGORY_TO_TITLE,
   FlightModel,
@@ -26,12 +29,12 @@ import {
   TodoDTO,
   TripDTO,
 } from '@/services/api'
-import {APIAction, enqueueAction} from '@/tasks/BackgroundTask'
-import {toCalendarString} from '@/utils/date'
-import {eachDayOfInterval} from 'date-fns'
-import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {v4 as uuidv4} from 'uuid'
-import {Accomodation} from '../Accomodation'
+import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
+import { toCalendarString } from '@/utils/date'
+import { eachDayOfInterval } from 'date-fns'
+import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { v4 as uuidv4 } from 'uuid'
+import { Accomodation } from '../Accomodation'
 
 export const TodolistModel = types
   .model('Preset')
@@ -43,7 +46,7 @@ export const TripSummaryModel = types
   .props({
     id: types.optional(types.identifier, () => uuidv4()),
     isInitialized: false,
-    title: types.string,
+    title: types.maybeNull(types.string),
     startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     destination: types.array(types.string),
@@ -61,7 +64,7 @@ export const TripStoreModel = types
   .props({
     id: types.optional(types.identifier, () => uuidv4()),
     isInitialized: false,
-    title: '',
+    title: types.maybeNull(types.string),
     startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     // destination: types.array(withLoading(DestinationModel)),
@@ -96,15 +99,15 @@ export const TripStoreModel = types
       switch (todoContent.category) {
         case 'reservation':
           title = '새 예약'
-          icon = {name: '🎫', type: 'tossface'}
+          icon = { name: '🎫', type: 'tossface' }
           break
         case 'foreign':
           title = '새 할 일'
-          icon = {name: '⭐️', type: 'tossface'}
+          icon = { name: '⭐️', type: 'tossface' }
           break
         case 'goods':
           title = '새 짐'
-          icon = {name: '🧳', type: 'tossface'}
+          icon = { name: '🧳', type: 'tossface' }
           break
         default:
           break
@@ -140,7 +143,7 @@ export const TripStoreModel = types
         //   trip.todolist.map(item => [item.id, item]),
         // ),
       )
-      store.setProp('todolist', {reservation: [], foreign: [], goods: []})
+      store.setProp('todolist', { reservation: [], foreign: [], goods: [] })
       //   Object.values(trip.todoMap).forEach(todo => {
       Object.values(store.todoMap).forEach(todo => {
         if (!store.todolist.has(todo.category)) {
@@ -215,7 +218,7 @@ export const TripStoreModel = types
       return api.getTodoPreset(store.id).then(response => {
         if (response.kind == 'ok') {
           const map = new Map<string, TodoPresetItem[]>()
-          response.data.forEach(({isFlaggedToAdd, todoContent}) => {
+          response.data.forEach(({ isFlaggedToAdd, todoContent }) => {
             if (!map.has(todoContent.category)) {
               map.set(todoContent.category, [])
             }
@@ -284,7 +287,18 @@ export const TripStoreModel = types
      * Patch(update) a trip.
      * @TODO use only changed sub-data as payload, instead of full store
      */
-    patchTrip(tripDTO: TripDTO) {
+    async patchToServer(tripDTO: TripDTO) {
+      api.patchTrip(tripDTO).then(response => {
+        return response.kind
+        // if (response.kind === 'ok') {
+        // }
+      })
+    },
+    /**
+     * Patch(update) a trip.
+     * @TODO use only changed sub-data as payload, instead of full store
+     */
+    patch(tripDTO: TripDTO) {
       console.log('[Tripstore.patch]')
       enqueueAction(APIAction.CREATE_TODO, tripDTO as TripDTO)
     },
@@ -490,29 +504,29 @@ export const TripStoreModel = types
       }))
     },
     get sectionedNonEmptyTrip() {
-      return this.sectionedTrip.filter(({data}) => data.length > 0)
+      return this.sectionedTrip.filter(({ data }) => data.length > 0)
     },
     get incompleteTrip() {
-      return this.sectionedNonEmptyTrip.map(({title, data}) => {
-        return {title, data: data.filter(item => !item.isCompleted)}
+      return this.sectionedNonEmptyTrip.map(({ title, data }) => {
+        return { title, data: data.filter(item => !item.isCompleted) }
       })
     },
     get completedTrip() {
       return this.sectionedNonEmptyTrip
-        .map(({title, data}) => {
+        .map(({ title, data }) => {
           return {
             title,
             data: data.filter(item => item.isCompleted),
           }
         })
-        .filter(({data}) => data.length > 0)
+        .filter(({ data }) => data.length > 0)
     },
     /*
      * Delete Todo
      */
     get deleteFlaggedCompletedTrip() {
       return this.completedTrip
-      return this.completedTrip.map(({title, data}) => {
+      return this.completedTrip.map(({ title, data }) => {
         return {
           title,
           data: data.toSorted((a, b) =>
@@ -527,7 +541,7 @@ export const TripStoreModel = types
     },
     get deleteFlaggedIncompleteTrip() {
       return this.incompleteTrip
-      return this.incompleteTrip.map(({title, data}) => {
+      return this.incompleteTrip.map(({ title, data }) => {
         return {
           title,
           data: data.toSorted((a, b) =>
@@ -556,7 +570,7 @@ export const TripStoreModel = types
           data: [
             ...((addedItems?.map(item => ({
               todo: item,
-            })) as {todo?: Todo; preset?: TodoPresetItem}[]) || []),
+            })) as { todo?: Todo; preset?: TodoPresetItem }[]) || []),
             ...(store.preset
               .get(category)
               ?.filter(
@@ -598,7 +612,7 @@ export const TripStoreModel = types
     },
     get accomodationTodoStatusText() {
       return store.endDate && store.startDate
-        ? `${this.reservedNights}박 / ${store.endDate?.getDate() - store.startDate?.getDate()}박`
+        ? `${this.reservedNights}박/${store.endDate?.getDate() - store.startDate?.getDate()}박`
         : null
     },
     get reservationTodoStatusText() {
@@ -630,7 +644,7 @@ export const TripStoreModel = types
           const start = item.checkinDate
           const end = item.checkoutDate
           console.log(start, end)
-          const intervalDays = eachDayOfInterval({start, end}).slice(0, -1)
+          const intervalDays = eachDayOfInterval({ start, end }).slice(0, -1)
           return intervalDays.map((date, index) => [
             toCalendarString(date),
             {
@@ -727,6 +741,7 @@ export const TripStoreModel = types
     //   }
     // },
   }))
+
 export interface TripStore extends Instance<typeof TripStoreModel> {}
 export interface TripStoreSnapshot extends SnapshotOut<typeof TripStoreModel> {}
 // export type TripStoreProps = keyof TripStoreSnapshot

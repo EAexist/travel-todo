@@ -49,7 +49,7 @@ import {
 import {GeneralApiProblem, getGeneralApiProblem} from './apiProblem'
 
 type ApiResult<T> = {kind: 'ok'; data: T} | GeneralApiProblem
-export type ApiStatus = {kind: 'ok'} | GeneralApiProblem
+// export type ApiStatus = {kind: 'ok'} | GeneralApiProblem
 
 function handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
   if (!response.ok) {
