@@ -13,13 +13,12 @@ import {Screen} from '@/components/Screen'
 import {useStores} from '@/models'
 import {useNavigate} from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
-import * as Fab from '@/components/Fab'
 import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
 import {ListItemBase} from '@/components/ListItem'
 import {ReservationSnapshot} from '@/models/stores/ReservationStore'
 import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
 import {useMainScreenHeader} from '@/utils/useHeader'
-import {Text} from '@rneui/themed'
+import {FAB, Text} from '@rneui/themed'
 import {Observer} from 'mobx-react-lite'
 
 const ReservationListItem: FC<{reservation: ReservationSnapshot}> = ({
@@ -112,12 +111,13 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
           </Text>
         )}
       </ScrollView>
-      <Fab.Container>
-        <Fab.Button
-          title={'예약 내역 추가하기'}
-          onPress={handleAddReservation}
-        />
-      </Fab.Container>
+      <FAB
+        onPress={handleAddReservation}
+        icon={{name: 'add', color: 'white'}}
+        // size="large"
+        // color={'red'}
+        placement="right"
+      />
     </Screen>
   )
 }

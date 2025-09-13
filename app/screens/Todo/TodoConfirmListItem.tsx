@@ -3,6 +3,7 @@ import {TransText} from '@/components/TransText'
 import {useStores, useTripStore} from '@/models'
 import {Todo} from '@/models/Todo'
 import {AppStackParamList, goBack, useNavigate} from '@/navigators'
+
 import {ListItem} from '@rneui/themed'
 import {FC, useCallback, useState} from 'react'
 
@@ -37,9 +38,8 @@ export const useTodoConfirmListItem = (
 ) => {
   const [isCompleted, setIsCompleted] = useState(todo.isCompleted)
 
-  const {
-    tripStore: {patchTodo, completeAndPatchTodo},
-  } = useStores()
+  const tripStore = useTripStore()
+
   const {navigateWithTrip} = useNavigate()
 
   const handleConfirm = useCallback(async () => {
@@ -50,13 +50,15 @@ export const useTodoConfirmListItem = (
       navigateWithTrip(confirmScreen, {todoId: todo.id})
     } else if (todo.isCompleted && !isCompleted) {
       todo.setIncomplete()
-      patchTodo(todo).then(() => {
-        goBack()
+      tripStore.patchTodo({
+        id: todo.id,
+        completeDateISOString: todo.completeDateISOString,
       })
+      goBack()
     } else {
       goBack()
     }
-  }, [completeAndPatchTodo, todo, todo.isCompleted, isCompleted])
+  }, [tripStore.completeAndPatchTodo, todo, todo.isCompleted, isCompleted])
 
   return {
     isCompleted,

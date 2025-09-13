@@ -1,5 +1,5 @@
 import {useTripStore} from '@/models'
-import {Todo, TodoPreset} from '@/models/Todo'
+import {Todo, TodoPresetItem} from '@/models/Todo'
 import {useNavigate} from '@/navigators'
 import {Trans} from '@lingui/react/macro'
 import {useFocusEffect} from '@react-navigation/native'
@@ -87,36 +87,38 @@ export const AddTodo: FC<{todo: Todo}> = ({todo}) => {
   )
 }
 
-export const AddPresetTodo: FC<{preset: TodoPreset}> = observer(({preset}) => {
-  const handlePress = useCallback(() => {
-    preset.toggleAddFlag()
-  }, [preset])
+export const AddPresetTodo: FC<{preset: TodoPresetItem}> = observer(
+  ({preset}) => {
+    const handlePress = useCallback(() => {
+      preset.toggleAddFlag()
+    }, [preset])
 
-  const {
-    theme: {colors},
-  } = useTheme()
-  return (
-    <TodoBase
-      rightContent={
-        <ListItem.CheckBox
-          onPress={handlePress}
-          checked={preset.isFlaggedToAdd}
-          checkedIcon={<Icon name="check-circle" />}
-          uncheckedIcon={
-            <Icon name="check-circle-outline" color={colors.grey1} />
-          }
-        />
-      }
-      onPress={handlePress}
-      {...(!preset.isFlaggedToAdd && {
-        avatarProps: {avatarStyle: styles.disabled},
-        contentStyle: styles.disabled,
-      })}
-      title={preset.todoContent.title}
-      icon={preset.todoContent.icon}
-    />
-  )
-})
+    const {
+      theme: {colors},
+    } = useTheme()
+    return (
+      <TodoBase
+        rightContent={
+          <ListItem.CheckBox
+            onPress={handlePress}
+            checked={preset.isFlaggedToAdd}
+            checkedIcon={<Icon name="check-circle" />}
+            uncheckedIcon={
+              <Icon name="check-circle-outline" color={colors.grey1} />
+            }
+          />
+        }
+        onPress={handlePress}
+        {...(!preset.isFlaggedToAdd && {
+          avatarProps: {avatarStyle: styles.disabled},
+          contentStyle: styles.disabled,
+        })}
+        title={preset.todoContent.title}
+        icon={preset.todoContent.icon}
+      />
+    )
+  },
+)
 
 const useDelayedEdit = ({
   initialState = false,

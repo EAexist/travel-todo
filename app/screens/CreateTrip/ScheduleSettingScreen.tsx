@@ -11,6 +11,7 @@ import {DateInterval} from '@/utils/date'
 import {FC, useCallback, useState} from 'react'
 import {EditScreenBaseProps} from '.'
 import {View} from 'react-native'
+import {APIAction, enqueueAction} from '@/tasks/BackgroundTask'
 
 export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
   isInitialSettingScreen,
@@ -40,7 +41,12 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
       dateInterval.start?.toISOString() || '',
     )
     tripStore.setProp('endDateISOString', dateInterval.end?.toISOString() || '')
-    // await tripStore.patch()
+
+    tripStore.patchTrip({
+      id: tripStore.id,
+      startDateISOString: tripStore.startDateISOString,
+      endDateISOString: tripStore.endDateISOString,
+    })
   }, [tripStore, dateInterval.start, dateInterval.end])
 
   return (

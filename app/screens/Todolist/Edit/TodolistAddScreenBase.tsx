@@ -11,7 +11,7 @@ import {
   Todo,
   TodoContent,
   TodoContentSnapshotIn,
-  TodoPreset,
+  TodoPresetItem,
 } from '@/models/Todo'
 import {useNavigate} from '@/navigators'
 import {ListItem} from '@rneui/themed'
@@ -96,7 +96,7 @@ export const TodolistAddScreenBase = observer(
     const {handleAddCutomTodo} = useHandleAddCutomTodo({})
 
     const renderItem: SectionListRenderItem<
-      {todo?: Todo; preset?: TodoPreset},
+      {todo?: Todo; preset?: TodoPresetItem},
       DefaultSectionT
     > = ({item: {preset, todo}}) => (
       <Observer

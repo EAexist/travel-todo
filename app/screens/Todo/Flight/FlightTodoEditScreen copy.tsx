@@ -138,7 +138,7 @@
 //   }, [])
 
 //   const handleBackPressBeforeNavigate = useCallback(async () => {
-//     if (isBeforeInitialization) await tripStore.deleteTodo(todo)
+//     if (isBeforeInitialization) tripStore.deleteTodo(todo)
 //   }, [isBeforeInitialization])
 
 //   useHeader({
@@ -244,7 +244,7 @@
 //   }, [navigateWithTrip, todo.id])
 
 //   //   const handleBackPressBeforeNavigate = useCallback(async () => {
-//   //     if (isBeforeInitialization) await tripStore.deleteTodo(todo)
+//   //     if (isBeforeInitialization) tripStore.deleteTodo(todo)
 //   //   }, [isBeforeInitialization])
 
 //   //   useHeader({

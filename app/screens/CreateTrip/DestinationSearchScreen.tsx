@@ -1,7 +1,7 @@
 import {googlePlacesAutocompleteConfig} from '@/components/GooglePlacesAutocompleteConfig'
 import {GooglePlacesSearchBarInput} from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import {LoadingScreen} from '@/screens/LoadingScreen'
+import {LoadingScreen} from '@/screens/Loading'
 import {Screen} from '@/components/Screen'
 import {TransText} from '@/components/TransText'
 import {useStores, useTripStore} from '@/models'

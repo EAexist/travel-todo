@@ -121,9 +121,7 @@ export const FlightTodoEditScreen: FC<{
     console.log('Hello [FlightTodoEditScreen')
   }, [])
 
-  const {
-    tripStore: {patchTodo, completeAndPatchTodo},
-  } = useStores()
+  const {patchTodo, completeAndPatchTodo} = useTripStore()
 
   const {isCompleted, setIsCompleted} = useTodoConfirmListItem(
     todo,
@@ -160,7 +158,7 @@ export const FlightTodoEditScreen: FC<{
   }, [])
 
   const handleBackPressBeforeNavigate = useCallback(async () => {
-    if (isBeforeInitialization) await tripStore.deleteTodo(todo)
+    if (isBeforeInitialization) tripStore.deleteTodo(todo)
   }, [isBeforeInitialization])
 
   useHeader({

@@ -3,7 +3,7 @@ import {Instance, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from '../helpers/withSetPropAction'
 
 export const SyncActionModel = types.model('SyncAction').props({
-  operation: types.string,
+  action: types.string,
   data: types.frozen(),
 })
 export interface SyncAction extends Instance<typeof SyncActionModel> {}

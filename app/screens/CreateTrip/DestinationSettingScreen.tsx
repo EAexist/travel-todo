@@ -8,13 +8,13 @@ import {useTripStore} from '@/models'
 import {Destination, DestinationSnapshotIn} from '@/models/Destination'
 import {useNavigate} from '@/navigators'
 import {getFlagEmoji} from '@/utils/nation'
-import {useHeader} from '@/utils/useHeader'
 import {Trans, useLingui} from '@lingui/react/macro'
 import {ListItem} from '@rneui/themed'
 import {observer} from 'mobx-react-lite'
 import {FC, ReactNode, useCallback} from 'react'
 import {FlatList, ListRenderItem, TouchableOpacity, View} from 'react-native'
 import {EditScreenBaseProps} from '.'
+import {useRequireConnection} from '../Loading'
 
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
@@ -124,45 +124,50 @@ export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
 
     //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
 
-    useHeader({
-      // backButtonShown: false,
-      // backNavigateProps: {name: 'Login', ignoreTrip: true},
-      // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
-    })
+    // useHeader({
+    //   // backButtonShown: false,
+    //   // backNavigateProps: {name: 'Login', ignoreTrip: true},
+    //   // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
+    // })
+
+    // const {isConnected} = useNetInfo()
+    const showScreen = useRequireConnection({title: '여행지 설정'})
 
     return (
-      <Screen>
-        <ContentTitle title={titleText} subtitle={subtitlteText} />
-        <View style={{paddingVertical: 16, flex: 1}}>
-          <TouchableOpacity onPress={handleSearchPress}>
-            <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
-          </TouchableOpacity>
-        </View>
-        {tripStore.isDestinationSet && (
-          <View>
-            <ListSubheader
-              title={`선택한 여행지 (${tripStore.destination.length})`}
-            />
-            <FlatList
-              data={tripStore.destination}
-              renderItem={renderDestinationListItem}
-              keyExtractor={item => item.id}
-            />
+      showScreen && (
+        <Screen>
+          <ContentTitle title={titleText} subtitle={subtitlteText} />
+          <View style={{paddingVertical: 16, flex: 1}}>
+            <TouchableOpacity onPress={handleSearchPress}>
+              <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
+            </TouchableOpacity>
           </View>
-        )}
-        <Fab.Container>
-          {isInitialSettingScreen ? (
-            <Fab.NextButton
-              title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}
-              navigateProps={{
-                name: 'ScheduleSetting',
-              }}
-            />
-          ) : (
-            <Fab.GoBackButton />
+          {tripStore.isDestinationSet && (
+            <View>
+              <ListSubheader
+                title={`선택한 여행지 (${tripStore.destination.length})`}
+              />
+              <FlatList
+                data={tripStore.destination}
+                renderItem={renderDestinationListItem}
+                keyExtractor={item => item.id}
+              />
+            </View>
           )}
-        </Fab.Container>
-      </Screen>
+          <Fab.Container>
+            {isInitialSettingScreen ? (
+              <Fab.NextButton
+                title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}
+                navigateProps={{
+                  name: 'ScheduleSetting',
+                }}
+              />
+            ) : (
+              <Fab.GoBackButton />
+            )}
+          </Fab.Container>
+        </Screen>
+      )
     )
   },
 )

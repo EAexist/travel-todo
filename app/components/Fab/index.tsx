@@ -47,10 +47,9 @@ export const useFabHeight = () => useContext(FabHeightContext)
  * @param {ButtonProps}
  * @returns {ReactElement}
  */
-export const Container: FC<PropsWithChildren<{fixed?: boolean}>> = ({
-  fixed = true,
-  children,
-}) => {
+export const Container: FC<
+  PropsWithChildren<{fixed?: boolean; dense?: boolean}>
+> = ({fixed = true, dense = false, children}) => {
   const {setHeight} = useFabHeight()
   const handleLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -59,14 +58,15 @@ export const Container: FC<PropsWithChildren<{fixed?: boolean}>> = ({
     [setHeight],
   )
   useEffect(() => {
-    return () => {
-      setHeight(0)
-    }
+    if (setHeight)
+      return () => {
+        setHeight(0)
+      }
   }, [setHeight])
   return (
     <View
       onLayout={fixed ? handleLayout : undefined}
-      style={$containerStyle(fixed)}>
+      style={$containerStyle(fixed, dense)}>
       {children}
     </View>
   )
@@ -160,10 +160,19 @@ export const NextButton: FC<NextButtonProps> = ({
   )
 }
 
-const $containerStyle: (fixed: boolean) => ViewStyle = fixed => ({
+const $containerStyle: (fixed: boolean, dense: boolean) => ViewStyle = (
+  fixed,
+  dense,
+) => ({
   // backgroundColor: 'blue',
   gap: 0.75 * 16,
-  paddingBottom: 2 * 16,
+  ...(dense
+    ? {
+        paddingBottom: 0,
+      }
+    : {
+        paddingBottom: 2 * 16,
+      }),
   paddingHorizontal: 1.25 * 16,
   paddingVertical: 1.25 * 16,
   ...(fixed

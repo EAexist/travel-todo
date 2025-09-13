@@ -12,9 +12,9 @@ import {usePickIamge} from '@/utils/image'
 export const CreateReservationScreen = withTodo<'CreateReservation'>(
   ({todo}) => {
     const {
-      tripStore: {completeAndPatchTodo},
       reservationStore: {addFlightTicket},
     } = useStores()
+    const {completeAndPatchTodo} = useTripStore()
 
     const {pickImage} = usePickIamge()
     const handleUploadPress = useCallback(async () => {

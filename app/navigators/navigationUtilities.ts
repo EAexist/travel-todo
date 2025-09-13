@@ -186,6 +186,9 @@ export function useNavigationPersistence(
   }
 }
 
+// export function useNavigation
+// navigation.dispatch(StackActions.replace('RequireConnection', {title}))
+
 /**
  * use this to navigate without the navigation
  * prop. If you have access to the navigation prop, do not use this.
