@@ -1,4 +1,4 @@
-import {FC, useCallback} from 'react'
+import { FC, useCallback } from 'react'
 import {
   DefaultSectionT,
   ScrollView,
@@ -9,22 +9,22 @@ import {
 } from 'react-native'
 //
 import ListSubheader from '@/components/ListSubheader'
-import {Screen} from '@/components/Screen'
-import {useStores} from '@/models'
-import {useNavigate} from '@/navigators'
+import { Screen } from '@/components/Screen'
+import { useStores } from '@/models'
+import { useNavigate } from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
-import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
-import {ListItemBase} from '@/components/ListItem'
-import {ReservationSnapshot} from '@/models/stores/ReservationStore'
-import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
-import {useMainScreenHeader} from '@/utils/useHeader'
-import {FAB, Text} from '@rneui/themed'
-import {Observer} from 'mobx-react-lite'
+import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
+import { ListItemBase } from '@/components/ListItem'
+import { ReservationSnapshot } from '@/models/stores/ReservationStore'
+import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
+import { useMainScreenHeader } from '@/utils/useHeader'
+import { FAB, Text } from '@rneui/themed'
+import { Observer } from 'mobx-react-lite'
 
-const ReservationListItem: FC<{reservation: ReservationSnapshot}> = ({
+const ReservationListItem: FC<{ reservation: ReservationSnapshot }> = ({
   reservation,
 }) => {
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
   const handlePress = useCallback(() => {
     navigateWithTrip('FullScreenImage', {
       reservationId: reservation.id,
@@ -38,7 +38,7 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
   route,
 }) => {
   const rootStore = useStores()
-  const {reservationStore} = rootStore
+  const { reservationStore } = rootStore
 
   const handleAddReservation = useCallback(() => {}, [])
 
@@ -46,7 +46,7 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
     //   Partial<ReservationSnapshot>,
     ReservationSnapshot,
     DefaultSectionT
-  > = ({item}) => (
+  > = ({ item }) => (
     <Observer
       render={() => {
         switch (item.type) {
@@ -62,7 +62,7 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
   )
 
   const renderSectionHeader = useCallback(
-    ({section: {title}}: {section: DefaultSectionT}) => (
+    ({ section: { title } }: { section: DefaultSectionT }) => (
       <ListSubheader title={title} />
     ),
     [],
@@ -77,16 +77,16 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
     //   title: tripStore.title,
     title: '내 예약',
     rightComponent: (
-      <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          onPress={handlePinButtonPress}
-          style={$headerRightButtonStyle}>
-          <HeaderIcon name="gear" type="octicon" />
-        </TouchableOpacity>
+      <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity
           onPress={handleSettingsButtonPress}
           style={$headerRightButtonStyle}>
           <HeaderIcon name="pin" type="octicon" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handlePinButtonPress}
+          style={$headerRightButtonStyle}>
+          <HeaderIcon name="gear" type="octicon" />
         </TouchableOpacity>
       </View>
     ),
@@ -104,7 +104,7 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
             //   renderSectionHeader={renderSectionHeader}
           />
         ) : (
-          <Text style={{padding: 24, textAlign: 'center'}}>
+          <Text style={{ padding: 24, textAlign: 'center' }}>
             이 곳에서
             <br />
             여행 중 필요한 다양한 예약을 관리해보세요
@@ -113,7 +113,7 @@ export const ReservationScreen: FC<MainTabScreenProps<'Reservation'>> = ({
       </ScrollView>
       <FAB
         onPress={handleAddReservation}
-        icon={{name: 'add', color: 'white'}}
+        icon={{ name: 'add', color: 'white' }}
         // size="large"
         // color={'red'}
         placement="right"

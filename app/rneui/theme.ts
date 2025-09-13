@@ -1,5 +1,5 @@
-import {createTheme} from '@rneui/themed'
-import {Platform, TextStyle} from 'react-native'
+import { createTheme } from '@rneui/themed'
+import { Platform, TextStyle } from 'react-native'
 
 type Font = {
   thin?: TextStyle
@@ -13,7 +13,7 @@ type Font = {
   black?: TextStyle
 }
 
-export const typography: {pretendard: Font} = {
+export const typography: { pretendard: Font } = {
   pretendard:
     Platform.OS == 'web'
       ? {
@@ -200,7 +200,7 @@ const theme = createTheme({
         paddingHorizontal: 0,
       },
     }),
-    Avatar: (props, {colors}) => ({
+    Avatar: (props, { colors }) => ({
       containerStyle: {
         backgroundColor: '#F5F5F7',
         alignItems: 'center',
@@ -292,7 +292,7 @@ const theme = createTheme({
         // min-height: 32,
       },
     }),
-    Text: (props, {colors}) => ({
+    Text: (props, { colors }) => ({
       style: {
         ...typography.pretendard.regular,
         color: props.primary ? colors.primary : colors.text.primary,
@@ -302,7 +302,7 @@ const theme = createTheme({
         letterSpacing: 0.15,
         // textDecoration: 'none',
         textTransform: 'none',
-        ...(props.disabled ? {opacity: 0.5} : {}),
+        ...(props.disabled ? { opacity: 0.5 } : {}),
       },
       h2Style: {
         ...typography.pretendard.bold,
@@ -320,15 +320,15 @@ const theme = createTheme({
         color: '#212121',
       },
     }),
-    Button: ({color}, {colors}) => ({
+    Button: ({ color }, { colors }) => ({
       titleStyle: {
         ...typography.pretendard.semiBold,
         fontSize: 17,
         lineHeight: 1.41 * 17,
         ...(color === 'primary'
-          ? {color: colors.contrastText.primary}
+          ? { color: colors.contrastText.primary }
           : color === 'secondary'
-            ? {color: colors.contrastText.secondary}
+            ? { color: colors.contrastText.secondary }
             : {}),
       },
       buttonStyle: {
@@ -336,10 +336,10 @@ const theme = createTheme({
         height: 56,
       },
     }),
-    FAB: ({}, {colors}) => ({
+    FAB: ({}, { colors }) => ({
       color: colors.primary,
     }),
-    Chip: ({color}, {colors}) => ({
+    Chip: ({ color }, { colors }) => ({
       titleStyle: {
         ...typography.pretendard.semiBold,
         fontSize: 14,
@@ -362,7 +362,7 @@ const theme = createTheme({
         // height: 56,
       },
     }),
-    Header: (props, {colors}) => ({
+    Header: (props, { colors }) => ({
       elevated: false,
       containerStyle: {
         backgroundColor: colors.transparent,
@@ -391,7 +391,7 @@ const theme = createTheme({
         // alignItems: 'center',
       },
     }),
-    Icon: (props, {colors}) => ({
+    Icon: (props, { colors }) => ({
       color: colors.primary,
     }),
     SectionHeader: props => ({
@@ -410,7 +410,7 @@ const theme = createTheme({
             lineHeight: 1.43 * 17,
           },
     }),
-    ListSubheader: (props, {colors}) => ({
+    ListSubheader: (props, { colors }) => ({
       style: {
         height: props.lg ? 64 : 44,
         paddingVertical: 8,
@@ -431,7 +431,7 @@ const theme = createTheme({
             color: colors.text?.secondary,
           },
     }),
-    Divider: ({inset}, {colors}) =>
+    Divider: ({ inset }, { colors }) =>
       inset
         ? {
             insetType: 'middle',
@@ -449,7 +449,7 @@ const theme = createTheme({
               paddingHorizontal: 20,
             },
           },
-    Input: ({primary, label}, {colors}) => ({
+    Input: ({ primary, label }, { colors }) => ({
       containerStyle: {
         paddingHorizontal: 20,
         // height: 92
@@ -488,7 +488,7 @@ const theme = createTheme({
       //   paddingRight: 8,
       // },
     }),
-    ListItemInput: ({primary}, {colors}) => ({
+    ListItemInput: ({ primary }, { colors }) => ({
       containerStyle: {
         // paddingHorizontal: 20,
         // height: 92
@@ -523,7 +523,7 @@ const theme = createTheme({
     }),
     ListItem: props => ({
       style: {
-        ...(props.useDisabledStyle ? {opacity: 0.5} : {}),
+        ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
       },
       containerStyle: {
         // backgroundColor: colorTheme.lightColors?.disabled,
@@ -536,19 +536,19 @@ const theme = createTheme({
         alignItems: 'center',
       },
     }),
-    ListItemTitle: (props, {colors}) => ({
+    ListItemTitle: (props, { colors }) => ({
       style: {
         display: 'flex',
         ...typography.pretendard.medium,
         fontSize: 17,
         lineHeight: 1.43 * 17,
         overflow: 'hidden',
-        ...(props.primary ? {color: colors.primary} : {}),
+        ...(props.primary ? { color: colors.primary } : {}),
       },
       numberOfLines: 1,
       ellipsizeMode: 'tail',
     }),
-    ListItemSubtitle: (_, {colors}) => ({
+    ListItemSubtitle: (_, { colors }) => ({
       style: {
         ...typography.pretendard.regular,
         color: colors.text.secondary,
@@ -560,17 +560,17 @@ const theme = createTheme({
       numberOfLines: 1,
       ellipsizeMode: 'tail',
     }),
-    ListItemChevron: ({primary}, {colors}) => ({
-      size: 32,
+    ListItemChevron: ({ primary }, { colors }) => ({
+      size: 28,
       color: primary ? colors.primary : colors.text.secondary,
     }),
-    ListItemCheckBox: (_, {colors}) => ({
+    ListItemCheckBox: (_, { colors }) => ({
       containerStyle: {
         width: 32,
         alignItems: 'center',
       },
     }),
-    TabItem: (_, {colors}) => ({
+    TabItem: (_, { colors }) => ({
       containerStyle: {
         backgroundColor: colors.white,
         paddingVertical: 16,

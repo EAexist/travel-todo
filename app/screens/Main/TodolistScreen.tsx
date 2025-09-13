@@ -1,5 +1,5 @@
-import {Divider} from '@rneui/themed'
-import {FC, useCallback, useRef} from 'react'
+import { Divider } from '@rneui/themed'
+import { FC, useCallback, useRef } from 'react'
 import {
   DefaultSectionT,
   ScrollView,
@@ -9,21 +9,21 @@ import {
   View,
 } from 'react-native'
 //
-import {BottomSheetModal} from '@/components/BottomSheetModal'
-import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
+import { BottomSheetModal } from '@/components/BottomSheetModal'
+import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import ListSubheader from '@/components/ListSubheader'
 import {
   NavigateMenuBottomSheet,
   NavigateMenuData,
 } from '@/components/NavigateMenuBottomSheet'
-import {Screen} from '@/components/Screen'
+import { Screen } from '@/components/Screen'
 import SectionHeader from '@/components/SectionHeader'
-import {AccomodationTodo, CompleteTodo} from '@/components/Todo'
-import {useTripStore} from '@/models'
-import {Todo} from '@/models/Todo'
-import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
-import {useMainScreenHeader} from '@/utils/useHeader'
-import {Observer, observer} from 'mobx-react-lite'
+import { AccomodationTodo, CompleteTodo } from '@/components/Todo'
+import { useTripStore } from '@/models'
+import { Todo } from '@/models/Todo'
+import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
+import { useMainScreenHeader } from '@/utils/useHeader'
+import { Observer, observer } from 'mobx-react-lite'
 
 // const SettingsDialog: FC = ({ visible6: boolean }) => {
 //   return (
@@ -79,7 +79,7 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
     )
 
     const renderSectionHeader = useCallback(
-      ({section: {title}}: {section: DefaultSectionT}) => (
+      ({ section: { title } }: { section: DefaultSectionT }) => (
         <ListSubheader title={title} />
       ),
       [],
@@ -100,25 +100,38 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
       //   title: tripStore.title,
       title: '할 일',
       rightComponent: (
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={handlePinButtonPress}
-            style={$headerRightButtonStyle}>
-            <HeaderIcon name="gear" type="octicon" />
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             onPress={handleSettingsButtonPress}
             style={$headerRightButtonStyle}>
             <HeaderIcon name="pin" type="octicon" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handlePinButtonPress}
+            style={$headerRightButtonStyle}>
+            <HeaderIcon name="gear" type="octicon" />
           </TouchableOpacity>
         </View>
       ),
     })
 
     const settingsOption: NavigateMenuData[] = [
-      {title: '할 일 추가', path: 'TodolistAdd', primary: true},
-      {title: '목록 순서 변경', path: 'TodolistReorder'},
-      {title: '목록에서 할 일 삭제', path: 'TodolistDelete'},
+      {
+        title: '할 일 추가',
+        path: 'TodolistAdd',
+        icon: { name: 'add', type: 'material' },
+        primary: true,
+      },
+      {
+        title: '목록 순서 변경',
+        path: 'TodolistReorder',
+        icon: { name: 'swap-vert', type: 'material' },
+      },
+      {
+        title: '목록에서 할 일 삭제',
+        path: 'TodolistDelete',
+        icon: { name: 'delete', type: 'material' },
+      },
     ]
 
     return (
