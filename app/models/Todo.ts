@@ -1,8 +1,9 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
-import {withSetPropAction} from './helpers/withSetPropAction'
-import {v4 as uuidv4} from 'uuid'
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
+import { withSetPropAction } from './helpers/withSetPropAction'
+import { v4 as uuidv4 } from 'uuid'
+import { Icon, IconModel } from './Icon'
 
-export const CATEGORY_TO_TITLE: {[key: string]: string} = {
+export const CATEGORY_TO_TITLE: { [key: string]: string } = {
   reservation: '예약',
   foreign: '해외여행',
   goods: '짐',
@@ -83,13 +84,6 @@ export const FlightModel = types.model('Flight').props({
   departure: AirportModel,
   arrival: AirportModel,
 })
-
-export const IconModel = types.model('Icon').props({
-  name: types.string,
-  type: types.optional(types.string, 'tossface'),
-})
-
-export interface Icon extends SnapshotOut<typeof IconModel> {}
 
 /**
  * PresetTodo
@@ -227,7 +221,7 @@ export const TodoModel = types
       return item.completeDateISOString !== null
     },
     get parsedTitleAndSubtitle() {
-      const defaultValue = {title: item.title?.trim(), subtitle: ''}
+      const defaultValue = { title: item.title?.trim(), subtitle: '' }
 
       if (!defaultValue.title) return defaultValue
 
@@ -235,7 +229,7 @@ export const TodoModel = types
 
       if (!titleMatches || titleMatches.length !== 3) return defaultValue
 
-      return {title: titleMatches[1], subtitle: titleMatches[2]}
+      return { title: titleMatches[1], subtitle: titleMatches[2] }
     },
   }))
 

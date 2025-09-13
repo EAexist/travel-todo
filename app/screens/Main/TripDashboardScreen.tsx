@@ -1,4 +1,4 @@
-import {FC, useCallback, useRef} from 'react'
+import { FC, useCallback, useRef } from 'react'
 import {
   ListRenderItem,
   ScrollView,
@@ -7,52 +7,51 @@ import {
   ViewStyle,
 } from 'react-native'
 //
-import {$headerRightButtonStyle, HeaderIcon} from '@/components/Header'
-import ContentTitle from '@/components/Layout/Content'
+import { Avatar } from '@/components/Avatar'
+import { ScheduleText } from '@/components/Calendar/index'
+import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
+import ListSubheader from '@/components/ListSubheader'
 import {
   NavigateMenuBottomSheet,
   NavigateMenuData,
 } from '@/components/NavigateMenuBottomSheet'
-import {Screen} from '@/components/Screen'
-import {useTripStore} from '@/models'
-import {Destination} from '@/models/Destination'
-import {MainTabScreenProps} from '@/navigators/MainTabNavigator'
-import {toCalendarString} from '@/utils/date'
-import {useMainScreenHeader} from '@/utils/useHeader'
-import {BottomSheetModal} from '@gorhom/bottom-sheet'
-import {observer} from 'mobx-react-lite'
-import {
-  CalendarProvider,
-  ExpandableCalendar,
-  WeekCalendar,
-} from 'react-native-calendars'
-import {Positions} from 'react-native-calendars/src/expandableCalendar'
-import {FlatList} from 'react-native-gesture-handler'
-import {
-  $calendarContainerStyle,
-  ScheduleText,
-  ScheduleViewerCalendar,
-} from '@/components/Calendar/index'
-import {Card, Chip, Divider, ListItem, Text, useTheme} from '@rneui/themed'
+import { Screen } from '@/components/Screen'
 import SectionCard from '@/components/SectionCard'
-import ListSubheader from '@/components/ListSubheader'
-import {Icon} from '@/components/Icon'
-import {Avatar} from '@/components/Avatar'
-import {useNavigate} from '@/navigators'
+import { useTripStore } from '@/models'
+import { Destination } from '@/models/Destination'
+import { useNavigate } from '@/navigators'
+import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
+import { useMainScreenHeader } from '@/utils/useHeader'
+import { BottomSheetModal } from '@gorhom/bottom-sheet'
+import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FlatList } from 'react-native-gesture-handler'
 
 export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
   observer(({}) => {
     const tripStore = useTripStore()
     const {
-      theme: {colors},
+      theme: { colors },
     } = useTheme()
 
     /* Settings Menu */
 
     const settingsOption: NavigateMenuData[] = [
-      {title: '여행 정보 수정', path: 'EditTrip'},
-      {title: '새 여행 만들기', path: 'TripList'},
-      {title: '지난 여행 보기', path: 'TripList'},
+      {
+        title: '여행 정보 수정',
+        path: 'EditTrip',
+        icon: { name: 'edit', type: 'material' },
+      },
+      {
+        title: '새 여행 만들기',
+        path: 'TripList',
+        icon: { name: 'add', type: 'material' },
+      },
+      {
+        title: '지난 여행 보기',
+        path: 'TripList',
+        icon: { name: 'list', type: 'material' },
+      },
     ]
     const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
@@ -69,7 +68,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
           <HeaderIcon name="gear" type="octicon" />
         </TouchableOpacity>
       ),
-      containerStyle: {backgroundColor: colors.secondaryBg},
+      containerStyle: { backgroundColor: colors.secondaryBg },
     })
 
     const renderDestinationText: ListRenderItem<Destination> = destination => (
@@ -80,10 +79,10 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
       navigateWithTrip('EditTripDestination')
     }, [])
 
-    const {navigateWithTrip} = useNavigate()
+    const { navigateWithTrip } = useNavigate()
 
     const handleViewTodolist = useCallback(() => {
-      navigateWithTrip('Main', {screen: 'Todolist'})
+      navigateWithTrip('Main', { screen: 'Todolist' })
     }, [])
 
     const handleViewAccomodationPlan = useCallback(() => {
@@ -94,7 +93,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
       {
         id: '0',
         category: '숙소 예약',
-        icon: {name: '🛌'},
+        icon: { name: '🛌' },
         title:
           tripStore.accomodationTodoStatusText ||
           `${tripStore.reservedNights}박 예약함`,
@@ -103,21 +102,21 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
       {
         id: '1',
         category: '해외여행 준비',
-        icon: {name: '🌐'},
+        icon: { name: '🌐' },
         title: tripStore.foreignTodoStatusText,
         onPress: handleViewTodolist,
       },
       {
         id: '2',
         category: '기타 예약',
-        icon: {name: '🎫'},
+        icon: { name: '🎫' },
         title: tripStore.reservationTodoStatusText,
         onPress: handleViewTodolist,
       },
       {
         id: '3',
         category: '짐 챙기기',
-        icon: {name: '💼'},
+        icon: { name: '💼' },
         title: tripStore.goodsTodoStatusText,
         onPress: handleViewTodolist,
       },
@@ -125,7 +124,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
 
     const renderTodoStatusGridItem: ListRenderItem<
       (typeof todoStatusGridData)[0]
-    > = ({item}) => (
+    > = ({ item }) => (
       <ListItem
         style={$gridItemStyle}
         containerStyle={$gridListItemContainerStyle}
@@ -141,7 +140,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
       <Screen backgroundColor={colors.secondaryBg}>
         <ScrollView>
           <SectionCard>
-            <ListItem containerStyle={{height: 'auto'}}>
+            <ListItem containerStyle={{ height: 'auto' }}>
               <ListItem.Content>
                 <ListItem.Title
                   numberOfLines={undefined}
@@ -163,7 +162,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
               )}
             </ListItem>
             {tripStore.isScheduleSet ? (
-              <View style={{paddingHorizontal: 20, paddingTop: 12}}>
+              <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
                 <ScheduleText
                   startDate={tripStore.startDate}
                   endDate={tripStore.endDate}
@@ -181,7 +180,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
               renderItem={renderTodoStatusGridItem}
               keyExtractor={item => item.id}
               numColumns={2}
-              contentContainerStyle={{width: '100%', paddingHorizontal: 20}}
+              contentContainerStyle={{ width: '100%', paddingHorizontal: 20 }}
               columnWrapperStyle={{}}
             />
             {/* <Divider inset />
@@ -194,7 +193,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
               <ListItem.Chevron />
             </ListItem> */}
           </SectionCard>
-          <SectionCard containerStyle={{marginBottom: 15}}>
+          <SectionCard containerStyle={{ marginBottom: 15 }}>
             <ListSubheader title="여행지 정보" />
             {tripStore.destination.length > 0 ? (
               <FlatList
@@ -204,9 +203,9 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
               />
             ) : (
               <ListItem onPress={handleAddDestination}>
-                <Avatar icon={{name: 'place', type: 'material'}} />
+                <Avatar icon={{ name: 'place', type: 'material' }} />
                 <ListItem.Content>
-                  <ListItem.Title style={{fontSize: 16}} numberOfLines={2}>
+                  <ListItem.Title style={{ fontSize: 16 }} numberOfLines={2}>
                     여행지를 설정하고
                     <br />
                     현지 정보를 확인해보세요
