@@ -30,7 +30,7 @@ import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet'
 import {Platform, View, ViewStyle} from 'react-native'
 import {EditTripScreen} from '@/screens/EditTrip/EditTripScreen'
-import {TripListScreen} from '@/screens/TripList'
+import {TripListScreen} from '@/screens/TripListScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -53,7 +53,8 @@ export type FlightSettingStackProps = TodoStackProps & {
 
 export type AppStackParamList = {
   /* Common */
-  Loading: {texts?: string[]}
+  Loading: {texts?: string[]; onSuccess?: () => void}
+  RequireConnection: {title?: string}
 
   Login: {}
   Welcome: {}
@@ -161,6 +162,10 @@ const AppStack = observer(function AppStack() {
       initialRouteName={isAuthenticated ? 'Welcome' : 'Login'}>
       <Stack.Screen name="TripList" component={TripListScreen} />
       <Stack.Screen name="Loading" component={Screens.Loading} />
+      <Stack.Screen
+        name="RequireConnection"
+        component={Screens.RequireConnection}
+      />
       <Stack.Screen name="Welcome" component={Screens.CreateTrip.Welcome} />
       <Stack.Group>
         <Stack.Screen

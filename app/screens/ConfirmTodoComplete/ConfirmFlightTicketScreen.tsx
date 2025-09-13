@@ -10,9 +10,9 @@ import {useCallback} from 'react'
 export const ConfirmFlightTicketScreen = withTodo<'ConfirmFlightTicket'>(
   ({todo}) => {
     const {
-      tripStore: {completeAndPatchTodo},
       reservationStore: {addFlightTicket},
     } = useStores()
+    const {completeAndPatchTodo} = useTripStore()
 
     const {pickImage} = usePickIamge()
     const handleUploadPress = useCallback(async () => {

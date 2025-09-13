@@ -66,9 +66,8 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
         region: flight.arrival.cityName,
         IATACode: flight.arrival.IATACode,
       })
-      tripStore.patchTodo(todo).then(() => {
-        navigateWithTrip('RoundTripSetting', {todoId: todo.id, callerName})
-      })
+      tripStore.patchTodo(todo)
+      navigateWithTrip('RoundTripSetting', {todoId: todo.id, callerName})
     }, [])
     const renderRecommendationChip: ListRenderItem<Flight> = useCallback(
       ({item}) => (

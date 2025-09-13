@@ -72,6 +72,7 @@
     "expo-task-manager": "~13.1.6",
     "i18next": "^23.14.0",
     "intl-pluralrules": "^2.0.1",
+    "lucide-react": "^0.544.0",
     "lucide-react-native": "^0.542.0",
     "mobx": "^6.13.7",
     "mobx-persist-store": "^1.1.8",

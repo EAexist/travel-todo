@@ -1,4 +1,4 @@
-import {Avatar} from '@/components/Avatar'
+import {Avatar, AvatarProps} from '@/components/Avatar'
 import BottomSheetModal, {
   GestureHandlerRootViewWrapper,
 } from '@/components/BottomSheetModal'
@@ -12,13 +12,14 @@ import {useStores, useTripStore} from '@/models'
 import {CATEGORY_TO_TITLE, Icon, Todo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {useHeader} from '@/utils/useHeader'
-import {ListItem} from '@rneui/themed'
+import {ListItem, Avatar as RNEAvatar, useTheme} from '@rneui/themed'
 import {Observer, observer} from 'mobx-react-lite'
 import {FC, useCallback, useRef, useState} from 'react'
 import {
   FlatList,
   ListRenderItem,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from 'react-native'
 
@@ -41,9 +42,8 @@ export const CustomTodoEditScreen: FC<{
   const handleConfirmPress = useCallback(() => {
     setIsConfirmed(true)
     todo.setTitle(title)
-    tripStore.patchTodo(todo).then(() => {
-      goBack()
-    })
+    tripStore.patchTodo(todo)
+    goBack()
   }, [todo, title, setIsConfirmed])
 
   const handleIconPress = useCallback(() => {
@@ -61,6 +61,9 @@ export const CustomTodoEditScreen: FC<{
     categoryBottomSheetModalRef.current?.present()
   }, [categoryBottomSheetModalRef])
 
+  /* IconMenu */
+  const [icon, setIcon] = useState<Icon>(todo.icon)
+
   const ICONS = [
     {name: '🛌', type: 'tossface'},
     {name: '💱', type: 'tossface'},
@@ -72,52 +75,78 @@ export const CustomTodoEditScreen: FC<{
     {name: '🎒', type: 'tossface'},
     {name: '📸', type: 'tossface'},
     {name: '☂️', type: 'tossface'},
-    {name: '💊', type: 'tossface'},
-    {name: '🧴', type: 'tossface'},
-    {name: '💄', type: 'tossface'},
-    {name: '🪒', type: 'tossface'},
-    {name: '🕶', type: 'tossface'},
-    {name: '✈️', type: 'tossface'},
-    {name: '🛫', type: 'tossface'},
-    {name: '🚄', type: 'tossface'},
-    {name: '🚆', type: 'tossface'},
-    {name: '🚕', type: 'tossface'},
-    {name: '⛴', type: 'tossface'},
-    {name: '🎢', type: 'tossface'},
-    {name: '⛩', type: 'tossface'},
-    {name: '🐶', type: 'tossface'},
-    {name: '🐱', type: 'tossface'},
-    {name: '⭐️', type: 'tossface'},
+    // {name: '💊', type: 'tossface'},
+    // {name: '🧴', type: 'tossface'},
+    // {name: '💄', type: 'tossface'},
+    // {name: '🪒', type: 'tossface'},
+    // {name: '🕶', type: 'tossface'},
+    // {name: '✈️', type: 'tossface'},
+    // {name: '🛫', type: 'tossface'},
+    // {name: '🚄', type: 'tossface'},
+    // {name: '🚆', type: 'tossface'},
+    // {name: '🚕', type: 'tossface'},
+    // {name: '⛴', type: 'tossface'},
+    // {name: '🎢', type: 'tossface'},
+    // {name: '⛩', type: 'tossface'},
+    // {name: '🐶', type: 'tossface'},
+    // {name: '🐱', type: 'tossface'},
+    // {name: '⭐️', type: 'tossface'},
   ]
 
   const iconMenu: {icon: Icon}[] = ICONS.map(icon => ({icon}))
 
   const handlePressNewIcon = useCallback(
     (icon: Icon) => {
-      todo.setIcon(icon)
-      iconBottomSheetModalRef.current?.close()
+      setIcon(icon)
     },
-    [iconBottomSheetModalRef, todo],
+    [setIcon],
   )
+  const {
+    theme: {colors},
+  } = useTheme()
+
   const renderIconListItem: ListRenderItem<{icon: Icon}> = useCallback(
     ({item}) => {
       return (
         <TouchableOpacity onPress={() => handlePressNewIcon(item.icon)}>
           <Avatar
+            size="medium"
             icon={item.icon}
-            fontSize={28}
-            containerStyle={$iconAvataContainerStyle}
+            // containerStyle={
+            //   item.icon.name === todo.icon.name
+            //     ? {
+            //         backgroundColor: 'bisque',
+            //       }
+            //     : {}
+            // }
+            // containerStyle={$iconAvataContainerStyle}
           />
+          {/* <RNEAvatar.Accessory
+                  iconProps={{name: 'check'}}
+                  size={20}
+                  style={{
+                    bottom: -20,
+                    right: -20,
+                    transform: [{translateX: '-50%'}, {translateY: '-50%'}],
+                  }}
+                />
+              </Avatar> */}
         </TouchableOpacity>
       )
     },
     [],
   )
 
+  const handleCloseIconBottomSheet = useCallback(() => {
+    todo.setIcon(icon)
+    iconBottomSheetModalRef.current?.close()
+  }, [todo, iconBottomSheetModalRef.current])
+
   /* categoryMenu */
   type CategoryListItemData = {
     title: string
     category: string
+    avatarProps: AvatarProps
     isActive?: boolean
   }
   const renderCategoryListItem: ListRenderItem<CategoryListItemData> =
@@ -132,6 +161,10 @@ export const CustomTodoEditScreen: FC<{
         }
         return (
           <ListItem onPress={handlePress} style={$s}>
+            <Avatar
+              //   size="medium"
+              {...item.avatarProps}
+            />
             <ListItem.Content>
               <ListItem.Title>{item.title}</ListItem.Title>
             </ListItem.Content>
@@ -145,7 +178,7 @@ export const CustomTodoEditScreen: FC<{
     )
 
   const handleBackPressBeforeNavigate = useCallback(async () => {
-    if (!isConfirmed && isBeforeInitialization) await tripStore.deleteTodo(todo)
+    if (!isConfirmed && isBeforeInitialization) tripStore.deleteTodo(todo)
   }, [tripStore, todo])
 
   useHeader({onBackPressBeforeNavigate: handleBackPressBeforeNavigate})
@@ -156,11 +189,14 @@ export const CustomTodoEditScreen: FC<{
       <Screen>
         <Title>
           <ListItem containerStyle={$listItemContainerStyle}>
-            <TouchableOpacity onPress={handleIconPress}>
-              <Observer
-                render={() => <Avatar icon={todo.icon} size={'xlarge'} />}
-              />
-            </TouchableOpacity>
+            <Observer
+              render={() => (
+                <TouchableOpacity onPress={handleIconPress}>
+                  <Avatar icon={todo.icon} size={'xlarge'} />
+                </TouchableOpacity>
+              )}
+            />
+
             <ListItem.Content>
               <ControlledListItemInput
                 setValue={setTitle}
@@ -215,14 +251,25 @@ export const CustomTodoEditScreen: FC<{
         <CategoryDropdownBottomSheet />
         <BottomSheetModal ref={iconBottomSheetModalRef}>
           <ContentTitle title={'아이콘 선택'} />
+          <View
+            style={{
+              paddingTop: 12,
+              paddingBottom: 24,
+              alignItems: 'center',
+            }}>
+            <Avatar icon={icon} size={64} rounded={true} />
+          </View>
           <FlatList
             data={iconMenu}
             renderItem={renderIconListItem}
             keyExtractor={item => item.icon.name}
-            numColumns={4}
+            numColumns={5}
             columnWrapperStyle={$d}
             contentContainerStyle={$s}
           />
+          <Fab.Container fixed={false} dense>
+            <Fab.Button title={'저장'} onPress={handleCloseIconBottomSheet} />
+          </Fab.Container>
         </BottomSheetModal>
         <BottomSheetModal ref={categoryBottomSheetModalRef}>
           <ContentTitle title={'카테고리 선택'} />
@@ -231,6 +278,19 @@ export const CustomTodoEditScreen: FC<{
               ([_category, title]) => ({
                 category: _category,
                 title,
+                avatarProps: {
+                  icon: {
+                    name:
+                      _category === 'reservation'
+                        ? '🎫'
+                        : _category === 'foreign'
+                          ? '🌐'
+                          : _category === 'goods'
+                            ? '💼'
+                            : '',
+                  },
+                  //   containerStyle: {backgroundColor: 'bisque'},
+                },
                 isActive: _category === todo.category,
               }),
             )}

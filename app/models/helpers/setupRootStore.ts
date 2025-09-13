@@ -26,7 +26,7 @@ import {DestinationModel} from '../Destination'
 /**
  * The key we'll be saving our state as within async storage.
  */
-const ROOT_STATE_STORAGE_KEY = 'root-v1'
+export const ROOT_STATE_STORAGE_KEY = 'root-v1'
 
 /**
  * Setup the root state.
@@ -36,7 +36,7 @@ export async function setupRootStore(rootStore: RootStore) {
   let restoredState: RootStoreSnapshot | undefined | null
 
   try {
-    // storage.clear()
+    storage.clear()
 
     /**
      * !!Test Only

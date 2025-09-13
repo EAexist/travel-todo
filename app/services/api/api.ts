@@ -6,21 +6,20 @@
  * documentation for more details.
  */
 import {AccomodationSnapshotIn} from '@/models/Accomodation'
-import {Destination, DestinationSnapshotIn} from '@/models/Destination'
+import {Destination} from '@/models/Destination'
 import {
   ReservationSnapshot,
   ReservationStoreSnapshot,
 } from '@/models/stores/ReservationStore'
+import {TripStoreSnapshot} from '@/models/stores/TripStore'
+import {UserStoreSnapshot} from '@/models/stores/UserStore'
 import {
   Flight,
   FlightRoute,
-  LocationPair,
   Todo,
-  TodoPresetSnapshotIn,
+  TodoPresetItemSnapshotIn,
   TodoSnapshotIn,
 } from '@/models/Todo'
-import {TripStore, TripStoreSnapshot} from '@/models/stores/TripStore'
-import {UserStoreSnapshot} from '@/models/stores/UserStore'
 import {KakaoProfile} from '@react-native-seoul/kakao-login'
 import {ApiResponse, ApisauceInstance, create} from 'apisauce'
 import {
@@ -31,6 +30,12 @@ import {
 } from 'expo-file-system'
 import {
   type ApiConfig,
+  CreateAccomodationProps,
+  CreateDestinationProps,
+  CreateTodoProps,
+  DeleteAccomodationProps,
+  DeleteDestinationProps,
+  DeleteTodoProps,
   GoogleUserDTO,
   PresetDTO,
   TodoDTO,
@@ -38,9 +43,7 @@ import {
   UserAccountDTO,
   mapToPreset,
   mapToTodo,
-  mapToTodoDTO,
   mapToTrip,
-  mapToTripDTO,
   mapToUserAccount,
 } from './api.types'
 import {GeneralApiProblem, getGeneralApiProblem} from './apiProblem'
@@ -339,7 +342,10 @@ export class Api {
         }
       : userDTO
   }
-  /* Trip & Trip.todolist CRUD APIS */
+
+  /*
+   * Trip CRUD
+   */
 
   /**
    * Gets a Trip data with given id.
@@ -362,18 +368,19 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {id} - Trip Id.
    */
-  async createTrip(): Promise<ApiResult<TripStoreSnapshot>> {
-    const response: ApiResponse<TripDTO> = await this.apisauce.post(`/trip`)
+  async createTrip(): Promise<ApiResult<UserStoreSnapshot>> {
+    const response: ApiResponse<UserAccountDTO> =
+      await this.apisauce.post(`/trip`)
     console.log(`[api.createTrip() config=${JSON.stringify(this.config)}`)
     console.log(`[api.createTrip() response=${JSON.stringify(response)}`)
 
-    const tripDTO = handleResponse<TripDTO>(response)
-    return tripDTO.kind === 'ok'
+    const userAccountDTO = handleResponse<UserAccountDTO>(response)
+    return userAccountDTO.kind === 'ok'
       ? {
           kind: 'ok',
-          data: mapToTrip(tripDTO.data),
+          data: mapToUserAccount(userAccountDTO.data),
         }
-      : tripDTO
+      : userAccountDTO
   }
 
   /**
@@ -381,22 +388,25 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Trip} - Updated Trip.
    */
-  async patchTrip(trip: TripStore): Promise<ApiResult<TripStoreSnapshot>> {
+  async patchTrip(tripDTO: TripDTO): Promise<ApiResult<TripStoreSnapshot>> {
     const response: ApiResponse<TripDTO> = await this.apisauce.patch(
-      `/trip/${trip.id}`,
-      mapToTripDTO(trip),
+      `/trip/${tripDTO.id}`,
+      tripDTO,
+      //   mapToTripDTO(trip),
     )
 
-    const tripDTO = handleResponse<TripDTO>(response)
-    return tripDTO.kind === 'ok'
+    const patchedTripDTO = handleResponse<TripDTO>(response)
+    return patchedTripDTO.kind === 'ok'
       ? {
           kind: 'ok',
-          data: mapToTrip(tripDTO.data),
+          data: mapToTrip(patchedTripDTO.data),
         }
-      : tripDTO
+      : patchedTripDTO
   }
 
-  /* Todo CRUD APIS */
+  /*
+   * Todo CRUD
+   */
 
   /**
    * Create todo.
@@ -405,14 +415,12 @@ export class Api {
    */
   async createTodo({
     tripId,
-    todo,
-  }: {
-    tripId: string
-    todo: Partial<TodoSnapshotIn>
-  }): Promise<ApiResult<TodoSnapshotIn>> {
+    todoDTO,
+  }: CreateTodoProps): Promise<ApiResult<TodoSnapshotIn>> {
     const response: ApiResponse<TodoDTO> = await this.apisauce.post(
       `/trip/${tripId}/todo`,
-      mapToTodoDTO({...todo, completeDateISOString: ''} as Todo),
+      todoDTO,
+      //   mapToTodoDTO({...todo, completeDateISOString: ''} as Todo),
     )
 
     const todoDTOResponse = handleResponse<TodoDTO>(response)
@@ -429,13 +437,14 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Todo} - Updated Trip.
    */
-  async patchTodo(
-    tripId: string,
-    todo: Todo,
-  ): Promise<ApiResult<TodoSnapshotIn>> {
+  async patchTodo({
+    tripId,
+    todoDTO,
+  }: CreateTodoProps): Promise<ApiResult<TodoSnapshotIn>> {
     const response: ApiResponse<TodoDTO> = await this.apisauce.patch(
-      `/trip/${tripId}/todo/${todo.id}`,
-      mapToTodoDTO(todo),
+      `/trip/${tripId}/todo/${todoDTO.id}`,
+      todoDTO,
+      //   mapToTodoDTO(todo),
     )
 
     const todoDTOResponse = handleResponse<TodoDTO>(response)
@@ -452,7 +461,10 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Todo} - Updated Trip.
    */
-  async deleteTodo(tripId: string, todoId: string): Promise<ApiResult<null>> {
+  async deleteTodo({
+    tripId,
+    todoId,
+  }: DeleteTodoProps): Promise<ApiResult<null>> {
     const response: ApiResponse<void> = await this.apisauce.delete(
       `/trip/${tripId}/todo/${todoId}`,
     )
@@ -464,7 +476,7 @@ export class Api {
    */
   async getTodoPreset(
     tripId: string,
-  ): Promise<ApiResult<TodoPresetSnapshotIn[]>> {
+  ): Promise<ApiResult<TodoPresetItemSnapshotIn[]>> {
     const response: ApiResponse<PresetDTO[]> = await this.apisauce.get(
       `/trip/${tripId}/todoPreset`,
     )
@@ -521,17 +533,21 @@ export class Api {
     return presetResponse
   }
 
+  /*
+   * Destination CRUD
+   */
+
   /**
    * Gets a list of recent React Native Radio episodes.
    */
-  async createDestination(
-    tripId: string,
-    destination: Partial<Destination>,
-  ): Promise<ApiResult<Destination>> {
+  async createDestination({
+    tripId,
+    destinationDTO,
+  }: CreateDestinationProps): Promise<ApiResult<Destination>> {
     // make the api call
     const response: ApiResponse<Destination> = await this.apisauce.post(
       `trip/${tripId}/destination`,
-      destination,
+      destinationDTO,
     )
 
     const handledResponse = handleResponse<Destination>(response)
@@ -552,16 +568,20 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Todo} - Updated Trip.
    */
-  async deleteDestination(
-    tripId: string,
-    destinationId: string,
-  ): Promise<ApiResult<null>> {
+  async deleteDestination({
+    tripId,
+    destinationId,
+  }: DeleteDestinationProps): Promise<ApiResult<null>> {
     const response: ApiResponse<void> = await this.apisauce.delete(
       `/trip/${tripId}/destination/${destinationId}`,
     )
 
     return handleDeleteResponse(response)
   }
+
+  /*
+   * Accomodation CRUD
+   */
 
   /**
    * Gets a list of recent React Native Radio episodes.
@@ -579,11 +599,11 @@ export class Api {
    * Gets a list of recent React Native Radio episodes.
    */
   async createAccomodation(
-    id: string,
+    tripId: string,
   ): Promise<ApiResult<Partial<AccomodationSnapshotIn>>> {
     // make the api call
     const response: ApiResponse<Partial<AccomodationSnapshotIn>> =
-      await this.apisauce.get(`trip/${id}/accomodation`)
+      await this.apisauce.get(`trip/${tripId}/accomodation`)
 
     return handleResponse<Partial<AccomodationSnapshotIn>>(response)
   }
@@ -593,10 +613,12 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Todo} - Updated Trip.
    */
-  async patchAccomodation(
-    tripId: string,
-    accomodation: AccomodationSnapshotIn,
-  ): Promise<ApiResult<Partial<AccomodationSnapshotIn>>> {
+  async patchAccomodation({
+    tripId,
+    accomodation,
+  }: CreateAccomodationProps): Promise<
+    ApiResult<Partial<AccomodationSnapshotIn>>
+  > {
     const response: ApiResponse<Partial<AccomodationSnapshotIn>> =
       await this.apisauce.patch(
         `/trip/${tripId}/accomodation/${accomodation.id}`,
@@ -612,10 +634,10 @@ export class Api {
    * @returns {kind} - Response Status.
    * @returns {...Todo} - Updated Trip.
    */
-  async deleteAccomodation(
-    tripId: string,
-    accomodationId: string,
-  ): Promise<ApiResult<null>> {
+  async deleteAccomodation({
+    tripId,
+    accomodationId,
+  }: DeleteAccomodationProps): Promise<ApiResult<null>> {
     const response: ApiResponse<void> = await this.apisauce.delete(
       `/trip/${tripId}/accomodation/${accomodationId}`,
     )

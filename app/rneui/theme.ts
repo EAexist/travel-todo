@@ -230,10 +230,12 @@ const theme = createTheme({
                     width: 60,
                     height: 60,
                   }
-                : {
-                    width: 32,
-                    height: 32,
-                  }),
+                : props.size
+                  ? {
+                      width: props.size + 36,
+                      height: props.size + 36,
+                    }
+                  : {}),
         // min-width: 32,
         // min-height: 32,
       },
@@ -250,7 +252,7 @@ const theme = createTheme({
                       ? 36
                       : props.size === 'xlarge'
                         ? 40
-                        : 44,
+                        : props.size,
             },
           }
         : {}),
@@ -333,6 +335,9 @@ const theme = createTheme({
         borderRadius: 16,
         height: 56,
       },
+    }),
+    FAB: ({}, {colors}) => ({
+      color: colors.primary,
     }),
     Chip: ({color}, {colors}) => ({
       titleStyle: {

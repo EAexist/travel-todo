@@ -28,13 +28,23 @@ import {
 } from 'react-native-safe-area-context'
 import {initI18n} from './i18n'
 import {useInitialRootStore} from './models'
-import {AppNavigator, useNavigationPersistence} from './navigators'
+import {
+  AppNavigator,
+  navigationRef,
+  useNavigationPersistence,
+} from './navigators'
 import {loadDateFnsLocale} from './utils/formatDate'
 import './utils/gestureHandler'
 import * as storage from './utils/storage'
 import {useFonts} from 'expo-font'
 import {Platform} from 'react-native'
 import {messages} from './locale/locales/ko/messages'
+import {addEventListener, useNetInfo} from '@react-native-community/netinfo'
+import * as TaskManager from 'expo-task-manager'
+import {registerTaskAsync} from 'expo-background-task'
+import {registerBackgroundTaskAsync} from './tasks/BackgroundTask'
+import {useNavigationContainerRef} from '@react-navigation/native'
+import {useLogger} from '@react-navigation/devtools'
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
@@ -122,11 +132,11 @@ export function App() {
 
   const [isI18nInitialized, setIsI18nInitialized] = useState(false)
 
-  useEffect(() => {
-    initI18n()
-      .then(() => setIsI18nInitialized(true))
-      .then(() => loadDateFnsLocale())
-  }, [])
+  //   useEffect(() => {
+  //     initI18n()
+  //       .then(() => setIsI18nInitialized(true))
+  //       .then(() => loadDateFnsLocale())
+  //   }, [])
 
   const {rehydrated} = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
@@ -142,14 +152,14 @@ export function App() {
   // In iOS: application:didFinishLaunchingWithOptions:
   // In Android: https://stackoverflow.com/a/45838109/204044
   // You can replace with your own loading component if you wish.
-  if (
-    !rehydrated ||
-    !isNavigationStateRestored ||
-    !isI18nInitialized ||
-    (!areFontsLoaded && !fontLoadError)
-  ) {
-    return null
-  }
+  //   if (
+  //     !rehydrated ||
+  //     !isNavigationStateRestored ||
+  //     !isI18nInitialized ||
+  //     (!areFontsLoaded && !fontLoadError)
+  //   ) {
+  //     return null
+  //   }
 
   const linking = {
     prefixes: [prefix],
@@ -159,6 +169,30 @@ export function App() {
   // https://lingui.dev/tutorials/react-native#internationalization-in-react-native
   i18n.loadAndActivate({locale: 'ko', messages})
   // otherwise, we're ready to render the app
+
+  /* Run Background Sync Actions when network connectivity is restored */
+  useEffect(() => {
+    console.log('HI')
+    const unsubscribe = addEventListener(state => {
+      console.log('Connection type', state.type)
+      console.log('Is connected?', state.isConnected)
+      if (state.isConnected) {
+        console.log('Device is now online. Manually calling background task.')
+        try {
+          registerBackgroundTaskAsync()
+        } catch (error) {
+          console.error('Failed to execute task:', error)
+        }
+      }
+    })
+    return () => unsubscribe()
+  }, [])
+
+  if (__DEV__) {
+    console.log('Running in dev mode')
+    useLogger(navigationRef) // Logs navigation events to the console in development mode
+  }
+
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <KeyboardProvider>

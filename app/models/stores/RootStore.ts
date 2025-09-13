@@ -103,37 +103,24 @@ export const RootStoreModel = types
       } else {
         console.error(`Error fetching Trip: ${JSON.stringify(response)}`)
       }
+      return response.kind
     },
     async createTrip() {
-      //   rootStore.setProp('tripStore', TripStoreModel.create())
-      //   rootStore.tripStore.setProp('todolist', {
-      //     reservation: [],
-      //     foreign: [],
-      //     goods: [],
-      //   })
-      //   await rootStore.userStore.fetchUserAccount()
-      console.log('[RootStore] createTrip()')
-      return await api.createTrip().then(async response => {
-        console.log(
-          `[RootStore] createTrip() response=${JSON.stringify(response)}`,
-        )
-        if (response.kind === 'ok') {
-          console.log('changed')
-          store.setProp('tripStore', response.data as TripStoreSnapshot)
-          store.tripStore?.setProp('todolist', {
-            reservation: [],
-            foreign: [],
-            goods: [],
+      return store.userStore.createTrip().then(kind => {
+        if (kind === 'ok' && store.userStore.trip[-1].id) {
+          return this.fetchTrip(store.userStore.trip[-1].id).then(kind => {
+            return kind
           })
-        }
-        return response.kind
+        } else return kind
       })
     },
-    async withApiStatus(action: () => Promise<string>) {
-      store.setProp('apiStatus', ApiStatus.PENDING)
-      action().then((kind: string) => {
-        store.handleResponseStatus(kind)
-      })
+    async withApiStatus<T>(action: (args: T) => Promise<string>) {
+      return (args: T) => {
+        store.setProp('apiStatus', ApiStatus.PENDING)
+        action(args).then((kind: string) => {
+          store.handleResponseStatus(kind)
+        })
+      }
     },
   }))
 

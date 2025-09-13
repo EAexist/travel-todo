@@ -271,7 +271,7 @@ export const demoEn = {
         name: 'Presets',
         description: 'There are a few presets that are preconfigured.',
         default: {
-          heading: 'Default TodoPreset (default)',
+          heading: 'Default TodoPresetItem (default)',
           content: 'Incididunt magna ut aliquip consectetur mollit dolor.',
           footer: 'Consectetur nulla non aliquip velit.',
         },

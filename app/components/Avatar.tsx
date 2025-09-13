@@ -33,7 +33,7 @@ export const Avatar = ({
                           ? 28
                           : size === 'xlarge'
                             ? 32
-                            : 36,
+                            : size,
                 }}>
                 {icon?.name}
               </Text>

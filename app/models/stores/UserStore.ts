@@ -2,7 +2,7 @@ import {api, GoogleUserDTO} from '@/services/api'
 import {KakaoProfile} from '@react-native-seoul/kakao-login'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
 import {withSetPropAction} from '../helpers/withSetPropAction'
-import {TripStoreModel} from './TripStore'
+import {TripStoreModel, TripSummaryModel} from './TripStore'
 
 export const UserStoreModel = types
   .model('UserStore')
@@ -10,7 +10,7 @@ export const UserStoreModel = types
     // authToken: types.maybe(types.string),
     id: types.maybeNull(types.string),
     nickname: types.maybe(types.string),
-    trip: types.array(TripStoreModel),
+    trip: types.array(TripSummaryModel),
   })
   .actions(withSetPropAction)
   .views(store => ({
@@ -40,6 +40,19 @@ export const UserStoreModel = types
         api.authenticate(store.id.toString())
       }
       //   console.log(`[UserStore.login] end`)
+    },
+    createTrip: async () => {
+      console.log('[RootStore] createTrip()')
+      return await api.createTrip().then(async response => {
+        console.log(
+          `[RootStore] createTrip() response=${JSON.stringify(response)}`,
+        )
+        if (response.kind === 'ok') {
+          console.log('changed')
+          store.setProp('trip', response.data.trip)
+        }
+        return response.kind
+      })
     },
   }))
   .actions(store => ({

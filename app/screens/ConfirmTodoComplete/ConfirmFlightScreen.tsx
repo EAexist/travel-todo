@@ -8,9 +8,7 @@ import {withTodo} from '@/utils/withTodo'
 import {useCallback} from 'react'
 
 export const ConfirmFlightScreen = withTodo<'ConfirmFlight'>(({todo}) => {
-  const {
-    tripStore: {completeAndPatchTodo},
-  } = useStores()
+  const {completeAndPatchTodo} = useTripStore()
   const handleUploadPress = useCallback(() => {
     // Handle next button press
     console.log('Next button pressed')

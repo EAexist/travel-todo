@@ -5,7 +5,7 @@ import {Title} from '@/components/Layout/Content'
 import {Screen} from '@/components/Screen'
 import {TextInfoListItem} from '@/components/TextInfoListItem'
 import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
+import {useTripStore} from '@/models'
 import {FlightTodo} from '@/models/Todo'
 import {goBack, useNavigate} from '@/navigators'
 import {ListItem} from '@rneui/themed'
@@ -28,9 +28,7 @@ export const FlightTicketTodoEditScreen: FC<{
     console.log('Hello [FlightTicketTodoEditScreen]')
   }, [])
 
-  const {
-    tripStore: {patchTodo},
-  } = useStores()
+  const {patchTodo} = useTripStore()
 
   const {isCompleted, setIsCompleted} = useTodoConfirmListItem(
     todo,
@@ -50,7 +48,7 @@ export const FlightTicketTodoEditScreen: FC<{
   }, [navigateWithTrip, todo.id])
 
   //   const handleBackPressBeforeNavigate = useCallback(async () => {
-  //     if (isBeforeInitialization) await tripStore.deleteTodo(todo)
+  //     if (isBeforeInitialization) tripStore.deleteTodo(todo)
   //   }, [isBeforeInitialization])
 
   //   useHeader({

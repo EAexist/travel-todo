@@ -120,9 +120,9 @@ export interface TodoContentSnapshotIn
 // })
 
 /**
- * TodoPreset
+ * TodoPresetItem
  */
-export const TodoPresetModel = types
+export const TodoPresetItemModel = types
   .model('Preset')
   .props({
     isFlaggedToAdd: types.boolean,
@@ -135,9 +135,9 @@ export const TodoPresetModel = types
     },
   }))
 
-export interface TodoPreset extends Instance<typeof TodoPresetModel> {}
-export interface TodoPresetSnapshotIn
-  extends SnapshotOut<typeof TodoPresetModel> {}
+export interface TodoPresetItem extends Instance<typeof TodoPresetItemModel> {}
+export interface TodoPresetItemSnapshotIn
+  extends SnapshotOut<typeof TodoPresetItemModel> {}
 
 /**
  * Todo

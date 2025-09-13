@@ -8,7 +8,7 @@ import {
   TodolistAddScreenBase,
   useAddFlaggedPreset,
 } from '../Todolist/Edit/TodolistAddScreenBase'
-import {useLoadingScreen} from '../LoadingScreen'
+import {useLoadingScreen} from '../Loading'
 
 export const TodolistSettingScreen: FC<AppStackScreenProps<'TodolistSetting'>> =
   observer(({route, navigation}) => {

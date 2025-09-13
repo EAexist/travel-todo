@@ -13,11 +13,20 @@ import {
   TodoContent,
   TodoContentModel,
   TodoModel,
-  TodoPreset,
-  TodoPresetModel,
-  TodoSnapshotIn,
+  TodoPresetItem,
+  TodoPresetItemModel,
 } from '@/models/Todo'
-import {api} from '@/services/api'
+import {
+  api,
+  CreateAccomodationProps,
+  CreateTodoProps,
+  DeleteAccomodationProps,
+  DeleteDestinationProps,
+  DeleteTodoProps,
+  TodoDTO,
+  TripDTO,
+} from '@/services/api'
+import {APIAction, enqueueAction} from '@/tasks/BackgroundTask'
 import {toCalendarString} from '@/utils/date'
 import {eachDayOfInterval} from 'date-fns'
 import {Instance, SnapshotOut, types} from 'mobx-state-tree'
@@ -28,6 +37,24 @@ export const TodolistModel = types
   .model('Preset')
   .actions(withSetPropAction)
   .actions(presetItem => ({}))
+
+export const TripSummaryModel = types
+  .model('TripSummary')
+  .props({
+    id: types.optional(types.identifier, () => uuidv4()),
+    isInitialized: false,
+    title: types.string,
+    startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    destination: types.array(types.string),
+  })
+  .views(store => ({
+    get scheduleText() {
+      return `${store.startDateISOString ? new Date(store.startDateISOString).toLocaleDateString() : ''}${store.endDateISOString ? ` - ${new Date(store.endDateISOString).toLocaleDateString()}` : ''}`
+    },
+  }))
+
+export interface TripSummary extends Instance<typeof TripSummaryModel> {}
 
 export const TripStoreModel = types
   .model('TripStore')
@@ -44,7 +71,7 @@ export const TripStoreModel = types
     customTodoContent: types.array(TodoContentModel),
     activeItem: types.maybeNull(types.reference(TodoModel)),
     accomodation: types.map(AccomodationModel),
-    preset: types.map(types.array(TodoPresetModel)),
+    preset: types.map(types.array(TodoPresetItemModel)),
     recommendedFlight: types.array(FlightModel),
     isReservationPinned: types.optional(types.boolean, false),
   })
@@ -178,17 +205,22 @@ export const TripStoreModel = types
     addDestination(destination: DestinationSnapshotIn) {
       store.destination.push(destination)
     },
+  }))
+  .actions(store => ({
+    /*
+     * Backend API calls
+     */
     async fetchPreset() {
       console.log('[Tripstore.fetchPreset]')
       return api.getTodoPreset(store.id).then(response => {
         if (response.kind == 'ok') {
-          const map = new Map<string, TodoPreset[]>()
+          const map = new Map<string, TodoPresetItem[]>()
           response.data.forEach(({isFlaggedToAdd, todoContent}) => {
             if (!map.has(todoContent.category)) {
               map.set(todoContent.category, [])
             }
             map.get(todoContent.category)?.push(
-              TodoPresetModel.create({
+              TodoPresetItemModel.create({
                 isFlaggedToAdd,
                 todoContent: todoContent,
               }),
@@ -208,44 +240,53 @@ export const TripStoreModel = types
         }
       })
     },
-  }))
-  .actions(store => ({
-    // /**
-    //  * Trip CRUD Actions
-    //  */
-    // /**
-    //  * Create an empty trip and fetch it with backend-generated id.
-    //  */
+    /**
+     * Create an empty trip and fetch it with backend-generated id.
+     */
     // async create() {
     //   const response = await api.createTrip()
     //   if (response.kind === 'ok') {
     //     store.setProp('id', response.data.id)
     //   }
     // },
+
+    /**
+     * Create an empty destination and fetch it with backend-generated id.
+     */
+    async createDestination(destination: DestinationContent) {
+      //   store.addDestination(destination)
+      const response = await api.createDestination({
+        tripId: store.id,
+        destinationDTO: destination,
+      })
+      if (response.kind === 'ok') {
+        store.addDestination(response.data)
+      }
+    },
+
+    /**
+     * Trip CRUD Actions
+     */
     /**
      * Fetch a trip with given id.
      */
-    async fetch(id: string) {
-      console.log('[Tripstore.fetch]')
-      const response = await api.getTrip(id)
-      if (response.kind === 'ok') {
-        store.set(response.data as TripStoreSnapshot)
-      } else {
-        console.error(`Error fetching Trip: ${JSON.stringify(response)}`)
-      }
-      console.log(store)
-    },
+    // async fetch(id: string) {
+    //   console.log('[Tripstore.fetch]')
+    //   const response = await api.getTrip(id)
+    //   if (response.kind === 'ok') {
+    //     store.set(response.data as TripStoreSnapshot)
+    //   } else {
+    //     console.error(`Error fetching Trip: ${JSON.stringify(response)}`)
+    //   }
+    //   console.log(store)
+    // },
     /**
      * Patch(update) a trip.
+     * @TODO use only changed sub-data as payload, instead of full store
      */
-    async patch() {
+    patchTrip(tripDTO: TripDTO) {
       console.log('[Tripstore.patch]')
-      const response = await api.patchTrip(store as TripStore)
-      if (response.kind == 'ok') {
-        store.set(response.data as TripStoreSnapshot)
-        console.log('[Tripstore.patch] returns')
-      }
-      return response.kind
+      enqueueAction(APIAction.CREATE_TODO, tripDTO as TripDTO)
     },
 
     /**
@@ -279,24 +320,25 @@ export const TripStoreModel = types
     //     store.addTodo(todo)
     //   }
     // },
+
     /**
      * Patch(update) a trip.
      */
-    async patchTodo(todo: Todo) {
-      store.setTodo(todo)
-      return todo
-      //   const response = await api.patchTodo(store.id, todo)
-      //   if (response.kind === 'ok') {
-      //     console.log(`[patchTodo] todo=${JSON.stringify(todo)}`)
-      //     store.setTodo(todo)
-      //     return todo
-      //   }
+    patchTodo(todoDTO: TodoDTO) {
+      enqueueAction(APIAction.CREATE_TODO, {
+        tripId: store.id,
+        todoDTO: todoDTO,
+      } as CreateTodoProps)
     },
     /**
      * Delete a trip.
      */
-    async deleteTodo(todo: Todo) {
+    deleteTodo(todo: Todo) {
       store._deleteTodo(todo)
+      enqueueAction(APIAction.DELETE_TODO, {
+        tripId: store.id,
+        todoId: todo.id,
+      } as DeleteTodoProps)
       //   await api.deleteTodo(store.id, todo.id).then(({kind}) => {
       //     if (kind == 'ok') {
       //       store._deleteTodo(todo)
@@ -305,47 +347,25 @@ export const TripStoreModel = types
       //   })
     },
 
-    /* TodoPreset Actions */
-
-    // async fetchPreset() {
-    //   const response = await api.getPreset('1')
-    //   console.log(response)
-    //   if (response.kind === 'ok') {
-    //     response.preset.forEach(preset => {
-    //       store.addTodo(preset.item)
-    //       store.addPreset(preset)
-    //     })
-    //     console.log(store.preset)
-    //   } else {
-    //     console.error(`Error fetching Trip: ${JSON.stringify(response)}`)
-    //   }
-    // },
-
     /**
      * Destination CRUD Actions
      */
     /**
-     * Create an empty destination and fetch it with backend-generated id.
-     */
-    async createDestination(destination: DestinationContent) {
-      store.addDestination(destination)
-      //   store.pend()
-      //   const response = await api.createDestination(store.id, destination)
-      //   if (response.kind === 'ok') {
-      //     store.addDestination(response.data)
-      //     store.rest()
-      //   }
-    },
-    /**
      * Delete a destination.
      */
     async deleteDestination(destination: Destination) {
-      api.deleteDestination(store.id, destination.id).then(({kind}) => {
-        console.log(kind, destination)
-        if (kind == 'ok') {
-          store._deleteDestination(destination)
-        }
-      })
+      store.destination.remove(destination)
+      enqueueAction(APIAction.DELETE_DESTINATION, {
+        tripId: store.id,
+        destinationId: destination.id,
+      } as DeleteDestinationProps)
+
+      //   api.deleteDestination(store.id, destination.id).then(({kind}) => {
+      //     console.log(kind, destination)
+      //     if (kind == 'ok') {
+      //       store._deleteDestination(destination)
+      //     }
+      //   })
     },
     /**
      * Create an empty accomodation and fetch it with backend-generated id.
@@ -363,6 +383,10 @@ export const TripStoreModel = types
      */
     async patchAccomodation(accomodation: AccomodationSnapshotIn) {
       store.accomodation.set((accomodation as Accomodation).id, accomodation)
+      enqueueAction(APIAction.PATCH_ACCOMODATION, {
+        tripId: store.id,
+        accomodation: accomodation,
+      } as CreateAccomodationProps)
       //   const response = await api.patchAccomodation(store.id, accomodation)
       //   if (response.kind === 'ok')
       //     store.accomodation.set(accomodation.id, accomodation)
@@ -372,6 +396,10 @@ export const TripStoreModel = types
      */
     async deleteAccomodation(accomodation: AccomodationSnapshotIn) {
       store.accomodation.delete((accomodation as Accomodation).id)
+      enqueueAction(APIAction.DELETE_ACCOMODATION, {
+        tripId: store.id,
+        accomodationId: accomodation.id,
+      } as DeleteAccomodationProps)
       //   api.deleteAccomodation(store.id, item.id).then(({kind}) => {
       //     if (kind == 'ok') {
       //       store.accomodation.delete(item.id)
@@ -518,7 +546,7 @@ export const TripStoreModel = types
     get todolistWithPreset() {
       return this.sections.map(category => {
         const addedItems = store.todolist.get(category)
-        const addedRresetIds = addedItems
+        const addedStockIds = addedItems
           ?.filter(item => item.isPreset)
           .map(item => item.content.id)
         // const addedItemIds = addedItems?.map(item => item.id) as string[]
@@ -528,11 +556,11 @@ export const TripStoreModel = types
           data: [
             ...((addedItems?.map(item => ({
               todo: item,
-            })) as {todo?: Todo; preset?: TodoPreset}[]) || []),
+            })) as {todo?: Todo; preset?: TodoPresetItem}[]) || []),
             ...(store.preset
               .get(category)
               ?.filter(
-                preset => !addedRresetIds?.includes(preset.todoContent.id),
+                preset => !addedStockIds?.includes(preset.todoContent.id),
               )
               .map(preset => ({
                 preset,
@@ -627,30 +655,30 @@ export const TripStoreModel = types
   .actions(store => ({
     async initialize() {
       store.setProp('isInitialized', true)
-      //   await store.patch()
+      enqueueAction(APIAction.PATCH_TRIP, {
+        id: store.id,
+        isInitialized: store.isInitialized,
+      } as TripDTO)
     },
-    async completeAndPatchTodo(todo: Todo) {
+    completeAndPatchTodo(todo: Todo) {
       todo.complete()
-      store.patchTodo(todo).then(todo => {
-        if (todo) {
-          if (todo.type == 'flight')
-            store.createCustomTodo({
-              ...todo,
-              type: 'flightTicket',
-            })
-        }
-      })
+      store.patchTodo(todo)
+      if (todo) {
+        if (todo.type == 'flight')
+          store.createCustomTodo({
+            ...todo,
+            type: 'flightTicket',
+          })
+      }
     },
-    async deleteTodos() {
-      await Promise.all(
-        Array.from(store.todoMap.values())
-          .filter(item => item.isFlaggedToDelete)
-          .map(store.deleteTodo),
-      )
+    deleteTodos() {
+      Array.from(store.todoMap.values())
+        .filter(item => item.isFlaggedToDelete)
+        .forEach(item => store.deleteTodo(item))
     },
     async addFlaggedPreset() {
       await Promise.all(
-        (Array.from(store.preset.values()).flat() as TodoPreset[])
+        (Array.from(store.preset.values()).flat() as TodoPresetItem[])
           .filter(preset => preset.isFlaggedToAdd)
           .map(async preset => {
             store.addTodo(
@@ -701,3 +729,4 @@ export const TripStoreModel = types
   }))
 export interface TripStore extends Instance<typeof TripStoreModel> {}
 export interface TripStoreSnapshot extends SnapshotOut<typeof TripStoreModel> {}
+// export type TripStoreProps = keyof TripStoreSnapshot

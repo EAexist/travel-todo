@@ -113,15 +113,7 @@ export const useMainScreenHeader = ({
 }) => {
   useHeader({
     backButtonShown: false,
-    leftComponent: (
-      <Text
-        ellipsizeMode="tail"
-        numberOfLines={1}
-        h2
-        h2Style={{lineHeight: 40}}>
-        {title}
-      </Text>
-    ),
+    leftComponent: <HeaderTitle>{title}</HeaderTitle>,
     rightComponent: rightComponent,
     leftContainerStyle: styles.headerLeftContainer,
     rightContainerStyle: styles.headerRightContainer,

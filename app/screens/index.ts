@@ -7,5 +7,8 @@ export * as Todo from './Todo'
 export * as Confirm from './ConfirmTodoComplete'
 export * as Accomodation from './Accomodation'
 export * as Reservation from './Reservation'
-export {LoadingScreen as Loading} from './LoadingScreen'
+export {
+  LoadingScreen as Loading,
+  RequireConnectionScreen as RequireConnection,
+} from './Loading'
 // export * as Login from './Login'
