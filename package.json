@@ -70,6 +70,7 @@
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.9",
     "expo-task-manager": "~13.1.6",
+    "expo-web-browser": "~14.2.0",
     "i18next": "^23.14.0",
     "intl-pluralrules": "^2.0.1",
     "lucide-react-native": "^0.542.0",
@@ -82,6 +83,7 @@
     "react-i18next": "^15.0.1",
     "react-native": "0.79.4",
     "react-native-calendars": "^1.1312.1",
+    "react-native-date-picker": "^5.0.13",
     "react-native-dotenv": "^3.4.11",
     "react-native-drawer-layout": "^4.0.1",
     "react-native-gesture-handler": "~2.24.0",
@@ -95,8 +97,7 @@
     "react-native-screens": "~4.11.1",
     "react-native-sortables": "^1.7.0",
     "react-native-web": "^0.20.0",
-    "uuid": "^11.1.0",
-    "expo-web-browser": "~14.2.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
