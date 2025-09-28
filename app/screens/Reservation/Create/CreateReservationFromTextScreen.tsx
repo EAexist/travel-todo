@@ -64,7 +64,7 @@ export const CreateReservationFromTextScreen: FC<
   }, [inputRef.current])
 
   useHeader(
-    isFocused
+    isFocused && value.length > 0
       ? {
           rightActionTitle: '초기화',
           onRightPress: handleReset,
@@ -73,7 +73,7 @@ export const CreateReservationFromTextScreen: FC<
           rightActionTitle: '',
           onRightPress: () => {},
         },
-    [isFocused],
+    [isFocused, value.length],
   )
 
   return (
@@ -81,7 +81,7 @@ export const CreateReservationFromTextScreen: FC<
       <ContentTitle
         title={'예약 관리하기'}
         subtitle={
-          '알림톡, 이메일, 또는 웹사이트의\n예약 내역 전체를 복사해 붙여넣어주세요.'
+          '알림톡, 이메일, 또는 웹사이트에서\n예약 내역 글 전체를 복사해 붙여넣은 후\n확인 버튼을 눌러주세요.'
         }
       />
       <Note_
@@ -97,14 +97,14 @@ export const CreateReservationFromTextScreen: FC<
           setIsTextChanged(true)
           setValue(text)
         }}
-        placeholder="예약 내역 텍스트 붙여넣기"
+        placeholder="예약 내역 붙여넣기"
         ref={inputRef}
       />
       <Fab.Container>
         <Fab.Button
           onPress={handlePressCreateReservationButton}
           disabled={isTextTooShort}
-          title={isTextTooShort ? '10자 이상 입력해주세요' : '확인'}
+          title={isTextTooShort ? '10자 이상 입력해주세요' : '예약 추가하기'}
         />
       </Fab.Container>
       {/* <ControlledInput

@@ -10,23 +10,26 @@ import {
 } from 'mobx-state-tree'
 import { v4 as uuidv4 } from 'uuid'
 import { withSetPropAction } from '../helpers/withSetPropAction'
-import { Icon } from '../Icon'
 import { AirportModel } from '../Todo'
 import { FlightTicketModel } from './FlightTicketModel'
 import { FlightBookingModel } from './FlightBookingModel'
 import { GeneralReservationModel } from './GeneralReservationModel'
 import { FlightModel } from './FlightModel'
+import { Icon } from '../Icon'
+import { VisitJapanModel } from './VisitJapanModel'
 
 export type ReservationCategory =
   | 'ACCOMODATION'
   | 'FLIGHT_BOOKING'
   | 'FLIGHT_TICKET'
+  | 'VISIT_JAPAN'
   | 'GENERAL'
 
 export const RESERVATION_CATEGORY_TO_TITLE: { [key: string]: string } = {
   ACCOMODATION: '숙박',
   FLIGHT_BOOKING: '항공권 예약',
   FLIGHT_TICKET: '모바일 탑승권',
+  VISIT_JAPAN: 'VISIT JAPAN',
   GENERAL: '기타 예약',
 }
 
@@ -43,12 +46,15 @@ export const RESERVATION_CATEGORY_TO_ICON: { [key: string]: Icon } = {
     name: '🛫',
     type: 'tossface',
   },
+  VISIT_JAPAN: {
+    name: 'visit-japan',
+    type: 'image',
+  },
   GENERAL: {
     name: '🎫',
     type: 'tossface',
   },
 }
-
 export const ReservationModel = types
   .model('Reservation')
   .props({
@@ -78,6 +84,7 @@ export const ReservationModel = types
     flightBooking: types.maybeNull(FlightBookingModel),
     flightTicket: types.maybeNull(FlightTicketModel),
     accomodation: types.maybeNull(AccomodationModel),
+    visitJapan: types.maybeNull(VisitJapanModel),
     generalReservation: types.maybeNull(GeneralReservationModel),
   })
   .actions(withSetPropAction)
@@ -87,8 +94,20 @@ export const ReservationModel = types
     },
   }))
   .views(item => ({
+    get addLinkInstruction() {
+      switch (item.category) {
+        case 'VISIT_JAPAN':
+          return 'QR코드 링크를 입력하세요'
+        case 'FLIGHT_TICKET':
+          return '모바일 탑승권 링크 입력'
+        default:
+          return '예약 확인 링크를 입력하세요'
+      }
+    },
     get timeDataTitle() {
       switch (item.category) {
+        case 'VISIT_JAPAN':
+          return '입국 날짜'
         case 'ACCOMODATION':
           return ''
         case 'FLIGHT_BOOKING':
@@ -105,12 +124,14 @@ export const ReservationModel = types
     },
     get title() {
       switch (item.category) {
+        case 'VISIT_JAPAN':
+          return 'Visit Japan'
         case 'ACCOMODATION':
           return item.accomodation?.title ?? ''
         case 'FLIGHT_BOOKING':
           return '항공권 예약'
         case 'FLIGHT_TICKET':
-          return '탑승권'
+          return '모바일 탑승권'
         case 'GENERAL':
           return item.generalReservation?.title ?? ''
         default:
@@ -119,8 +140,8 @@ export const ReservationModel = types
     },
     get subtitle() {
       switch (item.category) {
-        case 'ACCOMODATION':
-          return item.accomodation?.title ?? ''
+        case 'VISIT_JAPAN':
+          return '일본 입국 심사'
         case 'FLIGHT_BOOKING':
           return item.flightBooking?.title
             ? `${item.flightBooking?.title}${item.flightBooking?.flightNumberTitle ? ` (${item.flightBooking?.flightNumberTitle})` : ''}`
@@ -133,8 +154,26 @@ export const ReservationModel = types
           return item.categoryTitle ?? ''
       }
     },
+    get dateTimeIsoString() {
+      switch (item.category) {
+        case 'VISIT_JAPAN':
+          return item.visitJapan?.dateTimeIsoString ?? null
+        case 'ACCOMODATION':
+          return item.accomodation?.checkinDateIsoString ?? null
+        case 'FLIGHT_BOOKING':
+          return item.flightBooking?.departureDateTimeIsoString ?? null
+        case 'FLIGHT_TICKET':
+          return item.flightTicket?.departureDateTimeIsoString ?? null
+        case 'GENERAL':
+          return item.generalReservation?.dateTimeIsoString ?? null
+        default:
+          return
+      }
+    },
     get time() {
       switch (item.category) {
+        case 'VISIT_JAPAN':
+          return item.visitJapan?.dateTimeIsoString ?? null
         case 'ACCOMODATION':
           return item.accomodation?.checkinDateIsoString ?? null
         case 'FLIGHT_BOOKING':
@@ -161,6 +200,7 @@ export const ReservationModel = types
     },
     setCategory(category: ReservationCategory) {
       const title = item.title
+      const dateTimeIsoString = item.dateTimeIsoString
       if (item.category === category) {
         return
       }
@@ -169,29 +209,30 @@ export const ReservationModel = types
         case 'ACCOMODATION':
           item.accomodation = AccomodationModel.create({
             title: '새 숙소 예약',
+            checkinDateIsoString: dateTimeIsoString,
+          })
+          break
+        case 'VISIT_JAPAN':
+          item.visitJapan = VisitJapanModel.create({
+            dateTimeIsoString,
           })
           break
         case 'FLIGHT_BOOKING':
-          item.flightBooking = FlightBookingModel.create(
-            item.flightTicket
-              ? {
-                  ...getSnapshot(item.flightTicket),
-                }
-              : undefined,
-          )
+          item.flightBooking = FlightBookingModel.create({
+            ...(item.flightTicket ? getSnapshot(item.flightTicket) : {}),
+            departureDateTimeIsoString: dateTimeIsoString,
+          })
           break
         case 'FLIGHT_TICKET':
-          item.flightTicket = FlightTicketModel.create(
-            item.flightBooking
-              ? {
-                  ...getSnapshot(item.flightBooking),
-                }
-              : undefined,
-          )
+          item.flightTicket = FlightTicketModel.create({
+            ...(item.flightBooking ? getSnapshot(item.flightBooking) : {}),
+            departureDateTimeIsoString: dateTimeIsoString,
+          })
           break
         case 'GENERAL':
           item.generalReservation = GeneralReservationModel.create({
-            title: title,
+            title,
+            dateTimeIsoString,
           })
           break
         default:
@@ -254,7 +295,7 @@ export const ReservationModel = types
         },
         {
           id: 'departureAirport',
-          title: '출발',
+          title: '출발 공항',
           value: item.flightBooking?.departureAirport
             ? // ? `${item.flightBooking?.departureAirport.airportName}(${item.flightBooking?.departureAirport.iataCode})`
               `${item.flightBooking?.departureAirport.airportName}`
@@ -273,7 +314,7 @@ export const ReservationModel = types
         },
         {
           id: 'arrivalAirport',
-          title: '도착',
+          title: '도착 공항',
           value: item.flightBooking?.arrivalAirport
             ? // ? `${item.flightBooking?.arrivalAirport.airportName}(${item.flightBooking?.arrivalAirport.iataCode})`
               `${item.flightBooking?.arrivalAirport.airportName}`
@@ -298,18 +339,23 @@ export const ReservationModel = types
           id: 'code',
           title: '예약 번호',
           value: item.code,
+          setValue: (text: string) => {
+            item.setProp('code', text)
+          },
         },
       ]
     },
     get infoListItemProps(): ReservationDataItemType[] {
       let data: ReservationDataItemType[] = []
       switch (item.category) {
+        case 'VISIT_JAPAN':
+          return []
         case 'ACCOMODATION':
           data = [
             {
               id: 'roomTitle',
               title: '방 · 인원',
-              value: `${item.accomodation?.roomTitle}${item.accomodation?.numberOfGuest ? ` · ${item.accomodation?.numberOfGuest}명` : ''}`,
+              value: `${item.accomodation?.roomTitle ? item.accomodation?.roomTitle : ''}${item.accomodation?.roomTitle && item.accomodation.numberOfGuest ? '·' : ''}${item.accomodation?.numberOfGuest ? `${item.accomodation?.numberOfGuest}명` : ''}`,
               numberOfLines: 2,
             },
             {
@@ -341,6 +387,7 @@ export const ReservationModel = types
               value: item.flightBooking?.passengerNames
                 ? item.flightBooking?.passengerNames?.join(', ')
                 : null,
+              numberOfLines: 2,
             },
           ]
           break
@@ -361,11 +408,9 @@ export const ReservationModel = types
               title: '인원',
             },
             {
-              id: 'clientNames',
+              id: 'clientName',
               title: '예약자 이름',
-              value: item.generalReservation?.clientNames
-                ? item.generalReservation?.clientNames?.join(', ')
-                : null,
+              value: item.generalReservation?.clientName,
             },
           ]
         default:
@@ -376,6 +421,8 @@ export const ReservationModel = types
     get infoEditListItemProps(): ReservationDataItemType[] {
       let data: ReservationDataItemType[] = []
       switch (item.category) {
+        case 'VISIT_JAPAN':
+          return []
         case 'ACCOMODATION':
           data = [
             {
@@ -395,12 +442,21 @@ export const ReservationModel = types
               },
             },
             {
+              id: 'guestName',
+              title: '예약한 이름',
+              value: item.accomodation?.guestName,
+              setValue: (text: string) => {
+                item.setAccomodationProp('guestName', text)
+              },
+            },
+            {
               id: 'location',
               title: '위치',
               value: item.accomodation?.location,
               setValue: (text: string) => {
                 item.setAccomodationProp('location', text)
               },
+              numberOfLines: 2,
             },
             {
               id: 'checkinStartTimeIsoString',
@@ -442,14 +498,14 @@ export const ReservationModel = types
               },
             },
             {
-              id: 'passengerNames',
+              id: 'passengerName',
               title: '탑승객 이름',
-              value: item.flightBooking?.passengerNames
-                ? item.flightBooking?.passengerNames?.join(', ')
-                : null,
+              subtitle: '(대표 1명)',
+              value: item.flightBooking?.passengerName,
               setValue: (text: string) => {
-                item.setFlightBookingProp('passengerNames', [text])
+                item.setFlightBookingProp('passengerName', text)
               },
+              numberOfLines: 2,
             },
           ]
           break
@@ -474,16 +530,15 @@ export const ReservationModel = types
               },
             },
             {
-              id: 'clientNames',
+              id: 'clientName',
               title: '예약자 이름',
-              value: item.generalReservation?.clientNames
-                ? item.generalReservation?.clientNames?.join(', ')
-                : null,
+              value: item.generalReservation?.clientName,
               setValue: (text: string) => {
-                item.setGeneralReservationProp('clientNames', [text])
+                item.setGeneralReservationProp('clientName', text)
               },
             },
           ]
+          break
         default:
           data = []
       }
@@ -492,7 +547,7 @@ export const ReservationModel = types
   }))
 
 export type ReservationDataItemType = TextInfoListItemProps & {
-  id:
+  id?:
     | keyof SnapshotIn<typeof ReservationModel>
     | keyof SnapshotIn<typeof AccomodationModel>
     | keyof SnapshotIn<typeof FlightBookingModel>

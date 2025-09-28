@@ -22,6 +22,13 @@ export const EditReservationLinkScreen = withReservation<'EditReservationLink'>(
       })
     }, [value])
 
+    let linkLabel = '링크'
+    switch (reservation.category) {
+      case 'VISIT_JAPAN':
+        linkLabel = 'Visit Japan QR코드 페이지 링크'
+      default:
+        break
+    }
     return (
       <Screen>
         <ContentTitle
@@ -30,7 +37,7 @@ export const EditReservationLinkScreen = withReservation<'EditReservationLink'>(
           subtitle={reservation.categoryTitle}
           icon={reservation.icon}
         />
-        <ListSubheader title={'링크'} />
+        <ListSubheader title={linkLabel} />
         <ControlledInput
           value={value}
           onChangeText={setValue}
