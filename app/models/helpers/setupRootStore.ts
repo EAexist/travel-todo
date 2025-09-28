@@ -47,12 +47,12 @@ export async function setupRootStore(rootStore: RootStore) {
     //       id: 'mocked-created-trip_id',
     //       isInitialized: true,
     //       title: '여행',
-    //       startDateISOString: '2025-05-01 21:00:00',
-    //       endDateISOString: '2025-05-06 21:00:00',
+    //       startDateIsoString: '2025-05-01 21:00:00',
+    //       endDateIsoString: '2025-05-06 21:00:00',
     //       destination: [
     //         DestinationModel.create({
     //           description: '',
-    //           countryISO: 'JP',
+    //           countryIso: 'JP',
     //           title: '교토',
     //           region: '간사이',
     //         }),

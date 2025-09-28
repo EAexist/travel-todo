@@ -1,7 +1,7 @@
 import {
   AccomodationModel,
   AccomodationSnapshotIn,
-} from '@/models/Accomodation'
+} from '@/models/Reservation/Accomodation'
 import {
   Destination,
   DestinationContent,
@@ -10,7 +10,7 @@ import {
 } from '@/models/Destination'
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
 import {
-  CATEGORY_TO_TITLE,
+  TODO_CATEGORY_TO_TITLE,
   FlightModel,
   Todo,
   TodoContent,
@@ -34,7 +34,7 @@ import { toCalendarString } from '@/utils/date'
 import { eachDayOfInterval } from 'date-fns'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
 import { v4 as uuidv4 } from 'uuid'
-import { Accomodation } from '../Accomodation'
+import { Accomodation } from '../Reservation/Accomodation'
 
 export const TodolistModel = types
   .model('Preset')
@@ -47,13 +47,13 @@ export const TripSummaryModel = types
     id: types.optional(types.identifier, () => uuidv4()),
     isInitialized: false,
     title: types.maybeNull(types.string),
-    startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
-    endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    startDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     destination: types.array(types.string),
   })
   .views(store => ({
     get scheduleText() {
-      return `${store.startDateISOString ? new Date(store.startDateISOString).toLocaleDateString() : ''}${store.endDateISOString ? ` - ${new Date(store.endDateISOString).toLocaleDateString()}` : ''}`
+      return `${store.startDateIsoString ? new Date(store.startDateIsoString).toLocaleDateString() : ''}${store.endDateIsoString ? ` - ${new Date(store.endDateIsoString).toLocaleDateString()}` : ''}`
     },
   }))
 
@@ -65,8 +65,8 @@ export const TripStoreModel = types
     id: types.optional(types.identifier, () => uuidv4()),
     isInitialized: false,
     title: types.maybeNull(types.string),
-    startDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
-    endDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    startDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     // destination: types.array(withLoading(DestinationModel)),
     destination: types.array(DestinationModel),
     todoMap: types.map(TodoModel),
@@ -134,8 +134,8 @@ export const TripStoreModel = types
       store.setProp('id', trip.id)
       store.setProp('title', trip.title)
       store.setProp('destination', trip.destination)
-      store.setProp('startDateISOString', trip.startDateISOString)
-      store.setProp('endDateISOString', trip.endDateISOString)
+      store.setProp('startDateIsoString', trip.startDateIsoString)
+      store.setProp('endDateIsoString', trip.endDateIsoString)
       store.setProp(
         'todoMap',
         trip.todoMap,
@@ -231,7 +231,7 @@ export const TripStoreModel = types
           })
           store.setProp('preset', Object.fromEntries(map.entries()))
         }
-        return response.kind
+        return response
       })
     },
     async fetchRecommendedFlight() {
@@ -336,16 +336,16 @@ export const TripStoreModel = types
     // },
 
     /**
-     * Patch(update) a trip.
+     * Patch(update) a todo.
      */
     patchTodo(todoDTO: TodoDTO) {
-      enqueueAction(APIAction.CREATE_TODO, {
+      enqueueAction(APIAction.PATCH_TODO, {
         tripId: store.id,
         todoDTO: todoDTO,
       } as CreateTodoProps)
     },
     /**
-     * Delete a trip.
+     * Delete a todo.
      */
     deleteTodo(todo: Todo) {
       store._deleteTodo(todo)
@@ -436,13 +436,13 @@ export const TripStoreModel = types
      * Trip Metadata
      */
     get startDate() {
-      return store.startDateISOString
-        ? new Date(store.startDateISOString)
+      return store.startDateIsoString
+        ? new Date(store.startDateIsoString)
         : undefined
     },
     get endDate() {
-      return store.endDateISOString
-        ? new Date(store.endDateISOString)
+      return store.endDateIsoString
+        ? new Date(store.endDateIsoString)
         : undefined
     },
     get isScheduleSet() {
@@ -480,7 +480,7 @@ export const TripStoreModel = types
         .filter(([category, data]) => data.length > 0)
         .map(([category, _]) => ({
           category,
-          title: CATEGORY_TO_TITLE[category],
+          title: TODO_CATEGORY_TO_TITLE[category],
           data: [category],
         }))
     },
@@ -499,7 +499,7 @@ export const TripStoreModel = types
     get sectionedTrip() {
       return Array.from(store.todolist.entries()).map(([category, data]) => ({
         category,
-        title: CATEGORY_TO_TITLE[category],
+        title: TODO_CATEGORY_TO_TITLE[category],
         data,
       }))
     },
@@ -566,7 +566,7 @@ export const TripStoreModel = types
         // const addedItemIds = addedItems?.map(item => item.id) as string[]
         return {
           category,
-          title: CATEGORY_TO_TITLE[category],
+          title: TODO_CATEGORY_TO_TITLE[category],
           data: [
             ...((addedItems?.map(item => ({
               todo: item,

@@ -1,17 +1,17 @@
-import {TextInfoListItem} from '@/components/TextInfoListItem'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {Todo} from '@/models/Todo'
-import {AppStackParamList, goBack, useNavigate} from '@/navigators'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { Todo } from '@/models/Todo'
+import { AppStackParamList, goBack, useNavigate } from '@/navigators'
 
-import {ListItem} from '@rneui/themed'
-import {FC, useCallback, useState} from 'react'
+import { ListItem } from '@rneui/themed'
+import { FC, useCallback, useState } from 'react'
 
 export const TodoConfirmListItem: FC<{
   todo: Todo
   isCompleted: boolean
   onChange: () => void
-}> = ({isCompleted, onChange}) => {
+}> = ({ isCompleted, onChange }) => {
   return (
     <TextInfoListItem
       title={'상태'}
@@ -40,19 +40,19 @@ export const useTodoConfirmListItem = (
 
   const tripStore = useTripStore()
 
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
 
   const handleConfirm = useCallback(async () => {
     console.log(
       `[confirmCompleteNavigate] todo.isCompleted=${todo.isCompleted} isCompleted=${isCompleted}`,
     )
     if (!todo.isCompleted && isCompleted) {
-      navigateWithTrip(confirmScreen, {todoId: todo.id})
+      navigateWithTrip(confirmScreen, { todoId: todo.id })
     } else if (todo.isCompleted && !isCompleted) {
       todo.setIncomplete()
       tripStore.patchTodo({
         id: todo.id,
-        completeDateISOString: todo.completeDateISOString,
+        completeDateIsoString: todo.completeDateIsoString,
       })
       goBack()
     } else {

@@ -45,7 +45,7 @@ export const WelcomeScreen: FC<AppStackScreenProps<'TripList'>> = observer(
     useHeader({
       backButtonShown: false,
       leftComponent: <HeaderTitle>{'내 여행 목록'}</HeaderTitle>,
-      containerStyle: { backgroundColor: colors.secondaryBg },
+      backgroundColor: 'secondary',
     })
 
     return <TripListScreen {...props} />

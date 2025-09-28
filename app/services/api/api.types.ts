@@ -1,5 +1,9 @@
-import { Accomodation, AccomodationSnapshotIn } from '@/models/Accomodation'
+import {
+  Accomodation,
+  AccomodationSnapshotIn,
+} from '@/models/Reservation/Accomodation'
 import { Destination, DestinationSnapshotIn } from '@/models/Destination'
+import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import {
   Todo,
   TodoPresetItem,
@@ -8,6 +12,7 @@ import {
 } from '@/models/Todo'
 import { TripStore, TripStoreSnapshot } from '@/models/stores/TripStore'
 import { UserStore, UserStoreSnapshot } from '@/models/stores/UserStore'
+import { Reservation } from '@/screens'
 import { User } from '@react-native-google-signin/google-signin'
 import { ApisauceConfig } from 'apisauce'
 import { getSnapshot } from 'mobx-state-tree'
@@ -63,6 +68,8 @@ export interface TodoDTO
   id?: string
 }
 
+export interface ReservationDTO extends ReservationSnapshot {}
+
 // export interface CreateTodoDTO extends Omit<TodoDTO, 'id'> {
 //   tripId: number
 // }
@@ -91,11 +98,11 @@ export interface ApiAccomodationResponse {
   status: string
   items: (Omit<
     AccomodationSnapshotIn,
-    | 'checkinDateISOString'
-    | 'checkoutDateISOString'
-    | 'checkinStartTimeISOString'
-    | 'checkinEndTimeISOString'
-    | 'checkoutTimeISOString'
+    | 'checkinDateIsoString'
+    | 'checkoutDateIsoString'
+    | 'checkinStartTimeIsoString'
+    | 'checkinEndTimeIsoString'
+    | 'checkoutTimeIsoString'
   > & {
     checkinDate: string
     checkoutDate: string
@@ -145,6 +152,15 @@ export interface DeleteAccomodationProps {
   accomodationId: string
 }
 
+export interface CreateReservationProps {
+  id: string
+  reservationDTO: ReservationSnapshot
+}
+
+export interface DeleteReservationProps {
+  id: string
+}
+
 /*
  * Mapper
  */
@@ -189,6 +205,12 @@ export const mapToTodoDTO: (
   //   isPreset: false,
   //   orderKey: orderKey,
   //   trip_id: trip_id,
+})
+
+export const mapToReservation: (
+  reservation: ReservationDTO,
+) => ReservationSnapshot = reservation => ({
+  ...reservation,
 })
 
 export const mapToTodo: (todo: TodoDTO) => Partial<TodoSnapshotIn> = todo => ({

@@ -5,4 +5,4 @@ export const IconModel = types.model('Icon').props({
   type: types.optional(types.string, 'tossface'),
 })
 
-export interface Icon extends Partial<SnapshotOut<typeof IconModel>> {}
+export interface Icon extends SnapshotOut<typeof IconModel> {}

@@ -1,20 +1,20 @@
-import {Instance, SnapshotIn, SnapshotOut, types} from 'mobx-state-tree'
-import {withSetPropAction} from './helpers/withSetPropAction'
-import {v4 as uuidv4} from 'uuid'
+import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
+import { withSetPropAction } from './helpers/withSetPropAction'
+import { v4 as uuidv4 } from 'uuid'
 
 export const DestinationModel = types
   .model('Destination')
   .props({
     id: types.optional(types.identifier, () => uuidv4()),
     description: types.string,
-    countryISO: types.string,
+    countryIso: types.string,
     title: types.string,
     region: types.string,
   })
   .actions(withSetPropAction)
   .views(item => ({
     get parsedTitleAndSubtitle() {
-      const defaultValue = {title: item.title?.trim(), subtitle: ''}
+      const defaultValue = { title: item.title?.trim(), subtitle: '' }
 
       if (!defaultValue.title) return defaultValue
 
@@ -22,7 +22,7 @@ export const DestinationModel = types
 
       if (!titleMatches || titleMatches.length !== 3) return defaultValue
 
-      return {title: titleMatches[1], subtitle: titleMatches[2]}
+      return { title: titleMatches[1], subtitle: titleMatches[2] }
     },
   }))
 

@@ -5,14 +5,11 @@
  * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
  * documentation for more details.
  */
-import {AccomodationSnapshotIn} from '@/models/Accomodation'
-import {Destination} from '@/models/Destination'
-import {
-  ReservationSnapshot,
-  ReservationStoreSnapshot,
-} from '@/models/stores/ReservationStore'
-import {TripStoreSnapshot} from '@/models/stores/TripStore'
-import {UserStoreSnapshot} from '@/models/stores/UserStore'
+import { AccomodationSnapshotIn } from '@/models/Reservation/Accomodation'
+import { Destination } from '@/models/Destination'
+import { ReservationStoreSnapshot } from '@/models/stores/ReservationStore'
+import { TripStoreSnapshot } from '@/models/stores/TripStore'
+import { UserStoreSnapshot } from '@/models/stores/UserStore'
 import {
   Flight,
   FlightRoute,
@@ -20,8 +17,8 @@ import {
   TodoPresetItemSnapshotIn,
   TodoSnapshotIn,
 } from '@/models/Todo'
-import {KakaoProfile} from '@react-native-seoul/kakao-login'
-import {ApiResponse, ApisauceInstance, create} from 'apisauce'
+import { KakaoProfile } from '@react-native-seoul/kakao-login'
+import { ApiResponse, ApisauceInstance, create } from 'apisauce'
 import {
   FileSystemUploadOptions,
   FileSystemUploadResult,
@@ -32,26 +29,31 @@ import {
   type ApiConfig,
   CreateAccomodationProps,
   CreateDestinationProps,
+  CreateReservationProps,
   CreateTodoProps,
   DeleteAccomodationProps,
   DeleteDestinationProps,
+  DeleteReservationProps,
   DeleteTodoProps,
   GoogleUserDTO,
   PresetDTO,
+  ReservationDTO,
   TodoDTO,
   type TripDTO,
   UserAccountDTO,
   mapToPreset,
+  mapToReservation,
   mapToTodo,
   mapToTrip,
   mapToUserAccount,
 } from './api.types'
-import {GeneralApiProblem, getGeneralApiProblem} from './apiProblem'
+import { GeneralApiProblem, getGeneralApiProblem } from './apiProblem'
+import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 
-type ApiResult<T> = {kind: 'ok'; data: T} | GeneralApiProblem
+type ApiResult<T> = { kind: 'ok'; data: T } | GeneralApiProblem
 // export type ApiStatus = {kind: 'ok'} | GeneralApiProblem
 
-function handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
+function _handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
   if (!response.ok) {
     const problem = getGeneralApiProblem(response)
     if (problem) return problem
@@ -68,7 +70,31 @@ function handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
     if (__DEV__ && e instanceof Error) {
       console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
     }
-    return {kind: 'bad-data'}
+    return { kind: 'bad-data' }
+  }
+}
+
+function handleResponse<T, K>(
+  response: ApiResponse<T>,
+  mapper: (dto: T) => K,
+): ApiResult<K> {
+  if (!response.ok) {
+    const problem = getGeneralApiProblem(response)
+    if (problem) return problem
+  }
+  try {
+    if (!response.data) {
+      throw Error
+    }
+    return {
+      kind: 'ok',
+      data: mapper(response.data),
+    }
+  } catch (e) {
+    if (__DEV__ && e instanceof Error) {
+      console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+    }
+    return { kind: 'bad-data' }
   }
 }
 
@@ -92,7 +118,7 @@ function handleDeleteResponse(response: ApiResponse<void>): ApiResult<null> {
     if (__DEV__ && e instanceof Error) {
       console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
     }
-    return {kind: 'bad-data'}
+    return { kind: 'bad-data' }
   }
 }
 
@@ -143,6 +169,25 @@ export class Api {
     //   }
     // })
   }
+  /**
+   * Gets a Trip data with given id.
+   * @returns {kind} - Response Status.
+   * @returns {...Trip} - Trip.
+   */
+  async createReservationFromText(
+    tripId: string,
+    confirmationText: string,
+  ): Promise<ApiResult<ReservationSnapshot[]>> {
+    const response: ApiResponse<ReservationDTO[]> = await this.apisauce.post(
+      `/trip/${tripId}/reservation`,
+      {
+        confirmationText,
+      },
+    )
+    return handleResponse(response, (dto: ReservationDTO[]) =>
+      dto.map(mapToReservation),
+    )
+  }
 
   authenticate(userId: string) {
     this.apisauce.setBaseURL(`${this.config.baseURL}/user/${userId}`)
@@ -159,7 +204,7 @@ export class Api {
     const response: ApiResponse<ReservationStoreSnapshot> =
       await this.apisauce.get(`trip/${tripId}/reservation`)
 
-    const reservation = handleResponse<ReservationStoreSnapshot>(response)
+    const reservation = _handleResponse<ReservationStoreSnapshot>(response)
     return reservation
     // return reservation.kind === 'ok'
     //   ? {
@@ -182,7 +227,7 @@ export class Api {
       await this.apisauce.patch(`trip/${tripId}/reservation/${reservationId}`, {
         localAppStorageFileUri: localAppStorageFileUri,
       })
-    return handleResponse<ReservationSnapshot>(response)
+    return _handleResponse<ReservationSnapshot>(response)
   }
   /**
    * Gets a Trip data with given id.
@@ -205,7 +250,7 @@ export class Api {
         },
       },
     )
-    return handleResponse<ReservationSnapshot>(response)
+    return _handleResponse<ReservationSnapshot>(response)
   }
   /**
    * Gets a Trip data with given id.
@@ -242,9 +287,9 @@ export class Api {
   ): Promise<ApiResult<UserStoreSnapshot>> {
     const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
       `auth/kakao`,
-      {idToken, profile},
+      { idToken, profile },
     )
-    const userAccountResponse = handleResponse<UserAccountDTO>(response)
+    const userAccountResponse = _handleResponse<UserAccountDTO>(response)
     return userAccountResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -265,7 +310,7 @@ export class Api {
       `auth/google`,
       googleUser,
     )
-    const userAccountResponse = handleResponse<UserAccountDTO>(response)
+    const userAccountResponse = _handleResponse<UserAccountDTO>(response)
     return userAccountResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -291,7 +336,7 @@ export class Api {
         },
       },
     )
-    const userAccountResponse = handleResponse<UserAccountDTO>(response)
+    const userAccountResponse = _handleResponse<UserAccountDTO>(response)
     return userAccountResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -308,7 +353,7 @@ export class Api {
   async guestLogin(): Promise<ApiResult<UserStoreSnapshot>> {
     const response: ApiResponse<UserAccountDTO> =
       await this.apisauce.post(`auth/guest`)
-    const userAccountResponse = handleResponse<UserAccountDTO>(response)
+    const userAccountResponse = _handleResponse<UserAccountDTO>(response)
     return userAccountResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -323,7 +368,7 @@ export class Api {
    */
   async getCsrf(): Promise<ApiResult<void>> {
     const response: ApiResponse<void> = await this.apisauce.get(`csrf`)
-    return handleResponse<void>(response)
+    return _handleResponse<void>(response)
   }
 
   /**
@@ -334,7 +379,7 @@ export class Api {
   async getUserAccount(): Promise<ApiResult<UserStoreSnapshot>> {
     const response: ApiResponse<UserAccountDTO> = await this.apisauce.get(``)
 
-    const userDTO = handleResponse<UserAccountDTO>(response)
+    const userDTO = _handleResponse<UserAccountDTO>(response)
     return userDTO.kind === 'ok'
       ? {
           kind: 'ok',
@@ -355,7 +400,7 @@ export class Api {
   async getTrip(id: string): Promise<ApiResult<TripStoreSnapshot>> {
     const response: ApiResponse<TripDTO> = await this.apisauce.get(`trip/${id}`)
 
-    const tripDTO = handleResponse<TripDTO>(response)
+    const tripDTO = _handleResponse<TripDTO>(response)
     return tripDTO.kind === 'ok'
       ? {
           kind: 'ok',
@@ -374,7 +419,7 @@ export class Api {
     console.log(`[api.createTrip() config=${JSON.stringify(this.config)}`)
     console.log(`[api.createTrip() response=${JSON.stringify(response)}`)
 
-    const userAccountDTO = handleResponse<UserAccountDTO>(response)
+    const userAccountDTO = _handleResponse<UserAccountDTO>(response)
     return userAccountDTO.kind === 'ok'
       ? {
           kind: 'ok',
@@ -395,13 +440,81 @@ export class Api {
       //   mapToTripDTO(trip),
     )
 
-    const patchedTripDTO = handleResponse<TripDTO>(response)
+    const patchedTripDTO = _handleResponse<TripDTO>(response)
     return patchedTripDTO.kind === 'ok'
       ? {
           kind: 'ok',
           data: mapToTrip(patchedTripDTO.data),
         }
       : patchedTripDTO
+  }
+
+  /*
+   * Reservation CRUD
+   */
+
+  /**
+   * Create reservation.
+   * @returns {kind} - Response Status.
+   * @returns {...Trip} - Updated Trip.
+   */
+  async createReservation({
+    reservationDTO,
+  }: CreateReservationProps): Promise<ApiResult<ReservationSnapshot>> {
+    const response: ApiResponse<ReservationDTO> = await this.apisauce.post(
+      `/reservation`,
+      reservationDTO,
+      //   mapToReservationDTO({...reservation, completeDateIsoString: ''} as Reservation),
+    )
+
+    const reservationDTOResponse = _handleResponse<ReservationDTO>(response)
+    return reservationDTOResponse.kind === 'ok'
+      ? {
+          kind: 'ok',
+          data: mapToReservation(
+            reservationDTOResponse.data,
+          ) as ReservationSnapshot,
+        }
+      : reservationDTOResponse
+  }
+
+  /**
+   * Update reservation.
+   * @returns {kind} - Response Status.
+   * @returns {...Reservation} - Updated Trip.
+   */
+  async patchReservation({
+    reservationDTO,
+  }: CreateReservationProps): Promise<ApiResult<ReservationSnapshot>> {
+    const response: ApiResponse<ReservationDTO> = await this.apisauce.patch(
+      `/reservation/${reservationDTO.id}`,
+      reservationDTO,
+      //   mapToReservationDTO(reservation),
+    )
+
+    const reservationDTOResponse = _handleResponse<ReservationDTO>(response)
+    return reservationDTOResponse.kind === 'ok'
+      ? {
+          kind: 'ok',
+          data: mapToReservation(
+            reservationDTOResponse.data,
+          ) as ReservationSnapshot,
+        }
+      : reservationDTOResponse
+  }
+
+  /**
+   * Update reservation.
+   * @returns {kind} - Response Status.
+   * @returns {...Reservation} - Updated Trip.
+   */
+  async deleteReservation({
+    id,
+  }: DeleteReservationProps): Promise<ApiResult<null>> {
+    const response: ApiResponse<void> = await this.apisauce.delete(
+      `/reservation/${id}`,
+    )
+    return handleDeleteResponse(response)
   }
 
   /*
@@ -420,10 +533,10 @@ export class Api {
     const response: ApiResponse<TodoDTO> = await this.apisauce.post(
       `/trip/${tripId}/todo`,
       todoDTO,
-      //   mapToTodoDTO({...todo, completeDateISOString: ''} as Todo),
+      //   mapToTodoDTO({...todo, completeDateIsoString: ''} as Todo),
     )
 
-    const todoDTOResponse = handleResponse<TodoDTO>(response)
+    const todoDTOResponse = _handleResponse<TodoDTO>(response)
     return todoDTOResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -447,7 +560,7 @@ export class Api {
       //   mapToTodoDTO(todo),
     )
 
-    const todoDTOResponse = handleResponse<TodoDTO>(response)
+    const todoDTOResponse = _handleResponse<TodoDTO>(response)
     return todoDTOResponse.kind === 'ok'
       ? {
           kind: 'ok',
@@ -480,7 +593,7 @@ export class Api {
     const response: ApiResponse<PresetDTO[]> = await this.apisauce.get(
       `/trip/${tripId}/todoPreset`,
     )
-    const presetResponse = handleResponse<PresetDTO[]>(response)
+    const presetResponse = _handleResponse<PresetDTO[]>(response)
     return presetResponse.kind === 'ok'
       ? {
           ...presetResponse,
@@ -502,7 +615,7 @@ export class Api {
     console.log(
       `[api.getRecommendedFlight] response=${JSON.stringify(response)}`,
     )
-    const presetResponse = handleResponse<FlightRoute[]>(response)
+    const presetResponse = _handleResponse<FlightRoute[]>(response)
     return presetResponse
   }
 
@@ -516,7 +629,7 @@ export class Api {
     console.log(
       `[api.getRecommendedFlight] response=${JSON.stringify(response)}`,
     )
-    const presetResponse = handleResponse<Flight[]>(response)
+    const presetResponse = _handleResponse<Flight[]>(response)
     return presetResponse
   }
 
@@ -526,10 +639,10 @@ export class Api {
   async getAirportList(input: string): Promise<ApiResult<Flight[]>> {
     const response: ApiResponse<Flight[]> = await this.apisauce.get(
       `/airport/search`,
-      {input},
+      { input },
     )
     console.log(`[api.getAirportList] response=${JSON.stringify(response)}`)
-    const presetResponse = handleResponse<Flight[]>(response)
+    const presetResponse = _handleResponse<Flight[]>(response)
     return presetResponse
   }
 
@@ -550,7 +663,7 @@ export class Api {
       destinationDTO,
     )
 
-    const handledResponse = handleResponse<Destination>(response)
+    const handledResponse = _handleResponse<Destination>(response)
     console.log(JSON.stringify(handledResponse))
     return handledResponse.kind === 'ok'
       ? {
@@ -591,7 +704,7 @@ export class Api {
   //       await this.apisauce.get(`trip/1/accomodation`)
 
   //     const accomodationDTO =
-  //       handleResponse<AccomodationSnapshotIn[]>(response)
+  //       _handleResponse<AccomodationSnapshotIn[]>(response)
   //     return accomodationDTO
   //   }
 
@@ -605,7 +718,7 @@ export class Api {
     const response: ApiResponse<Partial<AccomodationSnapshotIn>> =
       await this.apisauce.get(`trip/${tripId}/accomodation`)
 
-    return handleResponse<Partial<AccomodationSnapshotIn>>(response)
+    return _handleResponse<Partial<AccomodationSnapshotIn>>(response)
   }
 
   /**
@@ -626,7 +739,7 @@ export class Api {
       )
 
     const accomodationDTO =
-      handleResponse<Partial<AccomodationSnapshotIn>>(response)
+      _handleResponse<Partial<AccomodationSnapshotIn>>(response)
     return accomodationDTO
   }
   /**
@@ -665,7 +778,7 @@ export class Api {
   //       'page[offset]': page * 10,
   //     })
 
-  //     return handleResponse<Location>(response)
+  //     return _handleResponse<Location>(response)
   //   }
 
   /**
@@ -683,7 +796,7 @@ export class Api {
   //       'page[offset]': page * 10,
   //     })
 
-  //     return handleResponse<Location>(response)
+  //     return _handleResponse<Location>(response)
   //   }
   /**
    * Gets a Trip data with given id.
@@ -696,13 +809,13 @@ export class Api {
   //     const response: ApiResponse<ReferenceDataLocationsResult['data']> =
   //       await this.apisauce.get(`amadeus/locations`, params)
   //     const handledResponse =
-  //       handleResponse<ReferenceDataLocationsResult['data']>(response)
+  //       _handleResponse<ReferenceDataLocationsResult['data']>(response)
   //     return handledResponse.kind === 'ok'
   //       ? {
   //           kind: 'ok',
   //           data: handledResponse.data.map(l => ({
   //             title: l.name || '',
-  //             IATACode: l.IATACode,
+  //             iataCode: l.iataCode,
   //             name: l.name || '',
   //           })),
   //         }

@@ -10,8 +10,8 @@
                     "state": "시코쿠"
                 }
             ],
-            "startDateISOString": "2025-02-20T00:00:00.001Z",
-            "endDateISOString": "2025-02-25T00:00:00.001Z",
+            "startDateIsoString": "2025-02-20T00:00:00.001Z",
+            "endDateIsoString": "2025-02-25T00:00:00.001Z",
             "todo": [],
             "id": 3,
             "accomodation": [],

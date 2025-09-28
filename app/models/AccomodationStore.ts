@@ -1,10 +1,13 @@
-import {toCalendarString} from '@/utils/date'
-import {eachDayOfInterval} from 'date-fns'
-import {Instance, SnapshotOut, types} from 'mobx-state-tree'
-import {MarkedDates} from 'react-native-calendars/src/types'
-import {api} from '../services/api'
-import {AccomodationModel, AccomodationSnapshotIn} from './Accomodation'
-import {withSetPropAction} from './helpers/withSetPropAction'
+import { toCalendarString } from '@/utils/date'
+import { eachDayOfInterval } from 'date-fns'
+import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { MarkedDates } from 'react-native-calendars/src/types'
+import { api } from '../services/api'
+import {
+  AccomodationModel,
+  AccomodationSnapshotIn,
+} from './Reservation/Accomodation'
+import { withSetPropAction } from './helpers/withSetPropAction'
 
 export const AccomodationStoreModel = types
   .model('AccomodationStore')
@@ -82,7 +85,7 @@ export const AccomodationStoreModel = types
           const start = item.checkinDate
           const end = item.checkoutDate
           console.log(start, end)
-          const intervalDays = eachDayOfInterval({start, end}).slice(0, -1)
+          const intervalDays = eachDayOfInterval({ start, end }).slice(0, -1)
           return intervalDays.map((date, index) => [
             toCalendarString(date),
             {

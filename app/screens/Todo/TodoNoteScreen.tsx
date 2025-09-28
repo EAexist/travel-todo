@@ -1,46 +1,33 @@
 import * as Fab from '@/components/Fab'
-import {Title} from '@/components/Layout/Content'
-import {Note} from '@/components/Note'
-import {Screen} from '@/components/Screen'
-import {useTripStore} from '@/models'
-import {useHeader} from '@/utils/useHeader'
-import {withTodo} from '@/utils/withTodo'
-import {Trans} from '@lingui/react/macro'
-import {ListItem} from '@rneui/themed'
-import {useCallback, useState} from 'react'
-import {ViewStyle} from 'react-native'
-import {Avatar} from '../../components/Avatar'
-import {TransText} from '../../components/TransText'
+import ContentTitle from '@/components/Layout/Content'
+import { Note } from '@/components/Note'
+import { Screen } from '@/components/Screen'
+import { useTripStore } from '@/models'
+import { useHeader } from '@/utils/useHeader'
+import { withTodo } from '@/utils/withTodo'
+import { useCallback, useState } from 'react'
+import { ViewStyle } from 'react-native'
 
-export const TodoNoteScreen = withTodo<'TodoNote'>(({todo}) => {
+export const TodoNoteScreen = withTodo<'TodoNote'>(({ todo }) => {
   const tripStore = useTripStore()
 
   const onBackPressBeforeNavigate = useCallback(async () => {
-    tripStore.patchTodo({id: todo.id, note: todo.note})
+    tripStore.patchTodo({ id: todo.id, note: todo.note })
   }, [todo])
 
-  useHeader({onBackPressBeforeNavigate})
+  useHeader({ onBackPressBeforeNavigate })
 
   const [isFocused, setIsFocused] = useState(false)
   const handleChangeNote = (value: string) => todo.setProp('note', value)
 
   return (
     <Screen>
-      <Title>
-        <ListItem containerStyle={$listItemContainerStyle}>
-          <Avatar icon={todo.icon} size="xlarge" fontSize={28} />
-          <ListItem.Content>
-            {true && (
-              <ListItem.Subtitle>
-                <Trans>{todo.categoryTitle}</Trans>
-              </ListItem.Subtitle>
-            )}
-            <ListItem.Title>
-              <TransText h2>{todo.title}</TransText>
-            </ListItem.Title>
-          </ListItem.Content>
-        </ListItem>
-      </Title>
+      <ContentTitle
+        variant="listItem"
+        title={todo.title}
+        subtitle={todo.categoryTitle}
+        icon={todo.icon}
+      />
       <Note
         onChangeNote={handleChangeNote}
         initialValue={todo.note}

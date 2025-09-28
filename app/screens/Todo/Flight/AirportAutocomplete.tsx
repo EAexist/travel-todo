@@ -1,11 +1,11 @@
-import {googlePlacesAutocompleteConfig} from '@/components/GooglePlacesAutocompleteConfig'
-import {GooglePlacesSearchBarInput} from '@/components/Input'
-import {ListItemBase} from '@/components/ListItem'
+import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
+import { GooglePlacesSearchBarInput } from '@/components/Input'
+import { ListItemBase } from '@/components/ListItem'
 import ListSubheader from '@/components/ListSubheader'
-import {Location} from '@/models/Todo'
-import {countryNameKrToISO, getFlagEmoji} from '@/utils/nation'
-import {useLingui} from '@lingui/react/macro'
-import {Observer, observer} from 'mobx-react-lite'
+import { Location } from '@/models/Todo'
+import { countryNameKrToIso, getFlagEmoji } from '@/utils/nation'
+import { useLingui } from '@lingui/react/macro'
+import { Observer, observer } from 'mobx-react-lite'
 import {
   FC,
   ReactElement,
@@ -22,7 +22,9 @@ import {
   Query,
 } from 'react-native-google-places-autocomplete'
 
-const AirportSearchResultListItem: FC<{data: GooglePlaceData}> = ({data}) => {
+const AirportSearchResultListItem: FC<{ data: GooglePlaceData }> = ({
+  data,
+}) => {
   useEffect(() => {
     console.log(JSON.stringify(data))
   }, [])
@@ -54,18 +56,18 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
   renderRecommendationContent,
   handlePressSearchResult,
 }) => {
-  const {t} = useLingui()
+  const { t } = useLingui()
 
   const handlePress = useCallback((data: GooglePlaceData) => {
     const lastTokenMatch =
       data.structured_formatting.main_text.match(/(\S+)\s*$/)
     const lastToken = lastTokenMatch ? lastTokenMatch[1] : ''
 
-    const IATACode = /\(([A-Z]+)\)/.test(lastToken)
+    const iataCode = /\(([A-Z]+)\)/.test(lastToken)
       ? lastToken.replace(/[()]/g, '').trim()
       : undefined
     const name = (
-      !!IATACode
+      !!iataCode
         ? data.structured_formatting.main_text.replace(/\(.*?\)/g, '')
         : data.structured_formatting.main_text
     ).trim()
@@ -77,9 +79,9 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
         .replace(' ', '')
         .trim(),
       name: name,
-      IATACode: IATACode || undefined,
-      countryISO:
-        countryNameKrToISO[
+      iataCode: iataCode || undefined,
+      countryIso:
+        countryNameKrToIso[
           data.structured_formatting.secondary_text.split(',')[0]
         ] || '',
     })

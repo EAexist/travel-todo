@@ -1,4 +1,4 @@
-import {ExpoConfig, ConfigContext} from '@expo/config'
+import { ExpoConfig, ConfigContext } from '@expo/config'
 
 /**
  * Use ts-node here so we can use TypeScript for our Config Plugins
@@ -12,7 +12,7 @@ require('ts-node/register')
  * You can read more about Expo's Configuration Resolution Rules here:
  * https://docs.expo.dev/workflow/configuration/#configuration-resolution-rules
  */
-module.exports = ({config}: ConfigContext): Partial<ExpoConfig> => {
+module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
   const existingPlugins = config.plugins ?? []
 
   return {
@@ -41,6 +41,7 @@ module.exports = ({config}: ConfigContext): Partial<ExpoConfig> => {
       require('./plugins/withSplashScreen').withSplashScreen,
       require('./plugins/withComposeCompiler').withComposeCompiler,
       'expo-background-task',
+      'expo-web-browser',
     ],
   }
 }

@@ -40,7 +40,7 @@ export const LoginScreen: FC<AppStackScreenProps<'Login'>> = observer(
     }, [])
 
     useHeader({ backButtonShown: false })
-    useLoadingScreen()
+    useLoadingScreen({})
 
     const handleGuest = useCallback(async () => {
       await guestLoginWithApiStatus({

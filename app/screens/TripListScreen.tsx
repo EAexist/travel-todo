@@ -87,7 +87,7 @@ export const TripListScreen: FC<AppStackScreenProps<'TripList'>> = observer(
     } = useTheme()
 
     useHeader({
-      containerStyle: { backgroundColor: colors.secondaryBg },
+      backgroundColor: 'secondary',
       centerComponent: <HeaderCenterTitle title="내 여행 목록" />,
       centerContainerStyle: $headerCenterTitleContainerStyle,
       // backNavigateProps: {name: 'Login', ignoreTrip: true},
@@ -95,7 +95,7 @@ export const TripListScreen: FC<AppStackScreenProps<'TripList'>> = observer(
     })
 
     return (
-      <Screen backgroundColor={colors.secondaryBg}>
+      <Screen backgroundColor={'secondary'}>
         <FlatList
           data={userStore.trip}
           renderItem={renderTripListItem}

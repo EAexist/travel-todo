@@ -1,20 +1,20 @@
-import {Avatar} from '@/components/Avatar'
-import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
-import {Button} from '@/components/Button'
+import { Avatar } from '@/components/Avatar'
+import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
+import { Button } from '@/components/Button'
 import * as Fab from '@/components/Fab'
-import {Title} from '@/components/Layout/Content'
+import { Title } from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
-import {Screen} from '@/components/Screen'
-import {TextInfoListItem} from '@/components/TextInfoListItem'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {Airline, FlightTodo, ReservationLink} from '@/models/Todo'
-import {goBack, useNavigate} from '@/navigators'
-import {api} from '@/services/api'
-import {useHeader} from '@/utils/useHeader'
-import {Icon, ListItem, Switch} from '@rneui/themed'
-import {Observer, observer} from 'mobx-react-lite'
-import {FC, useCallback, useEffect, useState} from 'react'
+import { Screen } from '@/components/Screen'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { Airline, FlightTodo, ReservationLink } from '@/models/Todo'
+import { goBack, useNavigate } from '@/navigators'
+import { api } from '@/services/api'
+import { useHeader } from '@/utils/useHeader'
+import { Icon, ListItem, Switch } from '@rneui/themed'
+import { Observer, observer } from 'mobx-react-lite'
+import { FC, useCallback, useEffect, useState } from 'react'
 import {
   DefaultSectionT,
   FlatList,
@@ -28,9 +28,9 @@ import {
   useTodoConfirmListItem,
 } from '../TodoConfirmListItem'
 
-const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
+const FlightRecommendation: FC<{ todoId: string }> = ({ todoId }) => {
   const {
-    tripStore: {id: tripId},
+    tripStore: { id: tripId },
   } = useStores()
 
   const [sections, setSections] =
@@ -59,7 +59,7 @@ const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
     <Observer
       render={() => (
         <ListItem>
-          <Avatar icon={{name: item.IATACode}} />
+          <Avatar icon={{ name: item.iataCode }} />
           <ListItem.Content>
             <ListItem.Title>{item.title}</ListItem.Title>
           </ListItem.Content>
@@ -69,10 +69,14 @@ const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
   )
 
   const renderSectionHeader = useCallback(
-    ({section: {title, reservationLinks}}: {section: DefaultSectionT}) => {
-      const renderItem = ({item}: {item: ReservationLink}) => (
+    ({
+      section: { title, reservationLinks },
+    }: {
+      section: DefaultSectionT
+    }) => {
+      const renderItem = ({ item }: { item: ReservationLink }) => (
         <ListItem>
-          <Avatar icon={{name: item.name}} />
+          <Avatar icon={{ name: item.name }} />
           <ListItem.Content>
             <ListItem.Title>{item.title}</ListItem.Title>
           </ListItem.Content>
@@ -86,7 +90,7 @@ const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
             data={reservationLinks}
             renderItem={renderItem}
             keyExtractor={item => item.name}
-            style={{flexGrow: 0}}
+            style={{ flexGrow: 0 }}
           />
         </View>
       )
@@ -97,7 +101,7 @@ const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
   return sections ? (
     <SectionList
       sections={sections}
-      keyExtractor={item => item.IATACode}
+      keyExtractor={item => item.iataCode}
       renderItem={renderItem}
       renderSectionHeader={renderSectionHeader}
     />
@@ -109,10 +113,10 @@ const FlightRecommendation: FC<{todoId: string}> = ({todoId}) => {
 export const FlightTodoEditScreen: FC<{
   todo: FlightTodo
   isBeforeInitialization?: boolean
-}> = observer(({todo, isBeforeInitialization = false}) => {
+}> = observer(({ todo, isBeforeInitialization = false }) => {
   //   const [isConfirmed, setIsConfirmed] = useState(false)
   //   const [isCompleted, setIsCompleted] = useState(false)
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
   const tripStore = useTripStore()
 
   //   const [isCompleted, setIsCompleted] = useState(false)
@@ -121,9 +125,9 @@ export const FlightTodoEditScreen: FC<{
     console.log('Hello [FlightTodoEditScreen')
   }, [])
 
-  const {patchTodo, completeAndPatchTodo} = useTripStore()
+  const { patchTodo, completeAndPatchTodo } = useTripStore()
 
-  const {isCompleted, setIsCompleted} = useTodoConfirmListItem(
+  const { isCompleted, setIsCompleted } = useTodoConfirmListItem(
     todo,
     'ConfirmFlight',
     isBeforeInitialization,
@@ -131,7 +135,7 @@ export const FlightTodoEditScreen: FC<{
 
   const handleConfirm = useCallback(async () => {
     if (!todo.isCompleted && isCompleted) {
-      navigateWithTrip('ConfirmFlight', {todoId: todo.id})
+      navigateWithTrip('ConfirmFlight', { todoId: todo.id })
     } else if (todo.isCompleted && !isCompleted) {
       todo.setIncomplete()
       patchTodo(todo).then(() => {
@@ -181,7 +185,7 @@ export const FlightTodoEditScreen: FC<{
       <Screen>
         <Title>
           <ListItem>
-            <Avatar icon={{name: '✈️'}} size="xlarge" fontSize={28} />
+            <Avatar icon={{ name: '✈️' }} size="xlarge" fontSize={28} />
             <ListItem.Content>
               <ListItem.Title>{todo.title}</ListItem.Title>
             </ListItem.Content>
@@ -202,7 +206,7 @@ export const FlightTodoEditScreen: FC<{
               <View>
                 <Button>
                   {todo.departure ? (
-                    `${todo.departure?.name}${todo.departure?.IATACode ? ` (${todo.departure?.IATACode})` : ''}`
+                    `${todo.departure?.name}${todo.departure?.iataCode ? ` (${todo.departure?.iataCode})` : ''}`
                   ) : (
                     <>
                       출발지 선택
@@ -213,7 +217,7 @@ export const FlightTodoEditScreen: FC<{
                 <Icon name={''} />
                 <Button>
                   {todo.arrival ? (
-                    `${todo.arrival?.name}${todo.arrival?.IATACode ? ` (${todo.arrival?.IATACode})` : ''}`
+                    `${todo.arrival?.name}${todo.arrival?.iataCode ? ` (${todo.arrival?.iataCode})` : ''}`
                   ) : (
                     <>
                       도착지 선택

@@ -1,17 +1,17 @@
-import {Avatar} from '@/components/Avatar'
-import {GestureHandlerRootViewWrapper} from '@/components/BottomSheetModal'
+import { Avatar } from '@/components/Avatar'
+import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
-import {Title} from '@/components/Layout/Content'
-import {Screen} from '@/components/Screen'
-import {TextInfoListItem} from '@/components/TextInfoListItem'
-import {TransText} from '@/components/TransText'
-import {useTripStore} from '@/models'
-import {FlightTodo} from '@/models/Todo'
-import {goBack, useNavigate} from '@/navigators'
-import {ListItem} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {FC, useCallback, useEffect} from 'react'
-import {View, ViewStyle} from 'react-native'
+import { Title } from '@/components/Layout/Content'
+import { Screen } from '@/components/Screen'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { TransText } from '@/components/TransText'
+import { useTripStore } from '@/models'
+import { FlightTodo } from '@/models/Todo'
+import { goBack, useNavigate } from '@/navigators'
+import { ListItem } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, useCallback, useEffect } from 'react'
+import { View, ViewStyle } from 'react-native'
 import {
   TodoConfirmListItem,
   useTodoConfirmListItem,
@@ -20,17 +20,17 @@ import {
 export const FlightTicketTodoEditScreen: FC<{
   todo: FlightTodo
   isBeforeInitialization?: boolean
-}> = observer(({todo, isBeforeInitialization = false}) => {
-  const {navigateWithTrip} = useNavigate()
+}> = observer(({ todo, isBeforeInitialization = false }) => {
+  const { navigateWithTrip } = useNavigate()
   const tripStore = useTripStore()
 
   useEffect(() => {
     console.log('Hello [FlightTicketTodoEditScreen]')
   }, [])
 
-  const {patchTodo} = useTripStore()
+  const { patchTodo } = useTripStore()
 
-  const {isCompleted, setIsCompleted} = useTodoConfirmListItem(
+  const { isCompleted, setIsCompleted } = useTodoConfirmListItem(
     todo,
     'ConfirmFlight',
     isBeforeInitialization,
@@ -57,7 +57,7 @@ export const FlightTicketTodoEditScreen: FC<{
 
   const handleConfirm = useCallback(async () => {
     if (!todo.isCompleted && isCompleted) {
-      navigateWithTrip('ConfirmFlightTicket', {todoId: todo.id})
+      navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
     } else if (todo.isCompleted && !isCompleted) {
       todo.setIncomplete()
       patchTodo(todo).then(() => {
@@ -78,7 +78,7 @@ export const FlightTicketTodoEditScreen: FC<{
       <Screen>
         <Title>
           <ListItem>
-            <Avatar icon={{name: '✈️'}} size="xlarge" />
+            <Avatar icon={{ name: '✈️' }} size="xlarge" />
             <ListItem.Content>
               <ListItem.Title
                 style={{
@@ -95,17 +95,17 @@ export const FlightTicketTodoEditScreen: FC<{
         {todo.departure && (
           <View>
             <TextInfoListItem title={'출발'}>
-              <TransText style={{fontWeight: 600}}>
+              <TransText style={{ fontWeight: 600 }}>
                 {`${todo.departure?.name} ${
-                  todo.departure?.IATACode
-                    ? `(${todo.departure?.IATACode})`
+                  todo.departure?.iataCode
+                    ? `(${todo.departure?.iataCode})`
                     : ''
                 }`}
               </TransText>
             </TextInfoListItem>
             <TextInfoListItem title={'도착'}>
-              <TransText style={{fontWeight: 600}}>
-                {`${todo.arrival?.name} ${todo.arrival?.IATACode ? `(${todo.arrival?.IATACode})` : ''}`}
+              <TransText style={{ fontWeight: 600 }}>
+                {`${todo.arrival?.name} ${todo.arrival?.iataCode ? `(${todo.arrival?.iataCode})` : ''}`}
               </TransText>
             </TextInfoListItem>
           </View>

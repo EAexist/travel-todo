@@ -1,6 +1,6 @@
 import '@rneui/themed'
-import {ListSubheaderProps} from '@/components/ListSubheader'
-import {SectionHeaderProps} from '@/components/SectionHeader'
+import { ListSubheaderProps } from '@/components/ListSubheader'
+import { SectionHeaderProps } from '@/components/SectionHeader'
 
 declare module '@rneui/themed' {
   export interface Colors {
@@ -20,6 +20,8 @@ declare module '@rneui/themed' {
     secondaryBg: string
   }
   export interface ListItemProps {
+    dense?: boolean
+    backgroundColor?: 'primary' | 'secondary'
     useDisabledStyle?: boolean
   }
   export interface IconProps {

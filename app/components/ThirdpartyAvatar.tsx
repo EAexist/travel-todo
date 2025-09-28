@@ -1,6 +1,6 @@
-import {AccomodationInfoProvider} from '@/models/Accomodation'
-import {Avatar, AvatarProps, ListItem} from '@rneui/themed'
-import {useCallback} from 'react'
+import { AccomodationInfoProvider } from '@/models/Reservation/Accomodation'
+import { Avatar, AvatarProps, ListItem } from '@rneui/themed'
+import { useCallback } from 'react'
 import {
   Alert,
   ImageSourcePropType,
@@ -10,16 +10,16 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import {Trans} from '@lingui/react/macro'
+import { Trans } from '@lingui/react/macro'
 import * as airbnbLogo from 'assets/images/third-party/airbnb-logo.png'
 import * as googleMapLogo from 'assets/images/third-party/googleMap-logo.png'
 
-const sources: {[key: AccomodationInfoProvider]: ImageSourcePropType} = {
+const sources: { [key: AccomodationInfoProvider]: ImageSourcePropType } = {
   airbnb: airbnbLogo,
   googleMap: googleMapLogo,
 }
 
-const titles: {[key: AccomodationInfoProvider]: string} = {
+const titles: { [key: AccomodationInfoProvider]: string } = {
   airbnb: '에어비엔비',
   googleMap: '구글 지도',
 }
@@ -56,7 +56,7 @@ export const ThirdpartyAvatar = ({
         source={sources[provider]}
         rounded={true}
         size={'large'}
-        imageProps={{style: {width: 40, height: 40}}}
+        imageProps={{ style: { width: 40, height: 40 } }}
         {...props}
       />
       <ListItem.Subtitle style={$labelStyle}>
@@ -66,7 +66,7 @@ export const ThirdpartyAvatar = ({
   )
 }
 // ListItemSubtitle
-const $labelStyle: TextStyle = {paddingTop: 8}
+const $labelStyle: TextStyle = { paddingTop: 8 }
 const $thirdpartyAvatarStyle: ViewStyle = {
   width: 80,
   alignItems: 'center',

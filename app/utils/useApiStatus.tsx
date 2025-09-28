@@ -1,5 +1,9 @@
 import { useStores } from '@/models'
-import { APiResponseKind } from '@/services/api/apiProblem'
+import { ReservationSnapshot } from '@/models/Reservation/Reservation'
+import { UserStoreSnapshot } from '@/models/stores/UserStore'
+import { TodoPresetItemSnapshotIn } from '@/models/Todo'
+import { ApiResponseKind } from '@/services/api/apiProblem'
+import { ApiResponse } from 'apisauce'
 import {
   ActionDispatch,
   Context,
@@ -146,8 +150,8 @@ const apiStatusReducer = (
   }
 }
 
-export function _useWithApiStatus<T extends {}>(
-  action: (args: T) => Promise<APiResponseKind>,
+export function _useWithApiStatus<T extends {}, K = void>(
+  action: (args: T) => Promise<{ kind: ApiResponseKind; data?: K }>,
 ) {
   const dispatch = useApiStatusDispatch()
 
@@ -158,7 +162,7 @@ export function _useWithApiStatus<T extends {}>(
       props: { apiStatus: ApiStatus.PENDING },
     })
     dispatch({ type: 'setOnSuccess', props: { onSuccess: onSuccess || null } })
-    return await action(args as T).then((kind: APiResponseKind) => {
+    return await action(args as T).then(({ kind, data }) => {
       console.log(`[_useWithApiStatus] kind=${kind}`)
       switch (kind) {
         case 'ok':
@@ -178,6 +182,7 @@ export function _useWithApiStatus<T extends {}>(
           })
           break
       }
+      return { kind, data }
     })
   }
 }
@@ -187,12 +192,20 @@ export const useActionsWithApiStatus = () => {
 
   return {
     createTripWithApiStatus: _useWithApiStatus<{}>(stores.createTrip),
-    guestLoginWithApiStatus: _useWithApiStatus<{}>(stores.userStore.guestLogin),
+    guestLoginWithApiStatus: _useWithApiStatus<{}, UserStoreSnapshot>(
+      stores.userStore.guestLogin,
+    ),
     fetchPresetWithApiStatus: stores.tripStore
-      ? _useWithApiStatus<{}>(stores.tripStore?.fetchPreset)
+      ? _useWithApiStatus<{}, TodoPresetItemSnapshotIn[]>(
+          stores.tripStore?.fetchPreset,
+        )
       : () => {
           console.log('[fetchPresetWithApiStatus] TripStore is not defined.')
         },
+    createReservationFromTextWithApiStatus: _useWithApiStatus<
+      string,
+      ReservationSnapshot[]
+    >(stores.createFromText),
   }
 }
 // export function withApiStatus<T>(action: (args?: T) => Promise<string>) {

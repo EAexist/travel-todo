@@ -68,7 +68,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
           <HeaderIcon name="gear" type="octicon" />
         </TouchableOpacity>
       ),
-      containerStyle: { backgroundColor: colors.secondaryBg },
+      backgroundColor: 'secondary',
     })
 
     const renderDestinationText: ListRenderItem<Destination> = destination => (
@@ -137,7 +137,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
       </ListItem>
     )
     return (
-      <Screen backgroundColor={colors.secondaryBg}>
+      <Screen backgroundColor={'secondary'}>
         <ScrollView>
           <SectionCard>
             <ListItem containerStyle={{ height: 'auto' }}>

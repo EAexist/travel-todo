@@ -3,7 +3,7 @@ export const toCalendarString = (date: Date) =>
 
 export const getNightsParsed = (start: Date, end: Date) => {
   const nights = end.getDate() - start.getDate()
-  return `${nights}박/${nights + 1}일`
+  return `${nights}박 ${nights + 1}일`
 }
 export const toLocaleDateMonthString = (date?: Date) =>
   date

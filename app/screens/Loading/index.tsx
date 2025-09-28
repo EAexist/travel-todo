@@ -1,5 +1,7 @@
 import { ActivityIndicator } from '@/components/ActivityIndicator'
 import * as Fab from '@/components/Fab'
+import { Icon } from '@/components/Icon'
+import ContentTitle from '@/components/Layout/Content'
 import { Screen } from '@/components/Screen'
 import { TransText } from '@/components/TransText'
 import { AppStackScreenProps, goBack, navigate } from '@/navigators'
@@ -15,25 +17,33 @@ import {
 } from '@/utils/useHeader'
 import { useNetInfo } from '@react-native-community/netinfo'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import { Icon, Text } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, ReactNode, useCallback, useEffect, useState } from 'react'
 import { TextStyle, View, ViewStyle } from 'react-native'
 
-export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
-  ({ route: { params } }) => {
+export const LoadingScreenBase: FC<{
+  variant?: 'simple' | 'article'
+  onProblem?: () => void
+  pendingIndicatorTitle?: string[]
+  onSuccess?: () => void
+  successContent?: ReactNode
+}> = observer(
+  ({
+    pendingIndicatorTitle,
+    onSuccess = goBack,
+    onProblem = () => {},
+    successContent,
+    variant = 'simple',
+  }) => {
     const { apiStatus } = useApiStatus()
     const dispatch = useApiStatusDispatch()
 
     const { isConnected } = useNetInfo()
 
-    const texts = params?.texts || undefined
-    const onProblem = params?.onProblem || undefined
-
-    const handleNoConnection = useCallback(() => {
+    const handleError = useCallback(() => {
       dispatch({ type: 'set_IDLE' })
       goBack()
-      if (onProblem) onProblem()
+      onProblem()
     }, [])
 
     // useEffect(() => {
@@ -41,64 +51,96 @@ export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
     // }, [isConnected])
 
     useEffect(() => {
-      if (apiStatus === ApiStatus.SUCCESS) goBack()
+      if (apiStatus === ApiStatus.SUCCESS) onSuccess()
     }, [apiStatus])
 
     useHeader({ backButtonShown: false })
 
+    let title: string | null = null
+    let subtitle: string | null = null
+    let activityIndicator: ReactNode = null
+    let fabTitle: string | undefined = undefined
+    let onPressFab: (() => void) | undefined = undefined
+
+    switch (apiStatus) {
+      case ApiStatus.PENDING:
+        if (pendingIndicatorTitle) title = pendingIndicatorTitle[0]
+        activityIndicator = <ActivityIndicator />
+        fabTitle = '돌아가기'
+        onPressFab = handleError
+        break
+      case ApiStatus.NO_CONNECTION:
+        title = '연결 상태가 좋지 않아요'
+        subtitle = '다시 시도해 주세요.'
+        activityIndicator = <Icon name="wifi-off" size={36} />
+        fabTitle = '확인'
+        onPressFab = handleError
+        break
+      case ApiStatus.ERROR:
+        title = '오류가 발생했어요'
+        subtitle = '다시 시도해 주세요.'
+        activityIndicator = <Icon name="😫" size={36} />
+        fabTitle = '확인'
+        onPressFab = handleError
+        break
+      case ApiStatus.SUCCESS:
+        break
+      default:
+        break
+    }
+
     return (
       <Screen>
-        {apiStatus === ApiStatus.PENDING ? (
+        {apiStatus === ApiStatus.SUCCESS && successContent ? (
+          successContent
+        ) : (
           <>
+            {variant === 'article' && title && (
+              <ContentTitle title={title} subtitle={subtitle} />
+            )}
             <View style={$statusViewStyle}>
-              <ActivityIndicator />
-              {texts && (
-                <TransText numberOfLines={1} style={$statusMessageStyle}>
-                  {texts.length > 0 && texts[0]}
+              {activityIndicator}
+              {variant === 'simple' && title && (
+                <TransText style={$statusMessageStyle}>
+                  {title}
+                  <br />
+                  {subtitle}
                 </TransText>
               )}
             </View>
             <Fab.Container>
-              <Fab.Button title={'돌아가기'} onPress={handleNoConnection} />
+              <Fab.Button title={fabTitle} onPress={onPressFab} />
             </Fab.Container>
           </>
-        ) : apiStatus === ApiStatus.NO_CONNECTION ? (
-          <>
-            <View style={$statusViewStyle}>
-              <Icon name="wifi-off" size={36} />
-              <TransText style={$statusMessageStyle}>
-                연결 상태가 좋지 않아요.
-                <br />
-                다시 시도해 주세요.
-              </TransText>
-            </View>
-            <Fab.Container>
-              <Fab.Button title={'확인'} onPress={handleNoConnection} />
-            </Fab.Container>
-          </>
-        ) : apiStatus === ApiStatus.ERROR ? (
-          <>
-            <View style={$statusViewStyle}>
-              <Text style={{ fontFamily: 'Tossface', fontSize: 36 }}>😓</Text>
-              <TransText style={$statusMessageStyle}>
-                오류가 발생했어요.
-                <br />
-                다시 시도해 주세요.
-              </TransText>
-            </View>
-            <Fab.Container>
-              <Fab.Button title={'확인'} onPress={handleNoConnection} />
-            </Fab.Container>
-          </>
-        ) : (
-          <></>
         )}
       </Screen>
     )
   },
 )
 
-export const useLoadingScreen = (props: { onProblem?: () => void }) => {
+export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
+  ({ route: { params } }) => {
+    return (
+      <LoadingScreenBase pendingIndicatorTitle={params.pendingIndicatorTitle} />
+    )
+  },
+)
+
+export const useLoadingScreen = (
+  props: AppStackScreenProps<'Loading'>['route']['params'],
+  name: string = 'Loading',
+) => {
+  const { apiStatus } = useApiStatus()
+
+  useEffect(() => {
+    console.log(`[useLoadingScreen] apiStatus=${apiStatus}`)
+    if (apiStatus === ApiStatus.PENDING) navigate(name, props)
+  }, [apiStatus])
+}
+
+export const useLoadingScreen_ = (
+  props: AppStackScreenProps<'Loading'>['route']['params'],
+) => {
   const { apiStatus } = useApiStatus()
 
   useEffect(() => {

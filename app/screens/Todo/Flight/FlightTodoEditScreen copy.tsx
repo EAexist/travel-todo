@@ -173,7 +173,7 @@
 //           onPress={handleDeparturePress}>
 //           <TransText style={{fontWeight: 600}}>
 //             {todo.departure
-//               ? `${todo.departure?.name} ${todo.departure?.IATACode ? `(${todo.departure?.IATACode})` : ''}`
+//               ? `${todo.departure?.name} ${todo.departure?.iataCode ? `(${todo.departure?.iataCode})` : ''}`
 //               : '출발지 입력하기'}
 //           </TransText>
 //         </TextInfoListItem>
@@ -183,7 +183,7 @@
 //           onPress={handleArrivalPress}>
 //           <TransText style={{fontWeight: 600}}>
 //             {todo.arrival
-//               ? `${todo.arrival?.name} ${todo.arrival?.IATACode ? `(${todo.arrival?.IATACode})` : ''}`
+//               ? `${todo.arrival?.name} ${todo.arrival?.iataCode ? `(${todo.arrival?.iataCode})` : ''}`
 //               : '도착지 입력하기'}
 //           </TransText>
 //         </TextInfoListItem>
@@ -293,15 +293,15 @@
 //             <TextInfoListItem title={'출발'}>
 //               <TransText style={{fontWeight: 600}}>
 //                 {`${todo.departure?.name} ${
-//                   todo.departure?.IATACode
-//                     ? `(${todo.departure?.IATACode})`
+//                   todo.departure?.iataCode
+//                     ? `(${todo.departure?.iataCode})`
 //                     : ''
 //                 }`}
 //               </TransText>
 //             </TextInfoListItem>
 //             <TextInfoListItem title={'도착'}>
 //               <TransText style={{fontWeight: 600}}>
-//                 {`${todo.arrival?.name} ${todo.arrival?.IATACode ? `(${todo.arrival?.IATACode})` : ''}`}
+//                 {`${todo.arrival?.name} ${todo.arrival?.iataCode ? `(${todo.arrival?.iataCode})` : ''}`}
 //               </TransText>
 //             </TextInfoListItem>
 //           </View>

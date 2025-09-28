@@ -1,23 +1,25 @@
-import {ROOT_STATE_STORAGE_KEY, RootStore} from '@/models'
-import {TripStore, TripStoreSnapshot} from '@/models/stores/TripStore'
-import {Todo} from '@/models/Todo'
+import { ROOT_STATE_STORAGE_KEY, RootStore } from '@/models'
+import { TripStore, TripStoreSnapshot } from '@/models/stores/TripStore'
+import { Todo } from '@/models/Todo'
 import {
   api,
   CreateAccomodationProps,
   CreateDestinationProps,
+  CreateReservationProps,
   CreateTodoProps,
   DeleteAccomodationProps,
   DeleteDestinationProps,
+  DeleteReservationProps,
   DeleteTodoProps,
   mapToTodoDTO,
   TodoDTO,
   TripDTO,
 } from '@/services/api'
-import {load, save, storage} from '@/utils/storage'
+import { load, save, storage } from '@/utils/storage'
 import * as BackgroundTask from 'expo-background-task'
 import * as TaskManager from 'expo-task-manager'
-import {useEffect, useState} from 'react'
-import {StyleSheet, Text, View, Button} from 'react-native'
+import { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, Button } from 'react-native'
 
 export enum APIAction {
   PATCH_TRIP,
@@ -29,6 +31,9 @@ export enum APIAction {
   CREATE_ACCOMODATION,
   PATCH_ACCOMODATION,
   DELETE_ACCOMODATION,
+  CREATE_RESERVATION,
+  PATCH_RESERVATION,
+  DELETE_RESERVATION,
 }
 
 interface AsyncAPIWriteAction {
@@ -75,7 +80,7 @@ export function enqueueAction(
 ): boolean | null {
   try {
     const queue = getAPIActionQueue() || []
-    queue.push({action, data, isSynced: false} as AsyncAPIWriteAction)
+    queue.push({ action, data, isSynced: false } as AsyncAPIWriteAction)
     const isSaved = save(BACKROUND_TASK_QUEUE_STORAGE_KEY, queue)
     if (isSaved) {
       registerBackgroundTaskAsync()
@@ -104,16 +109,17 @@ export function enqueueAction(
 // Register and create the task so that it is available also when the background task screen
 // (a React component defined later in this example) is not visible.
 // Note: This needs to be called in the global scope, not in a React component.
-TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
+
+const backgroundTask_sync_db = async () => {
   try {
     const now = Date.now()
     console.log(
-      `Got background task call at date: ${new Date(now).toISOString()}`,
+      `Got background task call at date: ${new Date(now).toIsoString()}`,
     )
     const apiActionQueue = getAPIActionQueue() || []
 
     for (const actionItem of apiActionQueue) {
-      const {action, data} = actionItem
+      const { action, data } = actionItem
       let kind
       try {
         switch (action) {
@@ -144,6 +150,14 @@ TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
             api.deleteAccomodation(data as DeleteAccomodationProps)
           default:
             break
+
+          /* Reservation CRUD */
+          case APIAction.CREATE_RESERVATION:
+            api.createReservation(data as CreateReservationProps)
+          case APIAction.PATCH_RESERVATION:
+            api.patchReservation(data as CreateReservationProps)
+          case APIAction.DELETE_RESERVATION:
+            api.deleteReservation(data as DeleteReservationProps)
         }
       } catch (error) {
         console.error('Failed to execute api call:', error)
@@ -162,7 +176,9 @@ TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, async () => {
     return BackgroundTask.BackgroundTaskResult.Failed
   }
   return BackgroundTask.BackgroundTaskResult.Success
-})
+}
+
+TaskManager.defineTask(BACKGROUND_TASK_IDENTIFIER, backgroundTask_sync_db)
 
 // 2. Register the task at some point in your app by providing the same name
 // Note: This does NOT need to be in the global scope and CAN be used in your React components!
