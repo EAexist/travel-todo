@@ -65,21 +65,27 @@ const ConstrainedTextInfoListItemInput: FC<
   ListItemInputProps & {
     // onChangeText: (text: string) => void
     inputFilterFunction: (text: string) => string | false
+    invalidInputMessage?: string
   }
-> = ({ onChangeText, inputFilterFunction, ...props }) => {
+> = ({ onChangeText, inputFilterFunction, invalidInputMessage, ...props }) => {
   const ref = useRef<
     TextInput & {
       shake: () => void
     }
   >(null)
 
+  const [showWarning, setShowWarning] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+
   const handleChangeText = useCallback(
     (text: string) => {
       if (onChangeText) {
         const filteredText = inputFilterFunction(text)
         if (filteredText === false) {
+          setShowWarning(true)
           ref.current?.shake()
         } else {
+          setShowWarning(false)
           onChangeText(filteredText)
         }
       }
@@ -87,10 +93,26 @@ const ConstrainedTextInfoListItemInput: FC<
     [onChangeText, ref.current],
   )
 
+  useEffect(() => {
+    if (!isFocused) {
+      setShowWarning(false)
+    }
+  }, [isFocused])
+
   return (
     <TextInfoListItemInput
       ref={ref}
       onChangeText={handleChangeText}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      label={showWarning && invalidInputMessage}
+      containerStyle={{ marginBottom: 12 }}
+      labelStyle={{
+        textAlign: 'right',
+        position: 'absolute',
+        right: 0,
+        top: '100%',
+      }}
       {...props}
     />
   )
@@ -176,6 +198,9 @@ export const EditReservationScreenBase: FC<{
               {item.category === 'FLIGHT_TICKET' && (
                 <ListItem.Subtitle>{'탑승권 받은 후'}</ListItem.Subtitle>
               )}
+              {item.category === 'VISIT_JAPAN' && (
+                <ListItem.Subtitle>{'일본 입국수속'}</ListItem.Subtitle>
+              )}
             </ListItem.Content>
             {item.isActive && (
               <ListItem.Chevron primary onPress={handlePress} name="check" />
@@ -203,11 +228,7 @@ export const EditReservationScreenBase: FC<{
   const [isTitleFocused, setIsTitleFocused] = useState(false)
   const [isLinkFocused, setIsLinkFocused] = useState(false)
 
-  const data = reservation.infoEditListItemProps.sort((a, b) => {
-    const isNullA = a.value === null ? 1 : 0
-    const isNullB = b.value === null ? 1 : 0
-    return isNullA - isNullB
-  })
+  const data = reservation.infoEditListItemProps
   // .map(item => {
   //   let setValue: ((text: string) => void) | undefined = undefined
   //   switch (item.id) {
@@ -231,9 +252,7 @@ export const EditReservationScreenBase: FC<{
   //   }
   // })
 
-  type RenderReservationDataProps = ReservationDataItemType & {
-    setValue?: (text: string) => void
-  }
+  type RenderReservationDataProps = ReservationDataItemType
 
   const renderReservationDetail: ListRenderItem<RenderReservationDataProps> =
     useCallback(({ item }) => {
@@ -263,6 +282,7 @@ export const EditReservationScreenBase: FC<{
               value={item.value || ''}
               onChangeText={item.setValue}
               inputFilterFunction={filterAlphaNumericUppercase}
+              invalidInputMessage="영문/숫자만 입력할 수 있어요"
             />
           )
           break
@@ -276,6 +296,7 @@ export const EditReservationScreenBase: FC<{
                 console.log(text, item.value)
               }}
               inputFilterFunction={filterNumeric}
+              invalidInputMessage="숫자만 입력할 수 있어요"
             />
           )
           break
@@ -288,10 +309,10 @@ export const EditReservationScreenBase: FC<{
           )
           break
       }
-      //   }
       return (
         <TextInfoListItem
           title={item.title}
+          subtitle={item.subtitle}
           onPress={onPress}
           titleSize={titleSize}>
           {inputComponent}
@@ -307,22 +328,29 @@ export const EditReservationScreenBase: FC<{
           title={
             reservation.category === 'ACCOMODATION' ||
             reservation.category === 'GENERAL' ? (
-              <ControlledListItemInput
-                onChangeText={(text: string) => {
-                  reservation.setTitle(text)
-                }}
-                value={reservation.title}
-                placeholder={'예약 이름 입력'}
-                autoFocus={isBeforeInitialization}
-                onBlur={() => setIsTitleFocused(false)}
-                onFocus={() => setIsTitleFocused(true)}
-                inputContainerStyle={{
-                  borderBottomWidth: isTitleFocused ? 2 : 0,
-                }}
-                primary={isTitleFocused}
-              />
+              <View style={{ flex: 1 }}>
+                <ControlledListItemInput
+                  onChangeText={(text: string) => {
+                    reservation.setTitle(text)
+                  }}
+                  value={reservation.title}
+                  placeholder={'예약 이름 입력'}
+                  autoFocus={isBeforeInitialization}
+                  onBlur={() => setIsTitleFocused(false)}
+                  onFocus={() => setIsTitleFocused(true)}
+                  // inputContainerStyle={{
+                  //   borderBottomWidth: isTitleFocused ? 2 : 0,
+                  // }}
+                  primary={isTitleFocused}
+                  rightIcon={
+                    !isTitleFocused && (
+                      <Icon color={'secondary'} name="edit" type="material" />
+                    )
+                  }
+                />
+              </View>
             ) : (
-              <Text>{reservation.title}</Text>
+              <Text h2>{reservation.title}</Text>
             )
           }
           icon={reservation.icon}
@@ -341,7 +369,7 @@ export const EditReservationScreenBase: FC<{
             title={'링크'}
             rightContent={<ListItem.Chevron />}>
             <TransText primary={!reservation.primaryHrefLink} numberOfLines={1}>
-              {reservation.primaryHrefLink || '예약 확인 링크를 입력하세요'}
+              {reservation.primaryHrefLink || reservation.addLinkInstruction}
             </TransText>
           </TextInfoListItem>
           {reservation.category === 'ACCOMODATION' ? (
@@ -377,7 +405,7 @@ export const EditReservationScreenBase: FC<{
             rightContent={<ListItem.Chevron />}>
             <TransText numberOfLines={2}>{reservation.note || '-'}</TransText>
           </TextInfoListItem>
-          {data && (
+          {data && data.length > 0 && (
             <>
               <Divider />
               <ListSubheader title={'상세 내역'} />

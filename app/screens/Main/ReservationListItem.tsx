@@ -26,7 +26,7 @@ export const ReservationListItem: FC<{ reservation: Reservation }> = observer(
       <ListItemBase
         avatarProps={{ icon: reservation.icon }}
         title={reservation.title}
-        subtitle={reservation.subtitle}
+        subtitle={reservation.subtitle || undefined}
         onPress={handlePress}
         rightContent={
           <ListItem.Chevron

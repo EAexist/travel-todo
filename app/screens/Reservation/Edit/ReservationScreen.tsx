@@ -88,7 +88,7 @@ export const ReservationScreen = withReservation<'Reservation'>(
               <TransText
                 primary={!reservation.primaryHrefLink}
                 numberOfLines={1}>
-                {reservation.primaryHrefLink || '예약 확인 링크를 입력하세요'}
+                {reservation.primaryHrefLink || reservation.addLinkInstruction}
               </TransText>
             </TextInfoListItem>
             {reservation.category === 'ACCOMODATION' ? (

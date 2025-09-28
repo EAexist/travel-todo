@@ -7,6 +7,7 @@ export const GeneralReservationModel = types
     title: types.maybeNull(types.string),
     dateTimeIsoString: types.maybeNull(types.string),
     numberOfClient: types.maybeNull(types.number),
+    clientName: types.maybeNull(types.string),
     clientNames: types.maybeNull(types.array(types.string)),
   })
   .actions(withSetPropAction)

@@ -491,29 +491,20 @@ const theme = createTheme({
       // },
     }),
     ListItemInput: ({ primary }, { colors }) => ({
-      containerStyle: {
-        // paddingHorizontal: 20,
-        // height: 92
-        // paddingVertical: 14,
-        // width: '100%',
-        // borderBottomWidth: 1,
-        // borderColor: colors.light0,
-      },
+      containerStyle: {},
       inputContainerStyle: {
         // paddingTop: label ? 0 : 12,
         borderBottomWidth: 2,
         borderColor: primary ? colors.primary : colors.grey0,
-        flexDirection: 'column',
-        alignItems: 'stretch',
       },
-      // inputContainerStyle: {},
       inputStyle: {
+        width: '100%',
+        textAlign: 'left',
         ...typography.pretendard.semiBold,
         fontSize: 21,
         lineHeight: 1.6 * 22,
         color: colors.text.primary,
         outlineStyle: undefined,
-        textAlign: 'left',
       },
       labelStyle: {
         ...typography.pretendard.medium,

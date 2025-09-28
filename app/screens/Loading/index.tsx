@@ -72,7 +72,7 @@ export const LoadingScreenBase: FC<{
       case ApiStatus.NO_CONNECTION:
         title = '연결 상태가 좋지 않아요'
         subtitle = '다시 시도해 주세요.'
-        activityIndicator = <Icon name="wifi-off" size={36} />
+        activityIndicator = <Icon name="wifi-off" type="material" size={36} />
         fabTitle = '확인'
         onPressFab = handleError
         break
@@ -168,7 +168,7 @@ export const RequireConnectionScreen: FC<
   return (
     <Screen>
       <View style={$statusViewStyle}>
-        <Icon name="wifi-off" size={36} />
+        <Icon name="wifi-off" type="material" size={36} />
         <TransText style={$statusMessageStyle}>
           네트워크 연결 상태가 좋지 않아요.
           <br />
