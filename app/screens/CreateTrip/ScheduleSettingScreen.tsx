@@ -19,11 +19,11 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
   const tripStore = useTripStore()
 
   const [dateInterval, setDateInterval] = useState<DateInterval>({
-    start: tripStore.startDateISOString
-      ? new Date(tripStore.startDateISOString)
+    start: tripStore.startDateIsoString
+      ? new Date(tripStore.startDateIsoString)
       : undefined,
-    end: tripStore.endDateISOString
-      ? new Date(tripStore.endDateISOString)
+    end: tripStore.endDateIsoString
+      ? new Date(tripStore.endDateIsoString)
       : undefined,
   })
 
@@ -37,15 +37,15 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
       date?.setHours(0)
     })
     tripStore.setProp(
-      'startDateISOString',
-      dateInterval.start?.toISOString() || '',
+      'startDateIsoString',
+      dateInterval.start?.toIsoString() || '',
     )
-    tripStore.setProp('endDateISOString', dateInterval.end?.toISOString() || '')
+    tripStore.setProp('endDateIsoString', dateInterval.end?.toIsoString() || '')
 
     tripStore.patch({
       id: tripStore.id,
-      startDateISOString: tripStore.startDateISOString,
-      endDateISOString: tripStore.endDateISOString,
+      startDateIsoString: tripStore.startDateIsoString,
+      endDateIsoString: tripStore.endDateIsoString,
     })
   }, [tripStore, dateInterval.start, dateInterval.end])
 

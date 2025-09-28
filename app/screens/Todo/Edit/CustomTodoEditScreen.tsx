@@ -1,20 +1,21 @@
-import {Avatar, AvatarProps} from '@/components/Avatar'
+import { Avatar, AvatarProps } from '@/components/Avatar'
 import BottomSheetModal, {
   GestureHandlerRootViewWrapper,
 } from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
-import {ControlledListItemInput} from '@/components/Input'
-import ContentTitle, {Title} from '@/components/Layout/Content'
-import {Screen} from '@/components/Screen'
-import {TextInfoListItem} from '@/components/TextInfoListItem'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {CATEGORY_TO_TITLE, Icon, Todo} from '@/models/Todo'
-import {goBack, useNavigate} from '@/navigators'
-import {useHeader} from '@/utils/useHeader'
-import {ListItem, Avatar as RNEAvatar, useTheme} from '@rneui/themed'
-import {Observer, observer} from 'mobx-react-lite'
-import {FC, useCallback, useRef, useState} from 'react'
+import { ControlledListItemInput } from '@/components/Input'
+import ContentTitle from '@/components/Layout/Content'
+import { Screen } from '@/components/Screen'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { TransText } from '@/components/TransText'
+import { useTripStore } from '@/models'
+import { Icon } from '@/models/Icon'
+import { TODO_CATEGORY_TO_TITLE, Todo } from '@/models/Todo'
+import { goBack, useNavigate } from '@/navigators'
+import { useHeader } from '@/utils/useHeader'
+import { ListItem, useTheme } from '@rneui/themed'
+import { Observer, observer } from 'mobx-react-lite'
+import { FC, useCallback, useRef, useState } from 'react'
 import {
   FlatList,
   ListRenderItem,
@@ -26,12 +27,12 @@ import {
 export const CustomTodoEditScreen: FC<{
   todo: Todo
   isBeforeInitialization?: boolean
-}> = observer(({todo, isBeforeInitialization}) => {
+}> = observer(({ todo, isBeforeInitialization }) => {
   const [title, setTitle] = useState(todo.title)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
   const iconBottomSheetModalRef = useRef<BottomSheetModal>(null)
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
   const tripStore = useTripStore()
 
   const handleCompletePress = useCallback(() => {
@@ -65,16 +66,16 @@ export const CustomTodoEditScreen: FC<{
   const [icon, setIcon] = useState<Icon>(todo.icon)
 
   const ICONS = [
-    {name: '🛌', type: 'tossface'},
-    {name: '💱', type: 'tossface'},
-    {name: '💲', type: 'tossface'},
-    {name: '📶', type: 'tossface'},
-    {name: '📝', type: 'tossface'},
-    {name: '🔌', type: 'tossface'},
-    {name: '🧳', type: 'tossface'},
-    {name: '🎒', type: 'tossface'},
-    {name: '📸', type: 'tossface'},
-    {name: '☂️', type: 'tossface'},
+    { name: '🛌', type: 'tossface' },
+    { name: '💱', type: 'tossface' },
+    { name: '💲', type: 'tossface' },
+    { name: '📶', type: 'tossface' },
+    { name: '📝', type: 'tossface' },
+    { name: '🔌', type: 'tossface' },
+    { name: '🧳', type: 'tossface' },
+    { name: '🎒', type: 'tossface' },
+    { name: '📸', type: 'tossface' },
+    { name: '☂️', type: 'tossface' },
     // {name: '💊', type: 'tossface'},
     // {name: '🧴', type: 'tossface'},
     // {name: '💄', type: 'tossface'},
@@ -93,7 +94,7 @@ export const CustomTodoEditScreen: FC<{
     // {name: '⭐️', type: 'tossface'},
   ]
 
-  const iconMenu: {icon: Icon}[] = ICONS.map(icon => ({icon}))
+  const iconMenu: { icon: Icon }[] = ICONS.map(icon => ({ icon }))
 
   const handlePressNewIcon = useCallback(
     (icon: Icon) => {
@@ -102,11 +103,11 @@ export const CustomTodoEditScreen: FC<{
     [setIcon],
   )
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
 
-  const renderIconListItem: ListRenderItem<{icon: Icon}> = useCallback(
-    ({item}) => {
+  const renderIconListItem: ListRenderItem<{ icon: Icon }> = useCallback(
+    ({ item }) => {
       return (
         <TouchableOpacity onPress={() => handlePressNewIcon(item.icon)}>
           <Avatar
@@ -151,7 +152,7 @@ export const CustomTodoEditScreen: FC<{
   }
   const renderCategoryListItem: ListRenderItem<CategoryListItemData> =
     useCallback(
-      ({item}) => {
+      ({ item }) => {
         const handlePress = () => {
           console.log(
             `[bottomSheetModalRef.current] ${categoryBottomSheetModalRef.current}`,
@@ -181,14 +182,27 @@ export const CustomTodoEditScreen: FC<{
     if (!isConfirmed && isBeforeInitialization) tripStore.deleteTodo(todo)
   }, [tripStore, todo])
 
-  useHeader({onBackPressBeforeNavigate: handleBackPressBeforeNavigate})
+  useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
 
   const [isFocused, setIsFocused] = useState(false)
   return (
     <GestureHandlerRootViewWrapper>
       <Screen>
-        <Title>
-          <ListItem containerStyle={$listItemContainerStyle}>
+        <ContentTitle
+          variant="listItem"
+          title={
+            <ControlledListItemInput
+              onChangeText={setTitle}
+              value={title}
+              placeholder={'할 일 이름 입력'}
+              autoFocus={isBeforeInitialization}
+              onBlur={() => setIsFocused(false)}
+              onFocus={() => setIsFocused(true)}
+              inputContainerStyle={{ borderBottomWidth: isFocused ? 2 : 0 }}
+              primary={isFocused}
+            />
+          }
+          leftComponent={
             <Observer
               render={() => (
                 <TouchableOpacity onPress={handleIconPress}>
@@ -196,21 +210,8 @@ export const CustomTodoEditScreen: FC<{
                 </TouchableOpacity>
               )}
             />
-
-            <ListItem.Content>
-              <ControlledListItemInput
-                setValue={setTitle}
-                value={title}
-                placeholder={'할 일 이름 입력'}
-                autoFocus={isBeforeInitialization}
-                onBlur={() => setIsFocused(false)}
-                onFocus={() => setIsFocused(true)}
-                inputContainerStyle={{borderBottomWidth: isFocused ? 2 : 0}}
-                primary={isFocused}
-              />
-            </ListItem.Content>
-          </ListItem>
-        </Title>
+          }
+        />
         <TextInfoListItem
           title={'상태'}
           rightContent={
@@ -274,7 +275,7 @@ export const CustomTodoEditScreen: FC<{
         <BottomSheetModal ref={categoryBottomSheetModalRef}>
           <ContentTitle title={'카테고리 선택'} />
           <FlatList
-            data={Object.entries(CATEGORY_TO_TITLE).map(
+            data={Object.entries(TODO_CATEGORY_TO_TITLE).map(
               ([_category, title]) => ({
                 category: _category,
                 title,

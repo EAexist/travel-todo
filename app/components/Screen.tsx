@@ -1,6 +1,6 @@
-import {useScrollToTop} from '@react-navigation/native'
-import {StatusBar, StatusBarProps, StatusBarStyle} from 'expo-status-bar'
-import {ReactNode, useRef, useState} from 'react'
+import { useScrollToTop } from '@react-navigation/native'
+import { StatusBar, StatusBarProps, StatusBarStyle } from 'expo-status-bar'
+import { ReactNode, useRef, useState } from 'react'
 import {
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,
@@ -12,15 +12,15 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import {$styles} from '../../theme'
+import { $styles } from '../../theme'
 import {
   ExtendedEdge,
   useSafeAreaInsetsStyle,
 } from '../utils/useSafeAreaInsetsStyle'
-import {KeyboardAwareScrollView} from 'react-native-keyboard-controller'
-import {useAppTheme} from '@/utils/useAppTheme'
-import {useTheme} from '@rneui/themed'
-import {useFabHeight} from './Fab'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { useAppTheme } from '@/utils/useAppTheme'
+import { useTheme } from '@rneui/themed'
+import { useFabHeight } from './Fab'
 
 export const DEFAULT_BOTTOM_OFFSET = 50
 
@@ -89,7 +89,7 @@ interface AutoScreenProps extends Omit<ScrollScreenProps, 'preset'> {
    * Threshold to trigger the automatic disabling/enabling of scroll ability.
    * Defaults to `{ percent: 0.92 }`.
    */
-  scrollEnabledToggleThreshold?: {percent?: number; point?: number}
+  scrollEnabledToggleThreshold?: { percent?: number; point?: number }
 }
 
 export type ScreenProps = ScrollScreenProps | FixedScreenProps | AutoScreenProps
@@ -116,8 +116,8 @@ function useAutoPreset(props: AutoScreenProps): {
   onContentSizeChange: (w: number, h: number) => void
   onLayout: (e: LayoutChangeEvent) => void
 } {
-  const {preset, scrollEnabledToggleThreshold} = props
-  const {percent = 0.92, point = 0} = scrollEnabledToggleThreshold || {}
+  const { preset, scrollEnabledToggleThreshold } = props
+  const { percent = 0.92, point = 0 } = scrollEnabledToggleThreshold || {}
 
   const scrollViewHeight = useRef<null | number>(null)
   const scrollViewContentHeight = useRef<null | number>(null)
@@ -164,7 +164,7 @@ function useAutoPreset(props: AutoScreenProps): {
    * @param {LayoutChangeEvent} e = The layout change event.
    */
   function onLayout(e: LayoutChangeEvent) {
-    const {height} = e.nativeEvent.layout
+    const { height } = e.nativeEvent.layout
     // update scroll-view  height
     scrollViewHeight.current = height
     updateScrollState()
@@ -185,9 +185,9 @@ function useAutoPreset(props: AutoScreenProps): {
  * @returns {JSX.Element} - The rendered `ScreenWithoutScrolling` component.
  */
 function ScreenWithoutScrolling(props: ScreenProps) {
-  const {style, contentContainerStyle, children, preset} = props
+  const { style, contentContainerStyle, children, preset } = props
 
-  const {height} = useFabHeight()
+  const { height } = useFabHeight()
   return (
     <View style={[$outerStyle, style]}>
       <View
@@ -195,7 +195,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
           $innerStyle,
           preset === 'fixed' && $justifyFlexEnd,
           contentContainerStyle,
-          {paddingBottom: height},
+          { paddingBottom: height },
         ]}>
         {children}
       </View>
@@ -219,7 +219,7 @@ function ScreenWithScrolling(props: ScreenProps) {
 
   const ref = useRef<ScrollView>(null)
 
-  const {scrollEnabled, onContentSizeChange, onLayout} = useAutoPreset(
+  const { scrollEnabled, onContentSizeChange, onLayout } = useAutoPreset(
     props as AutoScreenProps,
   )
 
@@ -227,12 +227,12 @@ function ScreenWithScrolling(props: ScreenProps) {
   // More info at: https://reactnavigation.org/docs/use-scroll-to-top/
   useScrollToTop(ref)
 
-  const {height} = useFabHeight()
+  const { height } = useFabHeight()
 
   return (
     <KeyboardAwareScrollView
       bottomOffset={keyboardBottomOffset}
-      {...{keyboardShouldPersistTaps, scrollEnabled, ref}}
+      {...{ keyboardShouldPersistTaps, scrollEnabled, ref }}
       {...ScrollViewProps}
       onLayout={e => {
         onLayout(e)
@@ -247,7 +247,7 @@ function ScreenWithScrolling(props: ScreenProps) {
         $innerStyle,
         ScrollViewProps?.contentContainerStyle,
         contentContainerStyle,
-        {paddingBottom: height},
+        { paddingBottom: height },
       ]}>
       {children}
     </KeyboardAwareScrollView>
@@ -263,7 +263,7 @@ function ScreenWithScrolling(props: ScreenProps) {
  * @returns {JSX.Element} The rendered `Screen` component.
  */
 export function Screen(props: ScreenProps) {
-  const {themeContext} = useAppTheme()
+  const { themeContext } = useAppTheme()
   const {
     backgroundColor,
     KeyboardAvoidingViewProps,
@@ -275,15 +275,18 @@ export function Screen(props: ScreenProps) {
 
   const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
 
-  const {theme} = useTheme()
+  const {
+    theme: { colors },
+  } = useTheme()
   return (
     <View
       style={[
         $containerStyle,
-        {backgroundColor},
-        // backgroundColor === 'secondary' && {
-        //   backgroundColor: theme.colors.grey0,
-        // },
+        backgroundColor === 'secondary'
+          ? {
+              backgroundColor: colors.secondaryBg,
+            }
+          : {},
         $containerInsets,
       ]}>
       <StatusBar

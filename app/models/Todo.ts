@@ -3,7 +3,7 @@ import { withSetPropAction } from './helpers/withSetPropAction'
 import { v4 as uuidv4 } from 'uuid'
 import { Icon, IconModel } from './Icon'
 
-export const CATEGORY_TO_TITLE: { [key: string]: string } = {
+export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
   reservation: '예약',
   foreign: '해외여행',
   goods: '짐',
@@ -15,7 +15,7 @@ export const CATEGORY_TO_TITLE: { [key: string]: string } = {
 //   category: '',
 //   title: '',
 //   note: '',
-//   completeDateISOString: null, // Ex: 2022-08-12 21:05:36
+//   completeDateIsoString: null, // Ex: 2022-08-12 21:05:36
 //   isFlaggedToDelete: false,
 //   orderKey: -1,
 //   presetId: -1,
@@ -24,9 +24,9 @@ export const CATEGORY_TO_TITLE: { [key: string]: string } = {
 export interface Location {
   name: string
   title: string
-  countryISO: string
+  countryIso: string
   region?: string
-  IATACode?: string
+  iataCode?: string
 }
 
 export interface LocationPair {
@@ -37,27 +37,27 @@ export interface LocationPair {
 export const LocationModel = types.model('Location').props({
   name: types.string,
   title: types.string,
-  countryISO: types.string,
+  countryIso: types.string,
   region: types.maybe(types.string),
-  IATACode: types.maybe(types.string),
+  iataCode: types.maybe(types.string),
 })
 
 export const AirportModel = types.model('Airport').props({
   airportName: types.string,
   cityName: types.string,
-  ISONationCode2Digit: types.string,
-  IATACode: types.string,
+  iso2DigitNationCode: types.string,
+  iataCode: types.string,
 })
 
 export interface Airport {
-  IATACode: string
+  iataCode: string
   airportName: string
   cityName: string
-  ISONationCode2Digit: string
+  iso2DigitNationCode: string
 }
 
 export interface Airline {
-  IATACode: string
+  iataCode: string
   title: string
 }
 
@@ -145,7 +145,7 @@ export const TodoModel = types
     // title: types.string,
     // icon: IconModel,
     note: types.optional(types.string, ''),
-    completeDateISOString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
+    completeDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
     isFlaggedToDelete: false,
     orderKey: types.optional(types.number, 0),
     isPreset: types.optional(types.boolean, false),
@@ -154,6 +154,7 @@ export const TodoModel = types
     // customTodoContent: types.maybeNull(types.reference(TodoContentModel)),
     // presetTodoContent: types.maybeNull(types.reference(PresetTodoContentModel)),
   })
+  .actions(withSetPropAction)
   .views(item => ({
     get category() {
       return item.content.category
@@ -182,13 +183,12 @@ export const TodoModel = types
   }))
   .views(item => ({
     get categoryTitle() {
-      return CATEGORY_TO_TITLE[item.category]
+      return TODO_CATEGORY_TO_TITLE[item.category]
     },
     get isCompleted() {
-      return item.completeDateISOString !== ''
+      return item.completeDateIsoString !== ''
     },
   }))
-  .actions(withSetPropAction)
   .actions(item => ({
     setTitle(title: string) {
       item.content.setProp('title', title)
@@ -202,11 +202,11 @@ export const TodoModel = types
   }))
   .actions(item => ({
     complete() {
-      item.setProp('completeDateISOString', new Date().toISOString())
+      item.setProp('completeDateIsoString', new Date().toIsoString())
     },
     setIncomplete() {
-      //   item.setProp('completeDateISOString', '')
-      item.setProp('completeDateISOString', null)
+      //   item.setProp('completeDateIsoString', '')
+      item.setProp('completeDateIsoString', null)
     },
     toggleDeleteFlag() {
       item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
@@ -214,11 +214,11 @@ export const TodoModel = types
   }))
   .views(item => ({
     get categoryTitle() {
-      return CATEGORY_TO_TITLE[item.category]
+      return TODO_CATEGORY_TO_TITLE[item.category]
     },
     get isCompleted() {
-      //   return item.completeDateISOString !== ''
-      return item.completeDateISOString !== null
+      //   return item.completeDateIsoString !== ''
+      return item.completeDateIsoString !== null
     },
     get parsedTitleAndSubtitle() {
       const defaultValue = { title: item.title?.trim(), subtitle: '' }
@@ -250,7 +250,7 @@ export const FlightTodoModel = types.compose(
       },
       get flightTitleWithCode() {
         return item.departure
-          ? `${item.departure?.title}${item.departure?.IATACode ? ` (${item.departure?.IATACode})` : ''} → ${item.arrival?.title || '목적지'}${item.arrival?.IATACode ? ` (${item.arrival?.IATACode})` : ''}`
+          ? `${item.departure?.title}${item.departure?.iataCode ? ` (${item.departure?.iataCode})` : ''} → ${item.arrival?.title || '목적지'}${item.arrival?.iataCode ? ` (${item.arrival?.iataCode})` : ''}`
           : ''
       },
     }))

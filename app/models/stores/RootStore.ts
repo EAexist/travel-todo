@@ -23,29 +23,10 @@ export const RootStoreModel = types
   .model('RootStore')
   .props({
     userStore: types.optional(UserStoreModel, { id: null }),
-    // userStore: types.optional(UserStoreModel, {id: '0'}),
     tripStore: types.maybeNull(TripStoreModel),
     reservationStore: types.optional(ReservationStoreModel, {}),
-    // apiStatus: types.enumeration<ApiStatus>(
-    //   'ApiStatus',
-    //   Object.values(ApiStatus),
-    // ),
   })
   .actions(withSetPropAction)
-  //   .actions(rootStore => ({
-  //     fetchUserAccount: async () => {
-  //       console.log('[RootStore] fetchUser()')
-  //       if (rootStore.userStore.id) {
-  //         const response = await api.getUserAccount(rootStore.userStore.id)
-  //         if (response.kind === 'ok') {
-  //           rootStore.setProp('userStore', response.data as UserStoreSnapshot)
-  //         } else {
-  //           console.error(`Error fetching User: ${JSON.stringify(response)}`)
-  //         }
-  //       }
-  //     },
-  //   }))
-  .actions(store => ({}))
   .actions(store => ({
     fetchTrip: async (tripId: string) => {
       console.log(`[RootStore.fetchTrip] tripId=${tripId}`)
@@ -62,11 +43,17 @@ export const RootStoreModel = types
         if (kind === 'ok') {
           return this.fetchTrip(store.userStore.tripSummary[0].id).then(
             kind => {
-              return kind
+              return { kind }
             },
           )
-        } else return kind
+        } else return { kind }
       })
+    },
+    async createFromText(text: string) {
+      if (!store.tripStore?.id) {
+        throw Error('[createFromText] Cannot find trip')
+      }
+      return store.reservationStore.createFromText(store.tripStore?.id, text)
     },
   }))
 

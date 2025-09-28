@@ -1,6 +1,6 @@
 import { ApiResponse } from 'apisauce'
 
-export type APiResponseKind = GeneralApiProblem['kind'] | 'ok'
+export type ApiResponseKind = GeneralApiProblem['kind'] | 'ok'
 
 export type GeneralApiProblem =
   /**

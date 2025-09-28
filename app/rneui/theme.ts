@@ -170,7 +170,7 @@ const colorTheme = createTheme({
     light0: '#2272EB',
     light1: '#E2EEFF',
     secondary: '#F2F3F5',
-    secondaryBg: '#F6F4F2',
+    secondaryBg: '#F2F4F6',
     black: '#333D4B',
     active: '#191E28',
     inactive: '#AFB8C1',
@@ -194,9 +194,11 @@ const theme = createTheme({
   components: {
     SectionCard: () => ({
       containerStyle: {
+        // marginHorizontal: 10,
+        // marginVertical: 10,
         borderWidth: 0,
         boxShadow: 'none',
-        borderRadius: 16,
+        borderRadius: 24,
         paddingHorizontal: 0,
       },
     }),
@@ -451,7 +453,7 @@ const theme = createTheme({
           },
     Input: ({ primary, label }, { colors }) => ({
       containerStyle: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 24,
         // height: 92
         // paddingVertical: 14,
         // width: '100%',
@@ -521,19 +523,21 @@ const theme = createTheme({
         color: primary ? colors.light0 : colors.text.secondary,
       },
     }),
-    ListItem: props => ({
+    ListItem: (props, { colors }) => ({
       style: {
         ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
       },
       containerStyle: {
-        // backgroundColor: colorTheme.lightColors?.disabled,
-        height: 52,
+        ...(props.backgroundColor === 'secondary'
+          ? { backgroundColor: colors.secondaryBg }
+          : {}),
+        height: props.dense === false ? 64 : 52,
         borderRadius: 16,
-        paddingHorizontal: 20, // 1.5rem
-        paddingVertical: 0, // ListItem has default vertical padding, overriding here
         // flexDirection: 'row',
         // gap: 12,
         alignItems: 'center',
+        paddingHorizontal: 24, // 1.5rem
+        paddingVertical: 24, // ListItem has default vertical padding, overriding here
       },
     }),
     ListItemTitle: (props, { colors }) => ({

@@ -1,22 +1,22 @@
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import {Screen} from '@/components/Screen'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {withTodo} from '@/utils/withTodo'
-import {useCallback} from 'react'
-import {launchImageLibraryAsync} from 'expo-image-picker'
+import { Screen } from '@/components/Screen'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { withTodo } from '@/utils/withTodo'
+import { useCallback } from 'react'
+import { launchImageLibraryAsync } from 'expo-image-picker'
 import * as storage from '../../utils/storage'
-import {usePickIamge} from '@/utils/image'
+import { usePickIamge } from '@/utils/image'
 
 export const CreateReservationScreen = withTodo<'CreateReservation'>(
-  ({todo}) => {
+  ({ todo }) => {
     const {
-      reservationStore: {addFlightTicket},
+      reservationStore: { addFlightTicket },
     } = useStores()
-    const {completeAndPatchTodo} = useTripStore()
+    const { completeAndPatchTodo } = useTripStore()
 
-    const {pickImage} = usePickIamge()
+    const { pickImage } = usePickIamge()
     const handleUploadPress = useCallback(async () => {
       pickImage().then(localFileUri => {
         if (localFileUri) {
@@ -56,7 +56,7 @@ export const CreateReservationScreen = withTodo<'CreateReservation'>(
           <Fab.NextButton
             navigateProps={{
               name: 'Main',
-              params: {screen: 'Todolist'},
+              params: { screen: 'Todolist' },
             }}
             title={'올리지 않고 할일 완료하기'}
             color={'secondary'}

@@ -8,7 +8,7 @@ import { useStores, useTripStore } from '@/models'
 import { DestinationSnapshotIn } from '@/models/Destination'
 import { goBack } from '@/navigators'
 import { rtrim } from '@/utils'
-import { countryNameKrToISO } from '@/utils/nation'
+import { countryNameKrToIso } from '@/utils/nation'
 import { useLingui } from '@lingui/react/macro'
 import { FC, useCallback, useRef } from 'react'
 import {
@@ -33,16 +33,16 @@ const PlacesAutoCompleteQuery: Query<AutocompleteRequestType> = {
 const mapGooglePlaceDataToDestination: (
   data: GooglePlaceData,
 ) => Omit<DestinationSnapshotIn, 'id'> = data => {
-  const ISO =
-    countryNameKrToISO[data.structured_formatting.secondary_text.split(' ')[0]]
+  const iso =
+    countryNameKrToIso[data.structured_formatting.secondary_text.split(' ')[0]]
   return {
     title:
-      ISO == 'JP'
+      iso == 'JP'
         ? rtrim(data.structured_formatting.main_text, '시')
         : data.structured_formatting.main_text, // 일본 지명의 경우 -시 suffix 제거: 아카시시 > 아카시, 교토시 > 교토
     region: data.structured_formatting.secondary_text,
     description: data.description,
-    countryISO: ISO,
+    countryIso: iso,
   }
 }
 

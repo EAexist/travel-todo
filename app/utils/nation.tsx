@@ -1,4 +1,4 @@
-import countryNameKrToISOJSON from 'app/utils/countryNameKrToISO.json'
+import countryNameKrToIsoJSON from 'app/utils/countryNameKrToISO.json'
 
 export const getFlagEmoji = (countryCode: string) => {
   if (!/^[A-Za-z]{2}$/.test(countryCode)) {
@@ -12,8 +12,8 @@ export const getFlagEmoji = (countryCode: string) => {
   return String.fromCodePoint(...codePoints)
 }
 
-export const regionNames = new Intl.DisplayNames(['kr'], {type: 'region'})
+export const regionNames = new Intl.DisplayNames(['kr'], { type: 'region' })
 
-export const countryNameKrToISO = countryNameKrToISOJSON as {
+export const countryNameKrToIso = countryNameKrToIsoJSON as {
   [key: string]: string
 }

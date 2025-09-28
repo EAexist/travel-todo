@@ -1,15 +1,15 @@
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
-import {Screen} from '@/components/Screen'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {Flight, Location, LocationPair, Todo} from '@/models/Todo'
-import {AppStackScreenProps, goBack, useNavigate} from '@/navigators'
-import {useTodo} from '@/utils/useTodo'
-import {withTodo} from '@/utils/withTodo'
-import {useLingui} from '@lingui/react/macro'
-import {Chip} from '@rneui/themed'
+import { Screen } from '@/components/Screen'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { Flight, Location, LocationPair, Todo } from '@/models/Todo'
+import { AppStackScreenProps, goBack, useNavigate } from '@/navigators'
+import { useTodo } from '@/utils/useTodo'
+import { withTodo } from '@/utils/withTodo'
+import { useLingui } from '@lingui/react/macro'
+import { Chip } from '@rneui/themed'
 import {
   FC,
   ReactNode,
@@ -19,13 +19,13 @@ import {
   useLayoutEffect,
   useState,
 } from 'react'
-import {FlatList, ListRenderItem, View} from 'react-native'
-import {AirportAutocomplete} from './AirportAutocomplete'
-import {ListItemBase} from '@/components/ListItem'
-import {ListItemChevron} from '@rneui/base/dist/ListItem/ListItem.Chevron'
-import {useFocusEffect} from '@react-navigation/native'
-import {getSnapshot} from 'mobx-state-tree'
-import {Observer} from 'mobx-react-lite'
+import { FlatList, ListRenderItem, View } from 'react-native'
+import { AirportAutocomplete } from './AirportAutocomplete'
+import { ListItemBase } from '@/components/ListItem'
+import { ListItemChevron } from '@rneui/base/dist/ListItem/ListItem.Chevron'
+import { useFocusEffect } from '@react-navigation/native'
+import { getSnapshot } from 'mobx-state-tree'
+import { Observer } from 'mobx-react-lite'
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
  * ERROR  Warning: TypeError: Cannot read property 'getFlagEmoji' of undefined
@@ -43,9 +43,9 @@ import {Observer} from 'mobx-react-lite'
 // }
 
 const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
-  ({todo, params: {callerName}}) => {
+  ({ todo, params: { callerName } }) => {
     const tripStore = useTripStore()
-    const {navigateWithTrip} = useNavigate()
+    const { navigateWithTrip } = useNavigate()
 
     useEffect(() => {
       tripStore.fetchRecommendedFlight()
@@ -55,24 +55,24 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
       todo.setDeparture({
         name: flight.departure.airportName,
         title: flight.departure.cityName,
-        countryISO: flight.departure.ISONationCode2Digit,
+        countryIso: flight.departure.iso2DigitNationCode,
         region: flight.departure.cityName,
-        IATACode: flight.departure.IATACode,
+        iataCode: flight.departure.iataCode,
       })
       todo.setArrival({
         name: flight.arrival.airportName,
         title: flight.arrival.cityName,
-        countryISO: flight.arrival.ISONationCode2Digit,
+        countryIso: flight.arrival.iso2DigitNationCode,
         region: flight.arrival.cityName,
-        IATACode: flight.arrival.IATACode,
+        iataCode: flight.arrival.iataCode,
       })
       tripStore.patchTodo(todo)
-      navigateWithTrip('RoundTripSetting', {todoId: todo.id, callerName})
+      navigateWithTrip('RoundTripSetting', { todoId: todo.id, callerName })
     }, [])
     const renderRecommendationChip: ListRenderItem<Flight> = useCallback(
-      ({item}) => (
+      ({ item }) => (
         <Chip
-          title={`${item.departure?.cityName}(${item.departure?.IATACode}) → ${item.arrival?.cityName}(${item.arrival?.IATACode})`}
+          title={`${item.departure?.cityName}(${item.departure?.iataCode}) → ${item.arrival?.cityName}(${item.arrival?.iataCode})`}
           onPress={() => handlePressRecommendationChip(item)}
         />
       ),
@@ -81,7 +81,10 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
     const handlePressSearchResult = useCallback(
       async (location: Location) => {
         todo.setDeparture(location)
-        navigateWithTrip('ArrivalAirportSetting', {todoId: todo.id, callerName})
+        navigateWithTrip('ArrivalAirportSetting', {
+          todoId: todo.id,
+          callerName,
+        })
       },
       [todo],
     )
@@ -89,7 +92,7 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
     const renderRecommendationContent = useCallback(
       () =>
         tripStore.recommendedFlight.length > 0 ? (
-          <View style={{paddingVertical: 8}}>
+          <View style={{ paddingVertical: 8 }}>
             <ListSubheader title={'추천 항공편'} />
             <FlatList
               contentContainerStyle={{
@@ -135,8 +138,8 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
 )
 
 const ArrivalAirportSettingScreen = withTodo<'ArrivalAirportSetting'>(
-  ({todo, params: {callerName}}) => {
-    const {navigateWithTrip} = useNavigate()
+  ({ todo, params: { callerName } }) => {
+    const { navigateWithTrip } = useNavigate()
     useEffect(() => {
       console.log('[ArrivalAirportSettingScreenBase] Hello')
     }, [])
@@ -153,7 +156,7 @@ const ArrivalAirportSettingScreen = withTodo<'ArrivalAirportSetting'>(
       <Screen>
         <ContentTitle
           title={'도착지를 선택해주세요'}
-          subtitle={`출발: ${todo.departure?.title}${todo.departure?.IATACode ? `(${todo.departure?.IATACode})` : ''}`}
+          subtitle={`출발: ${todo.departure?.title}${todo.departure?.iataCode ? `(${todo.departure?.iataCode})` : ''}`}
         />
         <AirportAutocomplete
           handlePressSearchResult={handlePressSearchResult}
@@ -164,17 +167,17 @@ const ArrivalAirportSettingScreen = withTodo<'ArrivalAirportSetting'>(
 )
 
 const RoundTripSettingScreen = withTodo<'RoundTripSetting'>(
-  ({todo, params: {callerName}}) => {
+  ({ todo, params: { callerName } }) => {
     const {
-      tripStore: {patchTodo, createCustomTodo},
+      tripStore: { patchTodo, createCustomTodo },
       roundTripStore,
     } = useStores()
 
     useFocusEffect(
       useCallback(() => {
         if (todo.departure && todo.arrival) {
-          roundTripStore?.setDeparture({...todo.arrival})
-          roundTripStore?.setArrival({...todo.departure})
+          roundTripStore?.setDeparture({ ...todo.arrival })
+          roundTripStore?.setArrival({ ...todo.departure })
         }
       }, []),
     )
@@ -182,22 +185,22 @@ const RoundTripSettingScreen = withTodo<'RoundTripSetting'>(
     return (
       <Screen>
         <ContentTitle title={'돌아오는 항공권 예매도\n할일로 추가할까요?'} />
-        <View style={{paddingVertical: 8}}>
+        <View style={{ paddingVertical: 8 }}>
           <ListSubheader title={'내 할 일'} />
           <ListItemBase
             useDisabledStyle
-            avatarProps={{icon: {name: '✈️'}}}
+            avatarProps={{ icon: { name: '✈️' } }}
             title={todo.flightTitleWithCode}
             rightContent={<ListItemChevron name="check" color={'priamry'} />}
           />
         </View>
         {roundTripStore && (
-          <View style={{paddingVertical: 8}}>
+          <View style={{ paddingVertical: 8 }}>
             <ListSubheader title={'새 할 일 (돌아오는 항공권 예매)'} />
             <Observer
               render={() => (
                 <ListItemBase
-                  avatarProps={{icon: {name: '✈️'}}}
+                  avatarProps={{ icon: { name: '✈️' } }}
                   title={roundTripStore.flightTitleWithCode}
                 />
               )}
@@ -212,7 +215,9 @@ const RoundTripSettingScreen = withTodo<'RoundTripSetting'>(
               // params: { todoId: todo.id, isInitializing: true },
             }}
             promiseBeforeNavigate={async () => {
-              createCustomTodo({...roundTripStore}).then(() => patchTodo(todo))
+              createCustomTodo({ ...roundTripStore }).then(() =>
+                patchTodo(todo),
+              )
             }}
           />
           <Fab.NextButton
@@ -232,7 +237,7 @@ const RoundTripSettingScreen = withTodo<'RoundTripSetting'>(
   },
 )
 
-const DepartureAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
+const DepartureAirportEditScreen = withTodo(({ todo }: { todo: Todo }) => {
   const handlePressSearchResult = useCallback(
     async (location: Location) => {
       todo.setDeparture(location)
@@ -248,7 +253,7 @@ const DepartureAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
   )
 })
 
-const ArrivalAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
+const ArrivalAirportEditScreen = withTodo(({ todo }: { todo: Todo }) => {
   const handlePressSearchResult = useCallback(
     async (location: Location) => {
       todo.setArrival(location)
@@ -260,7 +265,7 @@ const ArrivalAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
     <Screen>
       <ContentTitle
         title={'도착지를 선택해주세요'}
-        subtitle={`출발: ${todo.departure?.title}${todo.departure?.IATACode ? `(${todo.departure?.IATACode})` : ''}`}
+        subtitle={`출발: ${todo.departure?.title}${todo.departure?.iataCode ? `(${todo.departure?.iataCode})` : ''}`}
       />
       <AirportAutocomplete handlePressSearchResult={handlePressSearchResult} />
     </Screen>
@@ -273,8 +278,8 @@ const ArrivalAirportEditScreen = withTodo(({todo}: {todo: Todo}) => {
 //   return !!todo ? <RoundTripSettingScreenBase todo={todo} /> : <></>
 // }
 
-export {RoundTripSettingScreen as RoundTripSetting}
-export {DepartureAirportSettingScreen as DepartureAirportSetting}
-export {DepartureAirportEditScreen as DepartureAirportEdit}
-export {ArrivalAirportSettingScreen as ArrivalAirportSetting}
-export {ArrivalAirportEditScreen as ArrivalAirportEdit}
+export { RoundTripSettingScreen as RoundTripSetting }
+export { DepartureAirportSettingScreen as DepartureAirportSetting }
+export { DepartureAirportEditScreen as DepartureAirportEdit }
+export { ArrivalAirportSettingScreen as ArrivalAirportSetting }
+export { ArrivalAirportEditScreen as ArrivalAirportEdit }

@@ -1,0 +1,118 @@
+import * as Fab from '@/components/Fab'
+import ContentTitle from '@/components/Layout/Content'
+import { Note_ } from '@/components/Note'
+import { Screen } from '@/components/Screen'
+import { useStores } from '@/models'
+import { AppStackScreenProps, useNavigate } from '@/navigators'
+import { useLoadingScreen } from '@/screens/Loading'
+import { useActionsWithApiStatus, useApiStatus } from '@/utils/useApiStatus'
+import { useHeader } from '@/utils/useHeader'
+import {
+  createRef,
+  FC,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
+import { TextInput } from 'react-native'
+
+export const CreateReservationFromTextScreen: FC<
+  AppStackScreenProps<'CreateReservationFromText'>
+> = () => {
+  const { createReservationFromTextWithApiStatus } = useActionsWithApiStatus()
+
+  const { navigateWithTrip } = useNavigate()
+  const [value, setValue] = useState('')
+  const [isTextChanged, setIsTextChanged] = useState(false)
+  const [isFocused, setIsFocused] = useState(true)
+
+  const inputRef = useRef<TextInput>(null)
+
+  const { reservationStore } = useStores()
+
+  const isTextTooShort = value.length < 10
+
+  const handlePressCreateReservationButton = useCallback(async () => {
+    setIsTextChanged(false)
+    if (!isTextTooShort) {
+      //   const response = await reservationStore.createFromText(value)
+      const { kind, data: reservationIdList } =
+        await createReservationFromTextWithApiStatus({
+          args: value,
+          onSuccess: () => navigateWithTrip('ConfirmReservationFromText'),
+        })
+      //   if (kind === 'ok') {
+      //     if (reservationIdList && reservationIdList?.length > 0) {
+      //       navigateWithTrip('ConfirmReservationFromText', { reservationIdList })
+      //     } else {
+      //       navigateWithTrip('NotFoundReservationFromText')
+      //     }
+      //   }
+    }
+  }, [value])
+
+  const handleReset = useCallback(() => {
+    setValue('')
+    inputRef.current?.focus()
+  }, [inputRef.current])
+
+  useLoadingScreen({ pendingIndicatorTitle: ['예약 내역을 읽는 중이에요'] })
+
+  useLayoutEffect(() => {
+    inputRef.current?.focus()
+  }, [inputRef.current])
+
+  useHeader(
+    isFocused
+      ? {
+          rightActionTitle: '초기화',
+          onRightPress: handleReset,
+        }
+      : {
+          rightActionTitle: '',
+          onRightPress: () => {},
+        },
+    [isFocused],
+  )
+
+  return (
+    <Screen>
+      <ContentTitle
+        title={'예약 관리하기'}
+        subtitle={
+          '알림톡, 이메일, 또는 웹사이트의\n예약 내역 전체를 복사해 붙여넣어주세요.'
+        }
+      />
+      <Note_
+        autoFocus
+        onBlur={() => {
+          setIsFocused(false)
+        }}
+        onFocus={() => {
+          setIsFocused(true)
+        }}
+        value={value}
+        onChangeText={(text: string) => {
+          setIsTextChanged(true)
+          setValue(text)
+        }}
+        placeholder="예약 내역 텍스트 붙여넣기"
+        ref={inputRef}
+      />
+      <Fab.Container>
+        <Fab.Button
+          onPress={handlePressCreateReservationButton}
+          disabled={isTextTooShort}
+          title={isTextTooShort ? '10자 이상 입력해주세요' : '확인'}
+        />
+      </Fab.Container>
+      {/* <ControlledInput
+        value={rawText}
+        setValue={setrawText}
+        containerStyle={{ marginVertical: 24 }}
+        placeholder="예약 내역 텍스트 붙여넣기"
+      /> */}
+    </Screen>
+  )
+}

@@ -3,16 +3,16 @@ import {
   BottomTabScreenProps,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
-import {CompositeScreenProps} from '@react-navigation/native'
-import {TextStyle, ViewStyle} from 'react-native'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import { CompositeScreenProps } from '@react-navigation/native'
+import { TextStyle, ViewStyle } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import {Icon} from '@/components/Icon'
-import {typography} from '@/rneui/theme'
+import { Icon } from '@/components/Icon'
+import { typography } from '@/rneui/theme'
 import * as MainScreens from '@/screens/Main'
-import {useHeader} from '@/utils/useHeader'
-import {Button, useTheme} from '@rneui/themed'
-import {FC} from 'react'
+import { useHeader } from '@/utils/useHeader'
+import { Button, useTheme } from '@rneui/themed'
+import { FC } from 'react'
 import {
   AppStackParamList,
   AppStackScreenProps,
@@ -22,7 +22,7 @@ import {
 export type MainTabParamList = {
   TripDashboard: TripStackProps
   Todolist: TripStackProps
-  Reservation: TripStackProps
+  ReservationList: TripStackProps
 }
 
 /**
@@ -58,17 +58,19 @@ function TabBar(props: BottomTabBarProps) {
   )
 }
 
-export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
-  const {tripId} = route.params
-  const {bottom} = useSafeAreaInsets()
+export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({
+  route,
+}) => {
+  const { tripId } = route.params
+  const { bottom } = useSafeAreaInsets()
   //   const {
   //     themed,
   //     theme: {colors},
   //   } = useAppTheme()
 
-  const {theme} = useTheme()
+  const { theme } = useTheme()
 
-  useHeader({headerShown: false})
+  useHeader({ headerShown: false })
   return (
     // <GestureHandlerRootViewWrapper>
     <Tab.Navigator
@@ -86,11 +88,11 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
       }}>
       <Tab.Screen
         name="TripDashboard"
-        initialParams={{tripId: tripId}}
+        initialParams={{ tripId: tripId }}
         component={MainScreens.TripDashboard}
         options={{
           tabBarLabel: '여행',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <Icon
               type="material"
               name="card-travel"
@@ -102,11 +104,11 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
       />
       <Tab.Screen
         name="Todolist"
-        initialParams={{tripId: tripId}}
+        initialParams={{ tripId: tripId }}
         component={MainScreens.Todolist}
         options={{
           tabBarLabel: '할 일',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <Icon
               type="material"
               name="checklist"
@@ -117,12 +119,12 @@ export const MainTabNavigator: FC<AppStackScreenProps<'Main'>> = ({route}) => {
         }}
       />
       <Tab.Screen
-        name="Reservation"
-        initialParams={{tripId: tripId}}
-        component={MainScreens.Reservation}
+        name="ReservationList"
+        initialParams={{ tripId: tripId }}
+        component={MainScreens.ReservationList}
         options={{
           tabBarLabel: '예약',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <Icon
               type="material"
               name="qr-code"

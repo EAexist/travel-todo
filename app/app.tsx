@@ -16,35 +16,35 @@ if (__DEV__) {
   // If you turn it off in metro.config.js, you'll have to manually import it.
   require('./devtools/ReactotronConfig.ts')
 }
-import {i18n} from '@lingui/core'
-import {I18nProvider} from '@lingui/react'
+import { i18n } from '@lingui/core'
+import { I18nProvider } from '@lingui/react'
 import * as Linking from 'expo-linking'
 import * as SplashScreen from 'expo-splash-screen'
-import {useEffect, useState} from 'react'
-import {KeyboardProvider} from 'react-native-keyboard-controller'
+import { useEffect, useState } from 'react'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 import {
   initialWindowMetrics,
   SafeAreaProvider,
 } from 'react-native-safe-area-context'
-import {initI18n} from './i18n'
-import {useInitialRootStore} from './models'
+import { initI18n } from './i18n'
+import { useInitialRootStore } from './models'
 import {
   AppNavigator,
   navigationRef,
   useNavigationPersistence,
 } from './navigators'
-import {loadDateFnsLocale} from './utils/formatDate'
+import { loadDateFnsLocale } from './utils/formatDate'
 import './utils/gestureHandler'
 import * as storage from './utils/storage'
-import {useFonts} from 'expo-font'
-import {Platform} from 'react-native'
-import {messages} from './locale/locales/ko/messages'
-import {addEventListener, useNetInfo} from '@react-native-community/netinfo'
+import { useFonts } from 'expo-font'
+import { Platform } from 'react-native'
+import { messages } from './locale/locales/ko/messages'
+import { addEventListener, useNetInfo } from '@react-native-community/netinfo'
 import * as TaskManager from 'expo-task-manager'
-import {registerTaskAsync} from 'expo-background-task'
-import {registerBackgroundTaskAsync} from './tasks/BackgroundTask'
-import {useNavigationContainerRef} from '@react-navigation/native'
-import {useLogger} from '@react-navigation/devtools'
+import { registerTaskAsync } from 'expo-background-task'
+import { registerBackgroundTaskAsync } from './tasks/BackgroundTask'
+import { useNavigationContainerRef } from '@react-navigation/native'
+import { useLogger } from '@react-navigation/devtools'
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
@@ -106,6 +106,9 @@ const config = {
     AccomodationNote: 'trip/:tripId?/accomodation/:accomodationId?/note',
     CreateAccomodation: 'trip/:tripId?/createAccomodation',
 
+    /* Reservation */
+    CreateReservation: 'trip/:tripId?/reservation/create',
+
     FullScreenImage:
       'trip/:tripId?/reservation/:reservationId?/fullScreenImage',
   },
@@ -138,7 +141,7 @@ export function App() {
   //       .then(() => loadDateFnsLocale())
   //   }, [])
 
-  const {rehydrated} = useInitialRootStore(() => {
+  const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
 
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
@@ -167,7 +170,7 @@ export function App() {
   }
 
   // https://lingui.dev/tutorials/react-native#internationalization-in-react-native
-  i18n.loadAndActivate({locale: 'ko', messages})
+  i18n.loadAndActivate({ locale: 'ko', messages })
   // otherwise, we're ready to render the app
 
   /* Run Background Sync Actions when network connectivity is restored */

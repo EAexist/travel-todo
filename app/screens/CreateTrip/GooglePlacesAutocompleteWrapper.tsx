@@ -2,7 +2,7 @@
 // import {useStores, useTripStore} from '@/models'
 // import {goBack} from '@/navigators'
 // import {useLingui} from '@lingui/react/macro'
-// import countryNameKrToISOJSON from 'app/utils/countryNameKrToISO.json'
+// import countryNameKrToIsoJSON from 'app/utils/countryNameKrToIso.json'
 // import {useCallback, useEffect, useRef} from 'react'
 // import {
 //   AutocompleteRequestType,
@@ -61,7 +61,7 @@
 //   }, [ref])
 
 //   const {t} = useLingui()
-//   const countryNameKrToISO = countryNameKrToISOJSON as {[key: string]: string}
+//   const countryNameKrToIso = countryNameKrToIsoJSON as {[key: string]: string}
 
 //   const tripStore = useTripStore()
 //   //   const {navigateWithTrip} = useNavigate()
@@ -71,8 +71,8 @@
 //       .createDestination({
 //         title: data.structured_formatting.main_text,
 //         state: data.structured_formatting.secondary_text,
-//         countryISO:
-//           countryNameKrToISO[
+//         countryIso:
+//           countryNameKrToIso[
 //             data.structured_formatting.secondary_text.split(',')[0]
 //           ] || '',
 //       })
@@ -86,8 +86,8 @@
 //       .createDestination({
 //         title: data.structuredFormat.mainText.text,
 //         state: data.structuredFormat.secondaryText?.text || '',
-//         countryISO: data.structuredFormat.secondaryText?.text.split(',')
-//           ? countryNameKrToISO[
+//         countryIso: data.structuredFormat.secondaryText?.text.split(',')
+//           ? countryNameKrToIso[
 //               data.structuredFormat.secondaryText?.text.split(',')[0]
 //             ]
 //           : '',
@@ -104,8 +104,8 @@
 //         item={{
 //           title: data.structured_formatting.main_text,
 //           state: data.structured_formatting.secondary_text,
-//           countryISO:
-//             countryNameKrToISO[
+//           countryIso:
+//             countryNameKrToIso[
 //               data.structured_formatting.secondary_text.split(' ')[0]
 //             ] || '',
 //         }}

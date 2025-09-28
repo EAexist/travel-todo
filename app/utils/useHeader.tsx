@@ -1,5 +1,5 @@
-import {FC, ReactElement, useEffect, useLayoutEffect} from 'react'
-import {useNavigation} from '@react-navigation/native'
+import { FC, ReactElement, useEffect, useLayoutEffect } from 'react'
+import { useNavigation } from '@react-navigation/native'
 import {
   Platform,
   StyleSheet,
@@ -15,14 +15,14 @@ import {
   TextProps,
   useTheme,
 } from '@rneui/themed'
-import {BackButton, HeaderIcon, RightActionButton} from '@/components/Header'
-import {NavigateProps} from '@/navigators'
-import {TransText} from '@/components/TransText'
-import {Icon} from '@/models/Todo'
-import {IconProps} from '@/components/Icon'
-import {BlurView} from 'expo-blur'
+import { BackButton, HeaderIcon, RightActionButton } from '@/components/Header'
+import { NavigateProps } from '@/navigators'
+import { TransText } from '@/components/TransText'
+import { IconProps } from '@/components/Icon'
+import { BlurView } from 'expo-blur'
 
 interface HeaderProps extends RNEHeaderProps {
+  backgroundColor?: 'primary' | 'secondary'
   headerShown?: boolean
   backButtonShown?: boolean
   rightActionTitle?: string
@@ -47,6 +47,7 @@ export function useHeader(
     onBackPressBeforeNavigate,
     leftComponent,
     containerStyle,
+    backgroundColor = 'primary',
     ...props
   }: HeaderProps,
   deps: Parameters<typeof useLayoutEffect>[1] = [],
@@ -62,7 +63,7 @@ export function useHeader(
   const usePlatformEffect = Platform.OS === 'web' ? useEffect : useLayoutEffect
 
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
 
   // To avoid a visible header jump when navigating between screens, we use
@@ -91,7 +92,12 @@ export function useHeader(
             }
             containerStyle={[
               containerStyle,
-              // {backgroundColor: colors.transparent},
+              {
+                backgroundColor:
+                  backgroundColor === 'secondary'
+                    ? colors.secondaryBg
+                    : undefined,
+              },
             ]}
             {...props}
           />
@@ -126,19 +132,19 @@ export const HeaderTitle: FC<TextProps> = props => (
     ellipsizeMode="tail"
     numberOfLines={1}
     h2
-    h2Style={{lineHeight: 40}}
+    h2Style={{ lineHeight: 40 }}
     {...props}
   />
 )
 
-export const HeaderCenterTitle: FC<{icon?: IconProps; title: string}> = ({
+export const HeaderCenterTitle: FC<{ icon?: IconProps; title: string }> = ({
   icon,
   title,
 }) => {
   return (
     <>
       {icon && (
-        <Text style={{fontFamily: 'Tossface', paddingRight: 8}}>
+        <Text style={{ fontFamily: 'Tossface', paddingRight: 8 }}>
           {icon.name}
         </Text>
       )}

@@ -1,30 +1,30 @@
 import ContentTitle from '@/components/Layout/Content'
-import {Screen} from '@/components/Screen'
+import { Screen } from '@/components/Screen'
 import SectionHeader from '@/components/SectionHeader'
-import {TextInfoListItem} from '@/components/TextInfoListItem'
-import {ThirdpartyAvatar} from '@/components/ThirdpartyAvatar'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {AccomodationInfoProvider} from '@/models/Accomodation'
-import {AppStackScreenProps, useNavigate} from '@/navigators'
-import {ListItemChevron} from '@rneui/base/dist/ListItem/ListItem.Chevron'
-import {Divider, Text} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {FC, ReactNode, useCallback, useEffect} from 'react'
-import {FlatList, ListRenderItem, TextStyle, ViewStyle} from 'react-native'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { ThirdpartyAvatar } from '@/components/ThirdpartyAvatar'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { AccomodationInfoProvider } from '@/models/Reservation/Accomodation'
+import { AppStackScreenProps, useNavigate } from '@/navigators'
+import { ListItemChevron } from '@rneui/base/dist/ListItem/ListItem.Chevron'
+import { Divider, Text } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, ReactNode, useCallback, useEffect } from 'react'
+import { FlatList, ListRenderItem, TextStyle, ViewStyle } from 'react-native'
 
 interface AccomodationDetailScreenProps
   extends AppStackScreenProps<'Accomodation'> {}
 
 export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
-  observer(({route}) => {
+  observer(({ route }) => {
     const tripStore = useTripStore()
     // useEffect(() => {
     //   tripStore.fetchAccomodation().then(() => {
     //     console.log(tripStore)
     //   })
     // }, [])
-    const {accomodationId} = route.params
+    const { accomodationId } = route.params
 
     const item = tripStore.accomodation.get(accomodationId)
 
@@ -43,7 +43,7 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
         title: '방 · 인원',
         content: `${item?.roomTitle} · ${item?.numberofClient}명`,
       },
-      {title: '예약한 이름', content: item?.clientName},
+      { title: '예약한 이름', content: item?.clientName },
       {
         title: '체크인',
         content: (
@@ -68,7 +68,9 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
       },
     ]
 
-    const renderDetailListItem: ListRenderItem<TextListItemData> = ({item}) => {
+    const renderDetailListItem: ListRenderItem<TextListItemData> = ({
+      item,
+    }) => {
       // const handlePress = () => {
       //   console.log(item.title)
       // }
@@ -80,14 +82,14 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
     const renderLinkItem: ListRenderItem<{
       provider: AccomodationInfoProvider
       url: string
-    }> = ({item}) => {
+    }> = ({ item }) => {
       return <ThirdpartyAvatar {...item} />
     }
 
-    const {navigateWithTrip} = useNavigate()
+    const { navigateWithTrip } = useNavigate()
     const handleInputPress = useCallback(() => {
       console.log(`handleInputPress navigateWithTrip to [TodoNote]`)
-      navigateWithTrip('AccomodationNote', {accomodationId: item?.id})
+      navigateWithTrip('AccomodationNote', { accomodationId: item?.id })
     }, [item, navigateWithTrip])
 
     return item ? (
@@ -105,7 +107,7 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
           data={roomDetailData}
           renderItem={renderDetailListItem}
           keyExtractor={item => item.title}
-          style={{flexGrow: 0}}
+          style={{ flexGrow: 0 }}
         />
         <Divider />
         <SectionHeader>숙소 정보 더 보기</SectionHeader>

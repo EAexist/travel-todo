@@ -32,6 +32,8 @@ import Config from '../config'
 import { useStores } from '../models'
 import { MainTabNavigator, MainTabParamList } from './MainTabNavigator'
 import { navigationRef, useBackButtonHandler } from './navigationUtilities'
+import { CreateReservationScreen } from '@/screens/Reservation/Create/CreateReservationScreen'
+import { CreateReservationFromTextScreen } from '@/screens/Reservation/Create/CreateReservationFromTextScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -48,13 +50,15 @@ import { navigationRef, useBackButtonHandler } from './navigationUtilities'
  */
 export type TripStackProps = { tripId: string }
 export type TodoStackProps = TripStackProps & { todoId: string }
+export type ReservationStackProps = TripStackProps & { reservationId: string }
+
 export type FlightSettingStackProps = TodoStackProps & {
   callerName: 'TodolistSetting' | 'TodolistAdd'
 }
 
 export type AppStackParamList = {
   /* Common */
-  Loading: { texts?: string[]; onProblem?: () => void }
+  Loading: { pendingIndicatorTitle?: string[]; onProblem?: () => void }
   RequireConnection: { title?: string }
 
   Login: {}
@@ -90,15 +94,39 @@ export type AppStackParamList = {
   AccomodationNote: TripStackProps & { accomodationId: string }
   CreateAccomodation: TripStackProps
 
-  //   Reservation: TripStackProps & {reservationId: string}
+  /* Reservation */
+  DeleteReservation: TripStackProps
+  CreateReservation: TripStackProps
+  CreateReservationFromText: TripStackProps
+  ConfirmReservationFromText: TripStackProps & { reservationIdList: string[] }
+  NotFoundReservationFromText: TripStackProps
   FullScreenImage: TripStackProps & {
     reservationId: string
     localAppStorageFileUri: string
   }
 
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
-} & TodoAppStackParamList
+} & TodoAppStackParamList &
+  ReservationAppStackParamList
 
+export type ReservationAppStackParamList = {
+  /* Create Reservation */
+  Reservation: ReservationStackProps
+  CreateCustomReservation: ReservationStackProps
+  EditReservation: ReservationStackProps
+  EditReservationLink: ReservationStackProps
+  //   CreateFlightBookingReservation: ReservationStackProps & {
+  //     isInitializing: boolean
+  //   }
+  //   CreateFlightTicketReservation: ReservationStackProps & {
+  //     isInitializing: boolean
+  //   }
+
+  /* Edit Reservation */
+  //   EditReservationTitle: ReservationStackProps
+  //   ReservationLink: ReservationStackProps
+  //   EditReservation: ReservationStackProps
+}
 export type TodoAppStackParamList = {
   /* Confirm */
   //   ConfirmReservationTodo: TodoStackProps
@@ -218,6 +246,64 @@ const AppStack = observer(function AppStack() {
           name="TodolistDelete"
           component={Screens.Todolist.Delete}
         />
+      </Stack.Group>
+      <Stack.Group>
+        <Stack.Screen
+          name="CreateReservation"
+          component={CreateReservationScreen}
+        />
+        <Stack.Screen
+          name="Reservation"
+          component={Screens.Reservation.Detail}
+        />
+        <Stack.Screen
+          name="CreateReservationFromText"
+          component={Screens.Reservation.Create.FromText}
+        />
+        <Stack.Screen
+          name="ConfirmReservationFromText"
+          component={Screens.Reservation.Create.Confirm}
+        />
+        <Stack.Screen
+          name="NotFoundReservationFromText"
+          component={Screens.Reservation.Create.NotFound}
+        />
+        <Stack.Screen
+          name="CreateCustomReservation"
+          component={Screens.Reservation.Create.Custom}
+        />
+        <Stack.Screen
+          name="EditReservation"
+          component={Screens.Reservation.Edit}
+        />
+        <Stack.Screen
+          name="EditReservationLink"
+          component={Screens.Reservation.EditLink}
+        />
+        <Stack.Screen
+          name="EditReservationNote"
+          component={Screens.Reservation.EditNote}
+        />
+        <Stack.Screen
+          name="DeleteReservation"
+          component={Screens.Reservation.Delete}
+        />
+        {/* <Stack.Screen
+          name="CreateAccomodationReservation"
+          component={Screens.Reservation.Create.Accomodation}
+        /> */}
+        {/* <Stack.Screen
+          name="CreateFlightBookingReservation"
+          component={Screens.Reservation.Create.FlightBooking}
+        />
+        <Stack.Screen
+          name="CreateFlightTicketReservation"
+          component={Screens.Reservation.Create.FlightTicket}
+        /> */}
+        {/* <Stack.Screen
+          name="EditReservation"
+          component={EditReservationScreen}
+        /> */}
       </Stack.Group>
       <Stack.Screen
         name="ConfirmPassport"

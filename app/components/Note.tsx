@@ -1,14 +1,40 @@
-import {ControlledInput} from '@/components/Input'
-import ListSubheader from '@/components/ListSubheader'
-import {Dispatch, SetStateAction, useEffect, useState} from 'react'
-import {View} from 'react-native'
-import * as Fab from '@/components/Fab'
+import { ControlledInput } from '@/components/Input'
+import { InputProps } from '@rneui/themed'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { View } from 'react-native'
 
-interface NoteProps {
+interface _NoteProps extends InputProps {
+  onChangeText: (value: string) => void
+}
+
+export const Note_ = ({ ref, ...props }: _NoteProps) => {
+  return (
+    <View
+      style={{
+        flexShrink: 1,
+      }}>
+      <ControlledInput
+        multiline
+        numberOfLines={24}
+        containerStyle={{ flexShrink: 1 }}
+        inputContainerStyle={{
+          flexShrink: 1,
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}
+        ref={ref}
+        {...props}
+      />
+    </View>
+  )
+}
+
+interface NoteProps extends InputProps {
   initialValue?: string
-  onChangeNote?: (note: string) => void
   isFocused?: boolean
   setIsFocused?: Dispatch<SetStateAction<boolean>>
+  setValue?: Dispatch<SetStateAction<string>>
+  onChangeText: (value: string) => void
 }
 
 export const Note = ({
@@ -16,6 +42,7 @@ export const Note = ({
   initialValue,
   isFocused,
   setIsFocused,
+  ...props
 }: NoteProps) => {
   const [value, setValue] = useState(initialValue)
   const [_isFocused, _setIsFocused] = useState(false)
@@ -37,7 +64,6 @@ export const Note = ({
       style={{
         flexShrink: 1,
       }}>
-      <ListSubheader title={'메모'} />
       <ControlledInput
         setValue={setValue}
         value={value}
@@ -58,12 +84,13 @@ export const Note = ({
         }}
         multiline
         numberOfLines={24}
-        containerStyle={{flexShrink: 1}}
+        containerStyle={{ flexShrink: 1 }}
         inputContainerStyle={{
           flexShrink: 1,
           flexDirection: 'column',
           alignItems: 'stretch',
         }}
+        {...props}
       />
     </View>
   )

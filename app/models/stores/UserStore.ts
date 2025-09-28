@@ -108,7 +108,7 @@ export const UserStoreModel = types
         if (response.kind == 'ok') {
           store.login(response.data)
         }
-        return response.kind
+        return response
       })
     },
   }))

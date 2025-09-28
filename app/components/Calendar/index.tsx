@@ -1,14 +1,14 @@
-import {Calendar} from '@/components/Calendar'
-import {TransText} from '@/components/TransText'
-import {useTripStore} from '@/models'
+import { Calendar } from '@/components/Calendar'
+import { TransText } from '@/components/TransText'
+import { useTripStore } from '@/models'
 import {
   DateInterval,
   getNightsParsed,
   toCalendarString,
   toLocaleDateMonthString,
 } from '@/utils/date'
-import {Text, useTheme} from '@rneui/themed'
-import {eachDayOfInterval} from 'date-fns'
+import { Text, useTheme } from '@rneui/themed'
+import { eachDayOfInterval } from 'date-fns'
 import {
   Dispatch,
   FC,
@@ -17,16 +17,16 @@ import {
   useEffect,
   useState,
 } from 'react'
-import {TextStyle, View, ViewStyle} from 'react-native'
-import {DateData} from 'react-native-calendars'
-import {MarkedDates} from 'react-native-calendars/src/types'
+import { TextStyle, View, ViewStyle } from 'react-native'
+import { DateData } from 'react-native-calendars'
+import { MarkedDates } from 'react-native-calendars/src/types'
 
-export const ScheduleText: FC<{startDate?: Date; endDate?: Date}> = ({
+export const ScheduleText: FC<{ startDate?: Date; endDate?: Date }> = ({
   startDate,
   endDate,
 }) => {
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
 
   return (
@@ -34,12 +34,12 @@ export const ScheduleText: FC<{startDate?: Date; endDate?: Date}> = ({
       <TransText style={$scheduleTextStyle} disabled={!startDate}>
         {toLocaleDateMonthString(startDate) || '떠나는 날'}
       </TransText>
-      <Text style={{...$scheduleTextStyle, opacity: 0.5}}>{' - '}</Text>
+      <Text style={{ ...$scheduleTextStyle, opacity: 0.5 }}>{' - '}</Text>
       <TransText style={$scheduleTextStyle} disabled={!endDate}>
         {toLocaleDateMonthString(endDate) || '돌아오는 날'}
       </TransText>
       {'  '}
-      <TransText style={{...$nightsTextStyle, color: colors.text.secondary}}>
+      <TransText style={{ ...$nightsTextStyle, color: colors.text.secondary }}>
         {startDate && endDate && getNightsParsed(startDate, endDate)}
       </TransText>
     </View>
@@ -76,7 +76,7 @@ export const ScheduleViewerCalendar = (
     // console.log(`markedDates: ${Object.entries(markedDates)}`)
     setMarkedDates(() => {
       const intervalDays =
-        start && end && eachDayOfInterval({start, end}).slice(1, -1)
+        start && end && eachDayOfInterval({ start, end }).slice(1, -1)
       const o: MarkedDates = {}
       if (start) {
         o[toCalendarString(start)] = {
@@ -85,11 +85,11 @@ export const ScheduleViewerCalendar = (
         }
       }
       if (end) {
-        o[toCalendarString(end)] = {endingDay: true}
+        o[toCalendarString(end)] = { endingDay: true }
       }
       if (intervalDays) {
         intervalDays.forEach(date => {
-          o[toCalendarString(date)] = {selected: true}
+          o[toCalendarString(date)] = { selected: true }
         })
       }
       return o
@@ -142,15 +142,15 @@ export const ScheduleSettingCalendar = ({
     (dateData: DateData) => {
       const date = new Date(dateData.dateString)
       if (dateInterval.end) {
-        setDateInterval(() => ({start: date, end: undefined}))
+        setDateInterval(() => ({ start: date, end: undefined }))
       } else if (dateInterval.start) {
         if (date > dateInterval.start) {
-          setDateInterval(dateInterval => ({...dateInterval, end: date}))
+          setDateInterval(dateInterval => ({ ...dateInterval, end: date }))
         } else {
-          setDateInterval(() => ({start: date, end: undefined}))
+          setDateInterval(() => ({ start: date, end: undefined }))
         }
       } else {
-        setDateInterval(dateInterval => ({...dateInterval, start: date}))
+        setDateInterval(dateInterval => ({ ...dateInterval, start: date }))
       }
     },
     [dateInterval.start, dateInterval.end, setDateInterval],
@@ -171,7 +171,7 @@ export const ScheduleSettingCalendar = ({
     // console.log(`markedDates: ${Object.entries(markedDates)}`)
     setMarkedDates(() => {
       const intervalDays =
-        start && end && eachDayOfInterval({start, end}).slice(1, -1)
+        start && end && eachDayOfInterval({ start, end }).slice(1, -1)
       const o: MarkedDates = {}
       if (start) {
         o[toCalendarString(start)] = {
@@ -180,11 +180,11 @@ export const ScheduleSettingCalendar = ({
         }
       }
       if (end) {
-        o[toCalendarString(end)] = {endingDay: true}
+        o[toCalendarString(end)] = { endingDay: true }
       }
       if (intervalDays) {
         intervalDays.forEach(date => {
-          o[toCalendarString(date)] = {selected: true}
+          o[toCalendarString(date)] = { selected: true }
         })
       }
       return o
@@ -206,11 +206,11 @@ export const ScheduleSettingCalendar = ({
 //   const tripStore = useTripStore()
 
 //   const [dateInterval, setDateInterval] = useState<DateInterval>({
-//     start: tripStore.startDateISOString
-//       ? new Date(tripStore.startDateISOString)
+//     start: tripStore.startDateIsoString
+//       ? new Date(tripStore.startDateIsoString)
 //       : undefined,
-//     end: tripStore.endDateISOString
-//       ? new Date(tripStore.endDateISOString)
+//     end: tripStore.endDateIsoString
+//       ? new Date(tripStore.endDateIsoString)
 //       : undefined,
 //   })
 

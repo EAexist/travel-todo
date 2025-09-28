@@ -1,21 +1,21 @@
-import {Avatar} from '@/components/Avatar'
+import { Avatar } from '@/components/Avatar'
 import * as Fab from '@/components/Fab'
-import {ListItemBase} from '@/components/ListItem'
-import {Screen} from '@/components/Screen'
-import {TransText} from '@/components/TransText'
-import {useStores, useTripStore} from '@/models'
-import {Accomodation} from '@/models/Accomodation'
-import {useNavigate} from '@/navigators'
-import {toCalendarString} from '@/utils/date'
+import { ListItemBase } from '@/components/ListItem'
+import { Screen } from '@/components/Screen'
+import { TransText } from '@/components/TransText'
+import { useStores, useTripStore } from '@/models'
+import { Accomodation } from '@/models/Reservation/Accomodation'
+import { useNavigate } from '@/navigators'
+import { toCalendarString } from '@/utils/date'
 import {
   $headerCenterTitleContainerStyle,
   HeaderCenterTitle,
   useHeader,
 } from '@/utils/useHeader'
-import {Trans} from '@lingui/react/macro'
-import {ListItem, Text, useTheme} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {FC, useCallback, useEffect} from 'react'
+import { Trans } from '@lingui/react/macro'
+import { ListItem, Text, useTheme } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FC, useCallback, useEffect } from 'react'
 import {
   FlatList,
   ListRenderItem,
@@ -23,16 +23,16 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars'
-import {Positions} from 'react-native-calendars/src/expandableCalendar'
+import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
+import { Positions } from 'react-native-calendars/src/expandableCalendar'
 
 const AccomodationPlanCalendar: FC = () => {
   const tripStore = useTripStore()
 
   const markedDates = Object.fromEntries(
-    tripStore.calendarMarkedDateEntries.map(([k, {colorIndex, ...v}]) => [
+    tripStore.calendarMarkedDateEntries.map(([k, { colorIndex, ...v }]) => [
       k,
-      {color: $palette[colorIndex], ...v},
+      { color: $palette[colorIndex], ...v },
     ]),
   )
   useEffect(() => {
@@ -60,17 +60,17 @@ const AccomodationPlanCalendar: FC = () => {
 
 const AccomodationListItem: FC<{
   item: Accomodation
-}> = ({item}) => {
+}> = ({ item }) => {
   const tripStore = useTripStore()
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
   const handlePress = useCallback(() => {
-    navigateWithTrip('Accomodation', {accomodationId: item.id})
+    navigateWithTrip('Accomodation', { accomodationId: item.id })
   }, [])
   useEffect(() => {
     console.log(item)
   }, [])
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
   return (
     <ListItemBase
@@ -80,12 +80,12 @@ const AccomodationListItem: FC<{
         icon: {
           color: colors.white,
           ...(item.type === 'hotel'
-            ? {type: 'font-awesome-5', name: 'hotel'}
+            ? { type: 'font-awesome-5', name: 'hotel' }
             : item.type === 'airbnb'
-              ? {type: 'font-awesome-5', name: 'airbnb'}
+              ? { type: 'font-awesome-5', name: 'airbnb' }
               : item.type === 'dorm'
-                ? {type: 'material-community', name: 'bunk-bed-outline'}
-                : {type: 'material-community', name: 'bunk-bed-outline'}),
+                ? { type: 'material-community', name: 'bunk-bed-outline' }
+                : { type: 'material-community', name: 'bunk-bed-outline' }),
         },
         containerStyle: {
           backgroundColor:
@@ -93,7 +93,7 @@ const AccomodationListItem: FC<{
         },
       }}
       onPress={handlePress}
-      containerStyle={{height: 64}}
+      containerStyle={{ height: 64 }}
     />
   )
 }
@@ -103,11 +103,11 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
   const renderListItem: ListRenderItem<{
     item: Accomodation
     index: number
-  }> = ({item}) => {
+  }> = ({ item }) => {
     return <AccomodationListItem item={item.item} />
   }
 
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
   const handleAddItemPress = useCallback(() => {
     navigateWithTrip('CreateAccomodation')
   }, [])
@@ -133,7 +133,7 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
         }))}
         renderItem={renderListItem}
         keyExtractor={item => item.item.id}
-        style={{flexGrow: 0}}
+        style={{ flexGrow: 0 }}
         // contentContainerStyle={{ paddingHorizontal: 20 }}
       />
 
