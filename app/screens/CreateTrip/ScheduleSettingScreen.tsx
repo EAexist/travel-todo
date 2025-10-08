@@ -1,17 +1,17 @@
 import { Screen } from '@/components'
+import { Calendar } from '@/components/Calendar/Calendar'
+import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import {
-  $calendarContainerStyle,
-  ScheduleSettingCalendar,
   ScheduleText,
-} from '@/components/Calendar/index'
+  useScheduleSettingCalendar,
+} from '@/components/Calendar/useScheduleSettingCalendar'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { useTripStore } from '@/models'
-import { DateInterval } from '@/utils/date'
+import { DateInterval, toCalendarString } from '@/utils/date'
 import { FC, useCallback, useState } from 'react'
-import { EditScreenBaseProps } from '.'
 import { View } from 'react-native'
-import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
+import { EditScreenBaseProps } from '.'
 
 export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
   isInitialSettingScreen,
@@ -38,9 +38,9 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     })
     tripStore.setProp(
       'startDateIsoString',
-      dateInterval.start?.toIsoString() || '',
+      dateInterval.start?.toISOString() || '',
     )
-    tripStore.setProp('endDateIsoString', dateInterval.end?.toIsoString() || '')
+    tripStore.setProp('endDateIsoString', dateInterval.end?.toISOString() || '')
 
     tripStore.patch({
       id: tripStore.id,
@@ -49,55 +49,40 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     })
   }, [tripStore, dateInterval.start, dateInterval.end])
 
+  const { markedDates, onDayPress } = useScheduleSettingCalendar({
+    startDate: dateInterval.start || null,
+    endDate: dateInterval.end || null,
+    setStartDate: (date: Date | null) => {
+      setDateInterval(prev => ({ ...prev, start: date || undefined }))
+    },
+    setEndDate: (date: Date | null) => {
+      setDateInterval(prev => ({ ...prev, end: date || undefined }))
+    },
+  })
+
   return (
     <Screen>
       <ContentTitle
         title={'언제 떠나시나요?'}
         subtitle={'여행 일정을 알려주세요'}
       />
-      {/* <TextInfoListItem title={'E 날'}>
-        {
-          <TransText
-            style={{
-              ...$dateTextStyle,
-              ...(!dateInterval.end && {color: colors.text.secondary}),
-            }}>
-            {toLocaleDateMonthString(dateInterval.end) || '정하지 않음'}
-          </TransText>
-        }
-      </TextInfoListItem>
-      <TextInfoListItem title={'돌아오는 날'}>
-        {
-          <TransText
-            style={{
-              ...$dateTextStyle,
-              ...(!dateInterval.end && {color: colors.text.secondary}),
-            }}>
-            {toLocaleDateMonthString(dateInterval.end) || '정하지 않음'}
-          </TransText>
-        }
-      </TextInfoListItem> */}
-      {/* <View style={$dateContainerStyle}>
-        <TransText style={{...$dateTextStyle}}>{scheduleText}</TransText>
-      </View>
-      <View style={$calendarContainerStyle}>
-        <ScheduleSettingCalendar
-          dateInterval={dateInterval}
-          setDateInterval={setDateInterval}
-        />
-      </View> */}
       <View style={{ paddingHorizontal: 24 }}>
         <ScheduleText
           startDate={dateInterval.start}
           endDate={dateInterval.end}
         />
       </View>
-      <View style={$calendarContainerStyle}>
-        <ScheduleSettingCalendar
-          dateInterval={dateInterval}
-          setDateInterval={setDateInterval}
+      <CalendarContainer>
+        <Calendar
+          initialDate={
+            dateInterval.start && toCalendarString(dateInterval.start)
+          }
+          markingType="period"
+          markedDates={markedDates}
+          onDayPress={onDayPress}
+          theme={{}}
         />
-      </View>
+      </CalendarContainer>
       <Fab.Container>
         {isInitialSettingScreen ? (
           <Fab.NextButton

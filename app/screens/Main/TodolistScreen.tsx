@@ -1,4 +1,4 @@
-import { Divider } from '@rneui/themed'
+import { Divider, useTheme } from '@rneui/themed'
 import { FC, useCallback, useRef } from 'react'
 import {
   DefaultSectionT,
@@ -24,6 +24,7 @@ import { Todo } from '@/models/Todo'
 import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
 import { useMainScreenHeader } from '@/utils/useHeader'
 import { Observer, observer } from 'mobx-react-lite'
+import { Pin } from 'lucide-react-native'
 
 // const SettingsDialog: FC = ({ visible6: boolean }) => {
 //   return (
@@ -89,31 +90,43 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
     const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
     const handlePinButtonPress = useCallback(() => {
-      settingsMenuBottomSheetRef.current?.present()
+      tripStore.toggleTripMode()
     }, [settingsMenuBottomSheetRef])
 
     const handleSettingsButtonPress = useCallback(() => {
       settingsMenuBottomSheetRef.current?.present()
     }, [settingsMenuBottomSheetRef])
 
-    useMainScreenHeader({
-      //   title: tripStore.title,
-      title: '할 일',
-      rightComponent: (
-        <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            onPress={handleSettingsButtonPress}
-            style={$headerRightButtonStyle}>
-            <HeaderIcon name="pin" type="octicon" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handlePinButtonPress}
-            style={$headerRightButtonStyle}>
-            <HeaderIcon name="gear" type="octicon" />
-          </TouchableOpacity>
-        </View>
-      ),
-    })
+    const {
+      theme: { colors },
+    } = useTheme()
+
+    useMainScreenHeader(
+      {
+        //   title: tripStore.title,
+        title: '할 일',
+        rightComponent: (
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              //   onPress={handlePinButtonPress}
+              disabled
+              style={$headerRightButtonStyle}>
+              {tripStore.isTripMode ? (
+                <Pin />
+              ) : (
+                <Pin fill={colors.text.primary} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSettingsButtonPress}
+              style={$headerRightButtonStyle}>
+              <HeaderIcon name="gear" type="octicon" />
+            </TouchableOpacity>
+          </View>
+        ),
+      },
+      [tripStore.isTripMode],
+    )
 
     const settingsOption: NavigateMenuData[] = [
       {
@@ -149,7 +162,7 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
           {tripStore.completedTrip.length > 0 && (
             <View>
               <Divider />
-              <SectionHeader>완료했어요</SectionHeader>
+              <SectionHeader>완료한 할 일</SectionHeader>
               <SectionList
                 sections={tripStore.completedTrip}
                 keyExtractor={item => item.id}

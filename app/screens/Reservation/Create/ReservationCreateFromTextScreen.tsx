@@ -17,8 +17,8 @@ import {
 } from 'react'
 import { TextInput } from 'react-native'
 
-export const CreateReservationFromTextScreen: FC<
-  AppStackScreenProps<'CreateReservationFromText'>
+export const ReservationCreateFromTextScreen: FC<
+  AppStackScreenProps<'ReservationCreateFromText'>
 > = () => {
   const { createReservationFromTextWithApiStatus } = useActionsWithApiStatus()
 
@@ -33,20 +33,20 @@ export const CreateReservationFromTextScreen: FC<
 
   const isTextTooShort = value.length < 10
 
-  const handlePressCreateReservationButton = useCallback(async () => {
+  const handlePressReservationCreateButton = useCallback(async () => {
     setIsTextChanged(false)
     if (!isTextTooShort) {
       //   const response = await reservationStore.createFromText(value)
       const { kind, data: reservationIdList } =
         await createReservationFromTextWithApiStatus({
           args: value,
-          onSuccess: () => navigateWithTrip('ConfirmReservationFromText'),
+          onSuccess: () => navigateWithTrip('ReservationConfirmFromText'),
         })
       //   if (kind === 'ok') {
       //     if (reservationIdList && reservationIdList?.length > 0) {
-      //       navigateWithTrip('ConfirmReservationFromText', { reservationIdList })
+      //       navigateWithTrip('ReservationConfirmFromText', { reservationIdList })
       //     } else {
-      //       navigateWithTrip('NotFoundReservationFromText')
+      //       navigateWithTrip('ReservationNotFoundFromText')
       //     }
       //   }
     }
@@ -79,7 +79,7 @@ export const CreateReservationFromTextScreen: FC<
   return (
     <Screen>
       <ContentTitle
-        title={'예약 관리하기'}
+        // title={'새 예약'}
         subtitle={
           '알림톡, 이메일, 또는 웹사이트에서\n예약 내역 글 전체를 복사해 붙여넣은 후\n확인 버튼을 눌러주세요.'
         }
@@ -102,7 +102,7 @@ export const CreateReservationFromTextScreen: FC<
       />
       <Fab.Container>
         <Fab.Button
-          onPress={handlePressCreateReservationButton}
+          onPress={handlePressReservationCreateButton}
           disabled={isTextTooShort}
           title={isTextTooShort ? '10자 이상 입력해주세요' : '예약 추가하기'}
         />

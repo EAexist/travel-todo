@@ -63,7 +63,7 @@ export const TodolistDeleteScreen = observer(() => {
         {tripStore.completedTrip.length > 0 && (
           <View style={{ paddingBottom: 24 }}>
             <Divider />
-            <SectionHeader>완료했어요</SectionHeader>
+            <SectionHeader>완료한 할 일</SectionHeader>
             <SectionList
               sections={tripStore.deleteFlaggedCompletedTrip}
               keyExtractor={keyExtractor}

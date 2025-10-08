@@ -7,13 +7,15 @@ import { Reservation } from '@/models/Reservation/Reservation'
 import { ListItem } from '@rneui/themed'
 import * as WebBrowser from 'expo-web-browser'
 import { observer } from 'mobx-react-lite'
+import { useStores, useTripStore } from '@/models'
 
 export const ReservationListItem: FC<{ reservation: Reservation }> = observer(
   ({ reservation }) => {
     const { navigateWithTrip } = useNavigate()
+    const tripStore = useTripStore()
 
     const handlePress = useCallback(async () => {
-      if (reservation.primaryHrefLink) {
+      if (tripStore.isTripMode && reservation.primaryHrefLink) {
         await WebBrowser.openBrowserAsync(reservation.primaryHrefLink)
       } else {
         navigateWithTrip('Reservation', {

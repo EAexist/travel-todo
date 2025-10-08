@@ -18,6 +18,7 @@ declare module '@rneui/themed' {
     active: string
     inactive: string
     secondaryBg: string
+    palette: string[]
   }
   export interface ListItemProps {
     dense?: boolean
@@ -32,6 +33,9 @@ declare module '@rneui/themed' {
   }
   export interface InputProps {
     primary?: boolean
+  }
+  export interface AvatarProps {
+    avatarSize: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | number
   }
   // export interface ListItemInputProps {
   //     primary?: boolean

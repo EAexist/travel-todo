@@ -8,7 +8,7 @@ import { withReservation } from '@/utils/withReservation'
 import { useCallback, useState } from 'react'
 import { ViewStyle } from 'react-native'
 
-export const EditReservationLinkScreen = withReservation<'EditReservationLink'>(
+export const ReservationLinkEditScreen = withReservation<'ReservationLinkEdit'>(
   ({ reservation }) => {
     const { reservationStore } = useStores()
 

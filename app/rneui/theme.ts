@@ -186,12 +186,31 @@ const colorTheme = createTheme({
     grey1: '#D1D6DB',
     divider: '#F2F4F6',
     transparent: 'transparent',
+    palette: [
+      // '#9BF6FF',
+      '#A0C4FF',
+      '#BDB2FF',
+      '#FFC6FF',
+      '#FFADAD',
+      '#FFD6A5',
+      '#FDFFB6',
+      '#CAFFBF',
+    ],
   },
 })
 
 const theme = createTheme({
   ...colorTheme,
   components: {
+    Switch: (_, { colors }) => ({
+      trackColor: {
+        false: colors.inactive,
+        true: colors.light1,
+      },
+      style: {
+        height: 24,
+      },
+    }),
     SectionCard: () => ({
       containerStyle: {
         // marginHorizontal: 10,
@@ -210,34 +229,39 @@ const theme = createTheme({
         ...(props.rounded
           ? {}
           : {
-              borderRadius: 10,
+              borderRadius: props.avatarSize === 'xsmall' ? 5 : 10,
             }),
-        ...(props.size === 'small'
+        ...(props.avatarSize === 'xsmall'
           ? {
-              width: 32,
-              height: 32,
+              width: 24,
+              height: 24,
             }
-          : props.size === 'medium'
+          : props.avatarSize === 'small'
             ? {
-                width: 40,
-                height: 40,
+                width: 32,
+                height: 32,
               }
-            : props.size === 'large'
+            : props.avatarSize === 'medium'
               ? {
                   width: 40,
                   height: 40,
                 }
-              : props.size === 'xlarge'
+              : props.avatarSize === 'large'
                 ? {
-                    width: 60,
-                    height: 60,
+                    width: 40,
+                    height: 40,
                   }
-                : props.size
+                : props.avatarSize === 'xlarge'
                   ? {
-                      width: props.size + 36,
-                      height: props.size + 36,
+                      width: 60,
+                      height: 60,
                     }
-                  : {}),
+                  : props.avatarSize
+                    ? {
+                        width: props.avatarSize + 24,
+                        height: props.avatarSize + 24,
+                      }
+                    : {}),
         // min-width: 32,
         // min-height: 32,
       },
@@ -433,14 +457,17 @@ const theme = createTheme({
             color: colors.text?.secondary,
           },
     }),
-    Divider: ({ inset }, { colors }) =>
-      inset
+    Divider: ({ width }, { colors }) =>
+      width
         ? {
+            // inset: true,
             insetType: 'middle',
-            color: colors.black,
-            width: 1,
+            color: colors.text.primary,
+            width: width,
             style: {
               opacity: 0.5,
+              marginVertical: 8,
+              marginHorizontal: 16,
             },
           }
         : {

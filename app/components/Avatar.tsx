@@ -7,14 +7,16 @@ import { PropsWithChildren } from 'react'
 import { StyleSheet } from 'react-native'
 import { Icon, IconProps } from '@/components/Icon'
 
-export interface AvatarProps extends RNEAvatarProps {
+export interface AvatarProps extends Omit<RNEAvatarProps, 'avatarSize'> {
   fontSize?: number
+  avatarSize?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | number
 }
 
 export const Avatar = ({
   children,
   icon,
-  size = 'small',
+  avatarSize = 'small',
+  size,
   ...props
 }: PropsWithChildren<AvatarProps>) => {
   let iconProps: Partial<RNEAvatarProps>
@@ -27,15 +29,17 @@ export const Avatar = ({
             style={{
               ...styles.titleStyle,
               fontSize:
-                size === 'small'
-                  ? 18
-                  : size === 'medium'
-                    ? 24
-                    : size === 'large'
-                      ? 28
-                      : size === 'xlarge'
-                        ? 32
-                        : size,
+                avatarSize === 'xsmall'
+                  ? 16
+                  : avatarSize === 'small'
+                    ? 18
+                    : avatarSize === 'medium'
+                      ? 24
+                      : avatarSize === 'large'
+                        ? 28
+                        : avatarSize === 'xlarge'
+                          ? 32
+                          : avatarSize,
             }}>
             {icon?.name}
           </Text>
@@ -54,7 +58,7 @@ export const Avatar = ({
       break
   }
   return (
-    <RNEAvatar size={size} {...iconProps} {...props}>
+    <RNEAvatar avatarSize={avatarSize} {...iconProps} {...props}>
       {children}
     </RNEAvatar>
   )

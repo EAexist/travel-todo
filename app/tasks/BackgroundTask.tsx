@@ -28,12 +28,12 @@ export enum APIAction {
   DELETE_TODO,
   CREATE_DESTINATION,
   DELETE_DESTINATION,
-  CREATE_ACCOMODATION,
-  PATCH_ACCOMODATION,
-  DELETE_ACCOMODATION,
   CREATE_RESERVATION,
   PATCH_RESERVATION,
   DELETE_RESERVATION,
+  //   CREATE_ACCOMODATION,
+  //   PATCH_ACCOMODATION,
+  //   DELETE_ACCOMODATION,
 }
 
 interface AsyncAPIWriteAction {
@@ -114,7 +114,7 @@ const backgroundTask_sync_db = async () => {
   try {
     const now = Date.now()
     console.log(
-      `Got background task call at date: ${new Date(now).toIsoString()}`,
+      `Got background task call at date: ${new Date(now).toISOString()}`,
     )
     const apiActionQueue = getAPIActionQueue() || []
 
@@ -141,16 +141,6 @@ const backgroundTask_sync_db = async () => {
           case APIAction.DELETE_DESTINATION:
             api.deleteDestination(data as DeleteDestinationProps)
 
-          /* Accomodation CRUD */
-          case APIAction.CREATE_ACCOMODATION:
-            api.createAccomodation(data as string)
-          case APIAction.PATCH_ACCOMODATION:
-            api.patchAccomodation(data as CreateAccomodationProps)
-          case APIAction.DELETE_ACCOMODATION:
-            api.deleteAccomodation(data as DeleteAccomodationProps)
-          default:
-            break
-
           /* Reservation CRUD */
           case APIAction.CREATE_RESERVATION:
             api.createReservation(data as CreateReservationProps)
@@ -158,6 +148,17 @@ const backgroundTask_sync_db = async () => {
             api.patchReservation(data as CreateReservationProps)
           case APIAction.DELETE_RESERVATION:
             api.deleteReservation(data as DeleteReservationProps)
+
+          /* Accomodation CRUD */
+          //   case APIAction.CREATE_ACCOMODATION:
+          //     api.createAccomodation(data as string)
+          //   case APIAction.PATCH_ACCOMODATION:
+          //     api.patchAccomodation(data as CreateAccomodationProps)
+          //   case APIAction.DELETE_ACCOMODATION:
+          //     api.deleteAccomodation(data as DeleteAccomodationProps)
+
+          default:
+            break
         }
       } catch (error) {
         console.error('Failed to execute api call:', error)

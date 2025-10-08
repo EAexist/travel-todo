@@ -202,7 +202,7 @@ export const TodoModel = types
   }))
   .actions(item => ({
     complete() {
-      item.setProp('completeDateIsoString', new Date().toIsoString())
+      item.setProp('completeDateIsoString', new Date().toISOString())
     },
     setIncomplete() {
       //   item.setProp('completeDateIsoString', '')

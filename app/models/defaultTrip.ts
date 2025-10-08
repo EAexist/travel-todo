@@ -1,12 +1,12 @@
-import {TodoSnapshotIn} from './Todo'
-import {TripStoreSnapshot} from './TripStore'
+import { TodoSnapshotIn } from './Todo'
+import { TripStoreSnapshot } from './TripStore'
 
-const preset: {[id: string]: TodoSnapshotIn} = {
+const preset: { [id: string]: TodoSnapshotIn } = {
   '1': {
     id: '1',
     type: 'accomodation',
     category: 'reservation',
-    title: '숙소 예약',
+    title: '숙박 예약',
     iconId: '🛌',
     note: '',
     isFlaggedToDelete: true,
@@ -109,7 +109,7 @@ export const defaultTrip = {
     reservation: [],
     foreign: [],
     goods: [],
-  } as {[cateogry: string]: string[]},
+  } as { [cateogry: string]: string[] },
   preset: Object.keys(preset).map(id => ({
     isFlaggedToAdd: true,
     item: id,

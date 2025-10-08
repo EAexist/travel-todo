@@ -79,7 +79,7 @@ export const LoadingScreenBase: FC<{
       case ApiStatus.ERROR:
         title = '오류가 발생했어요'
         subtitle = '다시 시도해 주세요.'
-        activityIndicator = <Icon name="😫" size={36} />
+        activityIndicator = <Icon name="😫" type="tossface" size={36} />
         fabTitle = '확인'
         onPressFab = handleError
         break

@@ -1,17 +1,17 @@
 import { withReservation } from '@/utils/withReservation'
-import { EditReservationScreenBase } from '../Edit/EditReservationScreenBase'
+import { ReservationEditScreenBase } from '../Edit/ReservationEditScreenBase'
 
-const CreateCustomReservationListScreen =
-  withReservation<'CreateCustomReservation'>(({ reservation }) => {
+const CustomReservationCreateListScreen =
+  withReservation<'CustomReservationCreate'>(({ reservation }) => {
     return (
-      <EditReservationScreenBase
+      <ReservationEditScreenBase
         reservation={reservation}
         isBeforeInitialization={true}
       />
     )
   })
 
-export const Custom = CreateCustomReservationListScreen
-export { CreateReservationFromTextScreen as FromText } from './CreateReservationFromTextScreen'
-export { NotFoundReservationFromText as NotFound } from './NotFoundReservationFromText'
-export { ConfirmReservationFromTextScreen as Confirm } from './ConfirmReservationFromTextScreen'
+export const Custom = CustomReservationCreateListScreen
+export { ReservationCreateFromTextScreen as FromText } from './ReservationCreateFromTextScreen'
+export { ReservationNotFoundFromText as NotFound } from './ReservationNotFoundFromText'
+export { ReservationConfirmFromTextScreen as Confirm } from './ReservationConfirmFromTextScreen'

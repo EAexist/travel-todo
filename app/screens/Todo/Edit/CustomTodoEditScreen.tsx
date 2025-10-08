@@ -124,7 +124,7 @@ export const CustomTodoEditScreen: FC<{
           />
           {/* <RNEAvatar.Accessory
                   iconProps={{name: 'check'}}
-                  size={20}
+                  avatarSize={20}
                   style={{
                     bottom: -20,
                     right: -20,
@@ -206,7 +206,7 @@ export const CustomTodoEditScreen: FC<{
             <Observer
               render={() => (
                 <TouchableOpacity onPress={handleIconPress}>
-                  <Avatar icon={todo.icon} size={'xlarge'} />
+                  <Avatar icon={todo.icon} avatarSize={'xlarge'} />
                 </TouchableOpacity>
               )}
             />
@@ -258,7 +258,7 @@ export const CustomTodoEditScreen: FC<{
               paddingBottom: 24,
               alignItems: 'center',
             }}>
-            <Avatar icon={icon} size={64} rounded={true} />
+            <Avatar icon={icon} avatarSize={64} rounded={true} />
           </View>
           <FlatList
             data={iconMenu}

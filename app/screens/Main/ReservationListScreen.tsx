@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from 'react'
+import { FC, useCallback, useRef, useState } from 'react'
 import {
   DefaultSectionT,
   ScrollView,
@@ -10,7 +10,7 @@ import {
 //
 import ListSubheader from '@/components/ListSubheader'
 import { Screen } from '@/components/Screen'
-import { useStores } from '@/models'
+import { useStores, useTripStore } from '@/models'
 import { useNavigate } from '@/navigators'
 // import BottomSheet from '@gorhom/bottom-sheet'
 import BottomSheetModal from '@/components/BottomSheetModal'
@@ -22,18 +22,23 @@ import {
 import { Reservation } from '@/models/Reservation/Reservation'
 import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
 import { useMainScreenHeader } from '@/utils/useHeader'
-import { FAB, Text } from '@rneui/themed'
+import { Divider, FAB, Icon, Switch, Text } from '@rneui/themed'
 import { observer, Observer } from 'mobx-react-lite'
 import { ReservationListItem } from './ReservationListItem'
+import { ListItem } from '@rneui/themed'
+import { Pin } from 'lucide-react-native'
+import { useTheme } from '@rneui/themed'
+import { ListItemCaption } from '@/components/ListItemCaption'
 
 export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
   observer(() => {
+    const tripStore = useTripStore()
     const { navigateWithTrip } = useNavigate()
     const rootStore = useStores()
     const { reservationStore } = rootStore
 
     const handleAddReservation = useCallback(() => {
-      navigateWithTrip('CreateReservation')
+      navigateWithTrip('ReservationCreate')
     }, [])
 
     const renderItem: SectionListRenderItem<
@@ -52,7 +57,9 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
     )
 
     /* Menu */
-    const handlePinButtonPress = useCallback(() => {}, [])
+    const handlePinButtonPress = useCallback(() => {
+      tripStore.toggleTripMode()
+    }, [])
 
     const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
@@ -63,18 +70,18 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
     const settingsOption: NavigateMenuData[] = [
       {
         title: '예약 추가',
-        path: 'CreateReservation',
+        path: 'ReservationCreate',
         icon: { name: 'add', type: 'material' },
         primary: true,
       },
       {
         title: '예약 편집',
-        path: 'CreateReservation',
+        path: 'ReservationEditList',
         icon: { name: 'edit', type: 'material' },
       },
       {
         title: '예약 삭제',
-        path: 'DeleteReservation',
+        path: 'ReservationDelete',
         icon: { name: 'delete', type: 'material' },
       },
       // {
@@ -84,24 +91,44 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
       // },
     ]
 
-    useMainScreenHeader({
-      //   title: tripStore.title,
-      title: '내 예약',
-      rightComponent: (
-        <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            onPress={handlePinButtonPress}
-            style={$headerRightButtonStyle}>
-            <HeaderIcon name="pin" type="octicon" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSettingsButtonPress}
-            style={$headerRightButtonStyle}>
-            <HeaderIcon name="gear" type="octicon" />
-          </TouchableOpacity>
-        </View>
-      ),
-    })
+    const tripModeHelpBottomSheetRef = useRef<BottomSheetModal>(null)
+
+    const {
+      theme: { colors },
+    } = useTheme()
+
+    useMainScreenHeader(
+      {
+        //   title: tripStore.title,
+        title: '내 예약',
+        rightComponent: (
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              //   onPress={handlePinButtonPress}
+              disabled
+              style={$headerRightButtonStyle}>
+              {tripStore.isTripMode ? (
+                <Pin fill={colors.text.primary} />
+              ) : (
+                <Pin />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSettingsButtonPress}
+              style={$headerRightButtonStyle}>
+              <HeaderIcon name="gear" type="octicon" />
+            </TouchableOpacity>
+          </View>
+        ),
+      },
+      [tripStore.isTripMode],
+    )
+
+    const [showHelp, setShowHelp] = useState(false)
+
+    const handlePressHelpTravelMode = useCallback(() => {
+      setShowHelp(true)
+    }, [])
 
     return (
       <Screen>
@@ -132,7 +159,43 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
         <NavigateMenuBottomSheet
           data={settingsOption}
           ref={settingsMenuBottomSheetRef}
-        />
+          onDismiss={() => setShowHelp(false)}>
+          <Divider width={1} />
+          <ListItem>
+            <ListItem.Content>
+              <ListItem.Title>
+                {'여행 모드'}
+                <ListItemCaption>
+                  <TouchableOpacity onPress={handlePressHelpTravelMode}>
+                    <Icon
+                      name="help-outline"
+                      type="material"
+                      size={20}
+                      color={undefined}
+                    />
+                  </TouchableOpacity>
+                </ListItemCaption>
+              </ListItem.Title>
+              <ListItem.Subtitle>
+                {tripStore.isTripMode ? '사용중' : '사용 안 함'}
+              </ListItem.Subtitle>
+            </ListItem.Content>
+            <Switch
+              value={tripStore.isTripMode}
+              onValueChange={value => tripStore.setProp('isTripMode', value)}
+            />
+          </ListItem>
+          {showHelp && (
+            <Text
+              style={{ fontSize: 15, paddingHorizontal: 24, paddingTop: 12 }}>
+              여행 중 간편하게 사용할 수 있도록
+              <br />
+              1.앱을 켜면 <b>할 일</b> 대신 <b>예약</b> 페이지를 바로 열어요.
+              <br />
+              2.에약 항목을 누르면 <b>저장한 링크로 바로 연결</b>해요
+            </Text>
+          )}
+        </NavigateMenuBottomSheet>
       </Screen>
     )
   })

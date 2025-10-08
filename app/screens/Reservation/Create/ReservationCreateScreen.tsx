@@ -8,31 +8,31 @@ import { Input, ListItem } from '@rneui/themed'
 import { FC, useCallback } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
-export const CreateReservationScreen: FC<
-  AppStackScreenProps<'CreateReservation'>
-> = () => {
+export const ReservationCreateScreen: FC<
+  AppStackScreenProps<'ReservationCreate'>
+> = ({ route: { params } }) => {
   const {
     reservationStore: { createCustomReservation },
   } = useStores()
   const { navigateWithTrip } = useNavigate()
 
   const handleCreateFromText = useCallback(() => {
-    navigateWithTrip('CreateReservationFromText')
+    navigateWithTrip('ReservationCreateFromText')
   }, [])
 
   const handleCreateFromGmail = useCallback(() => {
     // navigateWithTrip('')
   }, [])
 
-  const handleCreateCustomReservation = useCallback(() => {
-    const reservation = createCustomReservation()
+  const handleCustomReservationCreate = useCallback(() => {
+    const reservation = createCustomReservation(params.defaultCategory)
     if (reservation) {
-      navigateWithTrip('CreateCustomReservation', {
+      navigateWithTrip('CustomReservationCreate', {
         reservationId: reservation?.id,
       })
     }
   }, [])
-  //   const handleCreateCustomReservation = useCallback(
+  //   const handleCustomReservationCreate = useCallback(
   //     (category: ReservationCategory) => {
   //       const reservation = createCustomReservation(category)
   //       if (reservation) {
@@ -48,7 +48,7 @@ export const CreateReservationScreen: FC<
   //             path = 'CreateFlightTicketReservation'
   //             break
   //           case 'GENERAL':
-  //             path = 'CreateCustomReservation'
+  //             path = 'CustomReservationCreate'
   //             break
   //           default:
   //             break
@@ -97,7 +97,7 @@ export const CreateReservationScreen: FC<
   //   const renderCategoryMenuItem: ListRenderItem<reservationCategoryMenuType> =
   //     useCallback(({ item }) => {
   //       return (
-  //         <ListItem onPress={() => handleCreateCustomReservation(item.category)}>
+  //         <ListItem onPress={() => handleCustomReservationCreate(item.category)}>
   //           <Avatar icon={item.icon} />
   //           <ListItem.Content>
   //             <ListItem.Title>{item.title}</ListItem.Title>
@@ -111,16 +111,13 @@ export const CreateReservationScreen: FC<
   return (
     <Screen>
       <ContentTitle
-        title={'예약 관리하기'}
-        // subtitle={
-        //   '알림톡, 이메일, 또는 웹사이트의\n예약 내역 전체를 복사해 붙여넣어주세요.'
-        // }
+        subtitle={'글에서 예약에 관한 내용만\n자동으로 정리해드려요'}
       />
       <TouchableOpacity onPress={handleCreateFromText}>
         <Input
-          containerStyle={{ marginVertical: 24 }}
+          //   containerStyle={{ marginVertical: 24 }}
           placeholder="예약 내역 붙여넣기"
-          label="글에서 예약에 관한 내용만 자동으로 정리해드려요"
+          //   label="글에서 예약에 관한 내용만 자동으로 정리해드려요"
         />
       </TouchableOpacity>
       <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 24 }}>
@@ -134,7 +131,7 @@ export const CreateReservationScreen: FC<
           </ListItem.Content>
           <ListItem.Chevron />
         </ListItem> */}
-        <ListItem onPress={handleCreateCustomReservation}>
+        <ListItem onPress={handleCustomReservationCreate}>
           <Avatar icon={{ name: 'edit', type: 'material' }} />
           <ListItem.Content>
             <ListItem.Title>{'직접 입력하기'}</ListItem.Title>

@@ -11,10 +11,10 @@
  */
 import { RootStore, RootStoreSnapshot } from '@/models/stores/RootStore'
 import { api } from '@/services/api'
+import { ApiStatus } from '@/utils/useApiStatus'
 import { autorun, reaction } from 'mobx'
 import { applySnapshot, IDisposer, onSnapshot } from 'mobx-state-tree'
 import * as storage from '../../utils/storage'
-import { ApiStatus } from '@/utils/useApiStatus'
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -41,14 +41,18 @@ export async function setupRootStore(rootStore: RootStore) {
     //   RootStoreModel.create({
     //     userStore: UserStoreModel.create({
     //       id: 'mocked-logged-in-user_id',
-    //       trip: ['mocked-created-trip_id'],
+    //       tripSummary: [
+    //         TripSummaryModel.create({
+    //           id: 'mocked-created-trip_id',
+    //         }),
+    //       ],
     //     }),
     //     tripStore: TripStoreModel.create({
     //       id: 'mocked-created-trip_id',
     //       isInitialized: true,
     //       title: '여행',
-    //       startDateIsoString: '2025-05-01 21:00:00',
-    //       endDateIsoString: '2025-05-06 21:00:00',
+    //       startDateIsoString: '2025-09-25 00:00:00',
+    //       endDateIsoString: '2025-10-06 00:00:00',
     //       destination: [
     //         DestinationModel.create({
     //           description: '',
@@ -57,6 +61,25 @@ export async function setupRootStore(rootStore: RootStore) {
     //           region: '간사이',
     //         }),
     //       ],
+    //     }),
+    //     reservationStore: ReservationStoreModel.create({
+    //       tripStore: 'mocked-created-trip_id',
+    //       reservation: {
+    //         'mocked-reservation-id_0': ReservationModel.create({
+    //           id: 'mocked-reservation-id_0',
+    //           accomodation: AccomodationModel.create({
+    //             checkinDateIsoString: '2025-09-25 00:00:00',
+    //             checkoutDateIsoString: '2025-09-27 00:00:00',
+    //           }),
+    //         }),
+    //         'mocked-reservation-id_1': ReservationModel.create({
+    //           id: 'mocked-reservation-id_1',
+    //           accomodation: AccomodationModel.create({
+    //             checkinDateIsoString: '2025-09-28 00:00:00',
+    //             checkoutDateIsoString: '2025-10-01 00:00:00',
+    //           }),
+    //         }),
+    //       },
     //     }),
     //   }),
     // )

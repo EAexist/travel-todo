@@ -259,13 +259,6 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = tripDTO => {
         .map(todo => todo.id?.toString())
       return acc
     }, {}),
-    accomodation: tripDTO.accomodation.reduce(
-      (acc: { [key: string]: any }, accomodation) => {
-        acc[accomodation.id.toString()] = accomodation
-        return acc
-      },
-      {},
-    ),
     destination: tripDTO.destination
       .filter(dest => dest.id != undefined)
       .map(dest => mapToDestination(dest)),

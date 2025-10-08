@@ -1,9 +1,9 @@
-import {TodoSnapshotIn} from './Todo'
+import { TodoSnapshotIn } from './Todo'
 const presetList: TodoSnapshotIn[] = [
   /* 예약 */
   {
     id: '1',
-    title: '숙소 예약',
+    title: '숙박 예약',
     iconId: '🛌',
     type: 'flight',
   },

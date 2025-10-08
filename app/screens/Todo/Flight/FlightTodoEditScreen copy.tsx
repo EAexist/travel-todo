@@ -39,7 +39,7 @@
 //           checked={isCompleted}
 //           checkedIcon="dot-circle-o"
 //           uncheckedIcon="circle-o"
-//           size={24}
+//           avatarSize={24}
 //         />
 //       }>
 //       <TransText primary={isCompleted}>

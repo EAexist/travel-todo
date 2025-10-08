@@ -1,36 +1,30 @@
-import {FC, useCallback} from 'react'
-import {ListRenderItem, ScrollView, View} from 'react-native'
-//
-import {
-  $calendarContainerStyle,
-  ScheduleText,
-  ScheduleViewerCalendar,
-} from '@/components/Calendar/index'
+import { FC, useCallback } from 'react'
+import { ListRenderItem, ScrollView } from 'react-native'
 import ListSubheader from '@/components/ListSubheader'
-import {Screen} from '@/components/Screen'
-import {useTripStore} from '@/models'
-import {Destination} from '@/models/Destination'
-import {useNavigate} from '@/navigators'
-import {toCalendarString} from '@/utils/date'
+import { Screen } from '@/components/Screen'
+import { useTripStore } from '@/models'
+import { Destination } from '@/models/Destination'
+import { useNavigate } from '@/navigators'
 import {
   $headerCenterTitleContainerStyle,
   HeaderCenterTitle,
   useHeader,
 } from '@/utils/useHeader'
-import {Divider, ListItem, Text} from '@rneui/themed'
-import {observer} from 'mobx-react-lite'
-import {CalendarProvider, ExpandableCalendar} from 'react-native-calendars'
-import {Positions} from 'react-native-calendars/src/expandableCalendar'
-import {FlatList} from 'react-native-gesture-handler'
-import {DestinationListItemBase} from '../CreateTrip/DestinationSettingScreen'
+import { Divider, ListItem } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
+import { FlatList } from 'react-native-gesture-handler'
+import { DestinationListItemBase } from '../CreateTrip/DestinationSettingScreen'
+import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
+import { ScheduleViewerCalendar } from '@/components/Calendar/ScheduleViewerCalendar'
+import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 
 export const EditTripScreen: FC<{}> = observer(({}) => {
   const tripStore = useTripStore()
-  const renderDestinationText: ListRenderItem<Destination> = ({item}) => (
+  const renderDestinationText: ListRenderItem<Destination> = ({ item }) => (
     <DestinationListItemBase item={item} />
   )
 
-  const {navigateWithTrip} = useNavigate()
+  const { navigateWithTrip } = useNavigate()
 
   const handleEditTitle = useCallback(() => {
     navigateWithTrip('EditTripTitle')
@@ -81,7 +75,7 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
         {/* <EditTripSubheader title={'일정'} path={'ScheduleSetting'} /> */}
         <ListSubheader title={'일정'} />
         <ListItem onPress={handleEditSchedule}>
-          <ListItem.Content style={{alignItems: 'stretch'}}>
+          <ListItem.Content style={{ alignItems: 'stretch' }}>
             {tripStore.startDate || tripStore.endDate ? (
               <ScheduleText
                 startDate={tripStore.startDate}
@@ -93,9 +87,9 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
           </ListItem.Content>
           <ListItem.Chevron />
         </ListItem>
-        <View style={$calendarContainerStyle}>
+        <CalendarContainer style={{ paddingHorizontal: 12 }}>
           <ScheduleViewerCalendar />
-        </View>
+        </CalendarContainer>
       </ScrollView>
     </Screen>
   )

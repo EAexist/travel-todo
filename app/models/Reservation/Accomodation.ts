@@ -1,6 +1,6 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from 'mobx-state-tree'
 import { withSetPropAction } from '../helpers/withSetPropAction'
-import { getNightsParsed } from '@/utils/date'
+import { getNightsParsed, parseDate, parseTime } from '@/utils/date'
 import { v4 as uuidv4 } from 'uuid'
 
 /**
@@ -82,21 +82,34 @@ export const AccomodationModel = types
         checkoutTimeString: item.checkoutTime?.getTime(),
       }
     },
+    get dateParsed() {
+      return item.checkinDate && item.checkoutDate
+        ? `${parseDate(item.checkinDate)} - ${parseDate(item.checkoutDate)}`
+        : null
+    },
     get checkinDateParsed() {
-      return item.checkinDate ? formatter.format(item.checkinDate) : null
-      //  ?.toLocaleDateString()
+      return parseDate(item.checkinDate)
     },
     get checkoutDateParsed() {
-      return item.checkoutDate ? formatter.format(item.checkoutDate) : null
-      // return item.checkoutDate?.toLocaleDateString()
+      return parseDate(item.checkoutDate)
+    },
+    get checkinDateTimeParsed() {
+      return item.checkinDate != null
+        ? `${parseDate(item.checkinDate)}${item.checkinStartTime ? ` ${parseTime(item.checkinStartTime)}` : ''}`
+        : null
+    },
+    get checkoutDateTimeParsed() {
+      return item.checkoutDate != null
+        ? `${parseDate(item.checkoutDate)}${item.checkoutTime ? ` ${parseTime(item.checkoutTime)}` : ''}`
+        : null
     },
     get checkinTimeParsed() {
       return item.checkinStartTime != null || item.checkinEndTime != null
-        ? `${item.checkinStartTime ? timeFormatter.format(item.checkinStartTime) : ''}~${item.checkinEndTime ? timeFormatter.format(item.checkinEndTime) : ''}`
+        ? `${parseTime(item.checkinStartTime) || ''}~${parseTime(item.checkinEndTime) || ''}`
         : null
     },
     get checkoutTimeParsed() {
-      return item.checkoutTime ? timeFormatter.format(item.checkoutTime) : null
+      return parseTime(item.checkoutTime)
     },
     get nightsParsed() {
       return item.checkinDate && item.checkoutDate
@@ -105,16 +118,6 @@ export const AccomodationModel = types
     },
   }))
 
-const formatter = new Intl.DateTimeFormat('kr', {
-  month: 'long',
-  day: 'numeric',
-})
-
-const timeFormatter = new Intl.DateTimeFormat('kr', {
-  timeStyle: 'short',
-  // hour: '2-digit',
-  // minute: '2-digit',
-})
 export type AccomodationInfoProvider = string
 
 export interface Accomodation extends Instance<typeof AccomodationModel> {}

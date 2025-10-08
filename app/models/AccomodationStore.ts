@@ -70,17 +70,21 @@ export const AccomodationStoreModel = types
     // },
   }))
   .views(store => ({
-    get orderedItems() {
+    get orderedAccomodationReservations() {
       console.log(store.accomodation.values())
       return [...store.accomodation.values()].sort(
         (a, b) => a.checkinDate.getDate() - b.checkinDate.getDate(),
       )
     },
     get indexedUniqueTitles() {
-      return [...new Set(this.orderedItems.map(item => item.title))]
+      return [
+        ...new Set(
+          this.orderedAccomodationReservations.map(item => item.title),
+        ),
+      ]
     },
     get calendarMarkedDateEntries() {
-      return this.orderedItems
+      return this.orderedAccomodationReservations
         .map(item => {
           const start = item.checkinDate
           const end = item.checkoutDate
@@ -107,7 +111,7 @@ export const AccomodationStoreModel = types
       ][]
     },
     // get accomodationListData() {
-    //   return this.orderedItems.map((item) => [[item.checkinDate, {startingDay: true }], [item.checkoutDate, {endingDay: true}]]).flat()
+    //   return this.orderedAccomodationReservations.map((item) => [[item.checkinDate, {startingDay: true }], [item.checkoutDate, {endingDay: true}]]).flat()
     // }
     // get sectionedAccomodation() {
     //   return (
