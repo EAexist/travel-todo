@@ -9,7 +9,7 @@ import { launchImageLibraryAsync } from 'expo-image-picker'
 import * as storage from '../../utils/storage'
 import { usePickIamge } from '@/utils/image'
 
-export const CreateReservationScreen = withTodo<'CreateReservation'>(
+export const ReservationCreateScreen = withTodo<'ReservationCreate'>(
   ({ todo }) => {
     const {
       reservationStore: { addFlightTicket },

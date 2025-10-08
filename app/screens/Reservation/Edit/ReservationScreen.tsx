@@ -1,5 +1,12 @@
 import { Avatar } from '@/components/Avatar'
-import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
+import BottomSheetModal, {
+  GestureHandlerRootViewWrapper,
+} from '@/components/BottomSheetModal'
+import {
+  $headerRightButtonStyle,
+  HeaderIcon,
+  RightActionButton,
+} from '@/components/Header'
 import ContentTitle, { Title } from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import { Screen } from '@/components/Screen'
@@ -15,7 +22,8 @@ import { useHeader } from '@/utils/useHeader'
 import { withReservation } from '@/utils/withReservation'
 import { Divider, ListItem, Text } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { TouchableOpacity } from 'react-native'
 import {
   FlatList,
   ListRenderItem,
@@ -23,6 +31,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
+import * as Fab from '@/components/Fab'
+import { openLinkInBrowser } from '@/utils/openLinkInBrowser'
+import { ReservationDetailListItem } from './ReservationDetailListItem'
 
 export const ReservationScreen = withReservation<'Reservation'>(
   observer(({ reservation }) => {
@@ -30,10 +41,9 @@ export const ReservationScreen = withReservation<'Reservation'>(
     const { reservationStore } = useStores()
 
     const handleLinkPress = useCallback(() => {
-      navigateWithTrip('EditReservationLink', {
-        reservationId: reservation.id,
-      })
-    }, [navigateWithTrip, reservation.id])
+      if (reservation.primaryHrefLink)
+        openLinkInBrowser(reservation.primaryHrefLink)
+    }, [reservation.primaryHrefLink])
 
     const handleBackPressBeforeNavigate = useCallback(async () => {
       reservationStore.patch(reservation as ReservationSnapshot)
@@ -44,28 +54,39 @@ export const ReservationScreen = withReservation<'Reservation'>(
     const [isLinkFocused, setIsLinkFocused] = useState(false)
 
     const renderReservationDetail: ListRenderItem<
-      Pick<ReservationDataItemType, 'title' | 'value' | 'numberOfLines'>
+      Pick<ReservationDataItemType, 'id' | 'title' | 'value' | 'numberOfLines'>
     > = useCallback(({ item }) => {
-      return (
-        <TextInfoListItem title={item.title}>
-          {item.numberOfLines ? (
-            <Text numberOfLines={item.numberOfLines}>{item.value}</Text>
-          ) : (
-            item.value
-          )}
-        </TextInfoListItem>
-      )
+      return <ReservationDetailListItem reservation={reservation} item={item} />
     }, [])
 
     const handleNavigateToEdit = useCallback(() => {
-      navigateWithTrip('EditReservation', {
+      navigateWithTrip('ReservationEdit', {
         reservationId: reservation.id,
       })
     }, [])
 
+    const confirmReservationDeleteBottomSheetModalRef =
+      useRef<BottomSheetModal>(null)
+
+    const handleDeletePress = useCallback(() => {
+      confirmReservationDeleteBottomSheetModalRef.current?.present()
+    }, [confirmReservationDeleteBottomSheetModalRef.current])
+
     useHeader({
-      rightActionTitle: '편집',
-      onRightPress: handleNavigateToEdit,
+      rightComponent: (
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            onPress={handleNavigateToEdit}
+            style={$headerRightButtonStyle}>
+            <HeaderIcon name="pencil" type="octicon" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleDeletePress}
+            style={$headerRightButtonStyle}>
+            <HeaderIcon name="trash" type="octicon" />
+          </TouchableOpacity>
+        </View>
+      ),
     })
 
     return (
@@ -75,42 +96,17 @@ export const ReservationScreen = withReservation<'Reservation'>(
             variant="listItem"
             title={reservation.title}
             icon={reservation.icon}
+            subtitle={reservation.categoryTitle}
           />
           <ScrollView>
-            <TextInfoListItem
-              onPress={handleLinkPress}
-              title={'링크'}
-              rightContent={
-                <ListItem.Chevron
-                  name={reservation.primaryHrefLink ? 'link' : 'chevron-right'}
-                />
-              }>
-              <TransText
-                primary={!reservation.primaryHrefLink}
-                numberOfLines={1}>
-                {reservation.primaryHrefLink || reservation.addLinkInstruction}
-              </TransText>
-            </TextInfoListItem>
-            {reservation.category === 'ACCOMODATION' ? (
-              <>
-                <TextInfoListItem title={'체크인'}>
-                  <TransText numberOfLines={1}>
-                    {reservation.time || '-'}
-                  </TransText>
-                </TextInfoListItem>
-                <TextInfoListItem title={'체크아웃'}>
-                  <TransText numberOfLines={1}>
-                    {reservation.time || '-'}
-                  </TransText>
-                </TextInfoListItem>
-              </>
-            ) : (
-              <TextInfoListItem title={reservation.timeDataTitle}>
-                <TransText numberOfLines={1}>
-                  {reservation.time || '-'}
-                </TransText>
-              </TextInfoListItem>
-            )}
+            <ReservationDetailListItem
+              reservation={reservation}
+              item={{ id: 'primaryHrefLink' }}
+            />
+            <ReservationDetailListItem
+              reservation={reservation}
+              item={{ id: 'time' }}
+            />
             <TextInfoListItem title={'메모'}>
               <TransText numberOfLines={2}>{reservation.note || '-'}</TransText>
             </TextInfoListItem>
@@ -125,7 +121,7 @@ export const ReservationScreen = withReservation<'Reservation'>(
                       ({ value }) => value !== null,
                     )}
                     renderItem={renderReservationDetail}
-                    keyExtractor={item => item.title}
+                    keyExtractor={item => item.id}
                   />
                 </View>
               )}
@@ -139,6 +135,18 @@ export const ReservationScreen = withReservation<'Reservation'>(
               </ListItem>
             )}
           </ScrollView>
+          <BottomSheetModal ref={confirmReservationDeleteBottomSheetModalRef}>
+            <ContentTitle title={'이 예약을 삭제할까요?'} />
+            <Fab.Container fixed={false} dense>
+              <Fab.GoBackButton
+                promiseBeforeNavigate={async () => {
+                  reservationStore.delete(reservation.id)
+                  confirmReservationDeleteBottomSheetModalRef.current?.close()
+                }}
+                title={'확인'}
+              />
+            </Fab.Container>
+          </BottomSheetModal>
         </Screen>
       </GestureHandlerRootViewWrapper>
     )

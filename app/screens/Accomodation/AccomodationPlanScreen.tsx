@@ -1,10 +1,12 @@
-import { Avatar } from '@/components/Avatar'
+import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
+import { useScheduleSettingCalendar } from '@/components/Calendar/useScheduleSettingCalendar'
+import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewerCalendar'
 import * as Fab from '@/components/Fab'
 import { ListItemBase } from '@/components/ListItem'
 import { Screen } from '@/components/Screen'
-import { TransText } from '@/components/TransText'
 import { useStores, useTripStore } from '@/models'
 import { Accomodation } from '@/models/Reservation/Accomodation'
+import { Reservation } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
 import { toCalendarString } from '@/utils/date'
 import {
@@ -12,149 +14,153 @@ import {
   HeaderCenterTitle,
   useHeader,
 } from '@/utils/useHeader'
-import { Trans } from '@lingui/react/macro'
-import { ListItem, Text, useTheme } from '@rneui/themed'
+import { useTheme } from '@rneui/themed'
+import { eachDayOfInterval } from 'date-fns'
 import { observer } from 'mobx-react-lite'
-import { FC, useCallback, useEffect } from 'react'
-import {
-  FlatList,
-  ListRenderItem,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native'
-import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars'
-import { Positions } from 'react-native-calendars/src/expandableCalendar'
+import { FC, useCallback, useEffect, useState } from 'react'
+import { FlatList } from 'react-native'
+import { ListRenderItem } from 'react-native'
+import { MarkedDates } from 'react-native-calendars/src/types'
 
-const AccomodationPlanCalendar: FC = () => {
-  const tripStore = useTripStore()
+const AccomodationPlanCalendar: FC = observer(() => {
+  const { reservationStore } = useStores()
 
-  const markedDates = Object.fromEntries(
-    tripStore.calendarMarkedDateEntries.map(([k, { colorIndex, ...v }]) => [
-      k,
-      { color: $palette[colorIndex], ...v },
-    ]),
-  )
-  useEffect(() => {
-    console.log(markedDates)
-  }, [markedDates])
-
-  return (
-    <CalendarProvider
-      date={toCalendarString(
-        tripStore.startDate ? tripStore.startDate : new Date(),
-      )}>
-      <ExpandableCalendar
-        // markedDates={markedDates}
-        initialPosition={Positions.CLOSED}
-        horizontal={false}
-        // ref={calendarRef}
-        // onCalendarToggled={onCalendarToggled}
-        // initialDate={toCalendarString(tripStore.startDate)}
-        // minDate={toCalendarString(tripStore.startDate)}
-        // maxDate={toCalendarString(tripStore.endDate)}
-      />
-    </CalendarProvider>
-  )
-}
-
-const AccomodationListItem: FC<{
-  item: Accomodation
-}> = ({ item }) => {
-  const tripStore = useTripStore()
-  const { navigateWithTrip } = useNavigate()
-  const handlePress = useCallback(() => {
-    navigateWithTrip('Accomodation', { accomodationId: item.id })
-  }, [])
-  useEffect(() => {
-    console.log(item)
-  }, [])
   const {
     theme: { colors },
   } = useTheme()
+
+  const markedDates = Object.fromEntries(
+    Object.entries(
+      reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
+    ).map(([k, { periods }]) => [
+      k,
+      {
+        periods: periods.map(({ colorIndex, ...v }) => ({
+          ...v,
+          color: colors.palette[colorIndex],
+        })),
+      },
+    ]),
+  )
+
+  useEffect(() => {
+    console.log(reservationStore.accomodationCalendarMarkedDatesWithColorIndex)
+  }, [reservationStore.accomodationCalendarMarkedDatesWithColorIndex])
+
+  return (
+    <ScheduleViewerCalendarBase
+      markingType="multi-period"
+      markedDates={markedDates}
+    />
+  )
+})
+
+const AccomodationListItem: FC<{
+  reservation: Reservation
+}> = ({ reservation }) => {
+  const { reservationStore } = useStores()
+  const { navigateWithTrip } = useNavigate()
+  const accomodation = reservation.accomodation as Accomodation
+
+  const handlePress = useCallback(() => {
+    navigateWithTrip('Reservation', { reservationId: reservation.id })
+  }, [])
+
+  const {
+    theme: { colors },
+  } = useTheme()
+
   return (
     <ListItemBase
-      title={item.title}
-      subtitle={item.nightsParsed}
+      title={accomodation.title || ''}
+      subtitle={accomodation.nightsParsed || undefined}
       avatarProps={{
         icon: {
           color: colors.white,
-          ...(item.type === 'hotel'
+          ...(accomodation.type === 'hotel'
             ? { type: 'font-awesome-5', name: 'hotel' }
-            : item.type === 'airbnb'
+            : accomodation.type === 'airbnb'
               ? { type: 'font-awesome-5', name: 'airbnb' }
-              : item.type === 'dorm'
+              : accomodation.type === 'dorm'
                 ? { type: 'material-community', name: 'bunk-bed-outline' }
-                : { type: 'material-community', name: 'bunk-bed-outline' }),
+                : { type: 'material-community', name: 'bed-king-outline' }),
         },
-        containerStyle: {
-          backgroundColor:
-            $palette[tripStore.indexedUniqueTitles.indexOf(item.title)],
-        },
+        containerStyle: accomodation.title
+          ? {
+              backgroundColor:
+                colors.palette[
+                  reservationStore.orderedAccomodationReservations.indexOf(
+                    reservation,
+                  )
+                ],
+            }
+          : {},
       }}
       onPress={handlePress}
       containerStyle={{ height: 64 }}
     />
   )
 }
+
 export const AccomodationPlanScreen: FC = observer(({}) => {
-  const tripStore = useTripStore()
+  const { reservationStore } = useStores()
 
   const renderListItem: ListRenderItem<{
-    item: Accomodation
+    reservation: Reservation
     index: number
   }> = ({ item }) => {
-    return <AccomodationListItem item={item.item} />
+    return <AccomodationListItem reservation={item.reservation} />
   }
-
-  const { navigateWithTrip } = useNavigate()
-  const handleAddItemPress = useCallback(() => {
-    navigateWithTrip('CreateAccomodation')
-  }, [])
 
   useHeader({
     centerComponent: (
       <HeaderCenterTitle
-        title="숙소 예약"
+        title="숙박 예약"
         //   icon={{name: '🛌'}}
       />
     ),
     centerContainerStyle: $headerCenterTitleContainerStyle,
   })
+
   return (
     <Screen>
-      <View>
+      <CalendarContainer>
         <AccomodationPlanCalendar />
-      </View>
+      </CalendarContainer>
       <FlatList
-        data={tripStore.orderedItems.map((item, index) => ({
-          index,
-          item,
-        }))}
+        data={reservationStore.orderedAccomodationReservations.map(
+          (reservation, index) => ({
+            index,
+            reservation,
+          }),
+        )}
         renderItem={renderListItem}
-        keyExtractor={item => item.item.id}
+        keyExtractor={item => item.reservation.id}
         style={{ flexGrow: 0 }}
         // contentContainerStyle={{ paddingHorizontal: 20 }}
       />
-
       <Fab.Container>
-        <Fab.Button
-          // color={'secondary'}
-          title={'숙소 추가하기'}
-          onPress={handleAddItemPress}
+        <Fab.NextButton
+          title={'숙박 예약 추가하기'}
+          navigateProps={{
+            name: 'ReservationCreate',
+            params: {
+              defaultCategory: 'ACCOMODATION',
+            },
+          }}
         />
       </Fab.Container>
     </Screen>
   )
 })
 
-const $palette = [
-  // '#9BF6FF',
-  '#A0C4FF',
-  '#BDB2FF',
-  '#FFC6FF',
-  '#FFADAD',
-  '#FFD6A5',
-  '#FDFFB6',
-  '#CAFFBF',
-]
+// const $palette = [
+//   // '#9BF6FF',
+//   '#A0C4FF',
+//   '#BDB2FF',
+//   '#FFC6FF',
+//   '#FFADAD',
+//   '#FFD6A5',
+//   '#FDFFB6',
+//   '#CAFFBF',
+// ]

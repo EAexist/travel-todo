@@ -46,6 +46,10 @@ import { registerBackgroundTaskAsync } from './tasks/BackgroundTask'
 import { useNavigationContainerRef } from '@react-navigation/native'
 import { useLogger } from '@react-navigation/devtools'
 
+import 'dayjs'
+import 'dayjs/locale/ko'
+import dayjs from 'dayjs'
+
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // Web linking configuration
@@ -107,7 +111,7 @@ const config = {
     CreateAccomodation: 'trip/:tripId?/createAccomodation',
 
     /* Reservation */
-    CreateReservation: 'trip/:tripId?/reservation/create',
+    ReservationCreate: 'trip/:tripId?/reservation/create',
 
     FullScreenImage:
       'trip/:tripId?/reservation/:reservationId?/fullScreenImage',
@@ -124,6 +128,7 @@ const customFontsToLoad = {
  * @returns {JSX.Element} The rendered `App` component.
  */
 export function App() {
+  dayjs.locale('ko')
   const {
     initialNavigationState,
     onNavigationStateChange,

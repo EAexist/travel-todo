@@ -110,7 +110,7 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
           style={{ flexGrow: 0 }}
         />
         <Divider />
-        <SectionHeader>숙소 정보 더 보기</SectionHeader>
+        <SectionHeader>숙박 정보 더 보기</SectionHeader>
         <FlatList
           data={item.links}
           renderItem={renderLinkItem}

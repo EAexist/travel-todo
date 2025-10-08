@@ -31,7 +31,7 @@ import {
 } from '@/services/api'
 import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 import { toCalendarString } from '@/utils/date'
-import { eachDayOfInterval } from 'date-fns'
+import { eachDayOfInterval, startOfDay } from 'date-fns'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
 import { v4 as uuidv4 } from 'uuid'
 import { Accomodation } from '../Reservation/Accomodation'
@@ -73,13 +73,16 @@ export const TripStoreModel = types
     todolist: types.map(types.array(types.reference(TodoModel))),
     customTodoContent: types.array(TodoContentModel),
     activeItem: types.maybeNull(types.reference(TodoModel)),
-    accomodation: types.map(AccomodationModel),
     preset: types.map(types.array(TodoPresetItemModel)),
-    recommendedFlight: types.array(FlightModel),
-    isReservationPinned: types.optional(types.boolean, false),
+    isTripMode: types.optional(types.boolean, false),
+    // accomodation: types.map(AccomodationModel),
+    // recommendedFlight: types.array(FlightModel),
   })
   .actions(withSetPropAction)
   .actions(store => ({
+    toggleTripMode() {
+      store.setProp('isTripMode', !store.isTripMode)
+    },
     syncOrderInCategory(category: string) {
       store.todolist.get(category)?.sort((a, b) => a.orderKey - b.orderKey)
     },
@@ -234,15 +237,15 @@ export const TripStoreModel = types
         return response
       })
     },
-    async fetchRecommendedFlight() {
-      console.log('[fetchRecommendedFlight]')
-      api.getRecommendedFlight(store.id).then(response => {
-        if (response.kind == 'ok') {
-          store.setProp('recommendedFlight', response.data)
-          console.log(`[fetchRecommendedFlight] data=${response.data}`)
-        }
-      })
-    },
+    // async fetchRecommendedFlight() {
+    //   console.log('[fetchRecommendedFlight]')
+    //   api.getRecommendedFlight(store.id).then(response => {
+    //     if (response.kind == 'ok') {
+    //       store.setProp('recommendedFlight', response.data)
+    //       console.log(`[fetchRecommendedFlight] data=${response.data}`)
+    //     }
+    //   })
+    // },
     /**
      * Create an empty trip and fetch it with backend-generated id.
      */
@@ -384,42 +387,42 @@ export const TripStoreModel = types
     /**
      * Create an empty accomodation and fetch it with backend-generated id.
      */
-    async createAccomodation() {
-      store.accomodation.put(AccomodationModel.create())
-      //   const response = await api.createAccomodation(store.id)
-      //   if (response.kind === 'ok') {
-      //     const accomodation = response.data as AccomodationSnapshotIn
-      //     store.accomodation.put(accomodation)
-      //   }
-    },
-    /**
-     * Patch(update) a accomodation.
-     */
-    async patchAccomodation(accomodation: AccomodationSnapshotIn) {
-      store.accomodation.set((accomodation as Accomodation).id, accomodation)
-      enqueueAction(APIAction.PATCH_ACCOMODATION, {
-        tripId: store.id,
-        accomodation: accomodation,
-      } as CreateAccomodationProps)
-      //   const response = await api.patchAccomodation(store.id, accomodation)
-      //   if (response.kind === 'ok')
-      //     store.accomodation.set(accomodation.id, accomodation)
-    },
-    /**
-     * Delete a accomodation.
-     */
-    async deleteAccomodation(accomodation: AccomodationSnapshotIn) {
-      store.accomodation.delete((accomodation as Accomodation).id)
-      enqueueAction(APIAction.DELETE_ACCOMODATION, {
-        tripId: store.id,
-        accomodationId: accomodation.id,
-      } as DeleteAccomodationProps)
-      //   api.deleteAccomodation(store.id, item.id).then(({kind}) => {
-      //     if (kind == 'ok') {
-      //       store.accomodation.delete(item.id)
-      //     }
-      //   })
-    },
+    // async createAccomodation() {
+    //   store.accomodation.put(AccomodationModel.create())
+    //   //   const response = await api.createAccomodation(store.id)
+    //   //   if (response.kind === 'ok') {
+    //   //     const accomodation = response.data as AccomodationSnapshotIn
+    //   //     store.accomodation.put(accomodation)
+    //   //   }
+    // },
+    // /**
+    //  * Patch(update) a accomodation.
+    //  */
+    // async patchAccomodation(accomodation: AccomodationSnapshotIn) {
+    //   store.accomodation.set((accomodation as Accomodation).id, accomodation)
+    //   enqueueAction(APIAction.PATCH_ACCOMODATION, {
+    //     tripId: store.id,
+    //     accomodation: accomodation,
+    //   } as CreateAccomodationProps)
+    //   //   const response = await api.patchAccomodation(store.id, accomodation)
+    //   //   if (response.kind === 'ok')
+    //   //     store.accomodation.set(accomodation.id, accomodation)
+    // },
+    // /**
+    //  * Delete a accomodation.
+    //  */
+    // async deleteAccomodation(accomodation: AccomodationSnapshotIn) {
+    //   store.accomodation.delete((accomodation as Accomodation).id)
+    //   enqueueAction(APIAction.DELETE_ACCOMODATION, {
+    //     tripId: store.id,
+    //     accomodationId: accomodation.id,
+    //   } as DeleteAccomodationProps)
+    //   //   api.deleteAccomodation(store.id, item.id).then(({kind}) => {
+    //   //     if (kind == 'ok') {
+    //   //       store.accomodation.delete(item.id)
+    //   //     }
+    //   //   })
+    // },
     /**
      * Delete a accomodation.
      */
@@ -446,7 +449,7 @@ export const TripStoreModel = types
         : undefined
     },
     get isScheduleSet() {
-      return this.startDate !== null
+      return store.startDateIsoString !== null
     },
     get isDestinationSet() {
       return store.destination.length > 0
@@ -603,18 +606,6 @@ export const TripStoreModel = types
         : null
       return dday
     },
-    get reservedNights() {
-      return [...store.accomodation.values()]
-        .map(acc => acc.checkoutDate.getDate() - acc.checkinDate.getDate())
-        .reduce((accumulator, currentValue) => {
-          return accumulator + currentValue
-        }, 0)
-    },
-    get accomodationTodoStatusText() {
-      return store.endDate && store.startDate
-        ? `${this.reservedNights}박/${store.endDate?.getDate() - store.startDate?.getDate()}박`
-        : null
-    },
     get reservationTodoStatusText() {
       const todos = store.todolist
         .get('reservation')
@@ -628,42 +619,6 @@ export const TripStoreModel = types
     get goodsTodoStatusText() {
       const todos = store.todolist.get('goods')
       return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
-    },
-    get orderedItems() {
-      console.log(store.accomodation.values())
-      return [...store.accomodation.values()].sort(
-        (a, b) => a.checkinDate.getDate() - b.checkinDate.getDate(),
-      )
-    },
-    get indexedUniqueTitles() {
-      return [...new Set(this.orderedItems.map(item => item.title))]
-    },
-    get calendarMarkedDateEntries() {
-      return this.orderedItems
-        .map(item => {
-          const start = item.checkinDate
-          const end = item.checkoutDate
-          console.log(start, end)
-          const intervalDays = eachDayOfInterval({ start, end }).slice(0, -1)
-          return intervalDays.map((date, index) => [
-            toCalendarString(date),
-            {
-              startingDay: index === 0,
-              endingDay: index === intervalDays.length - 1,
-              selected: true,
-              colorIndex: this.indexedUniqueTitles.indexOf(item.title),
-            },
-          ])
-        })
-        .flat() as [
-        string,
-        {
-          startingDay: boolean
-          endingDay: boolean
-          selected: boolean
-          colorIndex: number
-        },
-      ][]
     },
   }))
   .actions(store => ({

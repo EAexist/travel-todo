@@ -17,6 +17,7 @@ import { GeneralReservationModel } from './GeneralReservationModel'
 import { FlightModel } from './FlightModel'
 import { Icon } from '../Icon'
 import { VisitJapanModel } from './VisitJapanModel'
+import { parseDate, parseTime } from '@/utils/date'
 
 export type ReservationCategory =
   | 'ACCOMODATION'
@@ -170,79 +171,41 @@ export const ReservationModel = types
           return
       }
     },
-    get time() {
+  }))
+  .views(item => ({
+    get timeParsed() {
       switch (item.category) {
         case 'VISIT_JAPAN':
-          return item.visitJapan?.dateTimeIsoString ?? null
+          return item.dateTimeIsoString
+            ? `${parseDate(item.dateTimeIsoString)} ${parseTime(item.dateTimeIsoString)}`
+            : ''
         case 'ACCOMODATION':
-          return item.accomodation?.checkinDateIsoString ?? null
+          return item.dateTimeIsoString
+            ? `${parseDate(item.dateTimeIsoString)} ${parseTime(item.dateTimeIsoString)}`
+            : ''
         case 'FLIGHT_BOOKING':
-          return item.flightBooking?.departureDateTimeIsoString ?? null
+          return item.dateTimeIsoString
+            ? `${parseDate(item.dateTimeIsoString)} ${parseTime(item.dateTimeIsoString)}`
+            : ''
         case 'FLIGHT_TICKET':
-          return item.flightTicket?.departureDateTimeIsoString ?? null
+          return item.dateTimeIsoString
+            ? `${parseDate(item.dateTimeIsoString)} ${parseTime(item.dateTimeIsoString)}`
+            : ''
         case 'GENERAL':
-          return item.generalReservation?.dateTimeIsoString ?? null
+          return item.dateTimeIsoString
+            ? `${parseDate(item.dateTimeIsoString)} ${parseTime(item.dateTimeIsoString)}`
+            : ''
         default:
           return
       }
     },
   }))
   .actions(item => ({
-    updateFromSnapshot(snapshot: SnapshotIn<typeof item>) {
-      applySnapshot(item, snapshot)
-    },
-    setTitle(title: string) {
-      if (item.category === 'ACCOMODATION') {
-        item.accomodation?.setProp('title', title)
-      } else if (item.category === 'GENERAL') {
-        item.generalReservation?.setProp('title', title)
-      }
-    },
-    setCategory(category: ReservationCategory) {
-      const title = item.title
-      const dateTimeIsoString = item.dateTimeIsoString
-      if (item.category === category) {
-        return
-      }
-      item.setProp('category', category)
-      switch (category) {
-        case 'ACCOMODATION':
-          item.accomodation = AccomodationModel.create({
-            title: '새 숙소 예약',
-            checkinDateIsoString: dateTimeIsoString,
-          })
-          break
-        case 'VISIT_JAPAN':
-          item.visitJapan = VisitJapanModel.create({
-            dateTimeIsoString,
-          })
-          break
-        case 'FLIGHT_BOOKING':
-          item.flightBooking = FlightBookingModel.create({
-            ...(item.flightTicket ? getSnapshot(item.flightTicket) : {}),
-            departureDateTimeIsoString: dateTimeIsoString,
-          })
-          break
-        case 'FLIGHT_TICKET':
-          item.flightTicket = FlightTicketModel.create({
-            ...(item.flightBooking ? getSnapshot(item.flightBooking) : {}),
-            departureDateTimeIsoString: dateTimeIsoString,
-          })
-          break
-        case 'GENERAL':
-          item.generalReservation = GeneralReservationModel.create({
-            title,
-            dateTimeIsoString,
-          })
-          break
-        default:
-          break
-      }
-
-      if (category !== 'ACCOMODATION') item.setProp('accomodation', null)
-      if (category !== 'FLIGHT_BOOKING') item.setProp('flightBooking', null)
-      if (category !== 'FLIGHT_TICKET') item.setProp('flightTicket', null)
-      if (category !== 'GENERAL') item.setProp('generalReservation', null)
+    setVisitJapanProp<
+      K extends keyof SnapshotIn<typeof VisitJapanModel>,
+      V extends SnapshotIn<typeof VisitJapanModel>[K],
+    >(field: K, newValue: V) {
+      item.visitJapan?.setProp(field, newValue)
     },
     setAccomodationProp<
       K extends keyof SnapshotIn<typeof AccomodationModel>,
@@ -280,6 +243,97 @@ export const ReservationModel = types
       } else if (item.category === 'FLIGHT_TICKET') {
         item.setFlightTicketProp(field, newValue)
       }
+    },
+  }))
+  .actions(item => ({
+    updateFromSnapshot(snapshot: SnapshotIn<typeof item>) {
+      applySnapshot(item, snapshot)
+    },
+    setDateTime(dateTimeIsoString: string) {
+      switch (item.category) {
+        case 'VISIT_JAPAN':
+          return item.setVisitJapanProp('dateTimeIsoString', dateTimeIsoString)
+          break
+        case 'ACCOMODATION':
+          return item.setAccomodationProp(
+            'checkinDateIsoString',
+            dateTimeIsoString,
+          )
+          break
+        case 'FLIGHT_BOOKING':
+          return item.setFlightBookingProp(
+            'departureDateTimeIsoString',
+            dateTimeIsoString,
+          )
+          break
+        case 'FLIGHT_TICKET':
+          return item.setFlightTicketProp(
+            'departureDateTimeIsoString',
+            dateTimeIsoString,
+          )
+          break
+        case 'GENERAL':
+          return item.setGeneralReservationProp(
+            'dateTimeIsoString',
+            dateTimeIsoString,
+          )
+          break
+        default:
+          break
+      }
+    },
+    setTitle(title: string) {
+      if (item.category === 'ACCOMODATION') {
+        item.accomodation?.setProp('title', title)
+      } else if (item.category === 'GENERAL') {
+        item.generalReservation?.setProp('title', title)
+      }
+    },
+    setCategory(category: ReservationCategory) {
+      const title = item.title
+      const dateTimeIsoString = item.dateTimeIsoString
+      if (item.category === category) {
+        return
+      }
+      item.setProp('category', category)
+      switch (category) {
+        case 'ACCOMODATION':
+          item.accomodation = AccomodationModel.create({
+            title: '새 숙박 예약',
+            checkinDateIsoString: dateTimeIsoString,
+          })
+          break
+        case 'VISIT_JAPAN':
+          item.visitJapan = VisitJapanModel.create({
+            dateTimeIsoString,
+          })
+          break
+        case 'FLIGHT_BOOKING':
+          item.flightBooking = FlightBookingModel.create({
+            ...(item.flightTicket ? getSnapshot(item.flightTicket) : {}),
+            departureDateTimeIsoString: dateTimeIsoString,
+          })
+          break
+        case 'FLIGHT_TICKET':
+          item.flightTicket = FlightTicketModel.create({
+            ...(item.flightBooking ? getSnapshot(item.flightBooking) : {}),
+            departureDateTimeIsoString: dateTimeIsoString,
+          })
+          break
+        case 'GENERAL':
+          item.generalReservation = GeneralReservationModel.create({
+            title,
+            dateTimeIsoString,
+          })
+          break
+        default:
+          break
+      }
+
+      if (category !== 'ACCOMODATION') item.setProp('accomodation', null)
+      if (category !== 'FLIGHT_BOOKING') item.setProp('flightBooking', null)
+      if (category !== 'FLIGHT_TICKET') item.setProp('flightTicket', null)
+      if (category !== 'GENERAL') item.setProp('generalReservation', null)
     },
   }))
   .views(item => ({
@@ -406,6 +460,7 @@ export const ReservationModel = types
             {
               id: 'numberOfClient',
               title: '인원',
+              value: item.generalReservation?.numberOfClient?.toString(),
             },
             {
               id: 'clientName',
@@ -413,6 +468,7 @@ export const ReservationModel = types
               value: item.generalReservation?.clientName,
             },
           ]
+          break
         default:
           data = []
       }
@@ -546,13 +602,16 @@ export const ReservationModel = types
     },
   }))
 
+export type ReservationDataItemKey =
+  | keyof SnapshotIn<typeof ReservationModel>
+  | keyof SnapshotIn<typeof AccomodationModel>
+  | keyof SnapshotIn<typeof FlightBookingModel>
+  | keyof SnapshotIn<typeof FlightTicketModel>
+  | keyof SnapshotIn<typeof GeneralReservationModel>
+  | 'time'
+
 export type ReservationDataItemType = TextInfoListItemProps & {
-  id?:
-    | keyof SnapshotIn<typeof ReservationModel>
-    | keyof SnapshotIn<typeof AccomodationModel>
-    | keyof SnapshotIn<typeof FlightBookingModel>
-    | keyof SnapshotIn<typeof FlightTicketModel>
-    | keyof SnapshotIn<typeof GeneralReservationModel>
+  id: ReservationDataItemKey
   value?: string | null
   setValue?: (text: string) => void
   setNumericValue?: (value: number) => void

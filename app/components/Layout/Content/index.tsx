@@ -53,7 +53,9 @@ export interface ContentTitleProps {
   subtitle?: ReactNode
   icon?: Icon
   leftComponent?: ReactNode
+  rightComponent?: ReactNode
   variant?: 'default' | 'listItem'
+  useSubtitleAvatar?: boolean
 }
 
 export default function ContentTitle({
@@ -61,7 +63,9 @@ export default function ContentTitle({
   subtitle,
   icon,
   leftComponent,
+  rightComponent,
   variant = 'default',
+  useSubtitleAvatar = false,
 }: ContentTitleProps) {
   switch (variant) {
     case 'listItem':
@@ -69,9 +73,16 @@ export default function ContentTitle({
         <Title>
           <ListItem containerStyle={styles.ListItemContainer}>
             {leftComponent ??
-              (icon ? <Avatar icon={icon} size={'xlarge'} /> : null)}
+              (!useSubtitleAvatar && icon ? (
+                <Avatar icon={icon} avatarSize={'xlarge'} />
+              ) : null)}
             <ListItem.Content>
-              <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>
+              <ListItem.Subtitle style={styles.SubtitleContainer}>
+                {useSubtitleAvatar && icon ? (
+                  <Avatar icon={icon} avatarSize={'xsmall'} />
+                ) : null}
+                {subtitle}
+              </ListItem.Subtitle>
               <ListItem.Title>
                 {typeof title === 'string' ? (
                   <TransText h2>{title}</TransText>
@@ -80,6 +91,7 @@ export default function ContentTitle({
                 )}
               </ListItem.Title>
             </ListItem.Content>
+            {rightComponent}
           </ListItem>
         </Title>
       )
@@ -105,5 +117,11 @@ const styles = StyleSheet.create({
   },
   ListItemContainer: {
     height: 60,
+  },
+  SubtitleContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
 })

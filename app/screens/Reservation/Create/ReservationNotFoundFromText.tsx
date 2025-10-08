@@ -5,8 +5,8 @@ import { Screen } from '@/components/Screen'
 import { AppStackScreenProps, goBack } from '@/navigators'
 import { FC, useCallback } from 'react'
 
-export const NotFoundReservationFromText: FC<
-  AppStackScreenProps<'NotFoundReservationFromText'>
+export const ReservationNotFoundFromText: FC<
+  AppStackScreenProps<'ReservationNotFoundFromText'>
 > = () => {
   const handlePressConfirm = useCallback(() => {
     goBack()

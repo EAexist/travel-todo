@@ -9,7 +9,7 @@ import { Avatar } from './Avatar'
 export type TitleSizeType = 'md' | 'lg'
 
 export interface TextInfoListItemProps extends ListItemProps {
-  title: string
+  title?: string
   subtitle?: string
   caption?: string
   rightContent?: ReactNode
@@ -32,17 +32,19 @@ export const TextInfoListItem: FC<PropsWithChildren<TextInfoListItemProps>> = ({
   return (
     <ListItem {...props} containerStyle={$cotainerStyle}>
       <ListItem.Content style={{ ...$titleContainerstyle(titleSize) }}>
-        <ListItem.Title
-          style={{ color: theme.colors.contrastText.secondary }}
-          // style={
-          //   subtitle
-          //     ? listItemStyles.TitleWithSubtitle
-          //     : listItemStyles.TitleOnly
-          // }
-        >
-          <Trans>{title}</Trans>
-          {caption && <ListItemCaption>{caption}</ListItemCaption>}
-        </ListItem.Title>
+        {title && (
+          <ListItem.Title
+            style={{ color: theme.colors.contrastText.secondary }}
+            // style={
+            //   subtitle
+            //     ? listItemStyles.TitleWithSubtitle
+            //     : listItemStyles.TitleOnly
+            // }
+          >
+            <Trans>{title}</Trans>
+            {caption && <ListItemCaption>{caption}</ListItemCaption>}
+          </ListItem.Title>
+        )}
         {subtitle && (
           <ListItem.Subtitle>
             <Trans>{subtitle}</Trans>

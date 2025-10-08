@@ -1,22 +1,22 @@
-import {Avatar, AvatarProps} from '@/components/Avatar'
+import { Avatar, AvatarProps } from '@/components/Avatar'
 import BottomSheetModal, {
   GestureHandlerRootViewWrapper,
   useNavigationBottomSheet,
 } from '@/components/BottomSheetModal'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
-import {AddPresetTodo, AddTodo, TodoBase} from '@/components/Todo'
-import {useTripStore} from '@/models'
+import { AddPresetTodo, AddTodo, TodoBase } from '@/components/Todo'
+import { useTripStore } from '@/models'
 import {
   Todo,
   TodoContent,
   TodoContentSnapshotIn,
   TodoPresetItem,
 } from '@/models/Todo'
-import {useNavigate} from '@/navigators'
-import {ListItem} from '@rneui/themed'
-import {Observer, observer} from 'mobx-react-lite'
-import {ReactNode, RefObject, useCallback, useEffect, useRef} from 'react'
+import { useNavigate } from '@/navigators'
+import { ListItem } from '@rneui/themed'
+import { Observer, observer } from 'mobx-react-lite'
+import { ReactNode, RefObject, useCallback, useEffect, useRef } from 'react'
 import {
   DefaultSectionT,
   FlatList,
@@ -49,8 +49,8 @@ export const useHandleAddCutomTodo = ({
 }: {
   callerName?: 'TodolistSetting' | 'TodolistAdd'
 }) => {
-  const {createCustomTodo} = useTripStore()
-  const {navigateWithTrip} = useNavigate()
+  const { createCustomTodo } = useTripStore()
+  const { navigateWithTrip } = useNavigate()
   const handleAddCutomTodo = useCallback(
     (todoContent: TodoContent) => {
       const todo = createCustomTodo(todoContent)
@@ -93,12 +93,12 @@ export const TodolistAddScreenBase = observer(
   }: TodolistAddScreenBaseProps) => {
     const tripStore = useTripStore()
 
-    const {handleAddCutomTodo} = useHandleAddCutomTodo({})
+    const { handleAddCutomTodo } = useHandleAddCutomTodo({})
 
     const renderItem: SectionListRenderItem<
-      {todo?: Todo; preset?: TodoPresetItem},
+      { todo?: Todo; preset?: TodoPresetItem },
       DefaultSectionT
-    > = ({item: {preset, todo}}) => (
+    > = ({ item: { preset, todo } }) => (
       <Observer
         render={() =>
           preset ? (
@@ -114,11 +114,11 @@ export const TodolistAddScreenBase = observer(
     const bottomSheetRef = useRef<BottomSheetModal>(null)
 
     const renderSectionHeader = useCallback(
-      ({section: {category, title}}: {section: DefaultSectionT}) => (
+      ({ section: { category, title } }: { section: DefaultSectionT }) => (
         <View>
           <ListSubheader lg title={title} />
           <TodoBase
-            avatarProps={{icon: {name: 'add', type: 'material'}}}
+            avatarProps={{ icon: { name: 'add', type: 'material' } }}
             titleStyle={$titleStyleHighlighted}
             {...(category === 'reservation'
               ? {
@@ -187,9 +187,9 @@ const ReservationTypeDropDownBottomSheet = ({
   ref: RefObject<BottomSheetModal | null>
   callerName: 'TodolistSetting' | 'TodolistAdd'
 }) => {
-  const {handleAddCutomTodo} = useHandleAddCutomTodo({callerName})
+  const { handleAddCutomTodo } = useHandleAddCutomTodo({ callerName })
 
-  const {useActiveKey, handleBottomSheetModalChange, activate} =
+  const { useActiveKey, handleBottomSheetModalChange, activate } =
     useNavigationBottomSheet(ref)
 
   useActiveKey(activeKey =>
@@ -210,8 +210,8 @@ const ReservationTypeDropDownBottomSheet = ({
       type: 'flight',
       title: '항공권',
       avatarProps: {
-        icon: {name: '✈️'},
-        containerStyle: {backgroundColor: 'bisque'},
+        icon: { name: '✈️' },
+        containerStyle: { backgroundColor: 'bisque' },
       },
     },
     // {
@@ -223,13 +223,13 @@ const ReservationTypeDropDownBottomSheet = ({
       type: 'custom',
       title: '직접 입력',
       avatarProps: {
-        icon: {name: '✏️'},
-        containerStyle: {backgroundColor: 'bisque'},
+        icon: { name: '✏️' },
+        containerStyle: { backgroundColor: 'bisque' },
       },
     },
     // {
     //     type: 'accomodation',
-    //     title: '숙소 예약',
+    //     title: '숙박 예약',
     //     avatarProps: { icon: {name:'🛌'}, containerStyle: { backgroundColor: 'bisque' } },
     //     isManaged: true,
     // },
@@ -237,7 +237,7 @@ const ReservationTypeDropDownBottomSheet = ({
 
   const renderReservationTypeListItem: ListRenderItem<ReservationTypeOptionData> =
     useCallback(
-      ({item}) => {
+      ({ item }) => {
         const handlePress = () => activate(item.type)
 
         return (
@@ -253,7 +253,7 @@ const ReservationTypeDropDownBottomSheet = ({
               <ListItem.Title>{item.title}</ListItem.Title>
             </ListItem.Content>
             <ListItem.Chevron
-              iconProps={item.isManaged ? {name: 'check'} : undefined}
+              iconProps={item.isManaged ? { name: 'check' } : undefined}
             />
           </ListItem>
         )

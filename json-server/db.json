@@ -19,7 +19,7 @@
                     "orderKey": 1,
                     "type": "accomodation",
                     "category": "reservation",
-                    "title": "숙소 예약",
+                    "title": "숙박 예약",
                     "iconId": "🛌",
                     "note": "",
                     "isPreset": true
@@ -300,7 +300,7 @@
         {
             "id": 2,
             "preset": true,
-            "title": "숙소 예약",
+            "title": "숙박 예약",
             "iconId": "🛌"
         },
         {
@@ -364,7 +364,7 @@
                 "item": {
                     "category": "reservation",
                     "id": "1",
-                    "title": "숙소 예약",
+                    "title": "숙박 예약",
                     "iconId": "🛌",
                     "type": "flight"
                 }
@@ -537,7 +537,7 @@
         {
             "id": "2",
             "trip_id": "4",
-            "title": "Yoshiko 님의 숙소",
+            "title": "Yoshiko 님의 숙박",
             "roomTitle": "",
             "numberofClient": 2,
             "clientName": "PYO HYEON",

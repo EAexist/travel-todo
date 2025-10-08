@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from 'react'
+import { FC, useCallback, useRef, useState } from 'react'
 import {
   ListRenderItem,
   ScrollView,
@@ -8,7 +8,6 @@ import {
 } from 'react-native'
 //
 import { Avatar } from '@/components/Avatar'
-import { ScheduleText } from '@/components/Calendar/index'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import ListSubheader from '@/components/ListSubheader'
 import {
@@ -17,19 +16,24 @@ import {
 } from '@/components/NavigateMenuBottomSheet'
 import { Screen } from '@/components/Screen'
 import SectionCard from '@/components/SectionCard'
-import { useTripStore } from '@/models'
+import { useStores, useTripStore } from '@/models'
 import { Destination } from '@/models/Destination'
 import { useNavigate } from '@/navigators'
 import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
 import { useMainScreenHeader } from '@/utils/useHeader'
-import { BottomSheetModal } from '@gorhom/bottom-sheet'
-import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
+import { Chip, Icon, ListItem, Text, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FlatList } from 'react-native-gesture-handler'
+import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
+import { ListItemCaption } from '@/components/ListItemCaption'
+import { Switch } from '@rneui/themed'
+import BottomSheetModal from '@/components/BottomSheetModal'
+import ContentTitle from '@/components/Layout/Content'
 
 export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
   observer(({}) => {
     const tripStore = useTripStore()
+    const { reservationStore } = useStores()
     const {
       theme: { colors },
     } = useTheme()
@@ -92,11 +96,11 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
     const todoStatusGridData = [
       {
         id: '0',
-        category: '숙소 예약',
+        category: '숙박 예약',
         icon: { name: '🛌' },
         title:
-          tripStore.accomodationTodoStatusText ||
-          `${tripStore.reservedNights}박 예약함`,
+          reservationStore.accomodationTodoStatusText ||
+          `${reservationStore.reservedNights}박 예약 완료`,
         onPress: handleViewAccomodationPlan,
       },
       {
@@ -136,6 +140,12 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
         </ListItem.Content>
       </ListItem>
     )
+
+    const tripModeHelpBottomSheetRef = useRef<BottomSheetModal>(null)
+    const handlePressHelpTravelMode = useCallback(() => {
+      tripModeHelpBottomSheetRef.current?.present()
+    }, [tripModeHelpBottomSheetRef.current])
+
     return (
       <Screen backgroundColor={'secondary'}>
         <ScrollView>
@@ -171,6 +181,32 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
             ) : (
               <View></View>
             )}
+          </SectionCard>
+          <SectionCard>
+            <ListItem>
+              <ListItem.Content>
+                <ListItem.Title>
+                  {'여행 모드'}
+                  <ListItemCaption>
+                    <TouchableOpacity onPress={handlePressHelpTravelMode}>
+                      <Icon
+                        name="help-outline"
+                        type="material"
+                        size={20}
+                        color={undefined}
+                      />
+                    </TouchableOpacity>
+                  </ListItemCaption>
+                </ListItem.Title>
+                <ListItem.Subtitle>
+                  {tripStore.isTripMode ? '사용중' : '사용 안 함'}
+                </ListItem.Subtitle>
+              </ListItem.Content>
+              <Switch
+                value={tripStore.isTripMode}
+                onValueChange={value => tripStore.setProp('isTripMode', value)}
+              />
+            </ListItem>
           </SectionCard>
           {/* <SectionCard containerStyle={{paddingBottom: 0}}> */}
           <SectionCard>
@@ -216,6 +252,26 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
             )}
           </SectionCard>
         </ScrollView>
+        <BottomSheetModal ref={tripModeHelpBottomSheetRef}>
+          <ContentTitle
+            variant="listItem"
+            title={'여행 모드'}
+            subtitle={tripStore.isTripMode ? '사용중' : '사용 안 함'}
+            rightComponent={
+              <Switch
+                value={tripStore.isTripMode}
+                onValueChange={value => tripStore.toggleTripMode()}
+              />
+            }
+          />
+          <Text style={{ fontSize: 15, paddingHorizontal: 24, paddingTop: 12 }}>
+            여행 중 간편하게 사용할 수 있도록
+            <br />
+            1.앱을 켜면 <b>할 일</b> 대신 <b>예약</b> 페이지를 바로 열어요.
+            <br />
+            2.에약 항목을 누르면 <b>저장한 링크로 바로 연결</b>해요
+          </Text>
+        </BottomSheetModal>
         <NavigateMenuBottomSheet
           data={settingsOption}
           ref={settingsMenuBottomSheetRef}

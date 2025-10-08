@@ -1,10 +1,10 @@
-import {ListItem, ListItemProps} from '@rneui/themed'
-import {FC, ReactNode} from 'react'
-import {Avatar, AvatarProps} from './Avatar'
-import {Trans} from '@lingui/react/macro'
+import { ListItem, ListItemProps } from '@rneui/themed'
+import { FC, ReactNode } from 'react'
+import { Avatar, AvatarProps } from './Avatar'
+import { Trans } from '@lingui/react/macro'
 
 export interface ListItemBaseProps extends ListItemProps {
-  title: string
+  title?: string
   subtitle?: string
   avatarProps?: AvatarProps
   rightContent?: ReactNode
@@ -19,14 +19,18 @@ export const ListItemBase: FC<ListItemBaseProps> = ({
 }) => {
   return (
     <ListItem {...props}>
-      <Avatar {...avatarProps} />
+      {avatarProps && <Avatar {...avatarProps} />}
       <ListItem.Content>
-        <ListItem.Title>
-          <Trans>{title}</Trans>
-        </ListItem.Title>
-        <ListItem.Subtitle>
-          <Trans>{subtitle}</Trans>
-        </ListItem.Subtitle>
+        {title && (
+          <ListItem.Title>
+            <Trans>{title}</Trans>
+          </ListItem.Title>
+        )}
+        {subtitle && (
+          <ListItem.Subtitle>
+            <Trans>{subtitle}</Trans>
+          </ListItem.Subtitle>
+        )}
       </ListItem.Content>
       {rightContent}
     </ListItem>

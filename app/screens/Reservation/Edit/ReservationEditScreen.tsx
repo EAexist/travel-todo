@@ -1,10 +1,10 @@
 import { withReservation } from '@/utils/withReservation'
-import { EditReservationScreenBase } from './EditReservationScreenBase'
+import { ReservationEditScreenBase } from './ReservationEditScreenBase'
 
-export const EditReservationScreen = withReservation<'EditReservation'>(
+export const ReservationEditScreen = withReservation<'ReservationEdit'>(
   ({ reservation }) => {
     return (
-      <EditReservationScreenBase
+      <ReservationEditScreenBase
         reservation={reservation}
         isBeforeInitialization={false}
       />

@@ -2,20 +2,17 @@ import { Avatar, AvatarProps } from '@/components/Avatar'
 import BottomSheetModal, {
   GestureHandlerRootViewWrapper,
 } from '@/components/BottomSheetModal'
+import { AccomodationDateEditCalendar } from '@/components/Calendar/AccomodationDateEditCalendar'
+import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
+import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
+import { DatePicker } from '@/components/DatePicker'
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
-import {
-  ControlledInputProps,
-  ControlledListItemInput,
-} from '@/components/Input'
-import ContentTitle, { Title } from '@/components/Layout/Content'
+import { ControlledListItemInput } from '@/components/Input'
+import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListSubheader'
 import { Screen } from '@/components/Screen'
-import {
-  TextInfoListItem,
-  TextInfoListItemProps,
-  TitleSizeType,
-} from '@/components/TextInfoListItem'
+import { TextInfoListItem, TitleSizeType } from '@/components/TextInfoListItem'
 import { TextInfoListItemInput } from '@/components/TextInfoListItemInput'
 import { TransText } from '@/components/TransText'
 import { useStores } from '@/models'
@@ -25,33 +22,18 @@ import {
   RESERVATION_CATEGORY_TO_TITLE,
   ReservationCategory,
   ReservationDataItemType,
-  ReservationModel,
   ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
-import { AirportModel } from '@/models/Todo'
-import { goBack, ReservationStackProps, useNavigate } from '@/navigators'
+import { goBack, useNavigate } from '@/navigators'
 import { filterAlphaNumericUppercase, filterNumeric } from '@/utils/inputFilter'
 import { useHeader } from '@/utils/useHeader'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import {
-  ListItemInput,
-  ListItemInputProps,
-} from '@rneui/base/dist/ListItem/ListItem.Input'
-import { Divider, InputProps, ListItem, Text } from '@rneui/themed'
-import { time } from 'console'
+import { ListItemInputProps } from '@rneui/base/dist/ListItem/ListItem.Input'
+import { Divider, ListItem, Text } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { getSnapshot } from 'mobx-state-tree'
+import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
-  FC,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react'
-import {
-  DimensionValue,
   FlatList,
   ListRenderItem,
   ScrollView,
@@ -59,7 +41,6 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import DatePicker from 'react-native-date-picker'
 
 const ConstrainedTextInfoListItemInput: FC<
   ListItemInputProps & {
@@ -118,7 +99,7 @@ const ConstrainedTextInfoListItemInput: FC<
   )
 }
 
-export const EditReservationScreenBase: FC<{
+export const ReservationEditScreenBase: FC<{
   reservation: Reservation
   isBeforeInitialization: boolean
 }> = observer(({ reservation, isBeforeInitialization }) => {
@@ -128,23 +109,18 @@ export const EditReservationScreenBase: FC<{
     getSnapshot(reservation),
   )
 
-  //   useLayoutEffect(() => {
-
-  //   })
-
-  const [date, setDate] = useState(new Date())
   const [isConfirmed, setIsConfirmed] = useState(false)
   const { navigateWithTrip } = useNavigate()
   const { reservationStore } = useStores()
 
   const handleNotePress = useCallback(() => {
-    navigateWithTrip('EditReservationNote', {
+    navigateWithTrip('ReservationNoteEdit', {
       reservationId: reservation.id,
     })
   }, [reservation.id])
 
   const handleLinkPress = useCallback(() => {
-    navigateWithTrip('EditReservationLink', {
+    navigateWithTrip('ReservationLinkEdit', {
       reservationId: reservation.id,
     })
   }, [reservation.id])
@@ -160,10 +136,24 @@ export const EditReservationScreenBase: FC<{
 
   /* DateTimePicker Menu */
 
+  const [onDismiss, setOnDismiss] = useState<(date: Date) => void>(date => {})
+
   const dateTimePickerBottomSheetModalRef = useRef<BottomSheetModal>(null)
-  const handleTimePress = useCallback(() => {
-    dateTimePickerBottomSheetModalRef.current?.present()
-  }, [dateTimePickerBottomSheetModalRef.current])
+  const accomodationScheduleBottomSheetModalRef = useRef<BottomSheetModal>(null)
+  const handleTimePress = useCallback(
+    ({
+      initialDate,
+      setDate,
+    }: {
+      initialDate: Date
+      setDate: (date: Date) => void
+    }) => {
+      setDatePickerValue(initialDate)
+      setOnDismiss(() => setDate)
+      dateTimePickerBottomSheetModalRef.current?.present()
+    },
+    [dateTimePickerBottomSheetModalRef.current],
+  )
 
   /* category Menu */
   const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
@@ -261,8 +251,6 @@ export const EditReservationScreenBase: FC<{
       let titleSize: TitleSizeType = 'md'
 
       switch (item.id) {
-        case 'checkinDateIsoString':
-        case 'checkoutDateIsoString':
         case 'checkinStartTimeIsoString':
         case 'checkinEndTimeIsoString':
         case 'checkoutTimeIsoString':
@@ -274,7 +262,14 @@ export const EditReservationScreenBase: FC<{
               <ListItem.Chevron />
             </View>
           )
-          onPress = () => {}
+          onPress = () =>
+            handleTimePress({
+              initialDate: reservation.accomodation?.checkinDate || new Date(),
+              setDate: (date: Date) => {
+                reservation.setDateTime(date.toISOString())
+              },
+            })
+
           break
         case 'flightNumber':
           inputComponent = (
@@ -319,6 +314,8 @@ export const EditReservationScreenBase: FC<{
         </TextInfoListItem>
       )
     }, [])
+
+  const [datePickerValue, setDatePickerValue] = useState<Date | undefined>()
 
   return (
     <GestureHandlerRootViewWrapper>
@@ -372,31 +369,22 @@ export const EditReservationScreenBase: FC<{
               {reservation.primaryHrefLink || reservation.addLinkInstruction}
             </TransText>
           </TextInfoListItem>
-          {reservation.category === 'ACCOMODATION' ? (
-            <>
-              <TextInfoListItem
-                onPress={handleTimePress}
-                title={'체크인'}
-                rightContent={<ListItem.Chevron />}>
-                <TransText numberOfLines={1}>
-                  {reservation.time || '-'}
-                </TransText>
-              </TextInfoListItem>
-              <TextInfoListItem
-                onPress={handleTimePress}
-                title={'체크아웃'}
-                rightContent={<ListItem.Chevron />}>
-                <TransText numberOfLines={1}>
-                  {reservation.time || '-'}
-                </TransText>
-              </TextInfoListItem>
-            </>
-          ) : (
+          {reservation.category !== 'ACCOMODATION' && (
             <TextInfoListItem
-              onPress={handleTimePress}
+              onPress={() =>
+                handleTimePress({
+                  initialDate:
+                    reservation.accomodation?.checkinDate || new Date(),
+                  setDate: (date: Date) => {
+                    reservation.setDateTime(date.toISOString())
+                  },
+                })
+              }
               title={reservation.timeDataTitle}
               rightContent={<ListItem.Chevron />}>
-              <TransText numberOfLines={2}>{reservation.time || '-'}</TransText>
+              <TransText numberOfLines={2}>
+                {reservation.timeParsed || '-'}
+              </TransText>
             </TextInfoListItem>
           )}
           <TextInfoListItem
@@ -405,6 +393,27 @@ export const EditReservationScreenBase: FC<{
             rightContent={<ListItem.Chevron />}>
             <TransText numberOfLines={2}>{reservation.note || '-'}</TransText>
           </TextInfoListItem>
+          {reservation.category === 'ACCOMODATION' && (
+            <>
+              <Divider />
+              <ListSubheader title={'체크인 · 체크아웃 날짜'} />
+              <ListItem
+                onPress={() => {
+                  accomodationScheduleBottomSheetModalRef.current?.present()
+                }}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                  }}>
+                  <TransText numberOfLines={1}>
+                    {reservation.accomodation?.dateParsed || '-'}
+                  </TransText>
+                </View>
+                <ListItem.Chevron />
+              </ListItem>
+            </>
+          )}
           {data && data.length > 0 && (
             <>
               <Divider />
@@ -413,7 +422,7 @@ export const EditReservationScreenBase: FC<{
                 scrollEnabled={false}
                 data={data}
                 renderItem={renderReservationDetail}
-                keyExtractor={item => item.title}
+                keyExtractor={item => item.id}
               />
             </>
           )}
@@ -445,10 +454,49 @@ export const EditReservationScreenBase: FC<{
             keyExtractor={item => item.category}
           />
         </BottomSheetModal>
-        <BottomSheetModal ref={dateTimePickerBottomSheetModalRef}>
+        <BottomSheetModal
+          ref={dateTimePickerBottomSheetModalRef}
+          onDismiss={() => {
+            if (datePickerValue) onDismiss(datePickerValue)
+            setDatePickerValue(undefined)
+            setOnDismiss(() => {})
+          }}>
           <ContentTitle title={'예약 날짜 및 시간'} />
-          <DatePicker date={date} onDateChange={setDate} />
+          <DatePicker
+            date={datePickerValue}
+            onDateChange={setDatePickerValue}
+          />
         </BottomSheetModal>
+        {reservation.accomodation && (
+          <BottomSheetModal ref={accomodationScheduleBottomSheetModalRef}>
+            <ContentTitle title={'체크인 · 체크아웃 날짜 선택'} />
+            {/* <ListItem>
+              <ListItem.Title>
+                {reservation.accomodation?.dateParsed || '-'}
+              </ListItem.Title>
+            </ListItem> */}
+            <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+              <ScheduleText
+                startDate={reservation.accomodation.checkinDate ?? undefined}
+                endDate={reservation.accomodation.checkoutDate ?? undefined}
+              />
+            </View>
+            <CalendarContainer style={{ paddingHorizontal: 12 }}>
+              <AccomodationDateEditCalendar
+                accomodation={reservation.accomodation}
+              />
+            </CalendarContainer>
+            <Fab.Container fixed={false} dense>
+              <Fab.Button
+                // disabled={reservation.title.length === 0}
+                onPress={() => {
+                  accomodationScheduleBottomSheetModalRef.current?.close()
+                }}
+                title={'확인'}
+              />
+            </Fab.Container>
+          </BottomSheetModal>
+        )}
       </Screen>
     </GestureHandlerRootViewWrapper>
   )

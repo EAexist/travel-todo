@@ -109,22 +109,28 @@ export function useHeader(
   }, [...deps, navigation])
 }
 
-export const useMainScreenHeader = ({
-  title,
-  rightComponent,
-  ...props
-}: HeaderProps & {
-  title: string
-  rightComponent: ReactElement<{}>
-}) => {
-  useHeader({
-    backButtonShown: false,
-    leftComponent: <HeaderTitle>{title}</HeaderTitle>,
-    rightComponent: rightComponent,
-    leftContainerStyle: styles.headerLeftContainer,
-    rightContainerStyle: styles.headerRightContainer,
-    ...props,
-  })
+export const useMainScreenHeader = (
+  {
+    title,
+    rightComponent,
+    ...props
+  }: HeaderProps & {
+    title: string
+    rightComponent: ReactElement<{}>
+  },
+  deps: Parameters<typeof useLayoutEffect>[1] = [],
+) => {
+  useHeader(
+    {
+      backButtonShown: false,
+      leftComponent: <HeaderTitle>{title}</HeaderTitle>,
+      rightComponent: rightComponent,
+      leftContainerStyle: styles.headerLeftContainer,
+      rightContainerStyle: styles.headerRightContainer,
+      ...props,
+    },
+    deps,
+  )
 }
 
 export const HeaderTitle: FC<TextProps> = props => (

@@ -55,7 +55,7 @@ export const ThirdpartyAvatar = ({
       <Avatar
         source={sources[provider]}
         rounded={true}
-        size={'large'}
+        avatarSize={'large'}
         imageProps={{ style: { width: 40, height: 40 } }}
         {...props}
       />

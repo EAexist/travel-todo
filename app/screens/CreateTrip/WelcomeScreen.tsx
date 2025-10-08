@@ -33,7 +33,9 @@ export const WelcomeScreen: FC<AppStackScreenProps<'TripList'>> = observer(
 
     useEffect(() => {
       if (isTripStoreInitialized && navigationRef.isReady())
-        navigateWithTrip('Main', { screen: 'Todolist' })
+        navigateWithTrip('Main', {
+          screen: tripStore.isTripMode ? 'ReservationList' : 'Todolist',
+        })
     }, [isTripStoreInitialized, navigationRef.isReady()])
 
     useLoadingScreen({})

@@ -53,10 +53,10 @@ export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
     <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
       <Avatar
         icon={{ name: getFlagEmoji(item.countryIso) }}
-        size={35}
+        avatarSize={35}
         fontSize={20}
       />
-      {/* <Avatar title={flag} size={35} /> */}
+      {/* <Avatar title={flag} avatarSize={35} /> */}
       <ListItem.Content>
         <ListItem.Title>
           <Trans>{item.title}</Trans>

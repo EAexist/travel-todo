@@ -6,7 +6,7 @@
 // import { observer } from 'mobx-react-lite'
 // import { FC, useCallback } from 'react'
 
-// export const CreateReservationLoadingScreen: FC = observer(() => {
+// export const ReservationCreateLoadingScreen: FC = observer(() => {
 //   const { reservationStore } = useStores()
 
 //   useHeader({ backButtonShown: false })

@@ -1,6 +1,7 @@
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
 import {
   Reservation,
+  ReservationCategory,
   ReservationModel,
   ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
@@ -11,16 +12,35 @@ import {
   DeleteReservationProps,
 } from '@/services/api'
 import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
+import { toCalendarString } from '@/utils/date'
 import { copyImageToLocalStorage } from '@/utils/storage'
+import { differenceInDays, eachDayOfInterval, startOfDay } from 'date-fns'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { MarkedDates } from 'react-native-calendars/src/types'
+
+const ConfirmRequiringReservationModel = types
+  .model('ConfirmRequiringReservation')
+  .props({
+    isFlaggedToAdd: types.optional(types.boolean, true),
+    reservation: types.reference(ReservationModel),
+  })
+  .actions(withSetPropAction)
+  .actions(store => ({
+    async toggleIsFlaggedToAdd() {
+      store.setProp('isFlaggedToAdd', !store.isFlaggedToAdd)
+    },
+  }))
+
+export interface ConfirmRequiringReservation
+  extends Instance<typeof ConfirmRequiringReservationModel> {}
 
 export const ReservationStoreModel = types
   .model('ReservationStore')
   .props({
-    // id: types.string,
+    // id: types.string,d
     tripStore: types.maybe(types.reference(TripStoreModel)),
     reservation: types.map(ReservationModel),
-    confirmRequiringReservation: types.array(types.reference(ReservationModel)),
+    confirmRequiringReservation: types.array(ConfirmRequiringReservationModel),
   })
   .actions(withSetPropAction)
   .actions(store => ({
@@ -43,10 +63,21 @@ export const ReservationStoreModel = types
     addReservation(reservation: Reservation) {
       return store.reservation.put(reservation)
     },
+    clearConfirmRequiringList() {
+      console.log('CLEAR')
+      store.confirmRequiringReservation.clear()
+    },
+    addConfirmRequiringList(reservation: Reservation) {
+      store.confirmRequiringReservation.push(
+        ConfirmRequiringReservationModel.create({
+          reservation: reservation.id,
+        }),
+      )
+    },
   }))
   .actions(store => ({
-    createCustomReservation() {
-      return store.addReservation(
+    createCustomReservation(category?: ReservationCategory) {
+      const reservation = store.addReservation(
         ReservationModel.create({
           category: 'GENERAL',
           generalReservation: {
@@ -54,20 +85,21 @@ export const ReservationStoreModel = types
           },
         }),
       )
+      if (category) {
+        reservation.setCategory(category)
+      }
+      return reservation
     },
     async createFromText(tripId: string, text: string) {
+      store.clearConfirmRequiringList()
       return api.createReservationFromText(tripId, text).then(response => {
         if (response.kind === 'ok') {
-          const confirmRequiringReservationId = response.data.map(
-            reservation => {
-              return store.addReservation(ReservationModel.create(reservation))
-                .id
-            },
-          )
-          store.setProp(
-            'confirmRequiringReservation',
-            confirmRequiringReservationId,
-          )
+          console.log(response.data)
+          response.data.forEach(reservation => {
+            store.addConfirmRequiringList(
+              store.addReservation(ReservationModel.create(reservation)),
+            )
+          })
         }
         return response
       })
@@ -77,7 +109,7 @@ export const ReservationStoreModel = types
 
     //   switch (category) {
     //     case 'ACCOMODATION':
-    //       title = '새 숙소 예약'
+    //       title = '새 숙박 예약'
     //       break
     //     case 'FLIGHT_BOOKING':
     //       title = '새 항공권 예약'
@@ -154,6 +186,11 @@ export const ReservationStoreModel = types
     },
   }))
   .views(store => ({
+    get accomodation(): Reservation[] {
+      return [...store.reservation.values()].filter(
+        r => r.category === 'ACCOMODATION',
+      )
+    },
     get reservationSections() {
       if (store.tripStore) {
         const reservations: Reservation[] = Array.from(
@@ -173,6 +210,135 @@ export const ReservationStoreModel = types
         // )
         return [{ title: 'reservation', data: reservations }]
       }
+    },
+    get reservationsToDelete(): Reservation[] {
+      return store.confirmRequiringReservation
+        .filter(r => !r.isFlaggedToAdd)
+        .map(r => r.reservation)
+    },
+  }))
+  .views(store => ({
+    get reservedNights() {
+      return store.accomodation
+        .map(r => {
+          const d =
+            r.accomodation?.checkinDate && r.accomodation?.checkoutDate
+              ? differenceInDays(
+                  startOfDay(r.accomodation.checkoutDate),
+                  startOfDay(r.accomodation.checkinDate),
+                )
+              : 0
+          console.log('ACC', d)
+          return d
+        })
+        .reduce((accumulator, currentValue) => {
+          return accumulator + currentValue
+        }, 0)
+    },
+    get accomodationTodoStatusText() {
+      return store.tripStore?.endDate && store.tripStore?.startDate
+        ? `${this.reservedNights}박/${differenceInDays(startOfDay(store.tripStore?.endDate), startOfDay(store.tripStore?.startDate))}박`
+        : null
+    },
+    get orderedAccomodationReservations() {
+      return [...store.accomodation.values()]
+        .filter(r => r.accomodation !== null)
+        .sort((a, b) =>
+          a.accomodation?.checkinDate
+            ? b.accomodation?.checkinDate
+              ? a.accomodation.checkinDate?.getDate() -
+                b.accomodation.checkinDate.getDate()
+              : -1
+            : 1,
+        )
+    },
+    get indexedUniqueTitles() {
+      return [
+        ...new Set(
+          this.orderedAccomodationReservations.map(item => item.title),
+        ),
+      ]
+    },
+    get accomodationCalendarDotMarkedDates() {
+      const markedDates: {
+        [key: string]: {
+          marked: true
+          dotColorKey: number
+        }
+      } = {}
+      this.orderedAccomodationReservations.forEach((r, accIndex) => {
+        const start = r.accomodation?.checkinDate
+        const end = r.accomodation?.checkoutDate
+        const intervalDays =
+          start && end ? eachDayOfInterval({ start, end }).slice(0, -1) : []
+        intervalDays.forEach((date, index) => {
+          const dateString = toCalendarString(date)
+          if (!Object.keys(markedDates).includes(dateString)) {
+            markedDates[toCalendarString(date)] = {
+              dotColorKey: accIndex,
+              marked: true,
+            }
+          }
+        })
+      })
+      return markedDates
+    },
+    get accomodationCalendarMarkedDatesWithColorIndex() {
+      const markedDates: {
+        [key: string]: {
+          periods: {
+            startingDay: boolean
+            endingDay: boolean
+            colorIndex: number
+          }[]
+        }
+      } = {}
+      this.orderedAccomodationReservations.forEach((r, accIndex) => {
+        const start = r.accomodation?.checkinDate
+        const end = r.accomodation?.checkoutDate
+        const intervalDays =
+          start && end ? eachDayOfInterval({ start, end }).slice(0, -1) : []
+        intervalDays.forEach((date, index) => {
+          const dateString = toCalendarString(date)
+          if (!Object.keys(markedDates).includes(dateString)) {
+            markedDates[toCalendarString(date)] = { periods: [] }
+          }
+          markedDates[toCalendarString(date)].periods.push({
+            startingDay: index === 0,
+            endingDay: index === intervalDays.length - 1,
+            //   selected: true,
+            colorIndex: accIndex,
+          })
+        })
+      })
+      return markedDates
+    },
+    get calendarMarkedDateEntries() {
+      return this.orderedAccomodationReservations
+        .map(item => {
+          const start = item.accomodation?.checkinDate
+          const end = item.accomodation?.checkoutDate
+          const intervalDays =
+            start && end ? eachDayOfInterval({ start, end }).slice(0, -1) : []
+          return intervalDays.map((date, index) => [
+            toCalendarString(date),
+            {
+              startingDay: index === 0,
+              endingDay: index === intervalDays.length - 1,
+              selected: true,
+              colorIndex: this.indexedUniqueTitles.indexOf(item.title),
+            },
+          ])
+        })
+        .flat() as [
+        string,
+        {
+          startingDay: boolean
+          endingDay: boolean
+          selected: boolean
+          colorIndex: number
+        },
+      ][]
     },
   }))
 //   .actions(store => ())
