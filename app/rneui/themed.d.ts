@@ -24,6 +24,7 @@ declare module '@rneui/themed' {
     dense?: boolean
     backgroundColor?: 'primary' | 'secondary'
     useDisabledStyle?: boolean
+    asCard?:boolean = false
   }
   export interface IconProps {
     primary?: boolean

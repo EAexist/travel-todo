@@ -7,7 +7,7 @@
 // import { FC, useCallback } from 'react'
 
 // export const ReservationCreateLoadingScreen: FC = observer(() => {
-//   const { reservationStore } = useStores()
+//   const reservationStore = useReservationStore()
 
 //   useHeader({ backButtonShown: false })
 

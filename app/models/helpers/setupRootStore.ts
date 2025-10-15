@@ -12,8 +12,13 @@
 import { RootStore, RootStoreSnapshot } from '@/models/stores/RootStore'
 import { api } from '@/services/api'
 import { ApiStatus } from '@/utils/useApiStatus'
-import { autorun, reaction } from 'mobx'
-import { applySnapshot, IDisposer, onSnapshot } from 'mobx-state-tree'
+import { autorun } from 'mobx'
+import {
+    applySnapshot,
+    getSnapshot,
+    IDisposer,
+    onSnapshot,
+} from 'mobx-state-tree'
 import * as storage from '../../utils/storage'
 
 /**
@@ -26,139 +31,153 @@ export const ROOT_STATE_STORAGE_KEY = 'root-v1'
  */
 let _disposer: IDisposer | undefined
 export async function setupRootStore(rootStore: RootStore) {
-  let restoredState: RootStoreSnapshot | undefined | null
+    let restoredState: RootStoreSnapshot | undefined | null
 
-  try {
-    // storage.clear()
+    try {
+        // storage.clear()
 
-    /**
-     * !!Test Only
-     * Create a sample state of logined user and initialized trip
-     */
-    // console.log('[setupRootStore]')
-    // storage.save(
-    //   ROOT_STATE_STORAGE_KEY,
-    //   RootStoreModel.create({
-    //     userStore: UserStoreModel.create({
-    //       id: 'mocked-logged-in-user_id',
-    //       tripSummary: [
-    //         TripSummaryModel.create({
-    //           id: 'mocked-created-trip_id',
-    //         }),
-    //       ],
-    //     }),
-    //     tripStore: TripStoreModel.create({
-    //       id: 'mocked-created-trip_id',
-    //       isInitialized: true,
-    //       title: '여행',
-    //       startDateIsoString: '2025-09-25 00:00:00',
-    //       endDateIsoString: '2025-10-06 00:00:00',
-    //       destination: [
-    //         DestinationModel.create({
-    //           description: '',
-    //           countryIso: 'JP',
-    //           title: '교토',
-    //           region: '간사이',
-    //         }),
-    //       ],
-    //     }),
-    //     reservationStore: ReservationStoreModel.create({
-    //       tripStore: 'mocked-created-trip_id',
-    //       reservation: {
-    //         'mocked-reservation-id_0': ReservationModel.create({
-    //           id: 'mocked-reservation-id_0',
-    //           accomodation: AccomodationModel.create({
-    //             checkinDateIsoString: '2025-09-25 00:00:00',
-    //             checkoutDateIsoString: '2025-09-27 00:00:00',
-    //           }),
-    //         }),
-    //         'mocked-reservation-id_1': ReservationModel.create({
-    //           id: 'mocked-reservation-id_1',
-    //           accomodation: AccomodationModel.create({
-    //             checkinDateIsoString: '2025-09-28 00:00:00',
-    //             checkoutDateIsoString: '2025-10-01 00:00:00',
-    //           }),
-    //         }),
-    //       },
-    //     }),
-    //   }),
-    // )
+        /**
+         * !!Test Only
+         * Create a sample state of logined user and initialized trip
+         */
+        // console.log('[setupRootStore]')
+        // storage.save(
+        //   ROOT_STATE_STORAGE_KEY,
+        //   RootStoreModel.create({
+        //     userStore: UserStoreModel.create({
+        //       id: 'mocked-logged-in-user_id',
+        //       tripSummary: [
+        //         TripSummaryModel.create({
+        //           id: 'mocked-created-trip_id',
+        //         }),
+        //       ],
+        //     }),
+        //     tripStore: TripStoreModel.create({
+        //       id: 'mocked-created-trip_id',
+        //       isInitialized: true,
+        //       title: '여행',
+        //       startDateIsoString: '2025-09-25 00:00:00',
+        //       endDateIsoString: '2025-10-06 00:00:00',
+        //       destination: [
+        //         DestinationModel.create({
+        //           description: '',
+        //           countryIso: 'JP',
+        //           title: '교토',
+        //           region: '간사이',
+        //         }),
+        //       ],
+        //     }),
+        //     reservationStore: ReservationStoreModel.create({
+        //       tripStore: 'mocked-created-trip_id',
+        //       reservation: {
+        //         'mocked-reservation-id_0': ReservationModel.create({
+        //           id: 'mocked-reservation-id_0',
+        //           accomodation: AccomodationModel.create({
+        //             checkinDateIsoString: '2025-09-25 00:00:00',
+        //             checkoutDateIsoString: '2025-09-27 00:00:00',
+        //           }),
+        //         }),
+        //         'mocked-reservation-id_1': ReservationModel.create({
+        //           id: 'mocked-reservation-id_1',
+        //           accomodation: AccomodationModel.create({
+        //             checkinDateIsoString: '2025-09-28 00:00:00',
+        //             checkoutDateIsoString: '2025-10-01 00:00:00',
+        //           }),
+        //         }),
+        //       },
+        //     }),
+        //   }),
+        // )
 
-    // load the last known state from AsyncStorage
-    restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {
-      apiStatus: ApiStatus.IDLE,
-    }) as RootStoreSnapshot
-    applySnapshot(rootStore, restoredState)
-    if (rootStore.userStore.id) api.authenticate(rootStore.userStore.id)
+        // load the last known state from AsyncStorage
+        restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {
+            apiStatus: ApiStatus.IDLE,
+        }) as RootStoreSnapshot
+        applySnapshot(rootStore, restoredState)
 
-    // if(restoredState=={})
-  } catch (e) {
-    // if there's any problems loading, then inform the dev what happened
-    if (__DEV__) {
-      if (e instanceof Error) console.error(e.message)
+        // if(restoredState=={})
+    } catch (e) {
+        // if there's any problems loading, then inform the dev what happened
+        if (__DEV__) {
+            if (e instanceof Error) console.error(e.message)
+        }
     }
-  }
 
-  // stop tracking state changes if we've already setup
-  if (_disposer) _disposer()
+    // stop tracking state changes if we've already setup
+    if (_disposer) _disposer()
 
-  // track changes & save to AsyncStorage
-  _disposer = onSnapshot(rootStore, snapshot =>
-    storage.save(ROOT_STATE_STORAGE_KEY, snapshot),
-  )
-
-  const unsubscribe = () => {
-    _disposer?.()
-    _disposer = undefined
-  }
-  autorun(() => {
-    console.log('[ApiStatus changed:]', JSON.stringify(rootStore.apiStatus))
-  })
-  autorun(() => {
-    console.log(
-      '[todolistWithPreset changed:]',
-      JSON.stringify(rootStore.tripStore?.todolistWithPreset),
+    // track changes & save to AsyncStorage
+    _disposer = onSnapshot(rootStore, snapshot =>
+        storage.save(ROOT_STATE_STORAGE_KEY, snapshot),
     )
-  })
-  autorun(() => {
-    console.log('[UserStore changed:]', JSON.stringify(rootStore.userStore))
-  })
-  autorun(() => {
-    console.log('[TripStore changed:]', JSON.stringify(rootStore.tripStore))
-  })
-  autorun(() => {
-    console.log(
-      '[ReservationStore changed:]',
-      JSON.stringify(rootStore.reservationStore),
-    )
-  })
-  //   autorun(() => {
-  //     console.log(
-  //       '[RoundTripStore changed:]',
-  //       JSON.stringify(rootStore.roundTripStore),
-  //     )
-  //   })
-  //   reaction(
-  //     () => rootStore.userStore?.id,
-  //     id => {
-  //       console.log(`[reaction] userStore.id=${id}`)
-  //       if (id) api.authenticate(id.toString())
-  //     },
-  //   )
-  reaction(
-    () => rootStore.tripStore?.accomodation,
-    accomodation => {
-      console.log(accomodation)
-    },
-  )
-  reaction(
-    () => rootStore.tripStore?.id,
-    id => {
-      console.log(`[reaction] tripStore.id=${id}`)
-      if (rootStore.tripStore != null)
-        rootStore.reservationStore.setProp('tripStore', rootStore.tripStore)
-    },
-  )
 
-  return { rootStore, restoredState, unsubscribe }
+    const unsubscribe = () => {
+        _disposer?.()
+        _disposer = undefined
+    }
+    autorun(() => {
+        console.log(
+            '[UserStore changed:]',
+            rootStore?.userStore
+                ? JSON.stringify({
+                      ...getSnapshot(rootStore.userStore),
+                      activeTrip: null,
+                  })
+                : '',
+        )
+    })
+    autorun(() => {
+        console.log(
+            '[TripStore changed:]',
+            rootStore?.userStore?.activeTrip
+                ? JSON.stringify(
+                      rootStore.userStore.activeTrip && {
+                          ...getSnapshot(rootStore.userStore.activeTrip),
+                          todolist: null,
+                          todoMap: null,
+                          preset: null,
+                      },
+                  )
+                : '',
+        )
+    })
+    autorun(() => {
+        console.log(
+            '[Todolist changed:]',
+            rootStore?.userStore
+                ? JSON.stringify(
+                      rootStore.userStore.activeTrip?.todoMap && {
+                          ...getSnapshot(
+                              rootStore.userStore.activeTrip?.todoMap,
+                          ),
+                      },
+                  )
+                : '',
+        )
+    })
+    autorun(() => {
+        console.log(
+            '[ReservationStore changed:]',
+            rootStore?.userStore?.activeTrip
+                ? JSON.stringify(
+                      rootStore.userStore.activeTrip.reservationStore,
+                  )
+                : '',
+        )
+    })
+    //   autorun(() => {
+    //     console.log(
+    //       '[RoundTripStore changed:]',
+    //       JSON.stringify(rootStore.roundTripStore),
+    //     )
+    //   })
+    //   reaction(
+    //     () => rootStore.userStore?.id,
+    //     id => {
+    //       console.log(`[reaction] userStore.id=${id}`)
+    //       if (id) api.authenticate(id.toString())
+    //     },
+    //   )
+
+    return { rootStore, restoredState, unsubscribe }
 }

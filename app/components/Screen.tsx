@@ -1,6 +1,6 @@
 import { useScrollToTop } from '@react-navigation/native'
 import { StatusBar, StatusBarProps, StatusBarStyle } from 'expo-status-bar'
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,
@@ -17,10 +17,11 @@ import {
   ExtendedEdge,
   useSafeAreaInsetsStyle,
 } from '../utils/useSafeAreaInsetsStyle'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+// import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { useAppTheme } from '@/utils/useAppTheme'
 import { useTheme } from '@rneui/themed'
 import { useFabHeight } from './Fab'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 export const DEFAULT_BOTTOM_OFFSET = 50
 
@@ -195,6 +196,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
           $innerStyle,
           preset === 'fixed' && $justifyFlexEnd,
           contentContainerStyle,
+          //   { backgroundColor: 'red' },
           { paddingBottom: height },
         ]}>
         {children}
@@ -278,6 +280,14 @@ export function Screen(props: ScreenProps) {
   const {
     theme: { colors },
   } = useTheme()
+
+  useEffect(() => {
+    console.log(
+      '[Screen] isNonScrolling(props.preset):',
+      isNonScrolling(props.preset),
+    )
+  }, [isNonScrolling(props.preset)])
+
   return (
     <View
       style={[
@@ -301,12 +311,12 @@ export function Screen(props: ScreenProps) {
         {isNonScrolling(props.preset) ? (
           <ScreenWithoutScrolling
             {...props}
-            contentContainerStyle={$containerStyle}
+            // contentContainerStyle={$containerStyle}
           />
         ) : (
           <ScreenWithScrolling
             {...props}
-            contentContainerStyle={$containerStyle}
+            // contentContainerStyle={$containerStyle}
           />
         )}
       </KeyboardAvoidingView>
@@ -332,7 +342,11 @@ const $justifyFlexEnd: ViewStyle = {
 }
 
 const $innerStyle: ViewStyle = {
-  // justifyContent: 'flex-start',
-  // alignItems: 'stretch',
-  paddingBottom: 240,
+  justifyContent: 'flex-start',
+  alignItems: 'stretch',
+  flex: 1,
+  height: '100%',
+  width: '100%',
+  //   backgroundColor: 'red',
+  //   paddingBottom: 240,
 }

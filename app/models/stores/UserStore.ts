@@ -1,122 +1,228 @@
 import { api, GoogleUserDTO } from '@/services/api'
+import {
+    APIAction,
+    enqueueAction,
+    sync_db,
+    withDbSync,
+} from '@/tasks/BackgroundTask'
 import { KakaoProfile } from '@react-native-seoul/kakao-login'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
 import { withSetPropAction } from '../helpers/withSetPropAction'
-import { TripSummaryModel } from './TripStore'
+import {
+    TripStoreModel,
+    TripStoreSnapshot,
+    TripSummary,
+    TripSummaryModel,
+} from './TripStore'
 
 export const UserStoreModel = types
-  .model('UserStore')
-  .props({
-    // authToken: types.maybe(types.string),
-    id: types.maybeNull(types.string),
-    nickname: types.maybe(types.string),
-    tripSummary: types.array(TripSummaryModel),
-  })
-  .actions(withSetPropAction)
-  .views(store => ({
-    get isAuthenticated() {
-      console.log(`[UserStore.isAuthenticated] store.id=${store.id}`)
-      return !!store.id
-    },
-  }))
-  .actions(store => ({
-    setUser(user: UserStoreSnapshot) {
-      store.setProp('id', user.id)
-      store.setProp('nickname', user.nickname)
-      store.setProp('tripSummary', user.tripSummary || [])
-    },
-  }))
-  .actions(store => ({
-    // setAuthToken(value?: string) {
-    //   store.authToken = value
-    // },
-    // logout() {
-    //   store.authToken = undefined
-    // },
-    login(user: UserStoreSnapshot) {
-      store.setUser(user)
-      if (!!store.id) {
-        console.log(`[UserStore.login] !!store.id=${!!store.id}`)
-        api.authenticate(store.id.toString())
-      }
-      //   console.log(`[UserStore.login] end`)
-    },
-    createTrip: async () => {
-      console.log('[RootStore] createTrip()')
-      return await api.createTrip().then(async response => {
-        console.log(
-          `[RootStore] createTrip() response=${JSON.stringify(response)}`,
-        )
-        if (response.kind === 'ok') {
-          console.log('changed')
-          store.setProp('tripSummary', response.data.tripSummary)
-        }
-        return response.kind
-      })
-    },
-  }))
-  .actions(store => ({
-    // async localLogin() {
-    //     const user: UserStoreSnapshot =
-    //     store.setUser()
-    // },
-    fetchUserAccount: async () => {
-      const response = await api.getUserAccount()
-      if (response.kind === 'ok') {
-        console.log(
-          `[UserStore.fetchUserAccount] response=${JSON.stringify(response.data)}`,
-        )
-        store.setUser(response.data)
-      } else {
-        console.error(`Error fetching User: ${JSON.stringify(response)}`)
-      }
-    },
-    async kakaoLogin(idToken: string, profile: KakaoProfile) {
-      console.log(
-        `[UserStore.kakaoLogin] idToken=${idToken} profile=${JSON.stringify(profile)}`,
-      )
-      return api.kakaoLogin(idToken, profile).then(response => {
-        console.log(
-          `[UserStore.kakaoLogin] response=${response.kind} ${JSON.stringify(response)}`,
-        )
-        if (response.kind === 'ok') {
-          store.login(response.data)
-        }
-      })
-    },
-    async googleLogin(googleUser: GoogleUserDTO) {
-      return api.googleLogin(googleUser).then(response => {
-        console.log(`[api.googleLogin] response=${JSON.stringify(response)}`)
-        if (response.kind == 'ok') {
-          store.login(response.data)
-        }
-        return response.kind
-      })
-    },
-    async googleLoginWithIdToken(idToken: string) {
-      api.googleLoginWithIdToken(idToken).then(response => {
-        console.log(`[api.googleLogin] response=${JSON.stringify(response)}`)
-        if (response.kind == 'ok') {
-          store.login(response.data)
-        }
-        return response.kind
-      })
-    },
-    async guestLogin() {
-      return api.guestLogin().then(response => {
-        console.log(`[api.guestLogin] response=${JSON.stringify(response)}`)
-        if (response.kind == 'ok') {
-          store.login(response.data)
-        }
-        return response
-      })
-    },
-  }))
-  .views(store => ({
-    get currentTrip() {
-      return store.tripSummary[store.tripSummary.length - 1]
-    },
-  }))
+    .model('UserStore')
+    .props({
+        id: types.identifier,
+        nickname: types.maybeNull(types.string),
+        activeTrip: types.maybeNull(TripStoreModel),
+        tripSummary: types.array(TripSummaryModel),
+    })
+    .actions(withSetPropAction)
+    .actions(store => ({
+        setUser(user: UserStoreSnapshot) {
+            store.setProp('id', user.id)
+            store.setProp('nickname', user.nickname)
+            store.setProp('tripSummary', user.tripSummary || [])
+        },
+        setTrip(trip: TripStoreSnapshot | null) {
+            store.setProp('activeTrip', trip)
+        },
+        setTripSummary(tripSummary: TripSummary[]) {
+            store.tripSummary.clear()
+            store.tripSummary.push(...tripSummary)
+        },
+    }))
+    .actions(store => ({
+        // setAuthToken(value?: string) {
+        //   store.authToken = value
+        // },
+        // fetchUserAccount: async () => {
+        //     if ((await sync_db()) > 0) {
+        //         const response = await api.getUserAccount()
+        //         if (response.kind === 'ok') {
+        //             console.log(
+        //                 `[UserStore.fetchUserAccount] response=${JSON.stringify(response.data)}`,
+        //             )
+        //             store.setUser(response.data)
+        //         } else {
+        //             console.error(
+        //                 `Error fetching User: ${JSON.stringify(response)}`,
+        //             )
+        //         }
+        //     }
+        // },
+        fetchActiveTrip: withDbSync(async () => {
+            console.log(`[UserStore.fetchActiveTrip]`)
+            const response = await api.getActiveTrip(store.id)
+            if (response.kind === 'ok') {
+                console.log(
+                    `[UserStore.fetchActiveTrip] ok, response.data=${JSON.stringify(response.data)}`,
+                )
+                store.setTrip(response.data)
+            } else {
+                console.error(
+                    `Error fetching Trip: ${JSON.stringify(response)}`,
+                )
+            }
+            return { kind: response.kind }
+        }),
+        fetchTripSummary: withDbSync(async () => {
+            const response = await api.getTripSummary(store.id)
+            if (response.kind === 'ok') {
+                console.log(
+                    `[UserStore.fetchTripSummary] ok, response.data=${JSON.stringify(response.data)}`,
+                )
+                store.setTripSummary(response.data.tripSummary)
+            } else {
+                console.error(
+                    `Error fetching User: ${JSON.stringify(response)}`,
+                )
+            }
+            return { kind: response.kind }
+        }),
+        // fetchTripByLocation: async (location: string) => {
+        //     console.log(`[UserStore.fetchTripByLocation] location=${location}`)
+        //     const response = await api.getTripByLocation(location)
+        //     if (response.kind === 'ok') {
+        //         store.setProp('tripStore', response.data as TripStoreSnapshot)
+        //     } else {
+        //         console.error(
+        //             `Error fetching Trip: ${JSON.stringify(response)}`,
+        //         )
+        //     }
+        //     return response
+        // },
+    }))
+    .actions(store => ({
+        setActiveTrip: withDbSync(async (tripId: string) => {
+            console.log('[UserStore.setActiveTrip]')
+            return api.setActiveTrip(store.id, tripId).then(async response => {
+                console.log(
+                    `[UserStore.setActiveTrip] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind === 'ok') {
+                    store.setTrip(
+                        response.data,
+                        // TripStoreModel.create(response.data),
+                    )
+                }
+                return { kind: response.kind }
+            })
+        }),
+    }))
+    .actions(store => ({
+        createTrip: async () => {
+            console.log('[UserStore.createTrip]')
+            return api.createTrip({ userId: store.id }).then(async response => {
+                console.log(
+                    `[UserStore.createTrip] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind === 'ok') {
+                    store.setProp('tripSummary', response.data.tripSummary)
+                    return store.fetchActiveTrip({}).then(response => {
+                        return response
+                    })
+                }
+                return response
+            })
+        },
+        deleteTrip: (tripId: string) => {
+            console.log('[UserStore.deleteTrip]')
+            const trip = store.tripSummary.find(t => t.id === tripId)
+            if (trip) {
+                store.tripSummary.remove(trip)
+                enqueueAction(APIAction.DELETE_TRIP, { tripId })
+            }
+        },
+        // async kakaoLogin(idToken: string, profile: KakaoProfile) {
+        //     console.log(
+        //         `[UserStore.kakaoLogin] idToken=${idToken} profile=${JSON.stringify(profile)}`,
+        //     )
+        //     return api.kakaoLogin(idToken, profile).then(response => {
+        //         console.log(
+        //             `[UserStore.kakaoLogin] response=${response.kind} ${JSON.stringify(response)}`,
+        //         )
+        //         if (response.kind === 'ok') {
+        //             store.setUser(response.data)
+        //             return response
+        //         }
+        //     })
+        // },
+        // async googleLogin(googleUser: GoogleUserDTO) {
+        //     return api.googleLogin(googleUser).then(response => {
+        //         console.log(
+        //             `[api.googleLogin] response=${JSON.stringify(response)}`,
+        //         )
+        //         if (response.kind == 'ok') {
+        //             store.setUser(response.data)
+        //             return response
+        //         }
+        //         return response
+        //     })
+        // },
+        // async googleLoginWithIdToken(idToken: string) {
+        //     api.googleLoginWithIdToken(idToken).then(response => {
+        //         console.log(
+        //             `[api.googleLogin] response=${JSON.stringify(response)}`,
+        //         )
+        //         if (response.kind == 'ok') {
+        //             store.setUser(response.data)
+        //             return response
+        //         }
+        //         return response
+        //     })
+        // },
+        // async guestLogin() {
+        //     return api.guestLogin().then(response => {
+        //         console.log(
+        //             `[api.guestLogin] response=${JSON.stringify(response)}`,
+        //         )
+        //         if (response.kind == 'ok') {
+        //             store.setUser(response.data)
+        //             return store.fetchActiveTrip().then(response => {
+        //                 return response
+        //             })
+        //         }
+        //         return response
+        //     })
+        // },
+    }))
+    .views(store => ({
+        get maxNumberOfTrip() {
+            return 5
+        },
+    }))
+    .views(store => ({
+        get currentTrip() {
+            return store.tripSummary[store.tripSummary.length - 1]
+        },
+        get otherTripSummaryList() {
+            return [
+                ...store.tripSummary
+                    .filter(t => t.id !== store.activeTrip?.id)
+                    .toSorted(),
+            ]
+        },
+        get activeTripSumamry() {
+            return store.tripSummary.filter(
+                t => t.id === store.activeTrip?.id,
+            )[0]
+        },
+        get hasReachedTripNumberLimit() {
+            return store.tripSummary.length == store.maxNumberOfTrip
+        },
+    }))
+    .views(store => ({
+        get tripSummaryList() {
+            return [store.activeTripSumamry, ...store.otherTripSummaryList]
+        },
+    }))
 
 export interface UserStore extends Instance<typeof UserStoreModel> {}
 export interface UserStoreSnapshot extends SnapshotOut<typeof UserStoreModel> {}

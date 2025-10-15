@@ -7,7 +7,7 @@
 // import {TransText} from '@/components/TransText'
 // import {useStores, useTripStore} from '@/models'
 // import {Todo} from '@/models/Todo'
-// import {AppStackParamList, goBack, useNavigate} from '@/navigators'
+// import {AuthenticatedStackParamList, goBack, useNavigate} from '@/navigators'
 // import {useHeader} from '@/utils/useHeader'
 // import {ListItem} from '@rneui/themed'
 // import {observer} from 'mobx-react-lite'
@@ -51,7 +51,7 @@
 
 // const useTodoConfirmListItem = (
 //   todo: Todo,
-//   confirmScreen: keyof AppStackParamList,
+//   confirmScreen: keyof AuthenticatedStackParamList,
 //   isBeforeInitialization = false,
 // ) => {
 //   const [isCompleted, setIsCompleted] = useState(todo.isCompleted)
