@@ -2,7 +2,7 @@ import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewerCalendar'
 import * as Fab from '@/components/Fab'
 import { Screen } from '@/components/Screen'
-import { useStores, useTripStore } from '@/models'
+import { useReservationStore, useTripStore } from '@/models'
 import { toCalendarString } from '@/utils/date'
 import {
   $headerCenterTitleContainerStyle,
@@ -15,7 +15,7 @@ import { FC, useEffect, useState } from 'react'
 import { MarkedDates } from 'react-native-calendars/src/types'
 
 const AccomodationDateEditCalendar: FC = observer(() => {
-  const { reservationStore } = useStores()
+  const reservationStore = useReservationStore()
 
   //   const markedDates = Object.fromEntries(
   //     tripStore.calendarMarkedDateEntries.map(([k, { colorIndex, ...v }]) => [

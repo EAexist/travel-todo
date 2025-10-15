@@ -1,6 +1,5 @@
-import { FC, useCallback, useEffect } from 'react'
 import { LoginButton } from '@/components/Login/LoginButton'
-import { useStores } from '@/models'
+import { useUserStore } from '@/models'
 import { saveString } from '@/utils/storage'
 import {
     GoogleSignin,
@@ -9,10 +8,10 @@ import {
 } from '@react-native-google-signin/google-signin'
 import { ButtonProps } from '@rneui/themed'
 import * as g from 'assets/images/third-party/g.png'
+import { FC, useCallback, useEffect } from 'react'
 import { StyleSheet } from 'react-native'
 
 export const GoogleLoginButtonBase: FC<ButtonProps> = props => {
-
     return (
         <LoginButton
             title={'구글로 시작하기'}
@@ -36,8 +35,7 @@ const $googleButtonStyle = StyleSheet.create({
 })
 
 export const GoogleLoginButton: FC<ButtonProps> = props => {
-
-    const { userStore } = useStores()
+    const userStore = useUserStore()
 
     useEffect(() => {
         GoogleSignin.configure({
@@ -87,10 +85,5 @@ export const GoogleLoginButton: FC<ButtonProps> = props => {
         }
     }, [])
 
-    return (
-        <GoogleLoginButtonBase
-            onPress={handleGoogleLoginPress}
-            {...props}
-        />
-    )
+    return <GoogleLoginButtonBase onPress={handleGoogleLoginPress} {...props} />
 }

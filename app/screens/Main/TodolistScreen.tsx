@@ -1,20 +1,20 @@
 import { Divider, useTheme } from '@rneui/themed'
 import { FC, useCallback, useRef } from 'react'
 import {
-  DefaultSectionT,
-  ScrollView,
-  SectionList,
-  SectionListRenderItem,
-  TouchableOpacity,
-  View,
+    DefaultSectionT,
+    ScrollView,
+    SectionList,
+    SectionListRenderItem,
+    TouchableOpacity,
+    View,
 } from 'react-native'
 //
 import { BottomSheetModal } from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import ListSubheader from '@/components/ListSubheader'
 import {
-  NavigateMenuBottomSheet,
-  NavigateMenuData,
+    NavigateMenuBottomSheet,
+    NavigateMenuData,
 } from '@/components/NavigateMenuBottomSheet'
 import { Screen } from '@/components/Screen'
 import SectionHeader from '@/components/SectionHeader'
@@ -53,133 +53,125 @@ import { Pin } from 'lucide-react-native'
 // }
 
 export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
-  ({}) => {
-    const tripStore = useTripStore()
+    ({}) => {
+        const tripStore = useTripStore()
 
-    // const { tripId } = route.params
-
-    // useEffect(() => {
-    //     rootStore.fetchTrip(tripId)
-    // }, [tripId])
-
-    const renderItem: SectionListRenderItem<Todo, DefaultSectionT> = ({
-      item,
-    }) => (
-      <Observer
-        render={() => {
-          switch (item.type) {
-            case 'accomodation':
-              return <AccomodationTodo todo={item} />
-            case 'passport':
-              return <CompleteTodo todo={item} />
-            default:
-              return <CompleteTodo todo={item} />
-          }
-        }}
-      />
-    )
-
-    const renderSectionHeader = useCallback(
-      ({ section: { title } }: { section: DefaultSectionT }) => (
-        <ListSubheader title={title} />
-      ),
-      [],
-    )
-
-    /* Menu */
-    const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
-
-    const handlePinButtonPress = useCallback(() => {
-      tripStore.toggleTripMode()
-    }, [settingsMenuBottomSheetRef])
-
-    const handleSettingsButtonPress = useCallback(() => {
-      settingsMenuBottomSheetRef.current?.present()
-    }, [settingsMenuBottomSheetRef])
-
-    const {
-      theme: { colors },
-    } = useTheme()
-
-    useMainScreenHeader(
-      {
-        //   title: tripStore.title,
-        title: '할 일',
-        rightComponent: (
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity
-              //   onPress={handlePinButtonPress}
-              disabled
-              style={$headerRightButtonStyle}>
-              {tripStore.isTripMode ? (
-                <Pin />
-              ) : (
-                <Pin fill={colors.text.primary} />
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleSettingsButtonPress}
-              style={$headerRightButtonStyle}>
-              <HeaderIcon name="gear" type="octicon" />
-            </TouchableOpacity>
-          </View>
-        ),
-      },
-      [tripStore.isTripMode],
-    )
-
-    const settingsOption: NavigateMenuData[] = [
-      {
-        title: '할 일 추가',
-        path: 'TodolistAdd',
-        icon: { name: 'add', type: 'material' },
-        primary: true,
-      },
-      {
-        title: '목록 순서 변경',
-        path: 'TodolistReorder',
-        icon: { name: 'swap-vert', type: 'material' },
-      },
-      {
-        title: '목록에서 할 일 삭제',
-        path: 'TodolistDelete',
-        icon: { name: 'delete', type: 'material' },
-      },
-    ]
-
-    return (
-      //   <GestureHandlerRootViewWrapper>
-      <Screen>
-        <ScrollView>
-          <View>
-            <SectionList
-              sections={tripStore.incompleteTrip}
-              keyExtractor={item => item.id}
-              renderItem={renderItem}
-              renderSectionHeader={renderSectionHeader}
+        const renderItem: SectionListRenderItem<Todo, DefaultSectionT> = ({
+            item,
+        }) => (
+            <Observer
+                render={() => {
+                    switch (item.type) {
+                        case 'accomodation':
+                            return <AccomodationTodo todo={item} />
+                        case 'passport':
+                            return <CompleteTodo todo={item} />
+                        default:
+                            return <CompleteTodo todo={item} />
+                    }
+                }}
             />
-          </View>
-          {tripStore.completedTrip.length > 0 && (
-            <View>
-              <Divider />
-              <SectionHeader>완료한 할 일</SectionHeader>
-              <SectionList
-                sections={tripStore.completedTrip}
-                keyExtractor={item => item.id}
-                renderItem={renderItem}
-                renderSectionHeader={renderSectionHeader}
-              />
-            </View>
-          )}
-        </ScrollView>
-        <NavigateMenuBottomSheet
-          data={settingsOption}
-          ref={settingsMenuBottomSheetRef}
-        />
-      </Screen>
-      //   </GestureHandlerRootViewWrapper>
-    )
-  },
+        )
+
+        const renderSectionHeader = useCallback(
+            ({ section: { title } }: { section: DefaultSectionT }) => (
+                <ListSubheader title={title} />
+            ),
+            [],
+        )
+
+        /* Menu */
+        const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
+
+        const handlePinButtonPress = useCallback(() => {
+            tripStore.toggleTripMode()
+        }, [settingsMenuBottomSheetRef])
+
+        const handleSettingsButtonPress = useCallback(() => {
+            settingsMenuBottomSheetRef.current?.present()
+        }, [settingsMenuBottomSheetRef])
+
+        const {
+            theme: { colors },
+        } = useTheme()
+
+        useMainScreenHeader(
+            {
+                //   title: tripStore.title,
+                title: '할 일',
+                rightComponent: (
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            //   onPress={handlePinButtonPress}
+                            disabled
+                            style={$headerRightButtonStyle}>
+                            {tripStore.isTripMode ? (
+                                <Pin />
+                            ) : (
+                                <Pin fill={colors.text.primary} />
+                            )}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={handleSettingsButtonPress}
+                            style={$headerRightButtonStyle}>
+                            <HeaderIcon name="gear" type="octicon" />
+                        </TouchableOpacity>
+                    </View>
+                ),
+            },
+            [tripStore.isTripMode],
+        )
+
+        const settingsOption: NavigateMenuData[] = [
+            {
+                title: '할 일 추가',
+                path: 'TodolistAdd',
+                icon: { name: 'add', type: 'material' },
+                primary: true,
+            },
+            {
+                title: '목록 순서 변경',
+                path: 'TodolistReorder',
+                icon: { name: 'swap-vert', type: 'material' },
+            },
+            {
+                title: '목록에서 할 일 삭제',
+                path: 'TodolistDelete',
+                icon: { name: 'delete', type: 'material' },
+            },
+        ]
+
+        return (
+            <Screen>
+                <ScrollView>
+                    <View>
+                        <SectionList
+                            sections={tripStore.incompleteTrip}
+                            keyExtractor={item => item.id}
+                            renderItem={renderItem}
+                            renderSectionHeader={renderSectionHeader}
+                        />
+                    </View>
+                    {tripStore.completedTrip.length > 0 && (
+                        <View>
+                            <Divider />
+                            <SectionHeader>완료한 할 일</SectionHeader>
+                            <SectionList
+                                sections={tripStore.completedTrip}
+                                keyExtractor={item => item.id}
+                                renderItem={renderItem}
+                                renderSectionHeader={renderSectionHeader}
+                            />
+                        </View>
+                    )}
+                </ScrollView>
+                <NavigateMenuBottomSheet
+                    data={settingsOption}
+                    ref={settingsMenuBottomSheetRef}
+                />
+            </Screen>
+        )
+    },
 )
 
 // const SettingsMenuBottomSheet = ({

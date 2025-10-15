@@ -7,7 +7,7 @@ patch:
 ---
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import {
-  WelcomeScreen
+  HomeScreen
 } from "@/screens"
 
 export type <%= props.pascalCaseName %>NavigatorParamList = {
@@ -18,7 +18,7 @@ const Stack = createNativeStackNavigator<<%= props.pascalCaseName %>NavigatorPar
 export const <%= props.pascalCaseName %>Navigator = () => {
   return (
     <Stack.Navigator screenOptions={{ cardStyle: { backgroundColor: "transparent" }, headerShown: false, }}>
-      <Stack.Screen name="Demo" component={WelcomeScreen} />
+      <Stack.Screen name="Demo" component={HomeScreen} />
     </Stack.Navigator>
   )
 }

@@ -4,15 +4,15 @@ import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewer
 import * as Fab from '@/components/Fab'
 import { ListItemBase } from '@/components/ListItem'
 import { Screen } from '@/components/Screen'
-import { useStores, useTripStore } from '@/models'
+import { useReservationStore, useStores, useTripStore } from '@/models'
 import { Accomodation } from '@/models/Reservation/Accomodation'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
 import { toCalendarString } from '@/utils/date'
 import {
-  $headerCenterTitleContainerStyle,
-  HeaderCenterTitle,
-  useHeader,
+    $headerCenterTitleContainerStyle,
+    HeaderCenterTitle,
+    useHeader,
 } from '@/utils/useHeader'
 import { useTheme } from '@rneui/themed'
 import { eachDayOfInterval } from 'date-fns'
@@ -21,137 +21,150 @@ import { FC, useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 import { ListRenderItem } from 'react-native'
 import { MarkedDates } from 'react-native-calendars/src/types'
+import { Calendar } from '@/components/Calendar/Calendar'
 
 const AccomodationPlanCalendar: FC = observer(() => {
-  const { reservationStore } = useStores()
+    const reservationStore = useReservationStore()
 
-  const {
-    theme: { colors },
-  } = useTheme()
+    const {
+        theme: { colors },
+    } = useTheme()
 
-  const markedDates = Object.fromEntries(
-    Object.entries(
-      reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
-    ).map(([k, { periods }]) => [
-      k,
-      {
-        periods: periods.map(({ colorIndex, ...v }) => ({
-          ...v,
-          color: colors.palette[colorIndex],
-        })),
-      },
-    ]),
-  )
+    const tripStore = useTripStore()
 
-  useEffect(() => {
-    console.log(reservationStore.accomodationCalendarMarkedDatesWithColorIndex)
-  }, [reservationStore.accomodationCalendarMarkedDatesWithColorIndex])
+    const markedDates = Object.fromEntries(
+        Object.entries(
+            reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
+        ).map(([k, { periods }]) => [
+            k,
+            {
+                periods: periods.map(({ colorIndex, ...v }) => ({
+                    ...v,
+                    color: colors.palette[colorIndex],
+                })),
+            },
+        ]),
+    )
 
-  return (
-    <ScheduleViewerCalendarBase
-      markingType="multi-period"
-      markedDates={markedDates}
-    />
-  )
+    useEffect(() => {
+        console.log(
+            reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
+        )
+    }, [reservationStore.accomodationCalendarMarkedDatesWithColorIndex])
+
+    return tripStore.isScheduleSet ? (
+        <ScheduleViewerCalendarBase
+            markingType="multi-period"
+            markedDates={markedDates}
+        />
+    ) : (
+        <Calendar markingType="multi-period" markedDates={markedDates} />
+    )
 })
 
 const AccomodationListItem: FC<{
-  reservation: Reservation
+    reservation: Reservation
 }> = ({ reservation }) => {
-  const { reservationStore } = useStores()
-  const { navigateWithTrip } = useNavigate()
-  const accomodation = reservation.accomodation as Accomodation
+    const reservationStore = useReservationStore()
+    const { navigateWithTrip } = useNavigate()
+    const accomodation = reservation.accomodation as Accomodation
 
-  const handlePress = useCallback(() => {
-    navigateWithTrip('Reservation', { reservationId: reservation.id })
-  }, [])
+    const handlePress = useCallback(() => {
+        navigateWithTrip('Reservation', { reservationId: reservation.id })
+    }, [])
 
-  const {
-    theme: { colors },
-  } = useTheme()
+    const {
+        theme: { colors },
+    } = useTheme()
 
-  return (
-    <ListItemBase
-      title={accomodation.title || ''}
-      subtitle={accomodation.nightsParsed || undefined}
-      avatarProps={{
-        icon: {
-          color: colors.white,
-          ...(accomodation.type === 'hotel'
-            ? { type: 'font-awesome-5', name: 'hotel' }
-            : accomodation.type === 'airbnb'
-              ? { type: 'font-awesome-5', name: 'airbnb' }
-              : accomodation.type === 'dorm'
-                ? { type: 'material-community', name: 'bunk-bed-outline' }
-                : { type: 'material-community', name: 'bed-king-outline' }),
-        },
-        containerStyle: accomodation.title
-          ? {
-              backgroundColor:
-                colors.palette[
-                  reservationStore.orderedAccomodationReservations.indexOf(
-                    reservation,
-                  )
-                ],
-            }
-          : {},
-      }}
-      onPress={handlePress}
-      containerStyle={{ height: 64 }}
-    />
-  )
+    return (
+        <ListItemBase
+            title={accomodation.title || ''}
+            subtitle={accomodation.nightsParsed || undefined}
+            avatarProps={{
+                icon: {
+                    color: colors.white,
+                    ...(accomodation.category === 'HOTEL'
+                        ? { type: 'font-awesome-5', name: 'hotel' }
+                        : accomodation.category === 'AIRBNB'
+                          ? { type: 'font-awesome-5', name: 'airbnb' }
+                          : accomodation.category === 'DORMITORY'
+                            ? {
+                                  type: 'material-community',
+                                  name: 'bunk-bed-outline',
+                              }
+                            : {
+                                  type: 'material-community',
+                                  name: 'bed-king-outline',
+                              }),
+                },
+                containerStyle: accomodation.title
+                    ? {
+                          backgroundColor:
+                              colors.palette[
+                                  reservationStore.orderedAccomodationReservations.indexOf(
+                                      reservation,
+                                  )
+                              ],
+                      }
+                    : {},
+            }}
+            onPress={handlePress}
+            containerStyle={{ height: 64 }}
+        />
+    )
 }
 
 export const AccomodationPlanScreen: FC = observer(({}) => {
-  const { reservationStore } = useStores()
+    const reservationStore = useReservationStore()
 
-  const renderListItem: ListRenderItem<{
-    reservation: Reservation
-    index: number
-  }> = ({ item }) => {
-    return <AccomodationListItem reservation={item.reservation} />
-  }
+    const renderListItem: ListRenderItem<{
+        reservation: Reservation
+        index: number
+    }> = ({ item }) => {
+        return <AccomodationListItem reservation={item.reservation} />
+    }
 
-  useHeader({
-    centerComponent: (
-      <HeaderCenterTitle
-        title="숙박 예약"
-        //   icon={{name: '🛌'}}
-      />
-    ),
-    centerContainerStyle: $headerCenterTitleContainerStyle,
-  })
+    useHeader({
+        centerComponent: (
+            <HeaderCenterTitle
+                title="숙박 예약"
+                //   icon={{name: '🛌'}}
+            />
+        ),
+        centerContainerStyle: $headerCenterTitleContainerStyle,
+    })
 
-  return (
-    <Screen>
-      <CalendarContainer>
-        <AccomodationPlanCalendar />
-      </CalendarContainer>
-      <FlatList
-        data={reservationStore.orderedAccomodationReservations.map(
-          (reservation, index) => ({
-            index,
-            reservation,
-          }),
-        )}
-        renderItem={renderListItem}
-        keyExtractor={item => item.reservation.id}
-        style={{ flexGrow: 0 }}
-        // contentContainerStyle={{ paddingHorizontal: 20 }}
-      />
-      <Fab.Container>
-        <Fab.NextButton
-          title={'숙박 예약 추가하기'}
-          navigateProps={{
-            name: 'ReservationCreate',
-            params: {
-              defaultCategory: 'ACCOMODATION',
-            },
-          }}
-        />
-      </Fab.Container>
-    </Screen>
-  )
+    return (
+        <Screen>
+            <CalendarContainer>
+                <AccomodationPlanCalendar />
+            </CalendarContainer>
+            <FlatList
+                data={reservationStore.orderedAccomodationReservations.map(
+                    (reservation, index) => ({
+                        index,
+                        reservation,
+                    }),
+                )}
+                renderItem={renderListItem}
+                keyExtractor={item => item.reservation.id}
+                style={{ flexGrow: 0 }}
+                // contentContainerStyle={{ paddingHorizontal: 20 }}
+            />
+            <Fab.Container>
+                <Fab.NextButton
+                    title={'숙박 예약 추가하기'}
+                    navigateProps={{
+                        name: 'ReservationCreate',
+                        params: {
+                            defaultCategory: 'ACCOMODATION',
+                        },
+                    }}
+                />
+            </Fab.Container>
+        </Screen>
+    )
 })
 
 // const $palette = [

@@ -1,9 +1,10 @@
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
-import { api } from '@/services/api'
+import { api, ApiResult, GoogleUserDTO } from '@/services/api'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
-import { ReservationStoreModel } from './ReservationStore'
 import { TripStoreModel, TripStoreSnapshot } from './TripStore'
-import { UserStoreModel } from './UserStore'
+import { UserStoreModel, UserStoreSnapshot } from './UserStore'
+import { sync_db, withDbSync } from '@/tasks/BackgroundTask'
+import { KakaoProfile } from '@react-native-seoul/kakao-login'
 
 // const GeneralApiProblemType = types.custom<
 //   GeneralApiProblem,
@@ -20,42 +21,80 @@ import { UserStoreModel } from './UserStore'
  * A RootStore model.
  */
 export const RootStoreModel = types
-  .model('RootStore')
-  .props({
-    userStore: types.optional(UserStoreModel, { id: null }),
-    tripStore: types.maybeNull(TripStoreModel),
-    reservationStore: types.optional(ReservationStoreModel, {}),
-  })
-  .actions(withSetPropAction)
-  .actions(store => ({
-    fetchTrip: async (tripId: string) => {
-      console.log(`[RootStore.fetchTrip] tripId=${tripId}`)
-      const response = await api.getTrip(tripId)
-      if (response.kind === 'ok') {
-        store.setProp('tripStore', response.data as TripStoreSnapshot)
-      } else {
-        console.error(`Error fetching Trip: ${JSON.stringify(response)}`)
-      }
-      return response.kind
-    },
-    async createTrip() {
-      return store.userStore.createTrip().then(kind => {
-        if (kind === 'ok') {
-          return this.fetchTrip(store.userStore.tripSummary[0].id).then(
-            kind => {
-              return { kind }
-            },
-          )
-        } else return { kind }
-      })
-    },
-    async createFromText(text: string) {
-      if (!store.tripStore?.id) {
-        throw Error('[createFromText] Cannot find trip')
-      }
-      return store.reservationStore.createFromText(store.tripStore?.id, text)
-    },
-  }))
+    .model('RootStore')
+    .props({
+        userStore: types.maybeNull(UserStoreModel),
+    })
+    .actions(withSetPropAction)
+    .views(store => ({
+        get isAuthenticated() {
+            return store.userStore !== null
+        },
+    }))
+    .actions(store => ({
+        setUser: (userStore: UserStoreSnapshot) => {
+            store.setProp('userStore', UserStoreModel.create(userStore))
+        },
+    }))
+    .actions(store => ({
+        async kakaoLogin(idToken: string, profile: KakaoProfile) {
+            console.log(
+                `[UserStore.kakaoLogin] idToken=${idToken} profile=${JSON.stringify(profile)}`,
+            )
+            return api.kakaoLogin(idToken, profile).then(response => {
+                console.log(
+                    `[UserStore.kakaoLogin] response=${response.kind} ${JSON.stringify(response)}`,
+                )
+                if (response.kind === 'ok') {
+                    store.setUser(response.data)
+                    return response
+                }
+            })
+        },
+        async googleLogin(googleUser: GoogleUserDTO) {
+            return api.googleLogin(googleUser).then(response => {
+                console.log(
+                    `[api.googleLogin] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind == 'ok') {
+                    store.setUser(response.data)
+                    return response
+                }
+                return response
+            })
+        },
+        async googleLoginWithIdToken(idToken: string) {
+            api.googleLoginWithIdToken(idToken).then(response => {
+                console.log(
+                    `[api.googleLogin] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind == 'ok') {
+                    store.setUser(response.data)
+                    return response
+                }
+                return response
+            })
+        },
+        async guestLogin() {
+            return api.guestLogin().then(response => {
+                console.log(
+                    `[api.guestLogin] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind == 'ok') {
+                    store.setUser(response.data)
+                    return store.userStore
+                        ?.fetchActiveTrip({})
+                        .then(response => {
+                            return response
+                        })
+                }
+                return { kind: response.kind }
+            })
+        },
+        logout: withDbSync(() => {
+            store.setProp('userStore', null)
+        }),
+    }))
 
 /**
  * The RootStore instance.

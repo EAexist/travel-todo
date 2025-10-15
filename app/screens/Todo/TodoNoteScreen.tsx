@@ -9,40 +9,38 @@ import { useCallback, useState } from 'react'
 import { ViewStyle } from 'react-native'
 
 export const TodoNoteScreen = withTodo<'TodoNote'>(({ todo }) => {
-  const tripStore = useTripStore()
+    const onBackPressBeforeNavigate = useCallback(async () => {
+        todo.patch({ note: todo.note })
+    }, [todo])
 
-  const onBackPressBeforeNavigate = useCallback(async () => {
-    tripStore.patchTodo({ id: todo.id, note: todo.note })
-  }, [todo])
+    useHeader({ onBackPressBeforeNavigate })
 
-  useHeader({ onBackPressBeforeNavigate })
+    const [isFocused, setIsFocused] = useState(false)
+    const handleChangeNote = (value: string) => todo.setProp('note', value)
 
-  const [isFocused, setIsFocused] = useState(false)
-  const handleChangeNote = (value: string) => todo.setProp('note', value)
-
-  return (
-    <Screen>
-      <ContentTitle
-        variant="listItem"
-        title={todo.title}
-        subtitle={todo.categoryTitle}
-        icon={todo.icon}
-      />
-      <Note
-        onChangeNote={handleChangeNote}
-        initialValue={todo.note}
-        isFocused={isFocused}
-        setIsFocused={setIsFocused}
-      />
-      {isFocused && (
-        <Fab.Container>
-          <Fab.Button title={'확인'} />
-        </Fab.Container>
-      )}
-    </Screen>
-  )
+    return (
+        <Screen>
+            <ContentTitle
+                variant="listItem"
+                title={todo.title}
+                subtitle={todo.categoryTitle}
+                icon={todo.icon}
+            />
+            <Note
+                onChangeText={handleChangeNote}
+                initialValue={todo.note}
+                isFocused={isFocused}
+                setIsFocused={setIsFocused}
+            />
+            {isFocused && (
+                <Fab.Container>
+                    <Fab.Button title={'확인'} />
+                </Fab.Container>
+            )}
+        </Screen>
+    )
 })
 
 const $listItemContainerStyle: ViewStyle = {
-  height: 60,
+    height: 60,
 }

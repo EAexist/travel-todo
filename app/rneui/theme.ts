@@ -2,628 +2,633 @@ import { createTheme } from '@rneui/themed'
 import { Platform, TextStyle } from 'react-native'
 
 type Font = {
-  thin?: TextStyle
-  extraLight?: TextStyle
-  light?: TextStyle
-  regular?: TextStyle
-  medium?: TextStyle
-  semiBold?: TextStyle
-  bold?: TextStyle
-  extraBold?: TextStyle
-  black?: TextStyle
+    thin?: TextStyle
+    extraLight?: TextStyle
+    light?: TextStyle
+    regular?: TextStyle
+    medium?: TextStyle
+    semiBold?: TextStyle
+    bold?: TextStyle
+    extraBold?: TextStyle
+    black?: TextStyle
 }
 
 export const typography: { pretendard: Font } = {
-  pretendard:
-    Platform.OS == 'web'
-      ? {
-          thin: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 100,
-          },
-          extraLight: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 200,
-          },
-          light: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 300,
-          },
-          regular: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 400,
-          },
-          medium: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 500,
-          },
-          semiBold: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 600,
-          },
-          bold: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 700,
-          },
-          extraBold: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 800,
-          },
-          black: {
-            fontFamily: 'Pretendard Variable',
-            fontWeight: 900,
-          },
-        }
-      : Platform.OS == 'android'
-        ? {
-            thin: {
-              fontFamily: 'Pretendard-Thin',
-              fontWeight: 'normal',
-            },
-            extraLight: {
-              fontFamily: 'Pretendard-ExtraLight',
-              fontWeight: 'normal',
-            },
-            light: {
-              fontFamily: 'Pretendard-Light',
-              fontWeight: 'normal',
-            },
-            regular: {
-              fontFamily: 'Pretendard-Regular',
-              fontWeight: 'normal',
-            },
-            medium: {
-              fontFamily: 'Pretendard-Medium',
-              fontWeight: 'normal',
-            },
-            semiBold: {
-              fontFamily: 'Pretendard-SemiBold',
-              fontWeight: 'normal',
-            },
-            bold: {
-              fontFamily: 'Pretendard-Bold',
-              fontWeight: 'normal',
-            },
-            extraBold: {
-              fontFamily: 'Pretendard-ExtraBold',
-              fontWeight: 'normal',
-            },
-            black: {
-              fontFamily: 'Pretendard-Black',
-              fontWeight: 'normal',
-            },
-          }
-        : Platform.OS == 'ios'
-          ? {
-              thin: {
-                fontFamily: 'Pretendard',
-                fontWeight: 100,
-              },
-              extraLight: {
-                fontFamily: 'Pretendard',
-                fontWeight: 200,
-              },
-              light: {
-                fontFamily: 'Pretendard',
-                fontWeight: 300,
-              },
-              regular: {
-                fontFamily: 'Pretendard',
-                fontWeight: 400,
-              },
-              medium: {
-                fontFamily: 'Pretendard',
-                fontWeight: 500,
-              },
-              semiBold: {
-                fontFamily: 'Pretendard',
-                fontWeight: 600,
-              },
-              bold: {
-                fontFamily: 'Pretendard',
-                fontWeight: 700,
-              },
-              extraBold: {
-                fontFamily: 'Pretendard',
-                fontWeight: 800,
-              },
-              black: {
-                fontFamily: 'Pretendard',
-                fontWeight: 900,
-              },
-            }
-          : {
-              thin: {
-                fontFamily: 'Pretendard-Thin',
-              },
-              extraLight: {
-                fontFamily: 'Pretendard-ExtraLight',
-              },
-              light: {
-                fontFamily: 'Pretendard-Light',
-              },
-              regular: {
-                fontFamily: 'Pretendard-Regular',
-              },
-              medium: {
-                fontFamily: 'Pretendard-Medium',
-              },
-              semiBold: {
-                fontFamily: 'Pretendard-SemiBold',
-              },
-              bold: {
-                fontFamily: 'Pretendard-Bold',
-              },
-              extraBold: {
-                fontFamily: 'Pretendard-ExtraBold',
-              },
-              black: {
-                fontFamily: 'Pretendard-Black',
-              },
-            },
+    pretendard:
+        Platform.OS == 'web'
+            ? {
+                  thin: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 100,
+                  },
+                  extraLight: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 200,
+                  },
+                  light: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 300,
+                  },
+                  regular: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 400,
+                  },
+                  medium: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 500,
+                  },
+                  semiBold: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 600,
+                  },
+                  bold: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 700,
+                  },
+                  extraBold: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 800,
+                  },
+                  black: {
+                      fontFamily: 'Pretendard Variable',
+                      fontWeight: 900,
+                  },
+              }
+            : Platform.OS == 'android'
+              ? {
+                    thin: {
+                        fontFamily: 'Pretendard-Thin',
+                        fontWeight: 'normal',
+                    },
+                    extraLight: {
+                        fontFamily: 'Pretendard-ExtraLight',
+                        fontWeight: 'normal',
+                    },
+                    light: {
+                        fontFamily: 'Pretendard-Light',
+                        fontWeight: 'normal',
+                    },
+                    regular: {
+                        fontFamily: 'Pretendard-Regular',
+                        fontWeight: 'normal',
+                    },
+                    medium: {
+                        fontFamily: 'Pretendard-Medium',
+                        fontWeight: 'normal',
+                    },
+                    semiBold: {
+                        fontFamily: 'Pretendard-SemiBold',
+                        fontWeight: 'normal',
+                    },
+                    bold: {
+                        fontFamily: 'Pretendard-Bold',
+                        fontWeight: 'normal',
+                    },
+                    extraBold: {
+                        fontFamily: 'Pretendard-ExtraBold',
+                        fontWeight: 'normal',
+                    },
+                    black: {
+                        fontFamily: 'Pretendard-Black',
+                        fontWeight: 'normal',
+                    },
+                }
+              : Platform.OS == 'ios'
+                ? {
+                      thin: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 100,
+                      },
+                      extraLight: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 200,
+                      },
+                      light: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 300,
+                      },
+                      regular: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 400,
+                      },
+                      medium: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 500,
+                      },
+                      semiBold: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 600,
+                      },
+                      bold: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 700,
+                      },
+                      extraBold: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 800,
+                      },
+                      black: {
+                          fontFamily: 'Pretendard',
+                          fontWeight: 900,
+                      },
+                  }
+                : {
+                      thin: {
+                          fontFamily: 'Pretendard-Thin',
+                      },
+                      extraLight: {
+                          fontFamily: 'Pretendard-ExtraLight',
+                      },
+                      light: {
+                          fontFamily: 'Pretendard-Light',
+                      },
+                      regular: {
+                          fontFamily: 'Pretendard-Regular',
+                      },
+                      medium: {
+                          fontFamily: 'Pretendard-Medium',
+                      },
+                      semiBold: {
+                          fontFamily: 'Pretendard-SemiBold',
+                      },
+                      bold: {
+                          fontFamily: 'Pretendard-Bold',
+                      },
+                      extraBold: {
+                          fontFamily: 'Pretendard-ExtraBold',
+                      },
+                      black: {
+                          fontFamily: 'Pretendard-Black',
+                      },
+                  },
 }
 
 const colorTheme = createTheme({
-  lightColors: {
-    // background:
-    primary: '#006FFD',
-    light0: '#2272EB',
-    light1: '#E2EEFF',
-    secondary: '#F2F3F5',
-    secondaryBg: '#F2F4F6',
-    black: '#333D4B',
-    active: '#191E28',
-    inactive: '#AFB8C1',
-    text: {
-      primary: '#333D4B',
-      secondary: '#6B7684',
+    lightColors: {
+        // background:
+        primary: '#006FFD',
+        light0: '#2272EB',
+        light1: '#E2EEFF',
+        secondary: '#F2F3F5',
+        secondaryBg: '#F2F4F6',
+        black: '#333D4B',
+        active: '#191E28',
+        inactive: '#AFB8C1',
+        text: {
+            primary: '#333D4B',
+            secondary: '#6B7684',
+        },
+        contrastText: {
+            primary: 'white',
+            secondary: '#4E5968',
+        },
+        grey0: '#F2F4F6',
+        grey1: '#D1D6DB',
+        divider: '#F2F4F6',
+        transparent: 'transparent',
+        palette: [
+            // '#9BF6FF',
+            '#A0C4FF',
+            '#BDB2FF',
+            '#FFC6FF',
+            '#FFADAD',
+            '#FFD6A5',
+            '#FDFFB6',
+            '#CAFFBF',
+        ],
     },
-    contrastText: {
-      primary: 'white',
-      secondary: '#4E5968',
-    },
-    grey0: '#F2F4F6',
-    grey1: '#D1D6DB',
-    divider: '#F2F4F6',
-    transparent: 'transparent',
-    palette: [
-      // '#9BF6FF',
-      '#A0C4FF',
-      '#BDB2FF',
-      '#FFC6FF',
-      '#FFADAD',
-      '#FFD6A5',
-      '#FDFFB6',
-      '#CAFFBF',
-    ],
-  },
 })
 
 const theme = createTheme({
-  ...colorTheme,
-  components: {
-    Switch: (_, { colors }) => ({
-      trackColor: {
-        false: colors.inactive,
-        true: colors.light1,
-      },
-      style: {
-        height: 24,
-      },
-    }),
-    SectionCard: () => ({
-      containerStyle: {
-        // marginHorizontal: 10,
-        // marginVertical: 10,
-        borderWidth: 0,
-        boxShadow: 'none',
-        borderRadius: 24,
-        paddingHorizontal: 0,
-      },
-    }),
-    Avatar: (props, { colors }) => ({
-      containerStyle: {
-        backgroundColor: '#F5F5F7',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...(props.rounded
-          ? {}
-          : {
-              borderRadius: props.avatarSize === 'xsmall' ? 5 : 10,
-            }),
-        ...(props.avatarSize === 'xsmall'
-          ? {
-              width: 24,
-              height: 24,
-            }
-          : props.avatarSize === 'small'
-            ? {
-                width: 32,
-                height: 32,
-              }
-            : props.avatarSize === 'medium'
-              ? {
-                  width: 40,
-                  height: 40,
-                }
-              : props.avatarSize === 'large'
-                ? {
-                    width: 40,
-                    height: 40,
-                  }
-                : props.avatarSize === 'xlarge'
-                  ? {
-                      width: 60,
-                      height: 60,
-                    }
-                  : props.avatarSize
+    ...colorTheme,
+    components: {
+        Switch: (_, { colors }) => ({
+            trackColor: {
+                false: colors.inactive,
+                true: colors.light1,
+            },
+            style: {
+                height: 24,
+            },
+        }),
+        SectionCard: () => ({
+            containerStyle: {
+                borderWidth: 0,
+                boxShadow: 'none',
+                borderRadius: 24,
+                paddingHorizontal: 0,
+                // backgroundColor: 'red',
+            },
+        }),
+        Avatar: (props, { colors }) => ({
+            containerStyle: {
+                backgroundColor: '#F5F5F7',
+                alignItems: 'center',
+                justifyContent: 'center',
+                ...(props.rounded
+                    ? {}
+                    : {
+                          borderRadius: props.avatarSize === 'xsmall' ? 5 : 10,
+                      }),
+                ...(props.avatarSize === 'xsmall'
                     ? {
-                        width: props.avatarSize + 24,
-                        height: props.avatarSize + 24,
+                          width: 24,
+                          height: 24,
+                      }
+                    : props.avatarSize === 'small'
+                      ? {
+                            width: 32,
+                            height: 32,
+                        }
+                      : props.avatarSize === 'medium'
+                        ? {
+                              width: 40,
+                              height: 40,
+                          }
+                        : props.avatarSize === 'large'
+                          ? {
+                                width: 40,
+                                height: 40,
+                            }
+                          : props.avatarSize === 'xlarge'
+                            ? {
+                                  width: 60,
+                                  height: 60,
+                              }
+                            : props.avatarSize
+                              ? {
+                                    width: props.avatarSize + 24,
+                                    height: props.avatarSize + 24,
+                                }
+                              : {}),
+                // min-width: 32,
+                // min-height: 32,
+            },
+            ...(props.icon
+                ? {
+                      icon: {
+                          color: colors.primary,
+                          size:
+                              props.size === 'small'
+                                  ? 24
+                                  : props.size === 'medium'
+                                    ? 30
+                                    : props.size === 'large'
+                                      ? 36
+                                      : props.size === 'xlarge'
+                                        ? 40
+                                        : props.size,
+                      },
+                  }
+                : {}),
+            iconStyle: {
+                // ...(props.size === 'medium'
+                //   ? {
+                //       width: 20,
+                //       height: 20,
+                //     }
+                //   : props.size === 'xlarge'
+                //     ? {
+                //         width: 40,
+                //         height: 40,
+                //       }
+                //     : {
+                //         // width: 32,
+                //         // height: 32,
+                //       }),
+                // min-width: 32,
+                // min-height: 32,
+            },
+            titleStyle: {
+                borderRadius: 10,
+                ...(props.size === 'medium'
+                    ? {
+                          fontSize: 20,
+                      }
+                    : props.size === 'xlarge'
+                      ? {
+                            fontSize: 40,
+                        }
+                      : {
+                            // width: 32,
+                            // height: 32,
+                        }),
+                // min-width: 32,
+                // min-height: 32,
+            },
+        }),
+        Text: (props, { colors }) => ({
+            style: {
+                ...typography.pretendard.regular,
+                color: props.primary ? colors.primary : colors.text.primary,
+                fontSize: 17,
+                fontStyle: 'normal',
+                lineHeight: 1.5 * 17,
+                letterSpacing: 0.15,
+                // textDecoration: 'none',
+                textTransform: 'none',
+                ...(props.disabled ? { opacity: 0.5 } : {}),
+            },
+            h2Style: {
+                ...typography.pretendard.bold,
+                fontSize: 21,
+                lineHeight: 1.6 * 21,
+                letterSpacing: 0,
+                textTransform: 'none',
+            },
+            h3Style: {
+                ...typography.pretendard.bold,
+                fontSize: 17,
+                lineHeight: 1.33 * 21,
+                letterSpacing: 0,
+                textTransform: 'none',
+                color: '#212121',
+            },
+        }),
+        Button: ({ color }, { colors }) => ({
+            titleStyle: {
+                ...typography.pretendard.semiBold,
+                fontSize: 17,
+                lineHeight: 1.41 * 17,
+                ...(color === 'primary'
+                    ? { color: colors.contrastText.primary }
+                    : color === 'secondary'
+                      ? { color: colors.contrastText.secondary }
+                      : {}),
+            },
+            buttonStyle: {
+                borderRadius: 16,
+                height: 56,
+            },
+        }),
+        FAB: ({}, { colors }) => ({
+            color: colors.primary,
+        }),
+        Chip: ({ color }, { colors }) => ({
+            titleStyle: {
+                ...typography.pretendard.semiBold,
+                fontSize: 14,
+                letterSpacing: 0.16,
+                lineHeight: 18,
+                color:
+                    color === 'primary'
+                        ? colors.contrastText.primary
+                        : colors.contrastText.secondary,
+            },
+            containerStyle: {
+                borderRadius: 0,
+            },
+            buttonStyle: {
+                backgroundColor:
+                    color === 'primary' ? colors.primary : colors.secondary,
+                height: 36,
+                padding: 4,
+                borderRadius: 8,
+                // height: 56,
+            },
+        }),
+        Header: (props, { colors }) => ({
+            elevated: false,
+            containerStyle: {
+                backgroundColor: colors.transparent,
+                // backgroundColor: 'bisque',
+                borderBottomWidth: 0,
+                height: 48,
+                paddingHorizontal: 8,
+            },
+            leftContainerStyle: {
+                justifyContent: 'center',
+                paddingLeft: 4,
+            },
+            centerContainerStyle: {
+                flexGrow: 0,
+            },
+            rightContainerStyle: {
+                // flexDirection: 'row',
+                // alignItems: 'stretch',
+                // justifyContent: 'flex-end',
+                // flex: 1,
+                justifyContent: 'center',
+                // height: '100%',
+                // justifyContent: ''
+                // alignItems: '',
+                // flexGrow: 0,
+                // alignItems: 'center',
+            },
+        }),
+        Icon: (props, { colors }) => ({
+            color: colors.primary,
+        }),
+        SectionHeader: props => ({
+            style: {
+                paddingTop: 24,
+                paddingBottom: 8,
+                paddingHorizontal: 20,
+            },
+            titleStyle: props.lg
+                ? {
+                      // color: colors.text.primary,
+                  }
+                : {
+                      ...typography.pretendard.medium,
+                      fontSize: 17,
+                      lineHeight: 1.43 * 17,
+                  },
+        }),
+        ListSubheader: (props, { colors }) => ({
+            style: {
+                height: props.lg ? 64 : props.dense ? 32 : 44,
+                paddingVertical: 8,
+                paddingHorizontal: 20,
+            },
+            titleStyle: props.lg
+                ? {
+                      ...typography.pretendard.semiBold,
+                      fontSize: 19,
+                      lineHeight: 48,
+                      letterSpacing: 0.01,
+                      // color: var(-text--secondary),
+                  }
+                : {
+                      ...typography.pretendard.medium,
+                      fontSize: 13,
+                      letterSpacing: 0.1,
+                      color: colors.text?.secondary,
+                  },
+        }),
+        Divider: ({ width }, { colors }) =>
+            width
+                ? {
+                      // inset: true,
+                      insetType: 'middle',
+                      color: colors.text.primary,
+                      width: width,
+                      style: {
+                          opacity: 0.5,
+                          marginVertical: 8,
+                          marginHorizontal: 16,
+                      },
+                  }
+                : {
+                      width: 16,
+                      color: colors.divider,
+                      style: {
+                          height: 28,
+                          paddingHorizontal: 20,
+                      },
+                  },
+        Input: ({ primary, label }, { colors }) => ({
+            containerStyle: {
+                paddingHorizontal: 24,
+                // height: 92
+                // paddingVertical: 14,
+                // width: '100%',
+                // borderBottomWidth: 1,
+                // borderColor: colors.light0,
+            },
+            inputContainerStyle: {
+                // paddingTop: label ? 0 : 12,
+                borderBottomWidth: 2,
+                borderColor: primary ? colors.primary : colors.grey0,
+            },
+            // inputContainerStyle: {},
+            inputStyle: {
+                ...typography.pretendard.semiBold,
+                fontSize: 21,
+                lineHeight: 1.6 * 22,
+                color: colors.text.primary,
+                outlineStyle: undefined,
+                // fontWeight: 400,
+                // fontSize: 15,
+                // lineHeight: 1.6 * 15,
+            },
+            labelStyle: {
+                ...typography.pretendard.medium,
+                fontSize: 12,
+                lineHeight: 1 * 12,
+                letterSpacing: 0.01,
+                color: primary ? colors.light0 : colors.text.secondary,
+            },
+            // cursorColor: colors.primary,
+            // selectionColor: colors.primary,
+            // placeholderTextColor: colors.text.primary,
+            // leftIconContainerStyle: {
+            //   paddingRight: 8,
+            // },
+        }),
+        ListItemInput: ({ primary }, { colors }) => ({
+            containerStyle: {},
+            inputContainerStyle: {
+                // paddingTop: label ? 0 : 12,
+                borderBottomWidth: 2,
+                borderColor: primary ? colors.primary : colors.grey0,
+            },
+            inputStyle: {
+                width: '100%',
+                textAlign: 'left',
+                ...typography.pretendard.semiBold,
+                fontSize: 21,
+                lineHeight: 1.6 * 22,
+                color: colors.text.primary,
+                outlineStyle: undefined,
+            },
+            labelStyle: {
+                ...typography.pretendard.medium,
+                fontSize: 12,
+                lineHeight: 1 * 12,
+                letterSpacing: 0.01,
+                color: primary ? colors.light0 : colors.text.secondary,
+            },
+        }),
+        ListItem: (props, { colors }) => ({
+            style: {
+                ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
+            },
+            containerStyle: {
+                height: props.dense === false ? 64 : 52,
+                borderRadius: 16,
+                alignItems: 'center',
+                paddingHorizontal: 24, // 1.5rem
+                paddingVertical: 24, // ListItem has default vertical padding, overriding here
+                ...(props.backgroundColor === 'secondary'
+                    ? { backgroundColor: colors.secondaryBg }
+                    : {}),
+                ...(props.asCard
+                    ? {
+                          marginHorizontal: 15,
+                          marginTop: 15,
+                          height: 82,
+                          borderRadius: 24,
                       }
                     : {}),
-        // min-width: 32,
-        // min-height: 32,
-      },
-      ...(props.icon
-        ? {
-            icon: {
-              color: colors.primary,
-              size:
-                props.size === 'small'
-                  ? 24
-                  : props.size === 'medium'
-                    ? 30
-                    : props.size === 'large'
-                      ? 36
-                      : props.size === 'xlarge'
-                        ? 40
-                        : props.size,
             },
-          }
-        : {}),
-      iconStyle: {
-        // ...(props.size === 'medium'
-        //   ? {
-        //       width: 20,
-        //       height: 20,
-        //     }
-        //   : props.size === 'xlarge'
-        //     ? {
-        //         width: 40,
-        //         height: 40,
-        //       }
-        //     : {
-        //         // width: 32,
-        //         // height: 32,
-        //       }),
-        // min-width: 32,
-        // min-height: 32,
-      },
-      titleStyle: {
-        borderRadius: 10,
-        ...(props.size === 'medium'
-          ? {
-              fontSize: 20,
-            }
-          : props.size === 'xlarge'
-            ? {
-                fontSize: 40,
-              }
-            : {
-                // width: 32,
-                // height: 32,
-              }),
-        // min-width: 32,
-        // min-height: 32,
-      },
-    }),
-    Text: (props, { colors }) => ({
-      style: {
-        ...typography.pretendard.regular,
-        color: props.primary ? colors.primary : colors.text.primary,
-        fontSize: 17,
-        fontStyle: 'normal',
-        lineHeight: 1.5 * 17,
-        letterSpacing: 0.15,
-        // textDecoration: 'none',
-        textTransform: 'none',
-        ...(props.disabled ? { opacity: 0.5 } : {}),
-      },
-      h2Style: {
-        ...typography.pretendard.bold,
-        fontSize: 21,
-        lineHeight: 1.6 * 21,
-        letterSpacing: 0,
-        textTransform: 'none',
-      },
-      h3Style: {
-        ...typography.pretendard.bold,
-        fontSize: 17,
-        lineHeight: 1.33 * 21,
-        letterSpacing: 0,
-        textTransform: 'none',
-        color: '#212121',
-      },
-    }),
-    Button: ({ color }, { colors }) => ({
-      titleStyle: {
-        ...typography.pretendard.semiBold,
-        fontSize: 17,
-        lineHeight: 1.41 * 17,
-        ...(color === 'primary'
-          ? { color: colors.contrastText.primary }
-          : color === 'secondary'
-            ? { color: colors.contrastText.secondary }
-            : {}),
-      },
-      buttonStyle: {
-        borderRadius: 16,
-        height: 56,
-      },
-    }),
-    FAB: ({}, { colors }) => ({
-      color: colors.primary,
-    }),
-    Chip: ({ color }, { colors }) => ({
-      titleStyle: {
-        ...typography.pretendard.semiBold,
-        fontSize: 14,
-        letterSpacing: 0.16,
-        lineHeight: 18,
-        color:
-          color === 'primary'
-            ? colors.contrastText.primary
-            : colors.contrastText.secondary,
-      },
-      containerStyle: {
-        borderRadius: 0,
-      },
-      buttonStyle: {
-        backgroundColor:
-          color === 'primary' ? colors.primary : colors.secondary,
-        height: 36,
-        padding: 4,
-        borderRadius: 8,
-        // height: 56,
-      },
-    }),
-    Header: (props, { colors }) => ({
-      elevated: false,
-      containerStyle: {
-        backgroundColor: colors.transparent,
-        // backgroundColor: 'bisque',
-        borderBottomWidth: 0,
-        height: 48,
-        paddingHorizontal: 8,
-      },
-      leftContainerStyle: {
-        justifyContent: 'center',
-        paddingLeft: 4,
-      },
-      centerContainerStyle: {
-        flexGrow: 0,
-      },
-      rightContainerStyle: {
-        // flexDirection: 'row',
-        // alignItems: 'stretch',
-        // justifyContent: 'flex-end',
-        // flex: 1,
-        justifyContent: 'center',
-        // height: '100%',
-        // justifyContent: ''
-        // alignItems: '',
-        // flexGrow: 0,
-        // alignItems: 'center',
-      },
-    }),
-    Icon: (props, { colors }) => ({
-      color: colors.primary,
-    }),
-    SectionHeader: props => ({
-      style: {
-        paddingTop: 24,
-        paddingBottom: 8,
-        paddingHorizontal: 20,
-      },
-      titleStyle: props.lg
-        ? {
-            // color: colors.text.primary,
-          }
-        : {
-            ...typography.pretendard.medium,
-            fontSize: 17,
-            lineHeight: 1.43 * 17,
-          },
-    }),
-    ListSubheader: (props, { colors }) => ({
-      style: {
-        height: props.lg ? 64 : 44,
-        paddingVertical: 8,
-        paddingHorizontal: 20,
-      },
-      titleStyle: props.lg
-        ? {
-            ...typography.pretendard.semiBold,
-            fontSize: 19,
-            lineHeight: 48,
-            letterSpacing: 0.01,
-            // color: var(-text--secondary),
-          }
-        : {
-            ...typography.pretendard.medium,
-            fontSize: 13,
-            letterSpacing: 0.1,
-            color: colors.text?.secondary,
-          },
-    }),
-    Divider: ({ width }, { colors }) =>
-      width
-        ? {
-            // inset: true,
-            insetType: 'middle',
-            color: colors.text.primary,
-            width: width,
+        }),
+        ListItemTitle: (props, { colors }) => ({
             style: {
-              opacity: 0.5,
-              marginVertical: 8,
-              marginHorizontal: 16,
+                display: 'flex',
+                ...typography.pretendard.medium,
+                fontSize: 17,
+                lineHeight: 1.43 * 17,
+                overflow: 'hidden',
+                ...(props.primary ? { color: colors.primary } : {}),
             },
-          }
-        : {
-            width: 16,
-            color: colors.divider,
+            numberOfLines: 1,
+            ellipsizeMode: 'tail',
+        }),
+        ListItemSubtitle: (_, { colors }) => ({
             style: {
-              height: 28,
-              paddingHorizontal: 20,
+                ...typography.pretendard.regular,
+                color: colors.text.secondary,
+                fontSize: 12,
+                letterSpacing: 0.17,
+                lineHeight: 1 * 12,
+                textOverflow: 'ellipsis',
             },
-          },
-    Input: ({ primary, label }, { colors }) => ({
-      containerStyle: {
-        paddingHorizontal: 24,
-        // height: 92
-        // paddingVertical: 14,
-        // width: '100%',
-        // borderBottomWidth: 1,
-        // borderColor: colors.light0,
-      },
-      inputContainerStyle: {
-        // paddingTop: label ? 0 : 12,
-        borderBottomWidth: 2,
-        borderColor: primary ? colors.primary : colors.grey0,
-      },
-      // inputContainerStyle: {},
-      inputStyle: {
-        ...typography.pretendard.semiBold,
-        fontSize: 21,
-        lineHeight: 1.6 * 22,
-        color: colors.text.primary,
-        outlineStyle: undefined,
-        // fontWeight: 400,
-        // fontSize: 15,
-        // lineHeight: 1.6 * 15,
-      },
-      labelStyle: {
-        ...typography.pretendard.medium,
-        fontSize: 12,
-        lineHeight: 1 * 12,
-        letterSpacing: 0.01,
-        color: primary ? colors.light0 : colors.text.secondary,
-      },
-      // cursorColor: colors.primary,
-      // selectionColor: colors.primary,
-      // placeholderTextColor: colors.text.primary,
-      // leftIconContainerStyle: {
-      //   paddingRight: 8,
-      // },
-    }),
-    ListItemInput: ({ primary }, { colors }) => ({
-      containerStyle: {},
-      inputContainerStyle: {
-        // paddingTop: label ? 0 : 12,
-        borderBottomWidth: 2,
-        borderColor: primary ? colors.primary : colors.grey0,
-      },
-      inputStyle: {
-        width: '100%',
-        textAlign: 'left',
-        ...typography.pretendard.semiBold,
-        fontSize: 21,
-        lineHeight: 1.6 * 22,
-        color: colors.text.primary,
-        outlineStyle: undefined,
-      },
-      labelStyle: {
-        ...typography.pretendard.medium,
-        fontSize: 12,
-        lineHeight: 1 * 12,
-        letterSpacing: 0.01,
-        color: primary ? colors.light0 : colors.text.secondary,
-      },
-    }),
-    ListItem: (props, { colors }) => ({
-      style: {
-        ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
-      },
-      containerStyle: {
-        ...(props.backgroundColor === 'secondary'
-          ? { backgroundColor: colors.secondaryBg }
-          : {}),
-        height: props.dense === false ? 64 : 52,
-        borderRadius: 16,
-        // flexDirection: 'row',
-        // gap: 12,
-        alignItems: 'center',
-        paddingHorizontal: 24, // 1.5rem
-        paddingVertical: 24, // ListItem has default vertical padding, overriding here
-      },
-    }),
-    ListItemTitle: (props, { colors }) => ({
-      style: {
-        display: 'flex',
-        ...typography.pretendard.medium,
-        fontSize: 17,
-        lineHeight: 1.43 * 17,
-        overflow: 'hidden',
-        ...(props.primary ? { color: colors.primary } : {}),
-      },
-      numberOfLines: 1,
-      ellipsizeMode: 'tail',
-    }),
-    ListItemSubtitle: (_, { colors }) => ({
-      style: {
-        ...typography.pretendard.regular,
-        color: colors.text.secondary,
-        fontSize: 12,
-        letterSpacing: 0.17,
-        lineHeight: 1 * 12,
-        textOverflow: 'ellipsis',
-      },
-      numberOfLines: 1,
-      ellipsizeMode: 'tail',
-    }),
-    ListItemChevron: ({ primary }, { colors }) => ({
-      size: 28,
-      color: primary ? colors.primary : colors.text.secondary,
-    }),
-    ListItemCheckBox: (_, { colors }) => ({
-      containerStyle: {
-        width: 32,
-        alignItems: 'center',
-      },
-    }),
-    TabItem: (_, { colors }) => ({
-      containerStyle: {
-        backgroundColor: colors.white,
-        paddingVertical: 16,
-        width: '33.33%',
-      },
-      titleStyle: (active: boolean) => ({
-        color: active ? colors.text.primary : colors.text.secondary,
+            numberOfLines: 1,
+            ellipsizeMode: 'tail',
+        }),
+        ListItemChevron: ({ primary }, { colors }) => ({
+            size: 28,
+            color: primary ? colors.primary : colors.text.secondary,
+        }),
+        ListItemCheckBox: (_, { colors }) => ({
+            containerStyle: {
+                width: 32,
+                alignItems: 'center',
+            },
+        }),
+        TabItem: (_, { colors }) => ({
+            containerStyle: {
+                backgroundColor: colors.white,
+                paddingVertical: 16,
+                width: '33.33%',
+            },
+            titleStyle: (active: boolean) => ({
+                color: active ? colors.text.primary : colors.text.secondary,
 
-        fontSize: 17,
-      }),
-    }),
-    // FAB: {
-    //   containerStyle: {
-    //     backgroundColor: '#ffffff',
-    //     width: '100%',
-    //   },
-    //   style: {
-    //     backgroundColor: '#006ffd',
-    //     borderRadius: 1 * 16,
-    //     paddingHorizontal: 1.375 * 16,
-    //     paddingVertical: 1 * 16,
-    //     width: '100%',
-    //   },
-    //   titleStyle: {
-    //     color: '#ffffff',
-    //     fontSize: 17,
-    //     lineHeight: 1.5 * 16,
-    //     textAlign: 'left',
-    //   },
-    // },
-  },
+                fontSize: 17,
+            }),
+        }),
+        // FAB: {
+        //   containerStyle: {
+        //     backgroundColor: '#ffffff',
+        //     width: '100%',
+        //   },
+        //   style: {
+        //     backgroundColor: '#006ffd',
+        //     borderRadius: 1 * 16,
+        //     paddingHorizontal: 1.375 * 16,
+        //     paddingVertical: 1 * 16,
+        //     width: '100%',
+        //   },
+        //   titleStyle: {
+        //     color: '#ffffff',
+        //     fontSize: 17,
+        //     lineHeight: 1.5 * 16,
+        //     textAlign: 'left',
+        //   },
+        // },
+    },
 })
 
 export default theme

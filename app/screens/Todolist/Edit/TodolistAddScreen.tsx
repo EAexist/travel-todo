@@ -1,6 +1,6 @@
 import * as Fab from '@/components/Fab'
 import { useStores } from '@/models'
-import { AppStackScreenProps, useNavigate } from '@/navigators'
+import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback } from 'react'
@@ -9,7 +9,8 @@ import {
     useAddFlaggedPreset,
 } from './TodolistAddScreenBase'
 
-interface TodolistAddScreenProps extends AppStackScreenProps<'TodolistAdd'> { }
+interface TodolistAddScreenProps
+    extends AuthenticatedStackScreenProps<'TodolistAdd'> {}
 
 export const TodolistAddScreen: FC<TodolistAddScreenProps> = observer(
     ({ route }) => {
@@ -22,7 +23,7 @@ export const TodolistAddScreen: FC<TodolistAddScreenProps> = observer(
         useHeader({
             rightActionTitle: '삭제',
             onRightPress: handleToDeleteScreenPress,
-            backNavigateProps: { name: 'Main' }
+            backNavigateProps: { name: 'Main' },
         })
 
         return (
@@ -42,7 +43,7 @@ export const TodolistAddScreen: FC<TodolistAddScreenProps> = observer(
                         />
                     </Fab.Container>
                 }
-                callerName='TodolistAdd'
+                callerName="TodolistAdd"
             />
         )
     },

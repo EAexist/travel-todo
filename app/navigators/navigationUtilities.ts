@@ -1,18 +1,21 @@
-import {useState, useEffect, useRef, useCallback} from 'react'
-import {BackHandler, Linking, Platform} from 'react-native'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { BackHandler, Linking, Platform } from 'react-native'
 import {
-  NavigationState,
-  PartialState,
-  createNavigationContainerRef,
+    NavigationState,
+    PartialState,
+    createNavigationContainerRef,
 } from '@react-navigation/native'
 import Config from '../config'
-import type {PersistNavigationConfig} from '../config/config.base'
-import {useIsMounted} from '../utils/useIsMounted'
-import type {AppStackParamList, NavigationProps} from './AppNavigator'
+import type { PersistNavigationConfig } from '../config/config.base'
+import { useIsMounted } from '../utils/useIsMounted'
+import type {
+    AuthenticatedStackParamList,
+    NavigationProps,
+} from './AppNavigator'
 
 import * as storage from '../utils/storage'
-import {useStores, useTripStore} from '@/models'
-import {MainTabParamList} from './MainTabNavigator'
+import { useStores, useTripStore } from '@/models'
+import { MainTabParamList } from './MainTabNavigator'
 
 type Storage = typeof storage
 
@@ -26,7 +29,8 @@ type Storage = typeof storage
  * The types on this reference will only let you reference top level navigators. If you have
  * nested navigators, you'll need to use the `useNavigation` with the stack navigator's ParamList type.
  */
-export const navigationRef = createNavigationContainerRef<AppStackParamList>()
+export const navigationRef =
+    createNavigationContainerRef<AuthenticatedStackParamList>()
 
 /**
  * Gets the current screen from any navigation state.
@@ -34,15 +38,17 @@ export const navigationRef = createNavigationContainerRef<AppStackParamList>()
  * @returns {string} - The name of the current screen.
  */
 export function getActiveRouteName(
-  state: NavigationState | PartialState<NavigationState>,
+    state: NavigationState | PartialState<NavigationState>,
 ): string {
-  const route = state.routes[state.index ?? 0]
+    const route = state.routes[state.index ?? 0]
 
-  // Found the active route -- return the name
-  if (!route.state) return route.name as keyof AppStackParamList
+    // Found the active route -- return the name
+    if (!route.state) return route.name as keyof AuthenticatedStackParamList
 
-  // Recursive call to deal with nested routers
-  return getActiveRouteName(route.state as NavigationState<AppStackParamList>)
+    // Recursive call to deal with nested routers
+    return getActiveRouteName(
+        route.state as NavigationState<AuthenticatedStackParamList>,
+    )
 }
 
 const iosExit = () => false
@@ -55,49 +61,49 @@ const iosExit = () => false
  * @returns {void}
  */
 export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
-  // The reason we're using a ref here is because we need to be able
-  // to update the canExit function without re-setting up all the listeners
-  const canExitRef = useRef(Platform.OS !== 'android' ? iosExit : canExit)
+    // The reason we're using a ref here is because we need to be able
+    // to update the canExit function without re-setting up all the listeners
+    const canExitRef = useRef(Platform.OS !== 'android' ? iosExit : canExit)
 
-  useEffect(() => {
-    canExitRef.current = canExit
-  }, [canExit])
+    useEffect(() => {
+        canExitRef.current = canExit
+    }, [canExit])
 
-  useEffect(() => {
-    // We'll fire this when the back button is pressed on Android.
-    const onBackPress = () => {
-      if (!navigationRef.isReady()) {
-        return false
-      }
+    useEffect(() => {
+        // We'll fire this when the back button is pressed on Android.
+        const onBackPress = () => {
+            if (!navigationRef.isReady()) {
+                return false
+            }
 
-      // grab the current route
-      const routeName = getActiveRouteName(navigationRef.getRootState())
+            // grab the current route
+            const routeName = getActiveRouteName(navigationRef.getRootState())
 
-      // are we allowed to exit?
-      if (canExitRef.current(routeName)) {
-        // exit and let the system know we've handled the event
-        BackHandler.exitApp()
-        return true
-      }
+            // are we allowed to exit?
+            if (canExitRef.current(routeName)) {
+                // exit and let the system know we've handled the event
+                BackHandler.exitApp()
+                return true
+            }
 
-      // we can't exit, so let's turn this into a back action
-      if (navigationRef.canGoBack()) {
-        navigationRef.goBack()
-        return true
-      }
+            // we can't exit, so let's turn this into a back action
+            if (navigationRef.canGoBack()) {
+                navigationRef.goBack()
+                return true
+            }
 
-      return false
-    }
+            return false
+        }
 
-    // Subscribe when we come to life
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      onBackPress,
-    )
+        // Subscribe when we come to life
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress,
+        )
 
-    // Unsubscribe when we're done
-    return () => subscription.remove()
-  }, [])
+        // Unsubscribe when we're done
+        return () => subscription.remove()
+    }, [])
 }
 
 /**
@@ -107,14 +113,14 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
  * @returns {boolean} - Whether to restore navigation state by default.
  */
 function navigationRestoredDefaultState(
-  persistNavigation: PersistNavigationConfig,
+    persistNavigation: PersistNavigationConfig,
 ) {
-  if (persistNavigation === 'always') return false
-  if (persistNavigation === 'dev' && __DEV__) return false
-  if (persistNavigation === 'prod' && !__DEV__) return false
+    if (persistNavigation === 'always') return false
+    if (persistNavigation === 'dev' && __DEV__) return false
+    if (persistNavigation === 'prod' && !__DEV__) return false
 
-  // all other cases, disable restoration by returning true
-  return true
+    // all other cases, disable restoration by returning true
+    return true
 }
 
 /**
@@ -124,66 +130,71 @@ function navigationRestoredDefaultState(
  * @returns {object} - The navigation state and persistence functions.
  */
 export function useNavigationPersistence(
-  storage: Storage,
-  persistenceKey: string,
+    storage: Storage,
+    persistenceKey: string,
 ) {
-  const [initialNavigationState, setInitialNavigationState] =
-    useState<NavigationProps['initialState']>()
-  const isMounted = useIsMounted()
+    const [initialNavigationState, setInitialNavigationState] =
+        useState<NavigationProps['initialState']>()
+    const isMounted = useIsMounted()
 
-  const initNavState = navigationRestoredDefaultState(Config.persistNavigation)
-  const [isRestored, setIsRestored] = useState(initNavState)
+    const initNavState = navigationRestoredDefaultState(
+        Config.persistNavigation,
+    )
+    const [isRestored, setIsRestored] = useState(initNavState)
 
-  const routeNameRef = useRef<keyof AppStackParamList | undefined>(undefined)
+    const routeNameRef = useRef<keyof AuthenticatedStackParamList | undefined>(
+        undefined,
+    )
 
-  const onNavigationStateChange = (state: NavigationState | undefined) => {
-    const previousRouteName = routeNameRef.current
-    if (state !== undefined) {
-      const currentRouteName = getActiveRouteName(state)
+    const onNavigationStateChange = (state: NavigationState | undefined) => {
+        const previousRouteName = routeNameRef.current
+        if (state !== undefined) {
+            const currentRouteName = getActiveRouteName(state)
 
-      if (previousRouteName !== currentRouteName) {
-        // track screens.
-        if (__DEV__) {
-          console.log(currentRouteName)
+            if (previousRouteName !== currentRouteName) {
+                // track screens.
+                if (__DEV__) {
+                    console.log(currentRouteName)
+                }
+            }
+
+            // Save the current route name for later comparison
+            routeNameRef.current =
+                currentRouteName as keyof AuthenticatedStackParamList
+
+            // Persist state to storage
+            storage.save(persistenceKey, state)
         }
-      }
-
-      // Save the current route name for later comparison
-      routeNameRef.current = currentRouteName as keyof AppStackParamList
-
-      // Persist state to storage
-      storage.save(persistenceKey, state)
     }
-  }
 
-  const restoreState = async () => {
-    try {
-      const initialUrl = await Linking.getInitialURL()
+    const restoreState = async () => {
+        try {
+            const initialUrl = await Linking.getInitialURL()
 
-      // Only restore the state if app has not started from a deep link
-      if (!initialUrl) {
-        const state = (await storage.load(persistenceKey)) as
-          | NavigationProps['initialState']
-          | null
-        if (state) setInitialNavigationState(state)
-      }
-    } finally {
-      if (isMounted()) setIsRestored(true)
+            // Only restore the state if app has not started from a deep link
+            if (!initialUrl) {
+                const state = (await storage.load(persistenceKey)) as
+                    | NavigationProps['initialState']
+                    | null
+                if (state) setInitialNavigationState(state)
+            }
+        } finally {
+            if (isMounted()) setIsRestored(true)
+        }
     }
-  }
 
-  useEffect(() => {
-    if (!isRestored) restoreState()
-    // runs once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    useEffect(() => {
+        if (!isRestored) restoreState()
+        // runs once on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
-  return {
-    onNavigationStateChange,
-    restoreState,
-    isRestored,
-    initialNavigationState,
-  }
+    return {
+        onNavigationStateChange,
+        restoreState,
+        isRestored,
+        initialNavigationState,
+    }
 }
 
 // export function useNavigation
@@ -197,21 +208,21 @@ export function useNavigationPersistence(
  * @param {unknown} params - The params to pass to the route.
  */
 export function navigate(name: unknown, params?: unknown) {
-  console.log(`[navigate] ${name} ${JSON.stringify(params)}`)
-  if (navigationRef.isReady()) {
-    console.log(
-      `[navigate/navigationRef.isReady] ${name} ${JSON.stringify(params)}`,
-    )
-    // @ts-expect-error
-    // navigationRef.navigate(name as never, params as never)
-    navigationRef.navigate(name, params)
-  }
+    console.log(`[navigate] ${name} ${JSON.stringify(params)}`)
+    if (navigationRef.isReady()) {
+        console.log(
+            `[navigate/navigationRef.isReady] ${name} ${JSON.stringify(params)}`,
+        )
+        // @ts-expect-error
+        // navigationRef.navigate(name as never, params as never)
+        navigationRef.navigate(name, params)
+    }
 }
 
 export type NavigateProps = {
-  name: keyof AppStackParamList
-  params?: unknown
-  ignoreTrip?: boolean
+    name: keyof AuthenticatedStackParamList
+    params?: unknown
+    ignoreTrip?: boolean
 }
 /**
  * use this to navigate without the navigation
@@ -221,55 +232,51 @@ export type NavigateProps = {
  * @param {object} unknown - The params to pass to the route.
  */
 export function useNavigate(todoId?: string) {
-  //   const {
-  //     tripStore,
-  //     // : {id: tripId},
-  //   } = useStores()
-  const rootStore = useStores()
+    const tripStore = useTripStore()
 
-  const navigateWithTrip = useCallback(
-    (
-      name: string,
-      params?: unknown,
-      promiseBeforeNavigate?: () => Promise<any>,
-      ignoreTrip?: boolean,
-    ) => {
-      console.log(
-        `[navigateWithTrip] ${JSON.stringify(name)} ${rootStore.tripStore?.id} ${JSON.stringify(params)}`,
-      )
-      const _params = {
-        tripId: ignoreTrip ? undefined : rootStore.tripStore?.id,
-        todoId,
-      }
-      const _navigate = () =>
-        navigate(
-          name,
-          !!params && 'screen' in (params as Object)
-            ? {...params, ..._params, params: _params}
-            : {
-                ..._params,
-                ...(params as Object),
-              },
-        )
-      // navigate(name, {
-      //   ..._params,
-      //   ...(params as Object),
-      // })
+    const navigateWithTrip = useCallback(
+        (
+            name: string,
+            params?: unknown,
+            promiseBeforeNavigate?: () => Promise<any>,
+            ignoreTrip?: boolean,
+        ) => {
+            console.log(
+                `[navigateWithTrip] ${JSON.stringify(name)} ${tripStore?.id} ${JSON.stringify(params)}`,
+            )
+            const _params = {
+                tripId: ignoreTrip ? undefined : tripStore?.id,
+                todoId,
+            }
+            const _navigate = () =>
+                navigate(
+                    name,
+                    !!params && 'screen' in (params as Object)
+                        ? { ...params, ..._params, params: _params }
+                        : {
+                              ..._params,
+                              ...(params as Object),
+                          },
+                )
+            // navigate(name, {
+            //   ..._params,
+            //   ...(params as Object),
+            // })
 
-      if (promiseBeforeNavigate)
-        promiseBeforeNavigate().then(() => {
-          _navigate()
-        })
-      else _navigate()
-    },
-    [rootStore],
-  )
+            if (promiseBeforeNavigate)
+                promiseBeforeNavigate().then(() => {
+                    _navigate()
+                })
+            else _navigate()
+        },
+        [tripStore?.id],
+    )
 
-  //   const navigateWithTrip = () => navigateWithTodo()
+    //   const navigateWithTrip = () => navigateWithTodo()
 
-  return {
-    navigateWithTrip,
-  }
+    return {
+        navigateWithTrip,
+    }
 }
 
 /**
@@ -279,10 +286,10 @@ export function useNavigate(todoId?: string) {
  * The navigationRef variable is set in the App component.
  */
 export function goBack() {
-  console.log(`[goBack]`)
-  if (navigationRef.isReady() && navigationRef.canGoBack()) {
-    navigationRef.goBack()
-  }
+    console.log(`[goBack]`)
+    if (navigationRef.isReady() && navigationRef.canGoBack()) {
+        navigationRef.goBack()
+    }
 }
 
 /**
@@ -291,9 +298,12 @@ export function goBack() {
  * @returns {void}
  */
 export function resetRoot(
-  state: Parameters<typeof navigationRef.resetRoot>[0] = {index: 0, routes: []},
+    state: Parameters<typeof navigationRef.resetRoot>[0] = {
+        index: 0,
+        routes: [],
+    },
 ) {
-  if (navigationRef.isReady()) {
-    navigationRef.resetRoot(state)
-  }
+    if (navigationRef.isReady()) {
+        navigationRef.resetRoot(state)
+    }
 }

@@ -4,7 +4,7 @@
 // This is because react-native does not support tree-shaking.
 import { type Locale } from 'date-fns/locale'
 import { format } from 'date-fns/format'
-import { parseIso } from 'date-fns/parseIso'
+import { parseISO } from 'date-fns/parseISO'
 import i18n from 'i18next'
 
 type Options = Parameters<typeof format>[2]
@@ -49,5 +49,5 @@ export const formatDate = (
     ...options,
     locale: dateFnsLocale,
   }
-  return format(parseIso(date), dateFormat ?? 'MMM dd, yyyy', dateOptions)
+  return format(parseISO(date), dateFormat ?? 'MMM dd, yyyy', dateOptions)
 }

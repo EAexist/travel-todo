@@ -1,105 +1,105 @@
 {
-    "expo": {
-        "name": "trip-todo",
-        "slug": "trip-todo",
-        "scheme": "trip-todo",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "userInterfaceStyle": "automatic",
-        "icon": "./assets/images/app/app-icon-all.png",
-        "updates": {
-            "fallbackToCacheTimeout": 0
-        },
-        "newArchEnabled": false,
-        "jsEngine": "hermes",
-        "assetBundlePatterns": [
-            "**/*"
-        ],
-        "android": {
-            "icon": "./assets/images/app/app-icon-android-legacy.png",
-            "package": "com.trip_todo",
-            "allowBackup": false
-        },
-        "ios": {
-            "icon": "./assets/images/app/app-icon-ios.png",
-            "supportsTablet": true,
-            "bundleIdentifier": "com.trip_todo"
-        },
-        "web": {
-            "favicon": "./assets/images/app/app-icon-web-favicon.png",
-            "bundler": "metro"
-        },
-        "plugins": [
-            "expo-localization",
-            [
-                "@react-native-seoul/kakao-login",
-                {
-                    "kakaoAppKey": "db8e6a3ae272a123c55d4e1a2705c2e1",
-                    "overrideKakaoSDKVersion": "2.11.2",
-                    "kotlinVersion": "2.0.21"
-                }
-            ],
-            [
-                "expo-build-properties",
-                {
-                    "android": {
-                        "kotlinVersion": "2.0.21",
-                        "extraMavenRepos": [
-                            "https://devrepo.kakao.com/nexus/content/groups/public/"
-                        ]
-                    }
-                }
-            ],
-            [
-                "@react-native-google-signin/google-signin",
-                {
-                    "iosUrlScheme": "com.googleusercontent.apps.trip-todo"
-                }
-            ],
-            [
-                "expo-font",
-                {
-                    "fonts": [
-                        "./assets/fonts/pretendard/Pretendard-Thin.otf",
-                        "./assets/fonts/pretendard/Pretendard-ExtraLight.otf",
-                        "./assets/fonts/pretendard/Pretendard-Light.otf",
-                        "./assets/fonts/pretendard/Pretendard-Regular.otf",
-                        "./assets/fonts/pretendard/Pretendard-Medium.otf",
-                        "./assets/fonts/pretendard/Pretendard-SemiBold.otf",
-                        "./assets/fonts/pretendard/Pretendard-Bold.otf",
-                        "./assets/fonts/pretendard/Pretendard-ExtraBold.otf",
-                        "./assets/fonts/pretendard/Pretendard-Black.otf",
-                        "./assets/fonts/tossface/Tossface.ttf"
-                    ]
-                }
-            ],
-            [
-                "expo-splash-screen",
-                {
-                    "image": "./assets/images/third-party/airbnb-logo.png",
-                    "imageWidth": 300,
-                    "resizeMode": "contain",
-                    "backgroundColor": "#191015"
-                }
-            ],
-            [
-                "expo-image-picker",
-                {
-                    "photosPermission": "The app accesses your photos to let you share them with your friends."
-                }
-            ]
-        ],
-        "experiments": {
-            "tsconfigPaths": true
-        },
-        "extra": {
-            "eas": {
-                "projectId": "2d655092-0a51-4956-81c9-d2386da69171"
-            }
-        },
-        "owner": "hyeon.expression"
+  "expo": {
+    "name": "trip-todo",
+    "slug": "trip-todo",
+    "scheme": "trip-todo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/app/app-icon-all.png",
+    "updates": {
+      "fallbackToCacheTimeout": 0
     },
-    "ignite": {
-        "version": "10.5.3"
-    }
+    "newArchEnabled": false,
+    "jsEngine": "hermes",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "icon": "./assets/images/app/app-icon-android-legacy.png",
+      "package": "com.trip_todo",
+      "allowBackup": false
+    },
+    "ios": {
+      "icon": "./assets/images/app/app-icon-ios.png",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trip_todo"
+    },
+    "web": {
+      "favicon": "./assets/images/app/app-icon-web-favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-localization",
+      [
+        "@react-native-seoul/kakao-login",
+        {
+          "kakaoAppKey": "db8e6a3ae272a123c55d4e1a2705c2e1",
+          "overrideKakaoSDKVersion": "2.11.2",
+          "kotlinVersion": "2.0.21"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21",
+            "extraMavenRepos": [
+              "https://devrepo.kakao.com/nexus/content/groups/public/"
+            ]
+          }
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.trip-todo"
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/pretendard/Pretendard-Thin.otf",
+            "./assets/fonts/pretendard/Pretendard-ExtraLight.otf",
+            "./assets/fonts/pretendard/Pretendard-Light.otf",
+            "./assets/fonts/pretendard/Pretendard-Regular.otf",
+            "./assets/fonts/pretendard/Pretendard-Medium.otf",
+            "./assets/fonts/pretendard/Pretendard-SemiBold.otf",
+            "./assets/fonts/pretendard/Pretendard-Bold.otf",
+            "./assets/fonts/pretendard/Pretendard-ExtraBold.otf",
+            "./assets/fonts/pretendard/Pretendard-Black.otf",
+            "./assets/fonts/tossface/Tossface.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/third-party/airbnb-logo.png",
+          "imageWidth": 300,
+          "resizeMode": "contain",
+          "backgroundColor": "#191015"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b47c3b69-2bf0-4b16-b39c-c268d8bb5ef1"
+      }
+    },
+    "owner": "expression"
+  },
+  "ignite": {
+    "version": "10.5.3"
+  }
 }

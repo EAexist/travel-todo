@@ -1,13 +1,15 @@
 import {
-  RootStore,
-  RootStoreModel,
-  RootStoreSnapshot,
+    RootStore,
+    RootStoreModel,
+    RootStoreSnapshot,
 } from '@/models/stores/RootStore'
 import { TripStore } from '@/models/stores/TripStore'
 import { load, remove, save } from '@/utils/storage'
 import { configurePersistable, makePersistable } from 'mobx-persist-store'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { setupRootStore } from './setupRootStore'
+import { ReservationStore } from '../stores/ReservationStore'
+import { UserStore } from '../stores/UserStore'
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -51,11 +53,19 @@ export const RootStoreProvider = RootStoreContext.Provider
  * const { someStore, someOtherStore } = useStores()
  */
 export const useStores = (): RootStore => {
-  return useContext(RootStoreContext)
+    return useContext(RootStoreContext)
+}
+
+export const useUserStore = (): UserStore => {
+    return useContext(RootStoreContext).userStore as UserStore
 }
 
 export const useTripStore = (): TripStore => {
-  return useContext(RootStoreContext).tripStore as TripStore
+    return useUserStore()?.activeTrip as TripStore
+}
+
+export const useReservationStore = (): ReservationStore => {
+    return useTripStore().reservationStore as ReservationStore
 }
 
 /**
@@ -66,55 +76,55 @@ export const useTripStore = (): TripStore => {
  * @returns {object} - the RootStore and rehydrated state
  */
 export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
-  const rootStore = useStores()
-  const [rehydrated, setRehydrated] = useState(false)
+    const rootStore = useStores()
+    const [rehydrated, setRehydrated] = useState(false)
 
-  // Kick off initial async loading actions, like loading fonts and rehydrating RootStore
-  useEffect(() => {
-    let _unsubscribe: () => void | undefined
-    ;(async () => {
-      // set up the RootStore (returns the state restored from AsyncStorage)
-      const { unsubscribe } = await setupRootStore(rootStore)
-      _unsubscribe = unsubscribe
+    // Kick off initial async loading actions, like loading fonts and rehydrating RootStore
+    useEffect(() => {
+        let _unsubscribe: () => void | undefined
+        ;(async () => {
+            // set up the RootStore (returns the state restored from AsyncStorage)
+            const { unsubscribe } = await setupRootStore(rootStore)
+            _unsubscribe = unsubscribe
 
-      // reactotron integration with the MST root store (DEV only)
-      if (__DEV__) {
-        // @ts-ignore
-        console.tron.trackMstNode(rootStore)
-      }
+            // reactotron integration with the MST root store (DEV only)
+            if (__DEV__) {
+                // @ts-ignore
+                console.tron.trackMstNode(rootStore)
+            }
 
-      // let the app know we've finished rehydrating
-      setRehydrated(true)
+            // let the app know we've finished rehydrating
+            setRehydrated(true)
 
-      // invoke the callback, if provided
-      if (callback) callback()
-    })()
+            // invoke the callback, if provided
+            if (callback) callback()
+        })()
 
-    return () => {
-      // cleanup
-      if (_unsubscribe !== undefined) _unsubscribe()
-    }
-    // only runs on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+        return () => {
+            // cleanup
+            if (_unsubscribe !== undefined) _unsubscribe()
+        }
+        // only runs on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
-  return { rootStore, rehydrated }
+    return { rootStore, rehydrated }
 }
 
 /* Persist */
-makePersistable(_rootStore, {
-  name: 'RootStore',
-  properties: ['userStore', 'tripStore', 'reservationStore'],
+configurePersistable({
+    storage: {
+        setItem: (key, data) => {
+            save(key, data)
+        },
+        getItem: key => load(key),
+        removeItem: key => {
+            remove(key)
+        },
+    },
 })
 
-configurePersistable({
-  storage: {
-    setItem: (key, data) => {
-      save(key, data)
-    },
-    getItem: key => load(key),
-    removeItem: key => {
-      remove(key)
-    },
-  },
+makePersistable(_rootStore, {
+    name: 'RootStore',
+    properties: ['userStore'],
 })

@@ -1,43 +1,47 @@
-import { useStores, useTripStore } from '@/models'
+import { useReservationStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import {
-  AppStackParamList,
-  AppStackScreenProps,
-  ReservationAppStackParamList,
+    AuthenticatedStackParamList,
+    AuthenticatedStackScreenProps,
+    ReservationAuthenticatedStackParamList,
 } from '@/navigators'
 import { FC } from 'react'
 
 export interface WithReservationProps<
-  T extends keyof ReservationAppStackParamList,
+    T extends keyof ReservationAuthenticatedStackParamList,
 > {
-  reservation: Reservation
-  params: Readonly<AppStackParamList[T]>
+    reservation: Reservation
+    params: Readonly<AuthenticatedStackParamList[T]>
 }
 
-export const withReservation = <T extends keyof ReservationAppStackParamList>(
-  WrappedComponent: FC<WithReservationProps<T>>,
+export const withReservation = <
+    T extends keyof ReservationAuthenticatedStackParamList,
+>(
+    WrappedComponent: FC<WithReservationProps<T>>,
 ) => {
-  const Component: FC<AppStackScreenProps<T>> = ({ route: { params } }) => {
-    const { reservationStore } = useStores()
-    const reservation = params?.reservationId
-      ? reservationStore.reservation.get(params?.reservationId)
-      : undefined
-    return !!reservation && !!params ? (
-      <WrappedComponent reservation={reservation} params={params} />
-    ) : (
-      <></>
-    )
-  }
-  return Component
+    const Component: FC<AuthenticatedStackScreenProps<T>> = ({
+        route: { params },
+    }) => {
+        const reservationStore = useReservationStore()
+        const reservation = params?.reservationId
+            ? reservationStore.reservations.get(params?.reservationId)
+            : undefined
+        return !!reservation && !!params ? (
+            <WrappedComponent reservation={reservation} params={params} />
+        ) : (
+            <></>
+        )
+    }
+    return Component
 }
 
-// export const withFlightReservation = <T extends keyof ReservationAppStackParamList>(
+// export const withFlightReservation = <T extends keyof ReservationAuthenticatedStackParamList>(
 //   WrappedComponent: FC<{
 //     reservation: FlightReservation
-//     params: Readonly<AppStackParamList[T]>
+//     params: Readonly<AuthenticatedStackParamList[T]>
 //   }>,
 // ) => {
-//   const Component: FC<AppStackScreenProps<T>> = ({route: {params}}) => {
+//   const Component: FC<AuthenticatedStackScreenProps<T>> = ({route: {params}}) => {
 //     const tripStore = useTripStore()
 //     const reservation = params?.reservationId
 //       ? tripStore.reservationMap.get(params?.reservationId)

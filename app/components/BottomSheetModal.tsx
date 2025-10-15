@@ -5,8 +5,8 @@ import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop as GorhomBottomSheetBackdrop,
 } from '@gorhom/bottom-sheet'
-import {useFocusEffect} from '@react-navigation/native'
-import {useTheme} from '@rneui/themed'
+import { useFocusEffect } from '@react-navigation/native'
+import { useTheme } from '@rneui/themed'
 import {
   PropsWithChildren,
   Ref,
@@ -15,15 +15,15 @@ import {
   useEffect,
   useState,
 } from 'react'
-import {StyleSheet, Platform} from 'react-native'
-import {GestureHandlerRootView as RNGestureHandlerRootView} from 'react-native-gesture-handler'
-import {GestureHandlerRootViewProps} from 'react-native-gesture-handler/lib/typescript/components/GestureHandlerRootView'
+import { StyleSheet, Platform } from 'react-native'
+import { GestureHandlerRootView as RNGestureHandlerRootView } from 'react-native-gesture-handler'
+import { GestureHandlerRootViewProps } from 'react-native-gesture-handler/lib/typescript/components/GestureHandlerRootView'
 
 export const GestureHandlerRootViewWrapper = (
   props: GestureHandlerRootViewProps,
 ) => {
   const {
-    theme: {colors},
+    theme: { colors },
   } = useTheme()
   return (
     <RNGestureHandlerRootView
@@ -101,7 +101,9 @@ export const BottomSheetModal = ({
   children,
   ref,
   ...props
-}: PropsWithChildren<BottomSheetModalProps & {ref: Ref<BottomSheetModal>}>) => {
+}: PropsWithChildren<
+  BottomSheetModalProps & { ref: Ref<BottomSheetModal> }
+>) => {
   return (
     <GorhomBottomSheetModal
       ref={ref}
@@ -132,7 +134,7 @@ BottomSheetModal.displayName = 'BottomSheetModal'
 const styles = StyleSheet.create({
   gestureHandlerRootView: {
     flex: 1,
-    ...(Platform.OS === 'web' ? {maxWidth: 480} : {}),
+    ...(Platform.OS === 'web' ? { maxWidth: 480 } : {}),
   },
   containerStyle: {},
   style: {

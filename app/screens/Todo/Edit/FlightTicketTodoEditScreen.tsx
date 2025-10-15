@@ -13,140 +13,140 @@ import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
 import {
-  TodoConfirmListItem,
-  useTodoConfirmListItem,
+    TodoConfirmListItem,
+    useTodoConfirmListItem,
 } from '../TodoConfirmListItem'
 
 export const FlightTicketTodoEditScreen: FC<{
-  todo: FlightTodo
-  isBeforeInitialization?: boolean
+    todo: FlightTodo
+    isBeforeInitialization?: boolean
 }> = observer(({ todo, isBeforeInitialization = false }) => {
-  const { navigateWithTrip } = useNavigate()
-  const tripStore = useTripStore()
+    const { navigateWithTrip } = useNavigate()
+    const tripStore = useTripStore()
 
-  useEffect(() => {
-    console.log('Hello [FlightTicketTodoEditScreen]')
-  }, [])
+    useEffect(() => {
+        console.log('Hello [FlightTicketTodoEditScreen]')
+    }, [])
 
-  const { patchTodo } = useTripStore()
+    const { patchTodo } = useTripStore()
 
-  const { isCompleted, setIsCompleted } = useTodoConfirmListItem(
-    todo,
-    'ConfirmFlight',
-    isBeforeInitialization,
-  )
+    const { isCompleted, setIsCompleted } = useTodoConfirmListItem(
+        todo,
+        'ConfirmFlight',
+        isBeforeInitialization,
+    )
 
-  const handleUpload = useCallback(async () => {
-    console.log('handleUpload')
-  }, [])
+    const handleUpload = useCallback(async () => {
+        console.log('handleUpload')
+    }, [])
 
-  const handleNotePress = useCallback(() => {
-    console.log(`handleInputPress navigateWithTrip to [TodoNote]`)
-    navigateWithTrip('TodoNote', {
-      todoId: todo.id,
-    })
-  }, [navigateWithTrip, todo.id])
+    const handleNotePress = useCallback(() => {
+        console.log(`handleInputPress navigateWithTrip to [TodoNote]`)
+        navigateWithTrip('TodoNote', {
+            todoId: todo.id,
+        })
+    }, [navigateWithTrip, todo.id])
 
-  //   const handleBackPressBeforeNavigate = useCallback(async () => {
-  //     if (isBeforeInitialization) tripStore.deleteTodo(todo)
-  //   }, [isBeforeInitialization])
+    //   const handleBackPressBeforeNavigate = useCallback(async () => {
+    //     if (isBeforeInitialization) tripStore.deleteTodo(todo)
+    //   }, [isBeforeInitialization])
 
-  //   useHeader({
-  //     onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
-  //   })
+    //   useHeader({
+    //     onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
+    //   })
 
-  const handleConfirm = useCallback(async () => {
-    if (!todo.isCompleted && isCompleted) {
-      navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
-    } else if (todo.isCompleted && !isCompleted) {
-      todo.setIncomplete()
-      patchTodo(todo).then(() => {
-        goBack()
-      })
-    } else {
-      goBack()
-    }
-  }, [patchTodo, todo, todo.isCompleted, isCompleted])
+    const handleConfirm = useCallback(async () => {
+        if (!todo.isCompleted && isCompleted) {
+            navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
+        } else if (todo.isCompleted && !isCompleted) {
+            todo.setIncomplete()
+            patchTodo(todo).then(() => {
+                goBack()
+            })
+        } else {
+            goBack()
+        }
+    }, [patchTodo, todo, todo.isCompleted, isCompleted])
 
-  const handleChange = useCallback(() => {
-    setIsCompleted(prev => !prev)
-    console.log(isCompleted)
-  }, [setIsCompleted, isCompleted])
+    const handleChange = useCallback(() => {
+        setIsCompleted(prev => !prev)
+        console.log(isCompleted)
+    }, [setIsCompleted, isCompleted])
 
-  return (
-    <GestureHandlerRootViewWrapper>
-      <Screen>
-        <Title>
-          <ListItem>
-            <Avatar icon={{ name: '✈️' }} size="xlarge" />
-            <ListItem.Content>
-              <ListItem.Title
-                style={{
-                  fontFamily: 'Pretendard',
-                  fontWeight: 600,
-                  fontSize: 21,
-                  lineHeight: 1.6 * 22,
-                }}>
-                {todo.title}
-              </ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
-        </Title>
-        {todo.departure && (
-          <View>
-            <TextInfoListItem title={'출발'}>
-              <TransText style={{ fontWeight: 600 }}>
-                {`${todo.departure?.name} ${
-                  todo.departure?.iataCode
-                    ? `(${todo.departure?.iataCode})`
-                    : ''
-                }`}
-              </TransText>
+    return (
+        <Screen>
+            <Title>
+                <ListItem>
+                    <Avatar icon={{ name: '✈️' }} size="xlarge" />
+                    <ListItem.Content>
+                        <ListItem.Title
+                            style={{
+                                fontFamily: 'Pretendard',
+                                fontWeight: 600,
+                                fontSize: 21,
+                                lineHeight: 1.6 * 22,
+                            }}>
+                            {todo.title}
+                        </ListItem.Title>
+                    </ListItem.Content>
+                </ListItem>
+            </Title>
+            {todo.departure && (
+                <View>
+                    <TextInfoListItem title={'출발'}>
+                        <TransText style={{ fontWeight: 600 }}>
+                            {`${todo.departure?.name} ${
+                                todo.departure?.iataCode
+                                    ? `(${todo.departure?.iataCode})`
+                                    : ''
+                            }`}
+                        </TransText>
+                    </TextInfoListItem>
+                    <TextInfoListItem title={'도착'}>
+                        <TransText style={{ fontWeight: 600 }}>
+                            {`${todo.arrival?.name} ${todo.arrival?.iataCode ? `(${todo.arrival?.iataCode})` : ''}`}
+                        </TransText>
+                    </TextInfoListItem>
+                </View>
+            )}
+            {/* <Divider /> */}
+            <TodoConfirmListItem
+                todo={todo}
+                isCompleted={isCompleted}
+                onChange={handleChange}
+            />
+            <TextInfoListItem
+                onPress={handleNotePress}
+                title={'메모'}
+                rightContent={<ListItem.Chevron />}>
+                <TransText primary>
+                    {todo.note || '메모를 남겨보세요'}
+                </TransText>
             </TextInfoListItem>
-            <TextInfoListItem title={'도착'}>
-              <TransText style={{ fontWeight: 600 }}>
-                {`${todo.arrival?.name} ${todo.arrival?.iataCode ? `(${todo.arrival?.iataCode})` : ''}`}
-              </TransText>
-            </TextInfoListItem>
-          </View>
-        )}
-        {/* <Divider /> */}
-        <TodoConfirmListItem
-          todo={todo}
-          isCompleted={isCompleted}
-          onChange={handleChange}
-        />
-        <TextInfoListItem
-          onPress={handleNotePress}
-          title={'메모'}
-          rightContent={<ListItem.Chevron />}>
-          <TransText primary>{todo.note || '메모를 남겨보세요'}</TransText>
-        </TextInfoListItem>
-        <Fab.Container>
-          <Fab.Button
-            onPress={handleUpload}
-            color={'secondary'}
-            title={'예약 정보 입력'}
-          />
-          <Fab.Button onPress={handleConfirm} title={'확인'} />
-        </Fab.Container>
-      </Screen>
-    </GestureHandlerRootViewWrapper>
-  )
+            <Fab.Container>
+                <Fab.Button
+                    onPress={handleUpload}
+                    color={'secondary'}
+                    title={'예약 정보 입력'}
+                />
+                <Fab.Button onPress={handleConfirm} title={'확인'} />
+            </Fab.Container>
+        </Screen>
+    )
 })
 
 const $d: ViewStyle = {
-  flex: 1,
-  justifyContent: 'space-between',
-  paddingHorizontal: 24,
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
 }
 
 const $s: ViewStyle = {
-  gap: 32,
+    gap: 32,
 }
 
 const $iconAvataContainerStyle: ViewStyle = {
-  // width: 72,
-  // height: 72,
-  // height: 64
+    // width: 72,
+    // height: 72,
+    // height: 64
 }
