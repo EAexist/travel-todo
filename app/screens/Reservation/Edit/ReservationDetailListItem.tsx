@@ -1,19 +1,18 @@
-import { Avatar, AvatarProps } from '@/components/Avatar'
-import { Icon } from '@/components/Icon'
+import { Avatar } from '@/components/Avatar'
 import { Label } from '@/components/Label'
-import { ListItemBase } from '@/components/ListItem'
 import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
+import { Accomodation } from '@/models/Reservation/Accomodation'
 import {
     Reservation,
     ReservationDataItemType,
 } from '@/models/Reservation/Reservation'
+import { useNavigate } from '@/navigators'
+import { AccomodationAvatar } from '@/screens/Accomodation/AccomodationAvatar'
 import { openLinkInBrowser } from '@/utils/openLinkInBrowser'
-import { useTheme } from '@rneui/themed'
-import { ListItem, Text } from '@rneui/themed'
+import { ListItem, Text, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, ReactNode, useCallback } from 'react'
-import { View } from 'react-native'
 
 export const ReservationDetailListItem: FC<{
     reservation: Reservation
@@ -24,10 +23,17 @@ export const ReservationDetailListItem: FC<{
 }> = observer(({ reservation, item }) => {
     let customElement: ReactNode = null
 
+    const { navigateWithTrip } = useNavigate()
+
     const handleLinkPress = useCallback(() => {
-        if (item.id === 'primaryHrefLink' && reservation.primaryHrefLink)
+        if (reservation.primaryHrefLink)
             openLinkInBrowser(reservation.primaryHrefLink)
-    }, [item.id, reservation.primaryHrefLink])
+        else {
+            navigateWithTrip('ReservationLinkEdit', {
+                reservationId: reservation.id,
+            })
+        }
+    }, [reservation.primaryHrefLink])
 
     const {
         theme: { colors },
@@ -78,13 +84,15 @@ export const ReservationDetailListItem: FC<{
                             <TextInfoListItem>
                                 <Label
                                     title={`${reservation.accomodation?.nightsParsed}`}
-                                    avatarProps={{
-                                        icon: {
-                                            color: colors.text.primary,
-                                            name: 'moon',
-                                            type: 'octicon',
-                                        },
-                                    }}
+                                    leftContent={
+                                        <Avatar
+                                            icon={{
+                                                color: colors.text.primary,
+                                                name: 'moon',
+                                                type: 'octicon',
+                                            }}
+                                        />
+                                    }
                                 />
                             </TextInfoListItem>
                         )}
@@ -158,33 +166,14 @@ export const ReservationDetailListItem: FC<{
                         title={'숙소 타입'}>
                         <Label
                             title={reservation.accomodation?.categoryText}
-                            avatarProps={{
-                                icon: {
-                                    color: colors.text.primary,
-                                    ...(reservation.accomodation?.category ===
-                                    'HOTEL'
-                                        ? {
-                                              type: 'font-awesome-5',
-                                              name: 'hotel',
-                                          }
-                                        : reservation.accomodation?.category ===
-                                            'AIRBNB'
-                                          ? {
-                                                type: 'font-awesome-5',
-                                                name: 'airbnb',
-                                            }
-                                          : reservation.accomodation
-                                                  ?.category === 'DORMITORY'
-                                            ? {
-                                                  type: 'material-community',
-                                                  name: 'bunk-bed-outline',
-                                              }
-                                            : {
-                                                  type: 'material-community',
-                                                  name: 'bed-king-outline',
-                                              }),
-                                },
-                            }}
+                            leftContent={
+                                <AccomodationAvatar
+                                    accomodation={
+                                        reservation.accomodation as Accomodation
+                                    }
+                                    isColored={false}
+                                />
+                            }
                         />
                     </TextInfoListItem>
                 )

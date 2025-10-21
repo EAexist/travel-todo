@@ -9,38 +9,36 @@ import {
 } from 'react-native'
 //
 import { Avatar } from '@/components/Avatar'
+import {
+    NavigateListItemProp,
+    NavigateMenuBottomSheet,
+} from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import BottomSheetModal from '@/components/BottomSheetModal'
 import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
-import ContentTitle from '@/components/Layout/Content'
-import { ListItemCaption } from '@/components/ListItemCaption'
-import ListSubheader from '@/components/ListSubheader'
-import {
-    NavigateMenuBottomSheet,
-    NavigateMenuData,
-} from '@/components/NavigateMenuBottomSheet'
+import { ListItemBase } from '@/components/ListItem/ListItem'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import SectionCard from '@/components/SectionCard'
-import { TripModeHelpText } from '@/components/TripModeHelpText'
+import StyledSwitch from '@/components/StyledSwitch'
 import { useReservationStore, useTripStore } from '@/models'
 import { Destination } from '@/models/Destination'
-import { useNavigate } from '@/navigators'
-import { MainTabScreenProps } from '@/navigators/MainTabNavigator'
+import { MainTabScreenProps, useNavigate } from '@/navigators'
 import { useMainScreenHeader } from '@/utils/useHeader'
-import { Chip, Icon, ListItem, Switch, Text, useTheme } from '@rneui/themed'
+import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 
 export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
     observer(({}) => {
         const tripStore = useTripStore()
         const reservationStore = useReservationStore()
+
         const {
             theme: { colors },
         } = useTheme()
-
         /* Settings Menu */
 
-        const settingsOption: NavigateMenuData[] = [
+        const settingsOption: NavigateListItemProp[] = [
             {
                 title: '여행 정보 수정',
                 path: 'EditTrip',
@@ -64,7 +62,8 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
         }, [settingsMenuBottomSheetRef])
 
         useMainScreenHeader({
-            title: '내 여행',
+            title: '더보기',
+            backgroundColor: 'secondary',
             rightComponent: (
                 <TouchableOpacity
                     onPress={handleSettingsButtonPress}
@@ -72,12 +71,15 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                     <HeaderIcon name="gear" type="octicon" />
                 </TouchableOpacity>
             ),
-            backgroundColor: 'secondary',
         })
 
         const renderDestinationText: ListRenderItem<
             Destination
         > = destination => <>{}</>
+
+        const handleSetSchedule = useCallback(() => {
+            navigateWithTrip('EditTripSchedule')
+        }, [])
 
         const handleAddDestination = useCallback(() => {
             navigateWithTrip('EditTripDestination')
@@ -98,9 +100,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                 id: '0',
                 category: '숙박 예약',
                 icon: { name: '🛌' },
-                title:
-                    tripStore.accomodationTodoStatusText ||
-                    `${reservationStore.reservedNights}박 예약 완료`,
+                title: tripStore.accomodationTodoStatusText,
                 onPress: handleViewAccomodationPlan,
             },
             {
@@ -150,7 +150,11 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
             <Screen backgroundColor={'secondary'}>
                 <ScrollView>
                     <SectionCard>
-                        <ListItem containerStyle={{ height: 'auto' }}>
+                        <ListItem
+                            containerStyle={{
+                                height: 'auto',
+                                paddingVertical: 16,
+                            }}>
                             <ListItem.Content>
                                 <ListItem.Title
                                     numberOfLines={undefined}
@@ -165,7 +169,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                                             ? `D-${tripStore.dDay}`
                                             : tripStore.dDay === 0
                                               ? 'D-day'
-                                              : '여행 중'
+                                              : '여행중'
                                     }
                                     color={
                                         tripStore.dDay <= 0
@@ -187,43 +191,62 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                                 />
                             </View>
                         ) : (
-                            <View></View>
+                            <ListItemBase
+                                onPress={handleSetSchedule}
+                                title={'여행 일정을 설정해보세요'}
+                                titleColor="secondary"
+                                rightContent={<ListItem.Chevron />}
+                            />
                         )}
                     </SectionCard>
                     <SectionCard>
-                        <ListItem>
-                            <ListItem.Content>
-                                <ListItem.Title>
-                                    {'여행 모드'}
-                                    <ListItemCaption>
-                                        <TouchableOpacity
-                                            onPress={handlePressHelpTravelMode}>
-                                            <Icon
-                                                name="help-outline"
-                                                type="material"
-                                                size={20}
-                                                color={undefined}
-                                            />
-                                        </TouchableOpacity>
-                                    </ListItemCaption>
-                                </ListItem.Title>
-                                <ListItem.Subtitle>
-                                    {tripStore.isTripMode
-                                        ? '사용중'
-                                        : '사용 안 함'}
-                                </ListItem.Subtitle>
-                            </ListItem.Content>
-                            <Switch
-                                value={tripStore.isTripMode}
-                                onValueChange={value =>
-                                    tripStore.setProp('isTripMode', value)
+                        {/* <ListSubheader title="시작 탭" dense /> */}
+                        <ListItemBase
+                            title={'예약 탭에서 시작하기'}
+                            rightContent={
+                                <StyledSwitch
+                                    isActive={tripStore.settings.isTripMode}
+                                    onChange={tripStore.toggleIsTripMode}
+                                    iconProps={{
+                                        true: {
+                                            name: 'check',
+                                            type: 'material',
+                                        },
+                                        false: {
+                                            name: 'remove',
+                                            type: 'material',
+                                        },
+                                    }}
+                                />
+                            }
+                        />
+                        {/* <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                paddingHorizontal: 24,
+                                gap: 4,
+                            }}>
+                            <Text
+                                style={{
+                                    fontSize: 13,
+                                    color: colors.text.secondary,
+                                }}>
+                                {`현재 시작 탭: ${tripStore.settings.isTripMode ? '예약' : '여행 준비'}`}
+                            </Text>
+                            <Icon
+                                size={20}
+                                name={
+                                    tripStore.settings.isTripMode
+                                        ? 'qr-code'
+                                        : 'checklist'
                                 }
+                                color={colors.text.secondary}
                             />
-                        </ListItem>
+                        </View> */}
                     </SectionCard>
-                    {/* <SectionCard containerStyle={{paddingBottom: 0}}> */}
                     <SectionCard>
-                        <ListSubheader title="완료한 할 일" />
+                        <ListSubheader title="완료한 할 일" dense />
                         <FlatList
                             data={todoStatusGridData}
                             renderItem={renderTodoStatusGridItem}
@@ -235,17 +258,8 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                             }}
                             columnWrapperStyle={{}}
                         />
-                        {/* <Divider inset />
-            <ListItem onPress={handleAddDestination}>
-              <ListItem.Content>
-                <ListItem.Title style={{fontSize: 16}}>
-                  모든 할 일 보러가기
-                </ListItem.Title>
-              </ListItem.Content>
-              <ListItem.Chevron />
-            </ListItem> */}
                     </SectionCard>
-                    <SectionCard containerStyle={{ marginBottom: 15 }}>
+                    {/* <SectionCard containerStyle={{ marginBottom: 15 }}>
                         <ListSubheader title="여행지 정보" />
                         {tripStore.destination.length > 0 ? (
                             <FlatList
@@ -268,26 +282,8 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                                 <ListItem.Chevron />
                             </ListItem>
                         )}
-                    </SectionCard>
+                    </SectionCard> */}
                 </ScrollView>
-                <BottomSheetModal ref={tripModeHelpBottomSheetRef}>
-                    <ContentTitle
-                        variant="listItem"
-                        title={'여행 모드'}
-                        subtitle={
-                            tripStore.isTripMode ? '사용중' : '사용 안 함'
-                        }
-                        rightComponent={
-                            <Switch
-                                value={tripStore.isTripMode}
-                                onValueChange={value =>
-                                    tripStore.toggleTripMode()
-                                }
-                            />
-                        }
-                    />
-                    <TripModeHelpText />
-                </BottomSheetModal>
                 <NavigateMenuBottomSheet
                     data={settingsOption}
                     ref={settingsMenuBottomSheetRef}

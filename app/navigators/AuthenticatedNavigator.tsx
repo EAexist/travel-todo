@@ -8,10 +8,11 @@ import * as Screens from '@/screens'
 import { EditTripScreen } from '@/screens/EditTrip/EditTripScreen'
 import { ReservationCreateScreen } from '@/screens/Reservation/Create/ReservationCreateScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { useTheme } from '@rneui/themed'
+import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { MainTabNavigator } from './MainTabNavigator'
 import { AuthenticatedStackParamList } from './navigationTypes'
+import { BackButton } from '@/components/Header'
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const AuthenticatedStack =
@@ -23,7 +24,14 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
     } = useTheme()
 
     return (
-        <AuthenticatedStack.Navigator initialRouteName={'Home'}>
+        <AuthenticatedStack.Navigator
+            screenOptions={{
+                header: () => <Header leftComponent={<BackButton />} />,
+                contentStyle: {
+                    backgroundColor: colors.background,
+                },
+            }}
+            initialRouteName={'Home'}>
             <AuthenticatedStack.Screen
                 name="TripList"
                 component={Screens.TripList.List}
@@ -133,10 +141,10 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
                     name="ReservationNoteEdit"
                     component={Screens.Reservation.NoteEdit}
                 />
-                <AuthenticatedStack.Screen
+                {/* <AuthenticatedStack.Screen
                     name="ReservationEditList"
                     component={Screens.Reservation.EditList}
-                />
+                /> */}
                 <AuthenticatedStack.Screen
                     name="ReservationDelete"
                     component={Screens.Reservation.Delete}

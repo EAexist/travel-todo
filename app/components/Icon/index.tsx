@@ -23,7 +23,7 @@ export const Icon = ({ type = 'tossface', ...props }: IconProps) => {
                     return <></>
             }
         default:
-            return <RNEIcon {...props} />
+            return <RNEIcon type={type} {...props} />
     }
 }
 

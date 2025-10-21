@@ -13,6 +13,8 @@ import { useTheme } from '@rneui/themed'
 import { FC, useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { EditScreenBaseProps } from '.'
+import { Text } from '@rneui/themed'
+import { Icon } from '@/components/Icon'
 
 export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     isInitialSettingScreen,
@@ -29,7 +31,7 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
             : undefined,
     })
 
-    const isScheduleSet = dateInterval.start !== undefined
+    const isScheduleSet = dateInterval.end !== undefined
 
     const handleNextPress = useCallback(async () => {
         ;[dateInterval.start, dateInterval.end].forEach(date => {
@@ -98,8 +100,9 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
                     }}
                     hideExtraDays={dateInterval.end == undefined}
                     maxDate={
-                        dateInterval.start == undefined ||
-                        dateInterval.end !== undefined
+                        (dateInterval.start == undefined ||
+                            dateInterval.end !== undefined) &&
+                        reservationStore.firstCheckinDate
                             ? toCalendarString(
                                   reservationStore.firstCheckinDate,
                               )
@@ -107,13 +110,53 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
                     }
                     minDate={
                         dateInterval.start !== undefined &&
-                        dateInterval.end == undefined
+                        dateInterval.end == undefined &&
+                        reservationStore.lastCheckoutDate
                             ? toCalendarString(
                                   reservationStore.lastCheckoutDate,
                               )
                             : undefined
                     }
                 />
+                {reservationStore.hasScheduledAccomodation && (
+                    <View
+                        style={{
+                            paddingTop: 4,
+                            flexDirection: 'row',
+                            gap: 16,
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                        }}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 4,
+                            }}>
+                            <Icon
+                                name="dot"
+                                type="octicon"
+                                color={colors.text.primary}
+                            />
+                            <Text style={{ fontSize: 12 }}>{'선택 가능'}</Text>
+                        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 4,
+                            }}>
+                            <Icon
+                                name="dot"
+                                type="octicon"
+                                color={colors.disabled}
+                            />
+                            <Text style={{ fontSize: 12 }}>
+                                {'선택 불가능 (숙박 예약을 포함해야 해요)'}
+                            </Text>
+                        </View>
+                    </View>
+                )}
             </CalendarContainer>
             <Fab.Container>
                 {isInitialSettingScreen ? (
@@ -126,8 +169,15 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
                     />
                 ) : (
                     <Fab.GoBackButton
+                        disabled={!isScheduleSet}
                         promiseBeforeNavigate={handleNextPress}
-                        // title={isScheduleSet ? '다음' : '건너뛰기'}
+                        title={
+                            isScheduleSet
+                                ? '확인'
+                                : dateInterval.start
+                                  ? '돌아오는 날을 선택하세요'
+                                  : '떠나는 날을 선택하세요'
+                        }
                     />
                 )}
             </Fab.Container>

@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/Avatar'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { useTripStore } from '@/models'
 import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'

@@ -1,7 +1,7 @@
 import * as Fab from '@/components/Fab'
 import { ControlledInput } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { useReservationStore } from '@/models'
 import { withReservation } from '@/utils/withReservation'
@@ -10,15 +10,12 @@ import { ViewStyle } from 'react-native'
 
 export const ReservationLinkEditScreen = withReservation<'ReservationLinkEdit'>(
     ({ reservation }) => {
-        const reservationStore = useReservationStore()
-
         const [isFocused, setIsFocused] = useState(false)
         const [value, setValue] = useState(reservation.primaryHrefLink || '')
         const onConfirm = useCallback(async () => {
             reservation.setProp('primaryHrefLink', value)
-            reservationStore.patch({
-                id: reservation.id,
-                primaryHrefLink: reservation.note,
+            reservation.patch({
+                primaryHrefLink: reservation.primaryHrefLink,
             })
         }, [value])
 

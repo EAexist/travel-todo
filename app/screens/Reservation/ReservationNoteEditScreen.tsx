@@ -1,6 +1,6 @@
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Note_ } from '@/components/Note'
 import { Screen } from '@/components/Screen'
 import { useReservationStore } from '@/models'
@@ -10,14 +10,11 @@ import { ViewStyle } from 'react-native'
 
 export const ReservationNoteEditScreen = withReservation<'ReservationNoteEdit'>(
     ({ reservation }) => {
-        const reservationStore = useReservationStore()
-
         const [isFocused, setIsFocused] = useState(false)
         const [value, setValue] = useState(reservation.note || '')
         const onConfirm = useCallback(async () => {
             reservation.setProp('note', value)
-            reservationStore.patch({
-                id: reservation.id,
+            reservation.patch({
                 note: reservation.note,
             })
         }, [value])

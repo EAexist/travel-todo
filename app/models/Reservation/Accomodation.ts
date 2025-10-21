@@ -8,6 +8,7 @@ import {
 } from '@/utils/date'
 import { v4 as uuidv4 } from 'uuid'
 import { createEnumType } from '../helpers/createEnumtype'
+import { IconObject } from '@rneui/base'
 
 export type AccomodationCategory =
     | 'GENERAL'
@@ -15,6 +16,34 @@ export type AccomodationCategory =
     | 'DORMITORY'
     | 'GUESTHOUSE'
     | 'AIRBNB'
+
+export const ACCOMODATION_CATEGORY_TO_TITLE: { [key: string]: string } = {
+    GENERAL: '일반',
+    HOTEL: '호텔',
+    DORMITORY: '도미토리',
+    GUESTHOUSE: '게스트하우스',
+    AIRBNB: '에어비엔비',
+}
+
+export const ACCOMODATION_CATEGORY_TO_ICONOBJECT: {
+    [key: string]: IconObject
+} = {
+    GENERAL: {
+        type: 'material-community',
+        name: 'bed-king-outline',
+    },
+    HOTEL: { type: 'font-awesome-5', name: 'hotel' },
+    DORMITORY: {
+        type: 'material-community',
+        name: 'bunk-bed-outline',
+    },
+    GUESTHOUSE: {
+        type: 'material-community',
+        name: 'party-popper',
+    },
+    AIRBNB: { type: 'font-awesome-5', name: 'airbnb' },
+}
+
 /**
  * This represents a Accomodation
  */
@@ -29,8 +58,8 @@ export const AccomodationModel = types
         title: types.maybeNull(types.string),
         roomTitle: types.maybeNull(types.string),
         location: types.maybeNull(types.string),
-        numberOfGuest: 1,
-        guestName: types.maybeNull(types.string),
+        numberOfClient: types.maybeNull(types.number),
+        clientName: types.maybeNull(types.string),
         checkinDateIsoString: types.maybeNull(types.string),
         checkoutDateIsoString: types.maybeNull(types.string),
         checkinStartTimeIsoString: types.maybeNull(types.string),
@@ -42,38 +71,30 @@ export const AccomodationModel = types
                 url: '',
             }),
         ),
-        note: '',
-        isFlaggedToDelete: false,
-        isFlaggedToAdd: false,
+        // isFlaggedToDelete: false,
+        // isFlaggedToAdd: false,
     })
     .actions(withSetPropAction)
     .actions(item => ({
-        toggleDeleteFlag() {
-            item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
-        },
-        toggleAddFlag() {
-            item.setProp('isFlaggedToAdd', !item.isFlaggedToAdd)
-        },
+        // toggleDeleteFlag() {
+        //     item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
+        // },
+        // toggleAddFlag() {
+        //     item.setProp('isFlaggedToAdd', !item.isFlaggedToAdd)
+        // },
         // removeFavorite(Accomodation: Accomodation) {
         //   store.favorites.remove(accomodationItem)
         // },
     }))
     .views(item => ({
+        get isScheduleSet() {
+            return item.checkinDateIsoString && item.checkoutDateIsoString
+        },
         get categoryText() {
-            switch (item.category) {
-                case 'GENERAL':
-                    return '일반'
-                case 'HOTEL':
-                    return '호텔'
-                case 'DORMITORY':
-                    return '도미토리'
-                case 'GUESTHOUSE':
-                    return '게스트하우스'
-                case 'AIRBNB':
-                    return '에어비엔비'
-                default:
-                    return ''
-            }
+            return ACCOMODATION_CATEGORY_TO_TITLE[item.category]
+        },
+        get icon() {
+            return ACCOMODATION_CATEGORY_TO_ICONOBJECT[item.category]
         },
         get checkinDate() {
             return item.checkinDateIsoString
@@ -105,8 +126,8 @@ export const AccomodationModel = types
         get detailTextList() {
             return {
                 roomTitle: item.roomTitle,
-                numberOfGuest: item.numberOfGuest,
-                clientName: item.guestName,
+                numberOfClient: item.numberOfClient,
+                clientName: item.clientName,
                 checkinDate: item.checkinDate?.toLocaleDateString(),
                 checkoutDate: item.checkoutDate?.toLocaleDateString(),
                 checkinTimeString: `${item.checkinStartTime?.getTime()}~${item.checkinEndTime?.getTime()}`,

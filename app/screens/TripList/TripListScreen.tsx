@@ -22,7 +22,7 @@ import { FC, useCallback, useRef, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import { useLoadingScreen, useRequireConnection } from '../Loading'
 import { TripListItem } from './TripListitem'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 
 export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
     observer(({}) => {
@@ -57,7 +57,7 @@ export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
                     if (tripStore !== null) {
                         if (tripStore.isInitialized)
                             navigateWithTrip('Main', {
-                                screen: tripStore.isTripMode
+                                screen: tripStore.settings.isTripMode
                                     ? 'ReservationList'
                                     : 'Todolist',
                             })

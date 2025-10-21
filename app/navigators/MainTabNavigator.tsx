@@ -80,31 +80,11 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                     // sceneStyle: $sceneStyle,
                 }}>
                 <Tab.Screen
-                    name="TripDashboard"
-                    initialParams={{ tripId: tripId }}
-                    component={MainScreens.TripDashboard}
-                    options={{
-                        tabBarLabel: '여행',
-                        tabBarIcon: ({ focused }) => (
-                            <Icon
-                                type="material"
-                                name="card-travel"
-                                color={
-                                    focused
-                                        ? theme.colors.active
-                                        : theme.colors.inactive
-                                }
-                                size={24}
-                            />
-                        ),
-                    }}
-                />
-                <Tab.Screen
                     name="Todolist"
                     initialParams={{ tripId: tripId }}
                     component={MainScreens.Todolist}
                     options={{
-                        tabBarLabel: '할 일',
+                        tabBarLabel: '여행 준비',
                         tabBarIcon: ({ focused }) => (
                             <Icon
                                 type="material"
@@ -129,6 +109,26 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                             <Icon
                                 type="material"
                                 name="qr-code"
+                                color={
+                                    focused
+                                        ? theme.colors.active
+                                        : theme.colors.inactive
+                                }
+                                size={24}
+                            />
+                        ),
+                    }}
+                />
+                <Tab.Screen
+                    name="TripDashboard"
+                    initialParams={{ tripId: tripId }}
+                    component={MainScreens.TripDashboard}
+                    options={{
+                        tabBarLabel: '더보기',
+                        tabBarIcon: ({ focused }) => (
+                            <Icon
+                                type="material"
+                                name="more-horiz"
                                 color={
                                     focused
                                         ? theme.colors.active

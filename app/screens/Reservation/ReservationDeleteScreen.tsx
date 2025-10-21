@@ -1,20 +1,16 @@
 import { Screen } from '@/components'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import { ListItemBase } from '@/components/ListItem'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import { useReservationStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { ListItem } from '@rneui/themed'
-import { Observer, observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useState } from 'react'
-import {
-    DefaultSectionT,
-    ScrollView,
-    SectionList,
-    SectionListRenderItem,
-} from 'react-native'
+import { ScrollView } from 'react-native'
+import { ReservationList } from '../../components/Reservation/ReservationList'
 
 interface ReservationDeleteItemProps {
     reservation: Reservation
@@ -62,12 +58,6 @@ export const ReservationDeleteScreen: FC<
             })
     }, [deleteList])
 
-    //   const renderSectionHeader = useCallback(
-    //     ({ section: { title } }: { section: DefaultSectionT }) => (
-    //       <ListSubheader title={title} />
-    //     ),
-    //     [],
-    //   )
     const handlePress = useCallback(
         (reservationId: string) => {
             setDeleteList(prev => ({
@@ -78,23 +68,12 @@ export const ReservationDeleteScreen: FC<
         [setDeleteList],
     )
 
-    //   useEffect(() => {
-    //     console.log('deleteList', deleteList)
-    //   }, [deleteList])
-
-    const renderItem: SectionListRenderItem<
-        ReservationDeleteItemProps,
-        DefaultSectionT
-    > = useCallback(
-        ({ item }) => (
-            <Observer
-                render={() => (
-                    <ReservationDeleteItem
-                        reservation={item.reservation}
-                        isChecked={item.isChecked}
-                        onPress={item.onPress}
-                    />
-                )}
+    const renderItem_ = useCallback(
+        (reservation: Reservation) => (
+            <ReservationDeleteItem
+                reservation={reservation}
+                isChecked={deleteList[reservation.id]}
+                onPress={() => handlePress(reservation.id)}
             />
         ),
         [deleteList],
@@ -109,44 +88,26 @@ export const ReservationDeleteScreen: FC<
     }
 
     useHeader(
-        numberOfDeletion <= 0
-            ? {}
-            : {
-                  rightActionTitle: '선택 해제',
-                  onRightPress: handleReset,
-              },
+        {
+            ...(numberOfDeletion <= 0
+                ? {}
+                : {
+                      rightActionTitle: '선택 해제',
+                      onRightPress: handleReset,
+                  }),
+            backgroundColor: 'secondary',
+        },
         [numberOfDeletion],
     )
 
-    const sections = reservationStore.reservationSections?.map(
-        ({ title, data }) => {
-            const newData = data.map(r => ({
-                reservation: r,
-                isChecked: deleteList[r.id],
-                onPress: () => handlePress(r.id),
-            }))
-            return { title, data: newData }
-        },
-    )
-
     return (
-        <Screen>
+        <Screen backgroundColor="secondary">
             <ContentTitle
                 title={'예약 삭제하기'}
                 subtitle={'관리하지 않아도 되늗 예약을 지울 수 있어요'}
             />
             <ScrollView>
-                {sections && (
-                    <SectionList
-                        // sections={[...reservationStore.reservations.values()].map(r => ({
-                        //   reservation: r,
-                        // }))}
-                        sections={sections}
-                        keyExtractor={item => item.reservation.id}
-                        renderItem={renderItem}
-                        //   renderSectionHeader={renderSectionHeader}
-                    />
-                )}
+                <ReservationList renderItem={renderItem_} />
             </ScrollView>
             <Fab.Container>
                 <Fab.GoBackButton

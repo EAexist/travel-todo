@@ -1,56 +1,30 @@
+import { Calendar } from '@/components/Calendar/Calendar'
 import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
-import { useScheduleSettingCalendar } from '@/components/Calendar/useScheduleSettingCalendar'
 import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewerCalendar'
 import * as Fab from '@/components/Fab'
-import { ListItemBase } from '@/components/ListItem'
 import { Screen } from '@/components/Screen'
-import { useReservationStore, useStores, useTripStore } from '@/models'
+import { useReservationStore, useTripStore } from '@/models'
 import { Accomodation } from '@/models/Reservation/Accomodation'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
-import { toCalendarString } from '@/utils/date'
 import {
     $headerCenterTitleContainerStyle,
     HeaderCenterTitle,
     useHeader,
 } from '@/utils/useHeader'
-import { useTheme } from '@rneui/themed'
-import { eachDayOfInterval } from 'date-fns'
+import { ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { FC, useCallback, useEffect, useState } from 'react'
-import { FlatList } from 'react-native'
-import { ListRenderItem } from 'react-native'
-import { MarkedDates } from 'react-native-calendars/src/types'
-import { Calendar } from '@/components/Calendar/Calendar'
+import { FC, useCallback } from 'react'
+import { FlatList, ListRenderItem } from 'react-native'
+import { AccomodationAvatar } from './AccomodationAvatar'
 
 const AccomodationPlanCalendar: FC = observer(() => {
     const reservationStore = useReservationStore()
 
-    const {
-        theme: { colors },
-    } = useTheme()
-
     const tripStore = useTripStore()
 
-    const markedDates = Object.fromEntries(
-        Object.entries(
-            reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
-        ).map(([k, { periods }]) => [
-            k,
-            {
-                periods: periods.map(({ colorIndex, ...v }) => ({
-                    ...v,
-                    color: colors.palette[colorIndex],
-                })),
-            },
-        ]),
-    )
-
-    useEffect(() => {
-        console.log(
-            reservationStore.accomodationCalendarMarkedDatesWithColorIndex,
-        )
-    }, [reservationStore.accomodationCalendarMarkedDatesWithColorIndex])
+    const markedDates =
+        reservationStore.accomodationMarkedDatesMultiPeriodMarking
 
     return tripStore.isScheduleSet ? (
         <ScheduleViewerCalendarBase
@@ -65,7 +39,6 @@ const AccomodationPlanCalendar: FC = observer(() => {
 const AccomodationListItem: FC<{
     reservation: Reservation
 }> = ({ reservation }) => {
-    const reservationStore = useReservationStore()
     const { navigateWithTrip } = useNavigate()
     const accomodation = reservation.accomodation as Accomodation
 
@@ -73,45 +46,20 @@ const AccomodationListItem: FC<{
         navigateWithTrip('Reservation', { reservationId: reservation.id })
     }, [])
 
-    const {
-        theme: { colors },
-    } = useTheme()
-
     return (
-        <ListItemBase
-            title={accomodation.title || ''}
-            subtitle={accomodation.nightsParsed || undefined}
-            avatarProps={{
-                icon: {
-                    color: colors.white,
-                    ...(accomodation.category === 'HOTEL'
-                        ? { type: 'font-awesome-5', name: 'hotel' }
-                        : accomodation.category === 'AIRBNB'
-                          ? { type: 'font-awesome-5', name: 'airbnb' }
-                          : accomodation.category === 'DORMITORY'
-                            ? {
-                                  type: 'material-community',
-                                  name: 'bunk-bed-outline',
-                              }
-                            : {
-                                  type: 'material-community',
-                                  name: 'bed-king-outline',
-                              }),
-                },
-                containerStyle: accomodation.title
-                    ? {
-                          backgroundColor:
-                              colors.palette[
-                                  reservationStore.orderedAccomodationReservations.indexOf(
-                                      reservation,
-                                  )
-                              ],
-                      }
-                    : {},
-            }}
-            onPress={handlePress}
-            containerStyle={{ height: 64 }}
-        />
+        <ListItem onPress={handlePress} containerStyle={{ height: 64 }}>
+            <AccomodationAvatar accomodation={accomodation} />
+            <ListItem.Content>
+                {accomodation.title && (
+                    <ListItem.Title>{accomodation.title}</ListItem.Title>
+                )}
+                {accomodation.nightsParsed && (
+                    <ListItem.Subtitle>
+                        {accomodation.nightsParsed}
+                    </ListItem.Subtitle>
+                )}
+            </ListItem.Content>
+        </ListItem>
     )
 }
 

@@ -2,8 +2,9 @@ import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
+import StyledSwitch from '@/components/StyledSwitch'
 import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
 import { useReservationStore } from '@/models'
@@ -12,10 +13,9 @@ import {
     ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
-import { openLinkInBrowser } from '@/utils/openLinkInBrowser'
 import { useHeader } from '@/utils/useHeader'
 import { withReservation } from '@/utils/withReservation'
-import { Divider, ListItem } from '@rneui/themed'
+import { Divider, ListItem, Text } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useRef, useState } from 'react'
 import {
@@ -33,14 +33,9 @@ export const ReservationScreen = withReservation<'Reservation'>(
         const { navigateWithTrip } = useNavigate()
         const reservationStore = useReservationStore()
 
-        const handleLinkPress = useCallback(() => {
-            if (reservation.primaryHrefLink)
-                openLinkInBrowser(reservation.primaryHrefLink)
-        }, [reservation.primaryHrefLink])
-
         const handleBackPressBeforeNavigate = useCallback(async () => {
-            reservationStore.patch(reservation as ReservationSnapshot)
-        }, [reservationStore, reservation])
+            reservation.patch(reservation as ReservationSnapshot)
+        }, [])
 
         useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
 
@@ -99,6 +94,28 @@ export const ReservationScreen = withReservation<'Reservation'>(
                     subtitle={reservation.categoryTitle}
                 />
                 <ScrollView>
+                    <TextInfoListItem
+                        title={'상태'}
+                        rightContent={
+                            <StyledSwitch
+                                isActive={reservation.isCompleted}
+                                onChange={reservation.toggleIsCompleted}
+                                iconProps={{
+                                    true: {
+                                        name: 'check',
+                                        type: 'material',
+                                    },
+                                    false: {
+                                        name: 'remove',
+                                        type: 'material',
+                                    },
+                                }}
+                            />
+                        }>
+                        <Text>
+                            {reservation.isCompleted ? '사용 완료' : '사용 전'}
+                        </Text>
+                    </TextInfoListItem>
                     <ReservationDetailListItem
                         reservation={reservation}
                         item={{ id: 'primaryHrefLink' }}

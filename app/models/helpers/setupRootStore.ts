@@ -10,7 +10,6 @@
  * @refresh reset
  */
 import { RootStore, RootStoreSnapshot } from '@/models/stores/RootStore'
-import { api } from '@/services/api'
 import { ApiStatus } from '@/utils/useApiStatus'
 import { autorun } from 'mobx'
 import {

@@ -1,7 +1,7 @@
 import { Screen } from '@/components'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import { ListItemBase } from '@/components/ListItem'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import { useReservationStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
@@ -36,7 +36,7 @@ const ReservationEditItem: FC<ReservationEditItemProps> = ({ reservation }) => {
     )
 }
 
-export const ReservationEditListScreen: FC = observer(() => {
+const ReservationEditListScreen: FC = observer(() => {
     const reservationStore = useReservationStore()
 
     //   const renderSectionHeader = useCallback(

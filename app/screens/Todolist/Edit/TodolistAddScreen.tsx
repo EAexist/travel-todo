@@ -29,7 +29,7 @@ export const TodolistAddScreen: FC<TodolistAddScreenProps> = observer(
         return (
             <TodolistAddScreenBase
                 title={'새 할 일 추가하기'}
-                instruction={'체크리스트에서 관리할 할 일을 추가해보세요'}
+                instruction={'관리할 할 일을 추가해보세요'}
                 tripId={route.params.tripId}
                 fab={
                     <Fab.Container>

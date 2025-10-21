@@ -67,14 +67,32 @@ export interface TripDTO
     destination: DestinationDTO[]
     reservations: ReservationDTO[]
 }
+export interface TripPatchDTO
+    extends Partial<
+        Omit<
+            TripStoreSnapshot,
+            'todoMap' | 'todolist' | 'destination' | 'reservationStore'
+        >
+    > {
+    id: string
+}
 
 export interface TodoDTO
     extends Partial<Omit<TodoSnapshotIn, 'isFlaggedToDelete' | 'content'>> {
     content: TodoContentSnapshotIn
-    // | Pick<TodoContentSnapshotIn, 'isStock' | 'id'>
+}
+
+export interface TodoPatchDTO
+    extends Partial<Omit<TodoSnapshotIn, 'isFlaggedToDelete' | 'content'>> {
+    content?: TodoContentSnapshotIn
+    id: string
 }
 
 export interface ReservationDTO extends ReservationSnapshot {}
+
+export interface ReservationPatchDTO extends Partial<ReservationSnapshot> {
+    id: string
+}
 
 // export interface CreateTodoDTO extends Omit<TodoDTO, 'id'> {
 //   tripId: number
@@ -132,11 +150,11 @@ export interface DeleteTripProps {
 
 export interface CreateTodoProps {
     tripId: string
-    todoDTO: TodoDTO
+    todoDTO: TodoPatchDTO
 }
 
 export interface PatchTodoProps {
-    todoDTO: TodoDTO
+    todoDTO: TodoPatchDTO
 }
 
 export interface DeleteTodoProps {
@@ -165,11 +183,11 @@ export interface DeleteDestinationProps {
 
 export interface CreateReservationProps {
     tripId: string
-    reservationDTO: ReservationSnapshot
+    reservationDTO: ReservationPatchDTO
 }
 
 export interface PatchReservationProps {
-    reservationDTO: ReservationSnapshot
+    reservationDTO: ReservationPatchDTO
 }
 
 export interface DeleteReservationProps {
@@ -206,21 +224,16 @@ export const mapToDestination: (
     else throw Error
 }
 
-export const mapToTodoDTO: (todo: Todo) => TodoDTO = todo => ({
-    ...todo,
+export const mapToTodoPatchDTO: (
+    todo: Partial<TodoSnapshotIn> & {
+        id: string
+    },
+) => TodoPatchDTO = todo => ({
+    id: todo.id,
+    note: todo.note,
+    completeDateIsoString: todo.completeDateIsoString,
+    orderKey: todo.orderKey,
     content: todo.content,
-    // .isStock
-    //     ? {
-    //           id: todo.content.id,
-    //           isStock: true,
-    //       }
-    //     : todo.content,
-})
-
-export const mapToReservation: (
-    reservation: ReservationDTO,
-) => ReservationSnapshot = reservation => ({
-    ...reservation,
 })
 
 export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
@@ -231,22 +244,33 @@ export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
         ),
     })
 
-export const mapToTripDTO: (trip: Partial<TripStore>) => Partial<TripDTO> = ({
-    todolist,
-    destination,
-    ...trip
-}) => ({
-    ...getSnapshot(trip),
-    todolist: todolist?.values()
-        ? Array.from(todolist.values())
-              .map(todos => {
-                  return todos.map((todo, index) =>
-                      mapToTodoDTO(trip.todoMap?.get(todo.id) as Todo),
-                  )
-              })
-              .flat()
-        : undefined,
-    destination: destination?.map(dest => mapToDestinationDTO(dest)),
+// export const mapToTripDTO: (trip: Partial<TripStore>) => Partial<TripDTO> = ({
+//     todolist,
+//     destination,
+//     ...trip
+// }) => ({
+//     ...getSnapshot(trip),
+//     todolist: todolist?.values()
+//         ? Array.from(todolist.values())
+//               .map(todos => {
+//                   return todos.map((todo, index) =>
+//                       mapToTodoPatchDTO(trip.todoMap?.get(todo.id) as Todo),
+//                   )
+//               })
+//               .flat()
+//         : undefined,
+//     destination: destination?.map(dest => mapToDestinationDTO(dest)),
+// })
+
+export const mapToTripPatchDTO: (
+    trip: Partial<TripStoreSnapshot> & { id: string },
+) => TripPatchDTO = trip => ({
+    id: trip.id,
+    isInitialized: trip.isInitialized,
+    title: trip.title,
+    startDateIsoString: trip.startDateIsoString,
+    endDateIsoString: trip.endDateIsoString,
+    settings: trip.settings,
 })
 
 export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = ({
@@ -304,6 +328,30 @@ export const mapToPreset: (
         ...preset.todoContent,
         // id: preset.todoContent.id.toString(),
     },
+})
+
+export const mapToReservation: (
+    reservation: ReservationDTO,
+) => ReservationSnapshot = reservation => ({
+    ...reservation,
+})
+
+export const mapToReservationPatchDTO: (
+    reservation: Partial<ReservationSnapshot> & {
+        id: string
+    },
+) => ReservationPatchDTO = reservation => ({
+    id: reservation.id,
+    category: reservation.category,
+    primaryHrefLink: reservation.primaryHrefLink,
+    code: reservation.code,
+    note: reservation.note,
+    flightBooking: reservation.flightBooking,
+    flightTicket: reservation.flightTicket,
+    accomodation: reservation.accomodation,
+    visitJapan: reservation.visitJapan,
+    generalReservation: reservation.generalReservation,
+    isCompleted: reservation.isCompleted,
 })
 
 // export interface EpisodeItem {

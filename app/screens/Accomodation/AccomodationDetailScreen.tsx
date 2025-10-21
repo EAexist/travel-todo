@@ -43,7 +43,7 @@ export const AccomodationDetailScreen: FC<AccomodationDetailScreenProps> =
                 title: '방 · 인원',
                 content: `${item?.roomTitle} · ${item?.numberofClient}명`,
             },
-            { title: '예약한 이름', content: item?.clientName },
+            { title: '예약자 이름', content: item?.clientName },
             {
                 title: '체크인',
                 content: (

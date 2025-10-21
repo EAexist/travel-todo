@@ -1,5 +1,6 @@
-import { createTheme } from '@rneui/themed'
-import { Platform, TextStyle } from 'react-native'
+import { IconNode } from '@rneui/base'
+import { createTheme, IconProps } from '@rneui/themed'
+import { Platform, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 type Font = {
     thin?: TextStyle
@@ -163,7 +164,7 @@ export const typography: { pretendard: Font } = {
                   },
 }
 
-const colorTheme = createTheme({
+export const colorTheme = {
     lightColors: {
         // background:
         primary: '#006FFD',
@@ -182,8 +183,12 @@ const colorTheme = createTheme({
             primary: 'white',
             secondary: '#4E5968',
         },
+        icon: {
+            secondary: '#B0B8C1',
+        },
         grey0: '#F2F4F6',
         grey1: '#D1D6DB',
+        grey2: '#bfbfbf',
         divider: '#F2F4F6',
         transparent: 'transparent',
         palette: [
@@ -197,16 +202,156 @@ const colorTheme = createTheme({
             '#CAFFBF',
         ],
     },
-})
+}
+
+export const getPaletteColor = (index: number) =>
+    colorTheme.lightColors?.palette[
+        index % colorTheme.lightColors?.palette?.length
+    ]
+
+export const colorTheme_ = createTheme(colorTheme)
 
 const theme = createTheme({
-    ...colorTheme,
+    ...colorTheme_,
     components: {
+        SwitchTab: ({ variant = 'primary', size = 'md' }, { colors }) => ({
+            variant: variant,
+            disableIndicator: true,
+            style: {
+                backgroundColor:
+                    variant === 'primary' ? colors.secondary : colors.white,
+                ...(size === 'md'
+                    ? {
+                          borderRadius: 24,
+                      }
+                    : {
+                          borderRadius: 48,
+                      }),
+            },
+        }),
+        SwitchTabItem: (
+            { variant = 'primary', size = 'md', icon, color, active },
+            { colors },
+        ) => ({
+            containerStyle: {
+                backgroundColor: 'transparent',
+                ...(size === 'md'
+                    ? {
+                          flexShrink: 1,
+                          flexGrow: 0,
+                          flexBasis: 'auto',
+                          padding: 4,
+                          paddingVertical: 4,
+                      }
+                    : {
+                          padding: 4,
+                          paddingVertical: 4,
+                      }),
+                flexShrink: 1,
+                flexGrow: 0,
+                flexBasis: 'auto',
+            },
+            style: {
+                ...(size === 'md'
+                    ? {
+                          flexShrink: 1,
+                          flexGrow: 0,
+                          flexBasis: 'auto',
+                      }
+                    : {}),
+                flexShrink: 1,
+                flexGrow: 0,
+                flexBasis: 'auto',
+            },
+            iconContainerStyle: (active: boolean) => ({
+                aspectRatio: 1,
+                marginHorizontal: 0,
+                justifyContent: 'center',
+                ...(icon ? { width: 32, height: 32 } : {}),
+            }),
+            icon: {
+                ...(icon as Partial<IconProps>),
+                color: active ? colors.primary : colors.contrastText.secondary,
+                size: active ? 28 : 24,
+            },
+            buttonStyle: (active: boolean) => ({
+                // backgroundColor: active ? colors.white : 'transparent',
+                flexDirection: 'row',
+                backgroundColor: active
+                    ? variant === 'primary'
+                        ? colors.white
+                        : color === 'primary'
+                          ? colors.secondary
+                          : colors.secondary
+                    : 'transparent',
+                ...(size === 'md'
+                    ? {
+                          paddingVertical: 0,
+                          paddingHorizontal: 0,
+                          borderRadius: 24,
+                      }
+                    : {
+                          paddingVertical: 0,
+                          paddingHorizontal: 0,
+                          borderRadius: 24,
+                      }),
+            }),
+            titleStyle: (active: boolean) => ({
+                letterSpacing: 0.5,
+                minWidth: 64,
+                paddingVertical: 8,
+                color: active
+                    ? color === 'primary'
+                        ? colors.primary
+                        : colors.text.primary
+                    : colors.text.secondary,
+                // paddingHorizontal: 0,
+                ...(size === 'md'
+                    ? {
+                          fontSize: 13,
+                          ...(active
+                              ? typography.pretendard.medium
+                              : typography.pretendard.regular),
+                      }
+                    : {
+                          fontSize: 16,
+                          ...(active
+                              ? typography.pretendard.medium
+                              : typography.pretendard.regular),
+                      }),
+            }),
+        }),
+        StyledSwitch: (
+            { variant = 'default', size = 'md', ...props },
+            { colors },
+        ) => ({
+            style: [
+                {
+                    backgroundColor: props.isActive
+                        ? colors.primary
+                        : variant === 'default'
+                          ? colors.grey1
+                          : colors.white,
+                    ...(size === 'md'
+                        ? {
+                              width: 56,
+                              borderRadius: 24,
+                          }
+                        : {
+                              width: 64,
+                              borderRadius: 48,
+                          }),
+                },
+                props.style,
+            ] as StyleProp<ViewStyle>,
+            ...props,
+        }),
         Switch: (_, { colors }) => ({
             trackColor: {
                 false: colors.inactive,
-                true: colors.light1,
+                true: colors.inactive,
             },
+            thumbColor: colors.text.secondary,
             style: {
                 height: 24,
             },
@@ -267,7 +412,6 @@ const theme = createTheme({
             ...(props.icon
                 ? {
                       icon: {
-                          color: colors.primary,
                           size:
                               props.size === 'small'
                                   ? 24
@@ -278,10 +422,13 @@ const theme = createTheme({
                                       : props.size === 'xlarge'
                                         ? 40
                                         : props.size,
+                          color: props.icon.color || colors.primary,
+                          ...props.icon,
                       },
                   }
                 : {}),
             iconStyle: {
+                // color: props.iconStyle?.color || colors.primary
                 // ...(props.size === 'medium'
                 //   ? {
                 //       width: 20,
@@ -435,26 +582,44 @@ const theme = createTheme({
                       lineHeight: 1.43 * 17,
                   },
         }),
-        ListSubheader: (props, { colors }) => ({
+        ListSubheader: ({ size = 'medium', ...props }, { colors }) => ({
             style: {
-                height: props.lg ? 64 : props.dense ? 32 : 44,
-                paddingVertical: 8,
-                paddingHorizontal: 20,
+                justifyContent: 'center',
+                height:
+                    size === 'xlarge'
+                        ? 64
+                        : size === 'large'
+                          ? 56
+                          : props.dense
+                            ? 32
+                            : 44,
+                ...(props.dense
+                    ? {
+                          paddingHorizontal: 24,
+                      }
+                    : {
+                          paddingVertical: 8,
+                          paddingHorizontal: 24,
+                      }),
             },
-            titleStyle: props.lg
-                ? {
-                      ...typography.pretendard.semiBold,
-                      fontSize: 19,
-                      lineHeight: 48,
-                      letterSpacing: 0.01,
-                      // color: var(-text--secondary),
-                  }
-                : {
-                      ...typography.pretendard.medium,
-                      fontSize: 13,
-                      letterSpacing: 0.1,
-                      color: colors.text?.secondary,
-                  },
+            titleStyle:
+                size === 'medium'
+                    ? {
+                          ...typography.pretendard.medium,
+                          fontSize: 13,
+                          color: colors.text?.secondary,
+                      }
+                    : size === 'large'
+                      ? {
+                            ...typography.pretendard.semiBold,
+                            fontSize: 17,
+                            lineHeight: 48,
+                        }
+                      : {
+                            ...typography.pretendard.semiBold,
+                            fontSize: 19,
+                            lineHeight: 48,
+                        },
         }),
         Divider: ({ width }, { colors }) =>
             width
@@ -477,7 +642,7 @@ const theme = createTheme({
                           paddingHorizontal: 20,
                       },
                   },
-        Input: ({ primary, label }, { colors }) => ({
+        Input: ({ primary, size, label }, { colors }) => ({
             containerStyle: {
                 paddingHorizontal: 24,
                 // height: 92
@@ -493,14 +658,23 @@ const theme = createTheme({
             },
             // inputContainerStyle: {},
             inputStyle: {
-                ...typography.pretendard.semiBold,
-                fontSize: 21,
-                lineHeight: 1.6 * 22,
+                ...(size === 'small'
+                    ? {
+                          height: 40,
+                          ...typography.pretendard.regular,
+                          fontSize: 17,
+                          lineHeight: 40,
+                      }
+                    : {
+                          ...typography.pretendard.semiBold,
+                          fontSize: 21,
+                          lineHeight: 1.6 * 21,
+                          // fontWeight: 400,
+                          // fontSize: 15,
+                          // lineHeight: 1.6 * 15,}
+                      }),
                 color: colors.text.primary,
                 outlineStyle: undefined,
-                // fontWeight: 400,
-                // fontSize: 15,
-                // lineHeight: 1.6 * 15,
             },
             labelStyle: {
                 ...typography.pretendard.medium,
@@ -563,14 +737,16 @@ const theme = createTheme({
                     : {}),
             },
         }),
-        ListItemTitle: (props, { colors }) => ({
+        ListItemTitle: ({ ...props }, { colors }) => ({
             style: {
                 display: 'flex',
                 ...typography.pretendard.medium,
                 fontSize: 17,
                 lineHeight: 1.43 * 17,
                 overflow: 'hidden',
-                ...(props.primary ? { color: colors.primary } : {}),
+                ...(props.primary
+                    ? { color: colors.primary }
+                    : { color: colors.text.primary }),
             },
             numberOfLines: 1,
             ellipsizeMode: 'tail',
@@ -595,18 +771,22 @@ const theme = createTheme({
             containerStyle: {
                 width: 32,
                 alignItems: 'center',
+                backgroundColor: 'transparent',
             },
+            iconType: 'material',
+            checkedIcon: 'check-circle',
+            uncheckedIcon: 'radio-button-unchecked',
         }),
         TabItem: (_, { colors }) => ({
             containerStyle: {
                 backgroundColor: colors.white,
                 paddingVertical: 16,
-                width: '33.33%',
+                // width: '33.33%',
             },
             titleStyle: (active: boolean) => ({
-                color: active ? colors.text.primary : colors.text.secondary,
-
+                ...typography.pretendard.regular,
                 fontSize: 17,
+                color: active ? colors.text.primary : colors.text.secondary,
             }),
         }),
         // FAB: {

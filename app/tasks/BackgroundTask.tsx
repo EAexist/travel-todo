@@ -10,8 +10,7 @@ import {
     DeleteTripProps,
     PatchReservationProps,
     PatchTodoProps,
-    TodoDTO,
-    TripDTO,
+    TripPatchDTO,
 } from '@/services/api'
 import { GeneralApiProblem } from '@/services/api/apiProblem'
 import { load, save } from '@/utils/storage'
@@ -74,7 +73,7 @@ export function getAPIActionQueue(): AsyncAPIWriteActionWithSync[] | null {
 export const enqueueAction = async (
     action: APIAction,
     data:
-        | TripDTO
+        | TripPatchDTO
         | DeleteTripProps
         | CreateTodoProps
         | PatchTodoProps
@@ -135,7 +134,7 @@ const runAPIAction = async ({ action, data }: AsyncAPIWriteAction) => {
     switch (action) {
         /* Trip CRUD */
         case APIAction.PATCH_TRIP:
-            result = await api.patchTrip(data as TripDTO)
+            result = await api.patchTrip(data as TripPatchDTO)
             break
         case APIAction.DELETE_TRIP:
             result = await api.deleteTrip(data as DeleteTripProps)
