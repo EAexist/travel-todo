@@ -143,7 +143,7 @@
             "type_id": "flight"
         },
         {
-            "category": "foreign",
+            "category": "FOREIGN",
             "id": "2",
             "title": "여권",
             "iconId": "여권",
@@ -151,7 +151,7 @@
             "type_id": "passport"
         },
         {
-            "category": "foreign",
+            "category": "FOREIGN",
             "id": "3",
             "title": "환전",
             "iconId": "💱",
@@ -159,7 +159,7 @@
             "type_id": "currency"
         },
         {
-            "category": "foreign",
+            "category": "FOREIGN",
             "id": "4",
             "title": "로밍",
             "iconId": "📶",
@@ -167,7 +167,7 @@
             "type_id": "roaming"
         },
         {
-            "category": "foreign",
+            "category": "FOREIGN",
             "id": "5",
             "title": "Visit Japan",
             "iconId": "📝",
@@ -175,46 +175,46 @@
             "type_id": "visit-japan"
         },
         {
-            "category": "foreign",
+            "category": "FOREIGN",
             "id": "7",
             "title": "국외여행허가",
             "iconId": "🛌",
             "type_id": "military-approvement"
         },
         {
-            "category": "goods",
+            "category": "GOODS",
             "id": "8",
             "title": "세면도구",
             "iconId": "🧴",
-            "type_id": "goods"
+            "type_id": "GOODS"
         },
         {
-            "category": "goods",
+            "category": "GOODS",
             "id": "9",
             "title": "어댑터",
             "iconId": "🔌",
-            "type_id": "goods"
+            "type_id": "GOODS"
         },
         {
-            "category": "goods",
+            "category": "GOODS",
             "id": "10",
             "title": "선글라스",
             "iconId": "🕶",
-            "type_id": "goods"
+            "type_id": "GOODS"
         },
         {
-            "category": "goods",
+            "category": "GOODS",
             "id": "11",
             "title": "캐리어",
             "iconId": "🧳",
-            "type_id": "goods"
+            "type_id": "GOODS"
         },
         {
-            "category": "goods",
+            "category": "GOODS",
             "id": "12",
             "title": "우산",
             "iconId": "☂️",
-            "type_id": "goods"
+            "type_id": "GOODS"
         }
     ],
     "todo": [
@@ -235,7 +235,7 @@
             "preset_id": "2",
             "trip_id": "1",
             "type": "passport",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "여권",
             "iconId": "여권",
             "note": "미리미리 할 것"
@@ -246,7 +246,7 @@
             "preset_id": "3",
             "trip_id": "1",
             "type": "currency",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "환전",
             "iconId": "💱",
             "note": "미리미리 할 것"
@@ -257,7 +257,7 @@
             "preset_id": "4",
             "trip_id": "1",
             "type": "roaming",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "로밍",
             "iconId": "📶",
             "note": "미리미리 할 것"
@@ -268,7 +268,7 @@
             "preset_id": "5",
             "trip_id": "1",
             "type": "visit-japan",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "Visit Japan",
             "iconId": "📝",
             "note": "미리미리 할 것"
@@ -279,7 +279,7 @@
             "preset_id": "7",
             "trip_id": "1",
             "type": "military-approvement",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "국외여행허가",
             "iconId": "🛌",
             "note": ""
@@ -289,8 +289,8 @@
             "orderKey": "8",
             "preset_id": "8",
             "trip_id": "1",
-            "type": "goods",
-            "category": "goods",
+            "type": "GOODS",
+            "category": "GOODS",
             "title": "세면도구",
             "iconId": "🧴",
             "note": ""
@@ -300,8 +300,8 @@
             "orderKey": "9",
             "preset_id": "9",
             "trip_id": "1",
-            "type": "goods",
-            "category": "goods",
+            "type": "GOODS",
+            "category": "GOODS",
             "title": "어댑터",
             "iconId": "🔌",
             "note": ""
@@ -311,8 +311,8 @@
             "orderKey": "10",
             "preset_id": "10",
             "trip_id": "1",
-            "type": "goods",
-            "category": "goods",
+            "type": "GOODS",
+            "category": "GOODS",
             "title": "선글라스",
             "iconId": "🕶",
             "note": ""
@@ -322,8 +322,8 @@
             "orderKey": "11",
             "preset_id": "11",
             "trip_id": "1",
-            "type": "goods",
-            "category": "goods",
+            "type": "GOODS",
+            "category": "GOODS",
             "title": "캐리어",
             "iconId": "🧳",
             "note": ""
@@ -333,8 +333,8 @@
             "orderKey": "12",
             "preset_id": "12",
             "trip_id": "1",
-            "type": "goods",
-            "category": "goods",
+            "type": "GOODS",
+            "category": "GOODS",
             "title": "우산",
             "iconId": "☂️",
             "note": ""

@@ -45,6 +45,7 @@ import {
     ReservationDTO,
     TodoDTO,
     type TripDTO,
+    TripPatchDTO,
     UserAccountDTO,
     mapToPreset,
     mapToReservation,
@@ -453,7 +454,9 @@ export class Api {
      * @returns {kind} - Response Status.
      * @returns {...Trip} - Updated Trip.
      */
-    async patchTrip(tripDTO: TripDTO): Promise<ApiResult<TripStoreSnapshot>> {
+    async patchTrip(
+        tripDTO: TripPatchDTO,
+    ): Promise<ApiResult<TripStoreSnapshot>> {
         const response: ApiResponse<TripDTO> = await this.apisauce.patch(
             `/trip/${tripDTO.id}`,
             tripDTO,
@@ -659,7 +662,6 @@ export class Api {
         const response: ApiResponse<TodoDTO> = await this.apisauce.post(
             `/trip/${tripId}/todo`,
             todoDTO,
-            //   mapToTodoDTO({...todo, completeDateIsoString: ''} as Todo),
         )
 
         const todoDTOResponse = _handleResponse<TodoDTO>(response)
@@ -682,7 +684,6 @@ export class Api {
         const response: ApiResponse<TodoDTO> = await this.apisauce.patch(
             `/todo/${todoDTO.id}`,
             todoDTO,
-            //   mapToTodoDTO(todo),
         )
 
         const todoDTOResponse = _handleResponse<TodoDTO>(response)

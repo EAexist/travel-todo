@@ -1,7 +1,8 @@
-import { Avatar, AvatarProps } from '@/components/Avatar'
-import BottomSheetModal, {
-    GestureHandlerRootViewWrapper,
-} from '@/components/BottomSheetModal'
+import {
+    CategoryListItemProp,
+    CategoryMenuBottomSheet,
+} from '@/components/BottomSheet/CategoryMenuBottomSheet'
+import BottomSheetModal from '@/components/BottomSheetModal'
 import { AccomodationDateEditCalendar } from '@/components/Calendar/AccomodationDateEditCalendar'
 import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
@@ -9,27 +10,37 @@ import { DatePicker } from '@/components/DatePicker'
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
 import { ControlledListItemInput } from '@/components/Input'
+import { Label } from '@/components/Label'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import { ListItemBase } from '@/components/ListItem/ListItem'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { TextInfoListItem, TitleSizeType } from '@/components/TextInfoListItem'
 import { TextInfoListItemInput } from '@/components/TextInfoListItemInput'
 import { TransText } from '@/components/TransText'
 import { useReservationStore } from '@/models'
 import {
+    Accomodation,
+    ACCOMODATION_CATEGORY_TO_ICONOBJECT,
+    ACCOMODATION_CATEGORY_TO_TITLE,
+    AccomodationCategory,
+} from '@/models/Reservation/Accomodation'
+import {
     Reservation,
-    RESERVATION_CATEGORY_TO_ICON,
+    RESERVATION_CATEGORY_TO_ICONOBJECT,
     RESERVATION_CATEGORY_TO_TITLE,
     ReservationCategory,
     ReservationDataItemType,
     ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
 import { goBack, useNavigate } from '@/navigators'
+import { AccomodationAvatar } from '@/screens/Accomodation/AccomodationAvatar'
 import { filterAlphaNumericUppercase, filterNumeric } from '@/utils/inputFilter'
 import { useHeader } from '@/utils/useHeader'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { ListItemInputProps } from '@rneui/base/dist/ListItem/ListItem.Input'
-import { Divider, ListItem, Text } from '@rneui/themed'
+import { useTheme } from '@rneui/themed'
+import { Divider, Input, ListItem, Text } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { getSnapshot } from 'mobx-state-tree'
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
@@ -80,8 +91,12 @@ const ConstrainedTextInfoListItemInput: FC<
         }
     }, [isFocused])
 
+    const {
+        theme: { colors },
+    } = useTheme()
+
     return (
-        <TextInfoListItemInput
+        <Input
             ref={ref}
             onChangeText={handleChangeText}
             onFocus={() => setIsFocused(true)}
@@ -91,9 +106,11 @@ const ConstrainedTextInfoListItemInput: FC<
             labelStyle={{
                 textAlign: 'right',
                 position: 'absolute',
-                right: 0,
+                right: 24,
                 top: '100%',
+                color: colors.warning,
             }}
+            size="small"
             {...props}
         />
     )
@@ -109,38 +126,182 @@ export const ReservationEditScreenBase: FC<{
         getSnapshot(reservation),
     )
 
-    const [isConfirmed, setIsConfirmed] = useState(false)
     const { navigateWithTrip } = useNavigate()
     const reservationStore = useReservationStore()
+    const {
+        theme: { colors },
+    } = useTheme()
 
+    /* Refs */
+    const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
+    const dateTimePickerBottomSheetModalRef = useRef<BottomSheetModal>(null)
+    const accomodationScheduleBottomSheetModalRef =
+        useRef<BottomSheetModal>(null)
+    const accomodationCategoryBottomSheetModalRef =
+        useRef<BottomSheetModal>(null)
+
+    /* States */
+    const [isTitleFocused, setIsTitleFocused] = useState(false)
+    const [isConfirmed, setIsConfirmed] = useState(false)
+
+    /* Handlers */
     const handleNotePress = useCallback(() => {
         navigateWithTrip('ReservationNoteEdit', {
             reservationId: reservation.id,
         })
-    }, [reservation.id])
+    }, [])
 
     const handleLinkPress = useCallback(() => {
         navigateWithTrip('ReservationLinkEdit', {
             reservationId: reservation.id,
         })
-    }, [reservation.id])
+    }, [])
 
     const handleConfirmPress = useCallback(() => {
         setIsConfirmed(true)
-        reservationStore.patch(reservation as ReservationSnapshot)
+        reservation.patch(reservation)
         if (isBeforeInitialization) {
             navigation.dispatch(StackActions.pop(1))
         }
         goBack()
-    }, [reservation, setIsConfirmed])
+    }, [])
 
-    /* DateTimePicker Menu */
+    const handleCategoryPress = useCallback(() => {
+        categoryBottomSheetModalRef.current?.present()
+    }, [categoryBottomSheetModalRef.current])
 
+    const handleBackPressBeforeNavigate = useCallback(async () => {
+        if (!isConfirmed && isBeforeInitialization)
+            reservationStore.delete(reservation.id)
+        else {
+            reservation.updateFromSnapshot(tempReservation)
+        }
+    }, [reservationStore, reservation])
+
+    useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
+
+    const data = reservation.infoEditListItemProps
+
+    type RenderReservationDataProps = ReservationDataItemType
+
+    const renderReservationDetail: ListRenderItem<RenderReservationDataProps> =
+        useCallback(({ item }) => {
+            let inputComponent: ReactNode
+            let rightContent: ReactNode
+
+            switch (item.id) {
+                case 'checkinStartTimeIsoString':
+                case 'checkinEndTimeIsoString':
+                case 'checkoutTimeIsoString':
+                    inputComponent = (
+                        <ListItemBase
+                            onPress={() =>
+                                handleTimePress({
+                                    initialDate:
+                                        reservation.accomodation?.checkinDate ||
+                                        new Date(),
+                                    setDate: (date: Date) => {
+                                        reservation.setDateTime(
+                                            date.toISOString(),
+                                        )
+                                    },
+                                })
+                            }
+                            title={
+                                item.value ? item.value : '시간을 선택하세요'
+                            }
+                            titleColor="secondary"
+                            rightContent={
+                                <ListItem.Chevron name="keyboard-arrow-down" />
+                            }
+                        />
+                    )
+                    rightContent = !item.value ? <ListItem.Chevron /> : null
+
+                    break
+                case 'flightNumber':
+                    inputComponent = (
+                        <ConstrainedTextInfoListItemInput
+                            value={item.value || ''}
+                            onChangeText={item.setValue}
+                            inputFilterFunction={filterAlphaNumericUppercase}
+                            invalidInputMessage="영문/숫자만 입력할 수 있어요"
+                        />
+                    )
+                    break
+                case 'numberOfClient':
+                case 'numberOfClient':
+                case 'numberOfPassenger':
+                    inputComponent = (
+                        <ConstrainedTextInfoListItemInput
+                            value={item.value || ''}
+                            onChangeText={(text: string) => {
+                                if (item.setNumericValue)
+                                    item.setNumericValue(
+                                        text ? Number(text) : null,
+                                    )
+                                console.log(text, item.value)
+                            }}
+                            inputFilterFunction={filterNumeric}
+                            invalidInputMessage="숫자만 입력할 수 있어요"
+                        />
+                    )
+                    break
+                case 'category':
+                    inputComponent = (
+                        <ListItemBase
+                            avatarProps={{
+                                icon: {
+                                    ...reservation.accomodation?.icon,
+                                    color: colors.text.primary,
+                                },
+                            }}
+                            title={reservation.accomodation?.categoryText}
+                            titleColor="secondary"
+                            rightContent={
+                                <ListItem.Chevron name="keyboard-arrow-down" />
+                            }
+                            onPress={() => {
+                                accomodationCategoryBottomSheetModalRef.current?.present()
+                            }}
+                        />
+                    )
+                    break
+                default:
+                    inputComponent = (
+                        <Input
+                            value={item.value || ''}
+                            onChangeText={item.setValue}
+                            size="small"
+                        />
+                    )
+                    break
+            }
+            return (
+                <View>
+                    <ListSubheader title={item.title || ''} dense />
+                    {inputComponent}
+                </View>
+                // <TextInfoListItem
+                //     title={item.title}
+                //     subtitle={item.subtitle}
+                //     onPress={onPress}
+                //     titleSize={titleSize}
+                //     rightContent={rightContent}>
+                //     {inputComponent}
+                // </TextInfoListItem>
+            )
+        }, [])
+
+    const [datePickerValue, setDatePickerValue] = useState<Date | undefined>()
+
+    /*
+     * BottomSheetModals
+     */
+
+    /* DateTimePicker BottomSheetModal */
     const [onDismiss, setOnDismiss] = useState<(date: Date) => void>(date => {})
 
-    const dateTimePickerBottomSheetModalRef = useRef<BottomSheetModal>(null)
-    const accomodationScheduleBottomSheetModalRef =
-        useRef<BottomSheetModal>(null)
     const handleTimePress = useCallback(
         ({
             initialDate,
@@ -156,157 +317,51 @@ export const ReservationEditScreenBase: FC<{
         [dateTimePickerBottomSheetModalRef.current],
     )
 
-    /* category Menu */
-    const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
-
-    type CategoryListItemData = {
-        category: ReservationCategory
-        title: string
-        avatarProps: AvatarProps
-        isActive?: boolean
-    }
-    const renderCategoryListItem: ListRenderItem<CategoryListItemData> =
-        useCallback(
-            ({ item }) => {
-                const handlePress = () => {
-                    console.log(
-                        `[bottomSheetModalRef.current] ${categoryBottomSheetModalRef.current}`,
-                    )
-                    reservation.setCategory(item.category)
-                    categoryBottomSheetModalRef.current?.close()
-                }
-                return (
-                    <ListItem onPress={handlePress} style={$s}>
-                        <Avatar
-                            //   size="medium"
-                            {...item.avatarProps}
-                        />
-                        <ListItem.Content>
-                            <ListItem.Title>{item.title}</ListItem.Title>
-                            {item.category === 'FLIGHT_BOOKING' && (
-                                <ListItem.Subtitle>
-                                    {'탑승권 받기 전'}
-                                </ListItem.Subtitle>
-                            )}
-                            {item.category === 'FLIGHT_TICKET' && (
-                                <ListItem.Subtitle>
-                                    {'탑승권 받은 후'}
-                                </ListItem.Subtitle>
-                            )}
-                            {item.category === 'VISIT_JAPAN' && (
-                                <ListItem.Subtitle>
-                                    {'일본 입국수속'}
-                                </ListItem.Subtitle>
-                            )}
-                        </ListItem.Content>
-                        {item.isActive && (
-                            <ListItem.Chevron
-                                primary
-                                onPress={handlePress}
-                                name="check"
-                            />
-                        )}
-                    </ListItem>
-                )
-            },
-            [categoryBottomSheetModalRef, reservation],
-        )
-
-    const handleCategoryPress = useCallback(() => {
-        categoryBottomSheetModalRef.current?.present()
-    }, [categoryBottomSheetModalRef])
-
-    const handleBackPressBeforeNavigate = useCallback(async () => {
-        if (!isConfirmed && isBeforeInitialization)
-            reservationStore.delete(reservation.id)
-        else {
-            reservation.updateFromSnapshot(tempReservation)
+    /* CatgoryMenu BottomSheetModal */
+    const categoryMenuData: CategoryListItemProp[] = Object.entries(
+        RESERVATION_CATEGORY_TO_TITLE,
+    ).map(([_category, title]) => {
+        const category = _category as ReservationCategory
+        let subtitle: string | undefined
+        switch (category) {
+            case 'FLIGHT_BOOKING':
+                subtitle = '탑승권 받기 전'
+                break
+            case 'FLIGHT_TICKET':
+                subtitle = '탑승권 받은 후'
+                break
+            case 'VISIT_JAPAN':
+                subtitle = '일본 입국수속'
+                break
+            default:
+                subtitle = undefined
+                break
         }
-    }, [reservationStore, reservation])
+        return {
+            category: category,
+            title,
+            subtitle,
+            avatarProps: {
+                icon: RESERVATION_CATEGORY_TO_ICONOBJECT[category],
+            },
+            isActive: category === reservation.category,
+        }
+    })
 
-    useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
-
-    const [isTitleFocused, setIsTitleFocused] = useState(false)
-
-    const data = reservation.infoEditListItemProps
-
-    type RenderReservationDataProps = ReservationDataItemType
-
-    const renderReservationDetail: ListRenderItem<RenderReservationDataProps> =
-        useCallback(({ item }) => {
-            let inputComponent: ReactNode
-            let onPress: (() => void) | undefined = undefined
-            let titleSize: TitleSizeType = 'md'
-
-            switch (item.id) {
-                case 'checkinStartTimeIsoString':
-                case 'checkinEndTimeIsoString':
-                case 'checkoutTimeIsoString':
-                    titleSize = 'lg'
-                    inputComponent = item.value ? (
-                        <Text>{item.value}</Text>
-                    ) : (
-                        <View>
-                            <ListItem.Chevron />
-                        </View>
-                    )
-                    onPress = () =>
-                        handleTimePress({
-                            initialDate:
-                                reservation.accomodation?.checkinDate ||
-                                new Date(),
-                            setDate: (date: Date) => {
-                                reservation.setDateTime(date.toISOString())
-                            },
-                        })
-
-                    break
-                case 'flightNumber':
-                    inputComponent = (
-                        <ConstrainedTextInfoListItemInput
-                            value={item.value || ''}
-                            onChangeText={item.setValue}
-                            inputFilterFunction={filterAlphaNumericUppercase}
-                            invalidInputMessage="영문/숫자만 입력할 수 있어요"
-                        />
-                    )
-                    break
-                case 'numberOfClient':
-                case 'numberOfPassenger':
-                    inputComponent = (
-                        <ConstrainedTextInfoListItemInput
-                            value={item.value || ''}
-                            onChangeText={(text: string) => {
-                                if (item.setNumericValue)
-                                    item.setNumericValue(Number(text))
-                                console.log(text, item.value)
-                            }}
-                            inputFilterFunction={filterNumeric}
-                            invalidInputMessage="숫자만 입력할 수 있어요"
-                        />
-                    )
-                    break
-                default:
-                    inputComponent = (
-                        <TextInfoListItemInput
-                            value={item.value || ''}
-                            onChangeText={item.setValue}
-                        />
-                    )
-                    break
-            }
-            return (
-                <TextInfoListItem
-                    title={item.title}
-                    subtitle={item.subtitle}
-                    onPress={onPress}
-                    titleSize={titleSize}>
-                    {inputComponent}
-                </TextInfoListItem>
-            )
-        }, [])
-
-    const [datePickerValue, setDatePickerValue] = useState<Date | undefined>()
+    /* AccomodationCatgoryMenu BottomSheetModal */
+    const accomodationCategoryMenuData: CategoryListItemProp[] = Object.entries(
+        ACCOMODATION_CATEGORY_TO_TITLE,
+    ).map(([_category, title]) => {
+        const category = _category as AccomodationCategory
+        return {
+            category: category,
+            title,
+            avatarProps: {
+                icon: ACCOMODATION_CATEGORY_TO_ICONOBJECT[category],
+            },
+            isActive: category === reservation.accomodation?.category,
+        }
+    })
 
     return (
         <Screen>
@@ -395,8 +450,7 @@ export const ReservationEditScreenBase: FC<{
                 </TextInfoListItem>
                 {reservation.category === 'ACCOMODATION' && (
                     <>
-                        <Divider />
-                        <ListSubheader title={'체크인 · 체크아웃 날짜'} />
+                        <ListSubheader title={'체크인 · 체크아웃 날짜'} dense />
                         <ListItem
                             onPress={() => {
                                 accomodationScheduleBottomSheetModalRef.current?.present()
@@ -411,14 +465,13 @@ export const ReservationEditScreenBase: FC<{
                                         '-'}
                                 </TransText>
                             </View>
-                            <ListItem.Chevron />
+                            <ListItem.Chevron name="keyboard-arrow-down" />
                         </ListItem>
                     </>
                 )}
                 {data && data.length > 0 && (
                     <>
                         <Divider />
-                        <ListSubheader title={'상세 내역'} />
                         <FlatList
                             scrollEnabled={false}
                             data={data}
@@ -430,33 +483,37 @@ export const ReservationEditScreenBase: FC<{
             </ScrollView>
             <Fab.Container>
                 <Fab.Button
-                    disabled={reservation.title.length === 0}
+                    disabled={
+                        reservation.title.length === 0 ||
+                        reservation.isAccomodationWithoutSchedule
+                    }
                     onPress={handleConfirmPress}
-                    title={'확인'}
+                    title={
+                        reservation.title.length === 0
+                            ? '제목을 입력해주세요'
+                            : reservation.isAccomodationWithoutSchedule
+                              ? '체크인 · 체크아웃 날짜를 선택하세요'
+                              : '확인'
+                    }
                 />
             </Fab.Container>
-            <BottomSheetModal ref={categoryBottomSheetModalRef}>
-                <ContentTitle title={'카테고리 선택'} />
-                <FlatList
-                    data={Object.entries(RESERVATION_CATEGORY_TO_TITLE).map(
-                        ([_category, title]) => {
-                            const category = _category as ReservationCategory
-                            return {
-                                category: category,
-                                title,
-                                avatarProps: {
-                                    icon: RESERVATION_CATEGORY_TO_ICON[
-                                        category
-                                    ],
-                                },
-                                isActive: category === reservation.category,
-                            }
-                        },
-                    )}
-                    renderItem={renderCategoryListItem}
-                    keyExtractor={item => item.category}
-                />
-            </BottomSheetModal>
+            <CategoryMenuBottomSheet
+                ref={categoryBottomSheetModalRef}
+                data={categoryMenuData}
+                setCategory={(category: string) => {
+                    reservation.setCategory(category as ReservationCategory)
+                }}
+            />
+            <CategoryMenuBottomSheet
+                ref={accomodationCategoryBottomSheetModalRef}
+                data={accomodationCategoryMenuData}
+                setCategory={(category: string) => {
+                    reservation.accomodation?.setProp(
+                        'category',
+                        category as AccomodationCategory,
+                    )
+                }}
+            />
             <BottomSheetModal
                 ref={dateTimePickerBottomSheetModalRef}
                 onDismiss={() => {
@@ -471,7 +528,16 @@ export const ReservationEditScreenBase: FC<{
                 />
             </BottomSheetModal>
             {reservation.accomodation && (
-                <BottomSheetModal ref={accomodationScheduleBottomSheetModalRef}>
+                <BottomSheetModal
+                    ref={accomodationScheduleBottomSheetModalRef}
+                    onDismiss={() => {
+                        if (!reservation.accomodation?.checkoutDateIsoString) {
+                            reservation.accomodation?.setProp(
+                                'checkinDateIsoString',
+                                null,
+                            )
+                        }
+                    }}>
                     <ContentTitle title={'체크인 · 체크아웃 날짜 선택'} />
                     {/* <ListItem>
               <ListItem.Title>
@@ -497,11 +563,18 @@ export const ReservationEditScreenBase: FC<{
                     </CalendarContainer>
                     <Fab.Container fixed={false} dense>
                         <Fab.Button
-                            // disabled={reservation.title.length === 0}
+                            disabled={!reservation.accomodation.isScheduleSet}
                             onPress={() => {
                                 accomodationScheduleBottomSheetModalRef.current?.close()
                             }}
-                            title={'확인'}
+                            title={
+                                !reservation.accomodation.checkinDateIsoString
+                                    ? '체크인 날짜를 선택하세요'
+                                    : !reservation.accomodation
+                                            .checkoutDateIsoString
+                                      ? '체크아웃 날짜를 선택하세요'
+                                      : '확인'
+                            }
                         />
                     </Fab.Container>
                 </BottomSheetModal>

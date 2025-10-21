@@ -1,6 +1,8 @@
 import '@rneui/themed'
-import { ListSubheaderProps } from '@/components/ListSubheader'
+import { ListSubheaderProps } from '@/components/ListItem/ListSubheader'
 import { SectionHeaderProps } from '@/components/SectionHeader'
+import { TabItemProps, TabProps, IconProps as RNEIconProps } from '@rneui/themed'
+import { PressableProps, TouchableOpacityProps } from 'react-native'
 
 declare module '@rneui/themed' {
   export interface Colors {
@@ -11,6 +13,9 @@ declare module '@rneui/themed' {
     contrastText: {
       primary: string
       secondary: string
+    }
+    icon: {
+        secondary:string,
     }
     transparent: string
     light0: string
@@ -33,6 +38,7 @@ declare module '@rneui/themed' {
     primary?: boolean
   }
   export interface InputProps {
+    size?: 'small' | 'medium' = 'medium'
     primary?: boolean
   }
   export interface AvatarProps {
@@ -44,6 +50,26 @@ declare module '@rneui/themed' {
   // export interface ListItemTitleProps extends Partial<TextProps> {
   //     primary?: boolean
   // }
+  export interface SwitchTabProps extends Partial<TabProps> {
+    size?: 'md' | 'lg'
+        // variant?: 'primary' | 'secondary'
+    }
+  export interface SwitchTabItemProps extends Partial<TabItemProps> {
+    // size?: 'medium' | 'large'
+        // variant?: 'primary' | 'secondary'
+    }
+    
+  export interface StyledSwitchprops extends Partial<PressableProps> {
+    variant?: 'default' | 'secondary'
+    isActive: boolean
+    size?: 'md' | 'lg'
+    onChange: () =>void
+    iconProps: {
+        true: RNEIconProps,
+        false: RNEIconProps,
+    }
+    }
+    
   export interface ComponentTheme {
     ListSubheader: Partial<ListSubheaderProps>
     SectionHeader: Partial<SectionHeaderProps>
@@ -55,6 +81,10 @@ declare module '@rneui/themed' {
     Input: Partial<InputProps>
     Icon: Partial<IconProps>
     SectionCard: Partial<CardProps>
+    SwitchTab: SwitchTabProps
+    SwitchTabItem: SwitchTabItemProps
+    StyledSwitch: StyledSwitchprops
+
   }
   // export interface ListItem {
   //   Caption: Component

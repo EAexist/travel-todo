@@ -45,7 +45,7 @@ export const TripListItem: FC<TripListItemProps> = ({
                         item.scheduleText.length > 0) && (
                         <ListItem.Subtitle>
                             {(item.destination.length > 0
-                                ? [item.destination.join(' ')]
+                                ? [item.destination.slice(0, 2).join(' ')]
                                 : []
                             )
                                 .concat(

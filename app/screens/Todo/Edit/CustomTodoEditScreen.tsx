@@ -1,19 +1,25 @@
-import { Avatar, AvatarProps } from '@/components/Avatar'
-import BottomSheetModal, {
-    GestureHandlerRootViewWrapper,
-} from '@/components/BottomSheetModal'
+import { Avatar } from '@/components/Avatar'
+import {
+    CategoryListItemProp,
+    CategoryMenuBottomSheet,
+} from '@/components/BottomSheet/CategoryMenuBottomSheet'
+import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import { ControlledListItemInput } from '@/components/Input'
+import { Label } from '@/components/Label'
 import ContentTitle from '@/components/Layout/Content'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import { Screen } from '@/components/Screen'
+import StyledSwitch from '@/components/StyledSwitch'
 import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
 import { useTripStore } from '@/models'
 import { Icon } from '@/models/Icon'
-import { TODO_CATEGORY_TO_TITLE, Todo } from '@/models/Todo'
+import { TODO_CATEGORY_TO_TITLE, Todo, TodoCategory } from '@/models/Todo'
 import { goBack, useNavigate } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
-import { ListItem, useTheme } from '@rneui/themed'
+import { IconObject } from '@rneui/base'
+import { ListItem, Text, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import {
@@ -35,17 +41,12 @@ export const CustomTodoEditScreen: FC<{
     const { navigateWithTrip } = useNavigate()
     const tripStore = useTripStore()
 
-    const handleCompletePress = useCallback(() => {
-        if (!todo.isCompleted) todo.complete()
-        else todo.setIncomplete()
-    }, [todo])
-
     const handleConfirmPress = useCallback(() => {
         setIsConfirmed(true)
         todo.setTitle(title)
         todo.patch()
         goBack()
-    }, [todo, title, setIsConfirmed])
+    }, [title])
 
     const handleIconPress = useCallback(() => {
         iconBottomSheetModalRef.current?.present()
@@ -144,43 +145,33 @@ export const CustomTodoEditScreen: FC<{
     }, [todo, iconBottomSheetModalRef.current])
 
     /* categoryMenu */
-    type CategoryListItemData = {
-        title: string
-        category: string
-        avatarProps: AvatarProps
-        isActive?: boolean
-    }
-    const renderCategoryListItem: ListRenderItem<CategoryListItemData> =
-        useCallback(
-            ({ item }) => {
-                const handlePress = () => {
-                    console.log(
-                        `[bottomSheetModalRef.current] ${categoryBottomSheetModalRef.current}`,
-                    )
-                    todo.setCategory(item.category)
-                    categoryBottomSheetModalRef.current?.close()
-                }
-                return (
-                    <ListItem onPress={handlePress} style={$s}>
-                        <Avatar
-                            //   size="medium"
-                            {...item.avatarProps}
-                        />
-                        <ListItem.Content>
-                            <ListItem.Title>{item.title}</ListItem.Title>
-                        </ListItem.Content>
-                        {item.isActive && (
-                            <ListItem.Chevron
-                                primary
-                                onPress={handlePress}
-                                name="check"
-                            />
-                        )}
-                    </ListItem>
-                )
+    const categoryMenuData: CategoryListItemProp[] = Object.entries(
+        TODO_CATEGORY_TO_TITLE,
+    ).map(([category, title]) => {
+        let icon: IconObject
+        switch (category) {
+            case 'RESERVATION':
+                icon = { name: '🎫' }
+                break
+            case 'FOREIGN':
+                icon = { name: '🌐' }
+                break
+            case 'GOODS':
+                icon = { name: '💼' }
+                break
+            default:
+                icon = { name: '' }
+                break
+        }
+        return {
+            category: category,
+            title,
+            avatarProps: {
+                icon,
             },
-            [categoryBottomSheetModalRef, todo],
-        )
+            isActive: category === todo.category,
+        }
+    })
 
     const handleBackPressBeforeNavigate = useCallback(async () => {
         if (!isConfirmed && isBeforeInitialization) tripStore.deleteTodo(todo)
@@ -223,17 +214,22 @@ export const CustomTodoEditScreen: FC<{
             <TextInfoListItem
                 title={'상태'}
                 rightContent={
-                    <ListItem.CheckBox
-                        onPress={handleCompletePress}
-                        checked={todo.isCompleted}
-                        checkedIcon="dot-circle-o"
-                        uncheckedIcon="circle-o"
-                        size={24}
+                    <StyledSwitch
+                        isActive={todo.isCompleted}
+                        onChange={todo.toggleIsCompleted}
+                        iconProps={{
+                            true: {
+                                name: 'check',
+                                type: 'material',
+                            },
+                            false: {
+                                name: 'remove',
+                                type: 'material',
+                            },
+                        }}
                     />
                 }>
-                <TransText primary={todo.isCompleted}>
-                    {todo.isCompleted ? '완료' : '미완료'}
-                </TransText>
+                <Text>{todo.isCompleted ? '완료' : '미완료'}</Text>
             </TextInfoListItem>
             <TextInfoListItem
                 title={'카테고리'}
@@ -283,33 +279,13 @@ export const CustomTodoEditScreen: FC<{
                     />
                 </Fab.Container>
             </BottomSheetModal>
-            <BottomSheetModal ref={categoryBottomSheetModalRef}>
-                <ContentTitle title={'카테고리 선택'} />
-                <FlatList
-                    data={Object.entries(TODO_CATEGORY_TO_TITLE).map(
-                        ([_category, title]) => ({
-                            category: _category,
-                            title,
-                            avatarProps: {
-                                icon: {
-                                    name:
-                                        _category === 'reservation'
-                                            ? '🎫'
-                                            : _category === 'foreign'
-                                              ? '🌐'
-                                              : _category === 'goods'
-                                                ? '💼'
-                                                : '',
-                                },
-                                //   containerStyle: {backgroundColor: 'bisque'},
-                            },
-                            isActive: _category === todo.category,
-                        }),
-                    )}
-                    renderItem={renderCategoryListItem}
-                    keyExtractor={item => item.category}
-                />
-            </BottomSheetModal>
+            <CategoryMenuBottomSheet
+                ref={categoryBottomSheetModalRef}
+                data={categoryMenuData}
+                setCategory={(category: string) => {
+                    todo.setCategory(category as TodoCategory)
+                }}
+            />
         </Screen>
     )
 })

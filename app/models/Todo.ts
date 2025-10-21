@@ -1,33 +1,26 @@
+import { mapToTodoPatchDTO, PatchTodoProps, TodoPatchDTO } from '@/services/api'
+import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 import {
+    flow,
     getSnapshot,
     Instance,
     SnapshotIn,
     SnapshotOut,
     types,
 } from 'mobx-state-tree'
-import { withSetPropAction } from './helpers/withSetPropAction'
 import { v4 as uuidv4 } from 'uuid'
+import { createEnumType } from './helpers/createEnumtype'
+import { wait } from './helpers/wait'
+import { withSetPropAction } from './helpers/withSetPropAction'
 import { Icon, IconModel } from './Icon'
-import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
-import { PatchTodoProps, TodoDTO } from '@/services/api'
+
+export type TodoCategory = 'RESERVATION' | 'FOREIGN' | 'GOODS'
 
 export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
-    reservation: '예약',
-    foreign: '해외여행',
-    goods: '짐',
+    RESERVATION: '예약',
+    FOREIGN: '해외여행',
+    GOODS: '짐',
 }
-
-// export const defaultTodo : TodoModel = {
-//   id: '',
-//   type: '',
-//   category: '',
-//   title: '',
-//   note: '',
-//   completeDateIsoString: null, // Ex: 2022-08-12 21:05:36
-//   isFlaggedToDelete: false,
-//   orderKey: -1,
-//   presetId: -1,
-// }
 
 export interface Location {
     name: string
@@ -100,7 +93,7 @@ export const TodoContentModel = types
     .model('TodoContent')
     .props({
         id: types.optional(types.identifier, () => uuidv4()),
-        category: types.string,
+        category: createEnumType<TodoCategory>('TodoCategory'),
         type: types.maybeNull(types.string),
         title: types.string,
         icon: IconModel,
@@ -157,21 +150,11 @@ export const TodoModel = types
     .model('Todo')
     .props({
         id: types.optional(types.identifier, () => uuidv4()),
-        // category: types.string,
-        // type: types.string,
-        // title: types.string,
-        // icon: IconModel,
         note: types.optional(types.string, ''),
         completeDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         isFlaggedToDelete: false,
         orderKey: types.optional(types.number, 0),
-        // content: types.reference(TodoContentModel),
         content: TodoContentModel,
-        // isPreset: types.optional(types.boolean, false),
-        // content: types.reference(TodoContentModel),
-        // presetId: types.maybeNull(types.number),
-        // customTodoContent: types.maybeNull(types.reference(TodoContentModel)),
-        // presetTodoContent: types.maybeNull(types.reference(PresetTodoContentModel)),
     })
     .actions(withSetPropAction)
     .views(item => ({
@@ -215,28 +198,39 @@ export const TodoModel = types
         setIcon(icon: Icon) {
             item.content.setProp('icon', icon)
         },
-        setCategory(category: string) {
+        setCategory(category: TodoCategory) {
             item.content.setProp('category', category)
         },
-        patch(todoDTO?: Partial<TodoDTO>) {
+        patch(todoDTO?: Partial<TodoSnapshotIn>) {
             enqueueAction(APIAction.PATCH_TODO, {
-                todoDTO: todoDTO
-                    ? {
-                          id: item.id,
-                          ...todoDTO,
-                      }
-                    : getSnapshot(item),
-            } as PatchTodoProps)
+                todoDTO: mapToTodoPatchDTO(
+                    todoDTO
+                        ? {
+                              id: item.id,
+                              ...todoDTO,
+                          }
+                        : getSnapshot(item),
+                ),
+            })
         },
     }))
     .actions(item => ({
-        complete() {
-            item.setProp('completeDateIsoString', new Date().toISOString())
+        toggleIsCompleted() {
+            if (!item.isCompleted) {
+                item.setProp('completeDateIsoString', new Date().toISOString())
+            } else {
+                item.setProp('completeDateIsoString', null)
+            }
+            item.patch({
+                completeDateIsoString: item.completeDateIsoString,
+            })
         },
-        setIncomplete() {
-            //   item.setProp('completeDateIsoString', '')
-            item.setProp('completeDateIsoString', null)
-        },
+    }))
+    .actions(item => ({
+        toggleIsCompletedDelayed: flow(function* () {
+            yield wait()
+            item.toggleIsCompleted()
+        }),
         toggleDeleteFlag() {
             item.setProp('isFlaggedToDelete', !item.isFlaggedToDelete)
         },

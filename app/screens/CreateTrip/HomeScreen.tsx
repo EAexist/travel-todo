@@ -1,10 +1,10 @@
 import BottomSheetModal from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
-import { ListItemBase } from '@/components/ListItem'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import {
     NavigateMenuBottomSheet,
-    NavigateMenuData,
-} from '@/components/NavigateMenuBottomSheet'
+    NavigateListItemProp,
+} from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import { useTripStore } from '@/models'
 import {
     AuthenticatedStackScreenProps,
@@ -43,7 +43,7 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
                 ) {
                     if (tripStore.isInitialized)
                         navigateWithTrip('Main', {
-                            screen: tripStore.isTripMode
+                            screen: tripStore.settings.isTripMode
                                 ? 'ReservationList'
                                 : 'Todolist',
                         })
@@ -68,7 +68,7 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
             settingsMenuBottomSheetRef.current?.present()
         }, [settingsMenuBottomSheetRef])
 
-        const settingsOption: NavigateMenuData[] = [
+        const settingsOption: NavigateListItemProp[] = [
             {
                 title: '여행 삭제',
                 path: 'TripDelete',

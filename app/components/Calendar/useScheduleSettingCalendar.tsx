@@ -11,6 +11,7 @@ import { FC, useCallback, useEffect, useState } from 'react'
 import { TextStyle, View, ViewStyle } from 'react-native'
 import { DateData } from 'react-native-calendars'
 import { MarkedDates } from 'react-native-calendars/src/types'
+import * as _ from 'lodash'
 
 export const ScheduleText: FC<{ startDate?: Date; endDate?: Date }> = ({
     startDate,
@@ -29,7 +30,7 @@ export const ScheduleText: FC<{ startDate?: Date; endDate?: Date }> = ({
             <TransText style={$scheduleTextStyle} disabled={!endDate}>
                 {toLocaleDateMonthString(endDate) || '돌아오는 날'}
             </TransText>
-            <View style={{ width: 16 }} />
+            {/* <View style={{ width: 8 }} /> */}
             <TransText
                 style={{ ...$nightsTextStyle, color: colors.text.secondary }}>
                 {startDate && endDate && getNightsParsed(startDate, endDate)}
@@ -50,7 +51,6 @@ export const useScheduleSettingCalendar = ({
     endDate,
     setStartDate,
     setEndDate,
-    //   isViewCalendar = false,
 }: useScheduleSettingCalendarProps) => {
     const onDayPress = useCallback(
         (dateData: DateData) => {
@@ -76,7 +76,7 @@ export const useScheduleSettingCalendar = ({
         theme: { colors },
     } = useTheme()
 
-    const [markedDates, setMarkedDates] = useState<MarkedDates>()
+    const [markedDates, setMarkedDates] = useState<MarkedDates>({})
 
     const customContainerStyle: ViewStyle = {
         width: 42,
@@ -88,21 +88,19 @@ export const useScheduleSettingCalendar = ({
     }
 
     useEffect(() => {
+        const intervalDays =
+            startDate &&
+            endDate &&
+            eachDayOfInterval({ start: startDate, end: endDate }).slice(1, -1)
+
         setMarkedDates(() => {
-            const intervalDays =
-                startDate &&
-                endDate &&
-                eachDayOfInterval({ start: startDate, end: endDate }).slice(
-                    1,
-                    -1,
-                )
             const o: MarkedDates = {}
             if (startDate) {
                 o[toCalendarString(startDate)] = {
                     startingDay: true,
                     endingDay: endDate ? undefined : true,
                     color: colors.light1,
-                    textColor: colors.contrastText.primary,
+                    titleColor: colors.contrastText.primary,
                     customContainerStyle,
                 }
             }
@@ -110,7 +108,7 @@ export const useScheduleSettingCalendar = ({
                 o[toCalendarString(endDate)] = {
                     endingDay: true,
                     color: colors.light1,
-                    textColor: colors.contrastText.primary,
+                    titleColor: colors.contrastText.primary,
                     customContainerStyle,
                 }
             }
@@ -140,60 +138,13 @@ export const useScheduleSettingCalendarWithAccomodation = (
     props: useScheduleSettingCalendarProps,
 ) => {
     const reservationStore = useReservationStore()
-
-    const [markedDates, setMarkedDates] = useState<MarkedDates>()
-
-    const {
-        theme: { colors },
-    } = useTheme()
-
-    const { markedDates: _markedDates, onDayPress } =
-        useScheduleSettingCalendar(props)
-
-    useEffect(() => {
-        console.log(_markedDates)
-        setMarkedDates(() => {
-            const keys = [
-                ...new Set([
-                    ...Object.keys(
-                        reservationStore.accomodationCalendarDotMarkedDates,
-                    ),
-                    ...(_markedDates ? Object.keys(_markedDates) : []),
-                ]),
-            ]
-
-            return Object.fromEntries(
-                keys.map(k => [
-                    k,
-                    {
-                        ...(Object.keys(
-                            reservationStore.accomodationCalendarDotMarkedDates,
-                        ).includes(k)
-                            ? {
-                                  marked: reservationStore
-                                      .accomodationCalendarDotMarkedDates[k]
-                                      .marked,
-                                  dotColor:
-                                      colors.palette[
-                                          reservationStore
-                                              .accomodationCalendarDotMarkedDates[
-                                              k
-                                          ].dotColorKey
-                                      ],
-                              }
-                            : {}),
-                        ...(_markedDates &&
-                        Object.keys(_markedDates).includes(k)
-                            ? _markedDates[k]
-                            : {}),
-                    },
-                ]),
-            )
-        })
-    }, [_markedDates])
-
+    const { markedDates, onDayPress } = useScheduleSettingCalendar(props)
     return {
-        markedDates,
+        markedDates: _.merge(
+            {},
+            reservationStore.accomodationMarkedDatesMultiDotMarking,
+            markedDates,
+        ),
         onDayPress,
     }
 }

@@ -14,7 +14,8 @@ import {
     ViewStyle,
 } from 'react-native'
 import { Avatar, AvatarProps } from '../Avatar'
-import { ListItemCaption } from '../ListItemCaption'
+import { ListItemCaption } from '../ListItem/ListItemCaption'
+import { useDelayedEdit } from '@/utils/useDelayedEdit'
 
 interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
     title: string
@@ -73,7 +74,7 @@ export const AddTodo: FC<{ todo: Todo }> = ({ todo }) => {
 
     return (
         <TodoBase
-            caption={'추가함'}
+            // caption={'추가함'}
             subtitle={
                 todo.type == 'flight' || todo.type == 'flightTicket'
                     ? todo.flightTitle
@@ -123,70 +124,19 @@ export const AddPresetTodo: FC<{ preset: TodoPresetItem }> = observer(
     },
 )
 
-const useDelayedEdit = ({
-    initialState = false,
-    displayDelay = 500,
-    //   isComplete,
-    setComplete,
-}: {
-    initialState?: boolean
-    displayDelay?: number
-    //   isComplete: boolean
-    setComplete: (isComplete: boolean) => void
-}) => {
-    const [displayComplete, setDisplayComplete] = useState(initialState)
-
-    useEffect(() => {
-        {
-            const sleep = new Promise(resolve =>
-                setTimeout(resolve, displayDelay),
-            )
-            sleep.then(() => {
-                if (displayComplete) setComplete(true)
-                else setComplete(false)
-            })
-        }
-    }, [displayComplete, displayDelay])
-
-    return { displayComplete, setDisplayComplete }
-}
-
 const styles = StyleSheet.create({
     disabled: { opacity: 0.5 },
 })
 
 export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
-    const displayDelay = 500
     const { navigateWithTrip } = useNavigate()
     const tripStore = useTripStore()
 
     const [displayComplete, setDisplayComplete] = useState(todo.isCompleted)
 
-    useFocusEffect(
-        useCallback(() => {
-            //   console.log('HELLO')
-            if (displayComplete !== todo.isCompleted) {
-                const sleep = new Promise(resolve =>
-                    setTimeout(resolve, displayDelay),
-                )
-                sleep.then(() => {
-                    if (displayComplete) {
-                        tripStore.completeAndPatchTodo(todo)
-                    } else {
-                        todo.setIncomplete()
-                        todo.patch({
-                            completeDateIsoString: todo.completeDateIsoString,
-                        })
-                    }
-                })
-            }
-        }, [displayComplete]),
-    )
-
-    //   useEffect(() => {
-    //     if (displayComplete != todo.isCompleted)
-    //       setDisplayComplete(todo.isCompleted)
-    //   }, [displayComplete, todo.isCompleted])
+    const {
+        theme: { colors },
+    } = useTheme()
 
     const handleCompletePress = useCallback(() => {
         if (!todo.isCompleted) {
@@ -211,10 +161,14 @@ export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
                     break
                 default:
                     setDisplayComplete(prev => !prev)
+                    todo.toggleIsCompletedDelayed()
                     break
             }
-        } else setDisplayComplete(prev => !prev)
-    }, [todo, navigateWithTrip])
+        } else {
+            setDisplayComplete(prev => !prev)
+            todo.toggleIsCompletedDelayed()
+        }
+    }, [])
 
     const handlePress = useCallback(
         (e: GestureResponderEvent) => {
@@ -228,12 +182,17 @@ export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
 
     return (
         <TodoBase
+            useDisabledStyle={todo.isCompleted}
             rightContent={
                 <ListItem.CheckBox
                     onPress={handleCompletePress}
-                    checked={displayComplete}
-                    checkedIcon="dot-circle-o"
-                    uncheckedIcon="circle-o"
+                    checked={todo.isCompleted || displayComplete}
+                    checkedIcon="radio-button-checked"
+                    uncheckedIcon="radio-button-unchecked"
+                    uncheckedColor={colors.grey2}
+                    checkedColor={
+                        todo.isCompleted ? colors.grey2 : colors.primary
+                    }
                 />
             }
             subtitle={
@@ -285,13 +244,16 @@ export const AccomodationTodo: FC<{ todo: Todo }> = ({ todo }) => {
     const { navigateWithTrip } = useNavigate()
     const handlePress = useCallback(() => {
         navigateWithTrip('AccomodationPlan')
-    }, [navigateWithTrip])
+    }, [])
+
+    const tripStore = useTripStore()
 
     return (
         <TodoBase
             rightContent={<ListItem.Chevron size={32} onPress={handlePress} />}
             onPress={handlePress}
             title={todo.title}
+            subtitle={tripStore.accomodationTodoStatusText}
             icon={todo.icon}
         />
     )
@@ -355,11 +317,7 @@ export const DeleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
                         />
                     }
                     uncheckedIcon={
-                        <Icon
-                            name="delete"
-                            type="material"
-                            color={colors.error}
-                        />
+                        <Icon name="do-not-disturb-on" color={colors.error} />
                     }
                 />
             }

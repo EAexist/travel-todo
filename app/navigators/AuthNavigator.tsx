@@ -1,8 +1,9 @@
 import { LoginScreen } from '@/screens/Login/LoginScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { useTheme } from '@rneui/themed'
+import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { AuthStackParamList } from './navigationTypes'
+import { BackButton } from '@/components/Header'
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>()
 
@@ -13,12 +14,12 @@ export const AuthNavigator = observer(function AuthenicatedStack() {
 
     return (
         <AuthStack.Navigator
-            // screenOptions={{
-            //     header: () => <Header leftComponent={<BackButton />} />,
-            //     contentStyle: {
-            //         backgroundColor: colors.background,
-            //     },
-            // }}
+            screenOptions={{
+                header: () => <Header leftComponent={<BackButton />} />,
+                contentStyle: {
+                    backgroundColor: colors.background,
+                },
+            }}
             initialRouteName={'Login'}>
             <AuthStack.Screen name="Login" component={LoginScreen} />
         </AuthStack.Navigator>

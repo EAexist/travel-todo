@@ -2,7 +2,7 @@ import { Avatar } from '@/components/Avatar'
 import * as Fab from '@/components/Fab'
 import * as Input from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { useTripStore } from '@/models'
 import { Destination, DestinationSnapshotIn } from '@/models/Destination'
@@ -33,149 +33,158 @@ import { useRequireConnection } from '../Loading'
 // }
 
 export interface DestinationListItemBaseProps {
-  item: Omit<DestinationSnapshotIn, 'id' | 'description'>
-  rightContent?: ReactNode
-  onPress?: () => void
+    item: Omit<DestinationSnapshotIn, 'id' | 'description'>
+    rightContent?: ReactNode
+    onPress?: () => void
 }
 
 export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
-  item,
-  rightContent,
-  onPress,
+    item,
+    rightContent,
+    onPress,
 }) => {
-  //   const [flag, setFlag] = useState<string>()
-  //   useEffect(() => {
-  //     console.log(getFlagEmoji(item.countryIso))
-  //     setFlag(getFlagEmoji(item.countryIso))
-  //   }, [getFlagEmoji, item.countryIso])
+    //   const [flag, setFlag] = useState<string>()
+    //   useEffect(() => {
+    //     console.log(getFlagEmoji(item.countryIso))
+    //     setFlag(getFlagEmoji(item.countryIso))
+    //   }, [getFlagEmoji, item.countryIso])
 
-  return (
-    <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
-      <Avatar
-        icon={{ name: getFlagEmoji(item.countryIso) }}
-        avatarSize={35}
-        fontSize={20}
-      />
-      {/* <Avatar title={flag} avatarSize={35} /> */}
-      <ListItem.Content>
-        <ListItem.Title>
-          <Trans>{item.title}</Trans>
-        </ListItem.Title>
-        <ListItem.Subtitle>
-          {/* <Trans>{`${regionNames.of(item.countryIso.toUpperCase())}ㆍ${item.state}`}</Trans> */}
-          <Trans>{`${item.region}`}</Trans>
-        </ListItem.Subtitle>
-      </ListItem.Content>
-      {rightContent}
-    </ListItem>
-  )
+    return (
+        <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
+            <Avatar
+                icon={{ name: getFlagEmoji(item.countryIso) }}
+                avatarSize={35}
+                fontSize={20}
+            />
+            {/* <Avatar title={flag} avatarSize={35} /> */}
+            <ListItem.Content>
+                <ListItem.Title>
+                    <Trans>{item.title}</Trans>
+                </ListItem.Title>
+                <ListItem.Subtitle>
+                    {/* <Trans>{`${regionNames.of(item.countryIso.toUpperCase())}ㆍ${item.state}`}</Trans> */}
+                    <Trans>{`${item.region}`}</Trans>
+                </ListItem.Subtitle>
+            </ListItem.Content>
+            {rightContent}
+        </ListItem>
+    )
 }
 
 interface DestinationListItemProps {
-  destination: Destination
+    destination: Destination
 }
 
 const DestinationListItem: FC<DestinationListItemProps> = ({ destination }) => {
-  const tripStore = useTripStore()
-  const handleClosePress = useCallback(() => {
-    tripStore.deleteDestination(destination)
-  }, [])
-  return (
-    <DestinationListItemBase
-      key={destination.id}
-      item={destination}
-      rightContent={
-        <ListItem.Chevron
-          onPress={handleClosePress}
-          iconProps={{ name: 'close' }}
+    const tripStore = useTripStore()
+    const handleClosePress = useCallback(() => {
+        tripStore.deleteDestination(destination)
+    }, [])
+    return (
+        <DestinationListItemBase
+            key={destination.id}
+            item={destination}
+            rightContent={
+                <ListItem.Chevron
+                    onPress={handleClosePress}
+                    iconProps={{ name: 'close' }}
+                />
+            }
         />
-      }
-    />
-  )
+    )
 }
 export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
-  ({ isInitialSettingScreen }) => {
-    const tripStore = useTripStore()
-    const { t } = useLingui()
+    ({ isInitialSettingScreen }) => {
+        const tripStore = useTripStore()
+        const { t } = useLingui()
 
-    const renderDestinationListItem: ListRenderItem<Destination> = useCallback(
-      ({ item }) => <DestinationListItem key={item.id} destination={item} />,
-      [],
-    )
+        const renderDestinationListItem: ListRenderItem<Destination> =
+            useCallback(
+                ({ item }) => (
+                    <DestinationListItem key={item.id} destination={item} />
+                ),
+                [],
+            )
 
-    const { navigateWithTrip } = useNavigate()
+        const { navigateWithTrip } = useNavigate()
 
-    const handleSearchPress = useCallback(() => {
-      navigateWithTrip('DestinationSearch')
-    }, [])
-    //   const handleNextPress = useCallback(async () => {
-    //     tripStore.patch()
-    //   }, [])
+        const handleSearchPress = useCallback(() => {
+            navigateWithTrip('DestinationSearch')
+        }, [])
+        //   const handleNextPress = useCallback(async () => {
+        //     tripStore.patch()
+        //   }, [])
 
-    const { titleText, subtitlteText } = tripStore.isDestinationSet
-      ? {
-          titleText: `다른 도시도 여행할 예정인가요?`,
-          subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
-        }
-      : {
-          titleText: `어디로 떠나시나요?`,
-          subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
-        }
+        const { titleText, subtitlteText } = tripStore.isDestinationSet
+            ? {
+                  titleText: `다른 도시도 여행할 예정인가요?`,
+                  subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
+              }
+            : {
+                  titleText: `어디로 떠나시나요?`,
+                  subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
+              }
 
-    //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
+        //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
 
-    // useHeader({
-    //   // backButtonShown: false,
-    //   // backNavigateProps: {name: 'Login', ignoreTrip: true},
-    //   // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
-    // })
+        // useHeader({
+        //   // backButtonShown: false,
+        //   // backNavigateProps: {name: 'Login', ignoreTrip: true},
+        //   // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
+        // })
 
-    // const {isConnected} = useNetInfo()
-    const showScreen = useRequireConnection({ title: '여행지 설정' })
+        // const {isConnected} = useNetInfo()
+        const showScreen = useRequireConnection({ title: '여행지 설정' })
 
-    return (
-      showScreen && (
-        <Screen>
-          <ContentTitle title={titleText} subtitle={subtitlteText} />
-          <View style={{ paddingVertical: 16, flex: 1 }}>
-            <TouchableOpacity onPress={handleSearchPress}>
-              <Input.SearchBase placeholder={t`도시 또는 국가 검색`} />
-            </TouchableOpacity>
-          </View>
-          {tripStore.isDestinationSet && (
-            <View>
-              <ListSubheader
-                title={`선택한 여행지 (${tripStore.destination.length})`}
-              />
-              <FlatList
-                data={tripStore.destination}
-                renderItem={renderDestinationListItem}
-                keyExtractor={item => item.id}
-              />
-            </View>
-          )}
-          <Fab.Container>
-            {isInitialSettingScreen ? (
-              <Fab.NextButton
-                title={tripStore.isDestinationSet ? '다음' : '건너뛰기'}
-                navigateProps={{
-                  name: 'ScheduleSetting',
-                }}
-              />
-            ) : (
-              <Fab.GoBackButton />
-            )}
-          </Fab.Container>
-        </Screen>
-      )
-    )
-  },
+        return (
+            showScreen && (
+                <Screen>
+                    <ContentTitle title={titleText} subtitle={subtitlteText} />
+                    <View style={{ paddingVertical: 16, flex: 1 }}>
+                        <TouchableOpacity onPress={handleSearchPress}>
+                            <Input.SearchBase
+                                placeholder={t`도시 또는 국가 검색`}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    {tripStore.isDestinationSet && (
+                        <View>
+                            <ListSubheader
+                                title={`선택한 여행지 (${tripStore.destination.length})`}
+                            />
+                            <FlatList
+                                data={tripStore.destination}
+                                renderItem={renderDestinationListItem}
+                                keyExtractor={item => item.id}
+                            />
+                        </View>
+                    )}
+                    <Fab.Container>
+                        {isInitialSettingScreen ? (
+                            <Fab.NextButton
+                                title={
+                                    tripStore.isDestinationSet
+                                        ? '다음'
+                                        : '건너뛰기'
+                                }
+                                navigateProps={{
+                                    name: 'ScheduleSetting',
+                                }}
+                            />
+                        ) : (
+                            <Fab.GoBackButton />
+                        )}
+                    </Fab.Container>
+                </Screen>
+            )
+        )
+    },
 )
 
 export const TripDestinationSettingScreen: FC = () => {
-  return <EditTripDestinationScreenBase isInitialSettingScreen={true} />
+    return <EditTripDestinationScreenBase isInitialSettingScreen={true} />
 }
 
 export const EditTripDestinationScreen: FC = () => {
-  return <EditTripDestinationScreenBase isInitialSettingScreen={false} />
+    return <EditTripDestinationScreenBase isInitialSettingScreen={false} />
 }

@@ -1,6 +1,4 @@
-import BottomSheetModal, {
-    GestureHandlerRootViewWrapper,
-} from '@/components/BottomSheetModal'
+import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { Screen } from '@/components/Screen'
@@ -9,7 +7,7 @@ import { TripSummary } from '@/models/stores/TripStore'
 import { AuthenticatedStackScreenProps, goBack } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { useLingui } from '@lingui/react/macro'
-import { Divider, ListItem } from '@rneui/themed'
+import { Divider, ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, ListRenderItem, TouchableOpacity } from 'react-native'
@@ -17,6 +15,10 @@ import { TripListItem, TripListItemProps } from './TripListitem'
 
 const TripDeleteListItem: FC<Omit<TripListItemProps, 'renderRightContent'>> =
     observer(({ item, onPress, ...props }) => {
+        const {
+            theme: { colors },
+        } = useTheme()
+
         return (
             <TripListItem
                 item={item}
@@ -25,7 +27,7 @@ const TripDeleteListItem: FC<Omit<TripListItemProps, 'renderRightContent'>> =
                         onPress={onPress ? () => onPress(item) : undefined}>
                         <ListItem.Chevron
                             name="do-not-disturb-on"
-                            color="red"
+                            color={colors.error}
                         />
                     </TouchableOpacity>
                 )}

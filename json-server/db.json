@@ -28,7 +28,7 @@
                     "id": 2,
                     "orderKey": 2,
                     "type": "passport",
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "title": "여권",
                     "iconId": "여권",
                     "note": "미리미리 할 것",
@@ -38,7 +38,7 @@
                     "id": 3,
                     "orderKey": 3,
                     "type": "currency",
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "title": "환전",
                     "iconId": "💱",
                     "note": "미리미리 할 것",
@@ -48,7 +48,7 @@
                     "id": 4,
                     "orderKey": 4,
                     "type": "roaming",
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "title": "로밍",
                     "iconId": "📶",
                     "note": "미리미리 할 것",
@@ -58,7 +58,7 @@
                     "id": 5,
                     "orderKey": 5,
                     "type": "visit-japan",
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "title": "Visit Japan",
                     "iconId": "📝",
                     "note": "미리미리 할 것",
@@ -68,7 +68,7 @@
                     "id": 7,
                     "orderKey": 7,
                     "type": "military-approvement",
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "title": "국외여행허가",
                     "iconId": "🛌",
                     "note": "",
@@ -77,8 +77,8 @@
                 {
                     "id": 8,
                     "orderKey": 8,
-                    "type": "goods",
-                    "category": "goods",
+                    "type": "GOODS",
+                    "category": "GOODS",
                     "title": "세면도구",
                     "iconId": "🧴",
                     "note": "",
@@ -87,8 +87,8 @@
                 {
                     "id": 9,
                     "orderKey": 9,
-                    "type": "goods",
-                    "category": "goods",
+                    "type": "GOODS",
+                    "category": "GOODS",
                     "title": "어댑터",
                     "iconId": "🔌",
                     "note": "",
@@ -97,8 +97,8 @@
                 {
                     "id": 10,
                     "orderKey": 10,
-                    "type": "goods",
-                    "category": "goods",
+                    "type": "GOODS",
+                    "category": "GOODS",
                     "title": "선글라스",
                     "iconId": "🕶",
                     "note": "",
@@ -107,8 +107,8 @@
                 {
                     "id": 11,
                     "orderKey": 11,
-                    "type": "goods",
-                    "category": "goods",
+                    "type": "GOODS",
+                    "category": "GOODS",
                     "title": "캐리어",
                     "iconId": "🧳",
                     "note": "",
@@ -117,8 +117,8 @@
                 {
                     "id": 12,
                     "orderKey": 12,
-                    "type": "goods",
-                    "category": "goods",
+                    "type": "GOODS",
+                    "category": "GOODS",
                     "title": "우산",
                     "iconId": "☂️",
                     "note": "",
@@ -234,7 +234,7 @@
     "todo": [
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -244,7 +244,7 @@
         },
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -254,7 +254,7 @@
         },
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -264,7 +264,7 @@
         },
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -273,7 +273,7 @@
         },
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -282,7 +282,7 @@
         },
         {
             "type": "",
-            "category": "foreign",
+            "category": "FOREIGN",
             "title": "",
             "iconId": "",
             "note": "",
@@ -372,7 +372,7 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "id": "2",
                     "title": "여권",
                     "iconId": "여권",
@@ -383,7 +383,7 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "id": "3",
                     "title": "환전",
                     "iconId": "💱",
@@ -394,7 +394,7 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "id": "4",
                     "title": "로밍",
                     "iconId": "📶",
@@ -405,7 +405,7 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "id": "5",
                     "title": "Visit Japan",
                     "iconId": "📝",
@@ -416,7 +416,7 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "foreign",
+                    "category": "FOREIGN",
                     "id": "7",
                     "title": "국외여행허가",
                     "iconId": "🛌",
@@ -426,51 +426,51 @@
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "goods",
+                    "category": "GOODS",
                     "id": "8",
                     "title": "세면도구",
                     "iconId": "🧴",
-                    "type": "goods"
+                    "type": "GOODS"
                 }
             },
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "goods",
+                    "category": "GOODS",
                     "id": "9",
                     "title": "어댑터",
                     "iconId": "🔌",
-                    "type": "goods"
+                    "type": "GOODS"
                 }
             },
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "goods",
+                    "category": "GOODS",
                     "id": "10",
                     "title": "선글라스",
                     "iconId": "🕶",
-                    "type": "goods"
+                    "type": "GOODS"
                 }
             },
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "goods",
+                    "category": "GOODS",
                     "id": "11",
                     "title": "캐리어",
                     "iconId": "🧳",
-                    "type": "goods"
+                    "type": "GOODS"
                 }
             },
             {
                 "isFlaggedToAdd": true,
                 "item": {
-                    "category": "goods",
+                    "category": "GOODS",
                     "id": "12",
                     "title": "우산",
                     "iconId": "☂️",
-                    "type": "goods"
+                    "type": "GOODS"
                 }
             }
         ]

@@ -4,11 +4,12 @@ import BottomSheetModal, {
     useNavigationBottomSheet,
 } from '@/components/BottomSheetModal'
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { AddPresetTodo, AddTodo, TodoBase } from '@/components/Todo'
 import { useTripStore } from '@/models'
 import {
     Todo,
+    TodoCategory,
     TodoContent,
     TodoContentSnapshotIn,
     TodoPresetItem,
@@ -52,8 +53,8 @@ export const useHandleAddCutomTodo = ({
     const { createCustomTodo } = useTripStore()
     const { navigateWithTrip } = useNavigate()
     const handleAddCutomTodo = useCallback(
-        (todoContent: TodoContent) => {
-            const todo = createCustomTodo(todoContent)
+        (category: TodoCategory, type: string) => {
+            const todo = createCustomTodo(category, type)
             console.log(`useHandleAddCutomTodo] todo: ${JSON.stringify(todo)}`)
             if (todo) {
                 let path = ''
@@ -121,37 +122,39 @@ export const TodolistAddScreenBase = observer(
                 section: { category, title },
             }: {
                 section: DefaultSectionT
-            }) => (
-                <View>
-                    <ListSubheader lg title={title} />
-                    <TodoBase
-                        avatarProps={{
-                            icon: { name: 'add', type: 'material' },
-                        }}
-                        titleStyle={$titleStyleHighlighted}
-                        {...(category === 'reservation'
-                            ? {
-                                  title: '예약 할 일 추가하기',
-                                  subtitle: '항공권 · 기차표 · 입장권',
-                                  onPress: () => {
-                                      bottomSheetRef.current?.present()
-                                  },
-                              }
-                            : {
-                                  title:
-                                      category === 'foreign'
-                                          ? '해외여행 할 일 추가하기'
-                                          : '짐 추가하기',
-                                  subtitle: '',
-                                  onPress: () =>
-                                      handleAddCutomTodo({
-                                          category,
-                                          type: 'custom',
-                                      } as TodoContent),
-                              })}
-                    />
-                </View>
-            ),
+            }) => {
+                return (
+                    <View>
+                        <ListSubheader title={title} size="xlarge" />
+                        <TodoBase
+                            avatarProps={{
+                                icon: { name: 'add', type: 'material' },
+                            }}
+                            titleStyle={$titleStyleHighlighted}
+                            {...(category === 'RESERVATION'
+                                ? {
+                                      title: '예약 할 일 추가하기',
+                                      subtitle: '항공권 · 기차표 · 입장권',
+                                      onPress: () => {
+                                          bottomSheetRef.current?.present()
+                                      },
+                                  }
+                                : {
+                                      title:
+                                          category === 'FOREIGN'
+                                              ? '해외여행 할 일 추가하기'
+                                              : '짐 추가하기',
+                                      subtitle: '',
+                                      onPress: () =>
+                                          handleAddCutomTodo(
+                                              category,
+                                              'custom',
+                                          ),
+                                  })}
+                        />
+                    </View>
+                )
+            },
             [handleAddCutomTodo, bottomSheetRef.current],
         )
 
@@ -199,14 +202,10 @@ const ReservationTypeDropDownBottomSheet = ({
     const { useActiveKey, handleBottomSheetModalChange, activate } =
         useNavigationBottomSheet(ref)
 
-    useActiveKey(activeKey =>
-        handleAddCutomTodo({
-            category: 'reservation',
-            type: activeKey,
-        } as TodoContent),
-    )
+    useActiveKey(activeKey => handleAddCutomTodo('RESERVATION', activeKey))
 
-    interface ReservationTypeOptionData extends Pick<TodoContent, 'type'> {
+    interface ReservationTypeOptionData {
+        type: string
         title: string
         avatarProps: AvatarProps
         isManaged?: boolean
@@ -272,7 +271,7 @@ const ReservationTypeDropDownBottomSheet = ({
 
     return (
         <BottomSheetModal ref={ref} onChange={handleBottomSheetModalChange}>
-            <ContentTitle title={'무엇을 예약해야하나요?'} />
+            <ContentTitle title={'에약 할 일 추가하기'} />
             <FlatList
                 data={options}
                 renderItem={renderReservationTypeListItem}

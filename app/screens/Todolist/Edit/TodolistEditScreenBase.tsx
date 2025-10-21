@@ -1,5 +1,5 @@
 import ContentTitle from '@/components/Layout/Content'
-import ListSubheader from '@/components/ListSubheader'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { useStores } from '@/models'
 import { Todo } from '@/models/Todo'
@@ -22,7 +22,11 @@ import {
 export interface TodolistEditScreenBaseProps<SectionT = DefaultSectionT>
     extends Pick<
         SectionListProps<any, SectionT>,
-        'renderItem' | 'renderSectionHeader' | 'sections' | 'keyExtractor' | 'renderSectionFooter'
+        | 'renderItem'
+        | 'renderSectionHeader'
+        | 'sections'
+        | 'keyExtractor'
+        | 'renderSectionFooter'
     > {
     title: string
     instruction?: string
@@ -43,7 +47,6 @@ const TodolistEditScreenBase = observer(function <
     children,
     keyExtractor,
 }: PropsWithChildren<TodolistEditScreenBaseProps<SectionT>>) {
-
     const [activeTabIndex, setActiveTabIndex] = useState(0)
     // Handler for tab changes
     const handleTabChange = useCallback(
@@ -54,14 +57,14 @@ const TodolistEditScreenBase = observer(function <
     )
     const renderSectionHeaderInner = useCallback(
         ({ section: { title } }: { section: DefaultSectionT }) => (
-            <ListSubheader lg title={title} />
+            <ListSubheader size="xlarge" title={title} />
         ),
         [],
     )
 
     const renderSectionFooterInner = useCallback(
         ({ section: { isLast } }: { section: DefaultSectionT }) =>
-            isLast ? <></> : <Divider />,
+            !isLast ? <Divider /> : null,
         [],
     )
 
@@ -90,8 +93,12 @@ const TodolistEditScreenBase = observer(function <
                 }))}
                 keyExtractor={keyExtractor || keyExtractorInner}
                 renderItem={renderItem}
-                renderSectionHeader={renderSectionHeader || renderSectionHeaderInner}
-                renderSectionFooter={renderSectionFooter || renderSectionFooterInner}
+                renderSectionHeader={
+                    renderSectionHeader || renderSectionHeaderInner
+                }
+                renderSectionFooter={
+                    renderSectionFooter || renderSectionFooterInner
+                }
             />
             {children}
         </Screen>
