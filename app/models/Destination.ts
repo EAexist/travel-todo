@@ -3,32 +3,35 @@ import { withSetPropAction } from './helpers/withSetPropAction'
 import { v4 as uuidv4 } from 'uuid'
 
 export const DestinationModel = types
-  .model('Destination')
-  .props({
-    id: types.optional(types.identifier, () => uuidv4()),
-    description: types.string,
-    countryIso: types.string,
-    title: types.string,
-    region: types.string,
-  })
-  .actions(withSetPropAction)
-  .views(item => ({
-    get parsedTitleAndSubtitle() {
-      const defaultValue = { title: item.title?.trim(), subtitle: '' }
+    .model('Destination')
+    .props({
+        id: types.optional(types.identifier, () => uuidv4()),
+        description: types.maybeNull(types.string),
+        iso2DigitNationCode: types.maybeNull(types.string),
+        title: types.string,
+        region: types.maybeNull(types.string),
+    })
+    .actions(withSetPropAction)
+    .views(item => ({
+        get parsedTitleAndSubtitle() {
+            const defaultValue = { title: item.title?.trim(), subtitle: '' }
 
-      if (!defaultValue.title) return defaultValue
+            if (!defaultValue.title) return defaultValue
 
-      const titleMatches = defaultValue.title.match(/^(RNR.*\d)(?: - )(.*$)/)
+            const titleMatches = defaultValue.title.match(
+                /^(RNR.*\d)(?: - )(.*$)/,
+            )
 
-      if (!titleMatches || titleMatches.length !== 3) return defaultValue
+            if (!titleMatches || titleMatches.length !== 3) return defaultValue
 
-      return { title: titleMatches[1], subtitle: titleMatches[2] }
-    },
-  }))
+            return { title: titleMatches[1], subtitle: titleMatches[2] }
+        },
+    }))
 
 export interface Destination extends Instance<typeof DestinationModel> {}
 export interface DestinationSnapshotOut
-  extends SnapshotOut<typeof DestinationModel> {}
+    extends SnapshotOut<typeof DestinationModel> {}
 export interface DestinationSnapshotIn
-  extends SnapshotIn<typeof DestinationModel> {}
-export interface DestinationContent extends Omit<DestinationSnapshotIn, 'id'> {}
+    extends SnapshotIn<typeof DestinationModel> {}
+export interface DestinationCreateDTO
+    extends Partial<Omit<DestinationSnapshotIn, 'id'>> {}

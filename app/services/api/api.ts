@@ -38,6 +38,7 @@ import {
     DeleteReservationProps,
     DeleteTodoProps,
     DeleteTripProps,
+    DestinationDTO,
     GoogleUserDTO,
     PatchReservationProps,
     PatchTodoProps,
@@ -47,6 +48,8 @@ import {
     type TripDTO,
     TripPatchDTO,
     UserAccountDTO,
+    mapToDestination,
+    mapToDestinationDTO,
     mapToPreset,
     mapToReservation,
     mapToTodo,
@@ -55,6 +58,7 @@ import {
 } from './api.types'
 import { GeneralApiProblem, getGeneralApiProblem } from './apiProblem'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
+import { List } from 'lodash'
 
 export type ApiResult<T> =
     | { kind: 'ok'; data: T; location?: string }
@@ -777,6 +781,25 @@ export class Api {
     /**
      * Gets a list of recent React Native Radio episodes.
      */
+    async getDestinations(tripId: string): Promise<ApiResult<Destination[]>> {
+        // make the api call
+        const response: ApiResponse<DestinationDTO[]> = await this.apisauce.get(
+            `/trip/${tripId}/destination`,
+        )
+
+        const handledResponse = _handleResponse<DestinationDTO[]>(response)
+        console.log(JSON.stringify(handledResponse))
+        return handledResponse.kind === 'ok'
+            ? {
+                  ...handledResponse,
+                  data: handledResponse.data.map(d => mapToDestination(d)),
+              }
+            : handledResponse
+    }
+
+    /**
+     * Gets a list of recent React Native Radio episodes.
+     */
     async createDestination({
         tripId,
         destinationDTO,
@@ -789,15 +812,7 @@ export class Api {
 
         const handledResponse = _handleResponse<Destination>(response)
         console.log(JSON.stringify(handledResponse))
-        return handledResponse.kind === 'ok'
-            ? {
-                  ...handledResponse,
-                  data: {
-                      ...handledResponse.data,
-                      id: handledResponse.data.id.toString(),
-                  },
-              }
-            : handledResponse
+        return handledResponse
     }
 
     /**

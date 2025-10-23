@@ -59,14 +59,14 @@ const DepartureAirportSettingScreen = withTodo<'DepartureAirportSetting'>(
             todo.setDeparture({
                 name: flight.departure.airportName,
                 title: flight.departure.cityName,
-                countryIso: flight.departure.iso2DigitNationCode,
+                iso2DigitNationCode: flight.departure.iso2DigitNationCode,
                 region: flight.departure.cityName,
                 iataCode: flight.departure.iataCode,
             })
             todo.setArrival({
                 name: flight.arrival.airportName,
                 title: flight.arrival.cityName,
-                countryIso: flight.arrival.iso2DigitNationCode,
+                iso2DigitNationCode: flight.arrival.iso2DigitNationCode,
                 region: flight.arrival.cityName,
                 iataCode: flight.arrival.iataCode,
             })

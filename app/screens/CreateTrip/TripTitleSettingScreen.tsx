@@ -25,7 +25,7 @@ export const TripTitleEditScreenBase: FC<EditScreenBaseProps> = ({
         initialValue: tripStore.title
             ? tripStore.title
             : tripStore.isDestinationSet
-              ? `${tripStore.destination.map(dest => dest.title).join(', ')} 여행`
+              ? `${tripStore.destinations.map(dest => dest.title).join(', ')} 여행`
               : '수고한 나를 위한 여행',
         onConfirm: handleNextPress,
     })

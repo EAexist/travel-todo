@@ -1,5 +1,6 @@
 import {
     Destination,
+    DestinationCreateDTO,
     DestinationModel,
     DestinationSnapshotIn,
 } from '@/models/Destination'
@@ -61,17 +62,17 @@ export interface UserAccountDTO extends UserStoreSnapshot {}
 export interface TripDTO
     extends Omit<
         TripStoreSnapshot,
-        'todoMap' | 'todolist' | 'destination' | 'reservationStore'
+        'todoMap' | 'todolist' | 'destinations' | 'reservationStore'
     > {
     todolist: TodoDTO[]
-    destination: DestinationDTO[]
+    destinations: DestinationDTO[]
     reservations: ReservationDTO[]
 }
 export interface TripPatchDTO
     extends Partial<
         Omit<
             TripStoreSnapshot,
-            'todoMap' | 'todolist' | 'destination' | 'reservationStore'
+            'todoMap' | 'todolist' | 'destinations' | 'reservationStore'
         >
     > {
     id: string
@@ -163,23 +164,13 @@ export interface DeleteTodoProps {
 
 export interface CreateDestinationProps {
     tripId: string
-    destinationDTO: DestinationDTO
+    destinationDTO: DestinationCreateDTO
 }
 
 export interface DeleteDestinationProps {
     tripId: string
     destinationId: string
 }
-
-// export interface CreateAccomodationProps {
-//     tripId: string
-//     accomodation: AccomodationSnapshotIn
-// }
-
-// export interface DeleteAccomodationProps {
-//     tripId: string
-//     accomodationId: string
-// }
 
 export interface CreateReservationProps {
     tripId: string
@@ -275,7 +266,7 @@ export const mapToTripPatchDTO: (
 
 export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = ({
     todolist,
-    destination,
+    destinations,
     reservations,
     ...tripDTO
 }) => {
@@ -304,7 +295,7 @@ export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = ({
                   return acc
               }, {})
             : {},
-        destination: destination.map(dest => mapToDestination(dest)),
+        destinations: destinations.map(dest => mapToDestination(dest)),
         reservationStore: ReservationStoreModel.create({
             reservations: reservations
                 ? reservations.reduce(

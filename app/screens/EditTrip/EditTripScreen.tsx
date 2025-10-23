@@ -56,9 +56,9 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
                 <Divider />
                 {/* <EditTripSubheader title={'여행지'} path={'DestinationSetting'} /> */}
                 <ListSubheader title={'여행지'} />
-                {tripStore.destination.length > 0 ? (
+                {tripStore.destinations.length > 0 ? (
                     <FlatList
-                        data={tripStore.destination}
+                        data={tripStore.destinations}
                         renderItem={renderDestinationText}
                         keyExtractor={item => item.title}
                     />

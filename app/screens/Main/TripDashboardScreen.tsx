@@ -261,9 +261,9 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                     </SectionCard>
                     {/* <SectionCard containerStyle={{ marginBottom: 15 }}>
                         <ListSubheader title="여행지 정보" />
-                        {tripStore.destination.length > 0 ? (
+                        {tripStore.destinations.length > 0 ? (
                             <FlatList
-                                data={tripStore.destination}
+                                data={tripStore.destinations}
                                 renderItem={renderDestinationText}
                                 keyExtractor={item => item.title}
                             />

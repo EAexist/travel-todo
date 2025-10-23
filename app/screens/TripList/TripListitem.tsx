@@ -41,11 +41,11 @@ export const TripListItem: FC<TripListItemProps> = ({
             <ListItem.Content>
                 <ListItem.Title>{item.title || '새 여행'}</ListItem.Title>
                 {item.isInitialized &&
-                    (item.destination.length > 0 ||
+                    (item.destinationTitles.length > 0 ||
                         item.scheduleText.length > 0) && (
                         <ListItem.Subtitle>
-                            {(item.destination.length > 0
-                                ? [item.destination.slice(0, 2).join(' ')]
+                            {(item.destinationTitles.length > 0
+                                ? [item.destinationTitles.slice(0, 2).join(' ')]
                                 : []
                             )
                                 .concat(

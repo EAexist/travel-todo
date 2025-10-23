@@ -33,7 +33,7 @@ export async function setupRootStore(rootStore: RootStore) {
     let restoredState: RootStoreSnapshot | undefined | null
 
     try {
-        // storage.clear()
+        storage.clear()
 
         /**
          * !!Test Only
@@ -60,7 +60,7 @@ export async function setupRootStore(rootStore: RootStore) {
         //       destination: [
         //         DestinationModel.create({
         //           description: '',
-        //           countryIso: 'JP',
+        //           iso2DigitNationCode: 'JP',
         //           title: '교토',
         //           region: '간사이',
         //         }),
