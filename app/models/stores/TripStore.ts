@@ -1,6 +1,6 @@
 import {
     Destination,
-    DestinationContent,
+    DestinationCreateDTO,
     DestinationModel,
     DestinationSnapshotIn,
 } from '@/models/Destination'
@@ -55,7 +55,7 @@ export const TripSummaryModel = types
         title: types.maybeNull(types.string),
         startDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
-        destination: types.array(types.string),
+        destinationTitles: types.array(types.string),
     })
     .views(store => ({
         get scheduleText() {
@@ -95,7 +95,7 @@ export const TripStoreModel = types
         title: types.maybeNull(types.string),
         startDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
-        destination: types.array(DestinationModel),
+        destinations: types.array(DestinationModel),
         todoMap: types.map(TodoModel),
         todolist: types.optional(
             types.map(types.array(types.reference(TodoModel))),
@@ -117,6 +117,10 @@ export const TripStoreModel = types
             store.todolist
                 .get(category)
                 ?.sort((a, b) => a.orderKey - b.orderKey)
+        },
+        addDestinations(destinations: Destination[]) {
+            store.destinations.clear()
+            store.destinations.push(...destinations)
         },
     }))
     .actions(store => ({
@@ -205,7 +209,7 @@ export const TripStoreModel = types
             console.log('[Tripstore.set]')
             store.setProp('id', trip.id)
             store.setProp('title', trip.title)
-            store.setProp('destination', trip.destination)
+            store.setProp('destinations', trip.destinations)
             store.setProp('startDateIsoString', trip.startDateIsoString)
             store.setProp('endDateIsoString', trip.endDateIsoString)
             store.setProp(
@@ -252,7 +256,7 @@ export const TripStoreModel = types
             store.todoMap.delete(todo.id)
         },
         _deleteDestination(destination: Destination) {
-            store.destination.remove(destination)
+            store.destinations.remove(destination)
         },
         // updatePreset() {
         //   const usedPresetIds = [
@@ -282,7 +286,7 @@ export const TripStoreModel = types
             store.addTodo(todo)
         },
         addDestination(destination: DestinationSnapshotIn) {
-            store.destination.push(destination)
+            store.destinations.push(destination)
         },
     }))
     .actions(store => ({
@@ -333,15 +337,21 @@ export const TripStoreModel = types
         /**
          * Create an empty destination and fetch it with backend-generated id.
          */
-        async createDestination(destination: DestinationContent) {
-            //   store.addDestination(destination)
-            const response = await api.createDestination({
-                tripId: store.id,
-                destinationDTO: destination,
-            })
-            if (response.kind === 'ok') {
-                store.addDestination(response.data)
-            }
+        async createDestination(destinationCreateDTO: DestinationCreateDTO) {
+            return api
+                .createDestination({
+                    tripId: store.id,
+                    destinationDTO: destinationCreateDTO,
+                })
+                .then(response => {
+                    if (response.kind === 'ok') {
+                        return api.getDestinations(store.id).then(response => {
+                            if (response.kind === 'ok') {
+                                store.addDestinations(response.data)
+                            }
+                        })
+                    } else return
+                })
         },
 
         /**
@@ -466,16 +476,16 @@ export const TripStoreModel = types
          * Destination CRUD Actions
          */
         /**
-         * Delete a destination.
+         * Delete a destinations.
          */
         deleteDestination(destination: Destination) {
-            store.destination.remove(destination)
+            store.destinations.remove(destination)
             enqueueAction(APIAction.DELETE_DESTINATION, {
                 tripId: store.id,
                 destinationId: destination.id,
             } as DeleteDestinationProps)
 
-            //   api.deleteDestination(store.id, destination.id).then(({kind}) => {
+            //   api.deleteDestination(store.id, destinations.id).then(({kind}) => {
             //     console.log(kind, destination)
             //     if (kind == 'ok') {
             //       store._deleteDestination(destination)
@@ -550,20 +560,20 @@ export const TripStoreModel = types
             return store.endDateIsoString !== null
         },
         get isDestinationSet() {
-            return store.destination.length > 0
+            return store.destinations.length > 0
         },
         get destinationTitles() {
-            return store.destination.map(item => item.title)
-            // return store.destination.map((item) => item.title).join(', ')
+            return store.destinations.map(item => item.title)
+            // return store.destinations.map((item) => item.title).join(', ')
         },
         get numOfTodo() {
             return store.todoMap.size
-            // return store.destination.map((item) => item.title).join(', ')
+            // return store.destinations.map((item) => item.title).join(', ')
         },
         get numOfIncompleteTodo() {
             return [...store.todoMap.values()].filter(item => !item.isCompleted)
                 .length
-            // return store.destination.map((item) => item.title).join(', ')
+            // return store.destinations.map((item) => item.title).join(', ')
         },
         get passportExpiryRequiredAfterThisDate() {
             const daysPadding = 1

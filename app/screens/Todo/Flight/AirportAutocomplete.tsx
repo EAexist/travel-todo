@@ -80,7 +80,7 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
                 .trim(),
             name: name,
             iataCode: iataCode || undefined,
-            countryIso:
+            iso2DigitNationCode:
                 countryNameKrToIso[
                     data.structured_formatting.secondary_text.split(',')[0]
                 ] || '',

@@ -9,12 +9,13 @@ import { Destination, DestinationSnapshotIn } from '@/models/Destination'
 import { useNavigate } from '@/navigators'
 import { getFlagEmoji } from '@/utils/nation'
 import { Trans, useLingui } from '@lingui/react/macro'
-import { ListItem } from '@rneui/themed'
+import { ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, ReactNode, useCallback } from 'react'
 import { FlatList, ListRenderItem, TouchableOpacity, View } from 'react-native'
 import { EditScreenBaseProps } from '.'
 import { useRequireConnection } from '../Loading'
+import { ListItemBase, ListItemBaseProps } from '@/components/ListItem/ListItem'
 
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
@@ -32,42 +33,62 @@ import { useRequireConnection } from '../Loading'
 //   return String.fromCodePoint(...codePoints) // Return white flag for invalid codes.
 // }
 
-export interface DestinationListItemBaseProps {
+export interface DestinationListItemBaseProps extends ListItemBaseProps {
     item: Omit<DestinationSnapshotIn, 'id' | 'description'>
-    rightContent?: ReactNode
-    onPress?: () => void
 }
 
 export const DestinationListItemBase: FC<DestinationListItemBaseProps> = ({
     item,
-    rightContent,
-    onPress,
+    ...props
 }) => {
-    //   const [flag, setFlag] = useState<string>()
-    //   useEffect(() => {
-    //     console.log(getFlagEmoji(item.countryIso))
-    //     setFlag(getFlagEmoji(item.countryIso))
-    //   }, [getFlagEmoji, item.countryIso])
+    const {
+        theme: { colors },
+    } = useTheme()
 
     return (
-        <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
-            <Avatar
-                icon={{ name: getFlagEmoji(item.countryIso) }}
-                avatarSize={35}
-                fontSize={20}
-            />
-            {/* <Avatar title={flag} avatarSize={35} /> */}
-            <ListItem.Content>
-                <ListItem.Title>
-                    <Trans>{item.title}</Trans>
-                </ListItem.Title>
-                <ListItem.Subtitle>
-                    {/* <Trans>{`${regionNames.of(item.countryIso.toUpperCase())}ㆍ${item.state}`}</Trans> */}
-                    <Trans>{`${item.region}`}</Trans>
-                </ListItem.Subtitle>
-            </ListItem.Content>
-            {rightContent}
-        </ListItem>
+        <ListItemBase
+            avatarProps={{
+                icon: {
+                    ...(item.iso2DigitNationCode
+                        ? { name: getFlagEmoji(item.iso2DigitNationCode) }
+                        : {
+                              name: 'location-on',
+                              type: 'material',
+                              color: colors.contrastText.secondary,
+                          }),
+                },
+            }}
+            containerStyle={{ height: 60 }}
+            title={item.title}
+            subtitle={item.region}
+            {...props}
+        />
+        // <ListItem onPress={onPress} containerStyle={{ height: 60 }}>
+        //     <Avatar
+        //         icon={
+        //             item.iso2DigitNationCode
+        //                 ? { name: getFlagEmoji(item.iso2DigitNationCode) }
+        //                 : {
+        //                       name: 'location-on',
+        //                       type: 'material',
+        //                       color: colors.contrastText.secondary,
+        //                   }
+        //         }
+        //         // avatarSize={}
+        //         // fontSize={20}
+        //     />
+        //     {/* <Avatar title={flag} avatarSize={35} /> */}
+        //     <ListItem.Content>
+        //         <ListItem.Title>
+        //             <Trans>{item.title}</Trans>
+        //         </ListItem.Title>
+        //         <ListItem.Subtitle>
+        //             {/* <Trans>{`${regionNames.of(item.iso2DigitNationCode.toUpperCase())}ㆍ${item.state}`}</Trans> */}
+        //             <Trans>{`${item.region}`}</Trans>
+        //         </ListItem.Subtitle>
+        //     </ListItem.Content>
+        //     {rightContent}
+        // </ListItem>
     )
 }
 
@@ -150,10 +171,10 @@ export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
                     {tripStore.isDestinationSet && (
                         <View>
                             <ListSubheader
-                                title={`선택한 여행지 (${tripStore.destination.length})`}
+                                title={`선택한 여행지 (${tripStore.destinations.length})`}
                             />
                             <FlatList
-                                data={tripStore.destination}
+                                data={tripStore.destinations}
                                 renderItem={renderDestinationListItem}
                                 keyExtractor={item => item.id}
                             />

@@ -25,7 +25,7 @@ export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
 export interface Location {
     name: string
     title: string
-    countryIso: string
+    iso2DigitNationCode: string
     region?: string
     iataCode?: string
 }
@@ -38,7 +38,7 @@ export interface LocationPair {
 export const LocationModel = types.model('Location').props({
     name: types.string,
     title: types.string,
-    countryIso: types.string,
+    iso2DigitNationCode: types.string,
     region: types.maybe(types.string),
     iataCode: types.maybe(types.string),
 })
