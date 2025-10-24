@@ -1,5 +1,5 @@
 import * as Fab from '@/components/Fab'
-import { useStores, useTripStore } from '@/models'
+import { useTripStore } from '@/models'
 import {
     AuthenticatedStackScreenProps,
     goBack,
@@ -43,20 +43,22 @@ export const TodolistSettingScreen: FC<
     })
 
     useEffect(() => {
-        async function fetchPreset() {
-            await fetchPresetWithApiStatus()
+        if (tripStore.preset.values.length == 0) {
+            async function fetchPreset() {
+                await fetchPresetWithApiStatus()
+            }
+            fetchPreset().then(() => {
+                console.log('[TodolistAddScreenBase] fetchPreset()')
+            })
         }
-        fetchPreset().then(() => {
-            console.log('[TodolistAddScreenBase] fetchPreset()')
-        })
     }, [])
 
     useLoadingScreen({ onProblem: () => goBack() })
 
     return (
         <TodolistAddScreenBase
-            title={'새 할 일 추가하기'}
-            instruction={'관리할 할 일을 추가해보세요'}
+            title={'할 일 추가하기'}
+            instruction={'관리하고 싶은 할 일과 짐을 추가하세요'}
             tripId={route.params.tripId}
             fab={
                 <Fab.Container>

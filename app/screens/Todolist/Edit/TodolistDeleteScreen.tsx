@@ -31,7 +31,7 @@ export const TodolistDeleteScreen = observer(() => {
         },
     })
 
-    const [showIncompleteTodolist, setShowIncompleteTodolist] = useState(true)
+    // const [showIncompleteTodolist, setShowIncompleteTodolist] = useState(true)
 
     return (
         <Screen>
@@ -39,7 +39,7 @@ export const TodolistDeleteScreen = observer(() => {
                 title={'할 일 삭제하기'}
                 subtitle={'관리하지 않아도 되늗 할 일을 지울 수 있어요'}
             />
-            <View
+            {/* <View
                 style={{
                     paddingTop: 16,
                     flexDirection: 'row',
@@ -53,12 +53,13 @@ export const TodolistDeleteScreen = observer(() => {
                     <SwitchTabItem title={`남은 할 일`} />
                     <SwitchTabItem title={`완료한 할 일`} />
                 </SwitchTab>
-            </View>
+            </View> */}
             <TodoList
-                sections={(showIncompleteTodolist
-                    ? tripStore.incompleteTodolistSectionListData
-                    : tripStore.completedTodolistSectionListData
-                ).filter(section => section.data.length > 0)}
+                sections={tripStore// showIncompleteTodolist
+                // ? tripStore.incompleteTodolistSectionListData
+                // : tripStore.completedTodolistSectionListData
+                .todolistSectionListData
+                    .filter(section => section.data.length > 0)}
                 renderItem={renderItem}
             />
         </Screen>

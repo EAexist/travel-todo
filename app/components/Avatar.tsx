@@ -3,9 +3,13 @@ import {
     AvatarProps as RNEAvatarProps,
     Text,
 } from '@rneui/themed'
+import * as pajamas from 'assets/images/icon/pajamas.png'
+import * as powerBank from 'assets/images/icon/power-bank.png'
+import * as sandals from 'assets/images/icon/sandals.png'
+import * as smartphone from 'assets/images/icon/smartphone.png'
+import * as towel from 'assets/images/icon/towel.png'
 import { PropsWithChildren } from 'react'
-import { StyleSheet } from 'react-native'
-import { Icon, IconProps } from '@/components/Icon'
+import { ImageSourcePropType, StyleSheet } from 'react-native'
 
 export interface AvatarProps extends Omit<RNEAvatarProps, 'avatarSize'> {
     fontSize?: number
@@ -19,11 +23,11 @@ export const Avatar = ({
     size,
     ...props
 }: PropsWithChildren<AvatarProps>) => {
-    let iconProps: Partial<RNEAvatarProps>
+    let avatarProps: Partial<RNEAvatarProps>
 
     switch (icon?.type || 'tossface') {
         case 'tossface':
-            iconProps = {
+            avatarProps = {
                 renderCustomContent: (
                     <Text
                         style={{
@@ -47,18 +51,39 @@ export const Avatar = ({
             }
             break
         case 'image':
-            iconProps = {
-                renderCustomContent: <Icon {...(icon as IconProps)} />,
+            let source: ImageSourcePropType | undefined = undefined
+            switch (icon?.name) {
+                case 'towel':
+                    source = towel
+                    break
+                case 'pajamas':
+                    source = pajamas
+                    break
+                case 'power-bank':
+                    source = powerBank
+                    break
+                case 'sandals':
+                    source = sandals
+                    break
+                case 'smartphone':
+                    source = smartphone
+                    break
+                default:
+                    break
+            }
+
+            avatarProps = {
+                source,
             }
             break
         default:
-            iconProps = {
+            avatarProps = {
                 icon,
             }
             break
     }
     return (
-        <RNEAvatar avatarSize={avatarSize} {...iconProps} {...props}>
+        <RNEAvatar avatarSize={avatarSize} {...props} {...avatarProps}>
             {children}
         </RNEAvatar>
     )
