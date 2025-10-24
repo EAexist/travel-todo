@@ -1,6 +1,8 @@
 import { IconNode } from '@rneui/base'
 import { createTheme, IconProps } from '@rneui/themed'
+import { Icon } from 'lucide-react-native'
 import { Platform, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { colors } from 'theme'
 
 type Font = {
     thin?: TextStyle
@@ -218,6 +220,8 @@ const theme = createTheme({
             variant: variant,
             disableIndicator: true,
             style: {
+                paddingRight: 0,
+                paddingLeft: 0,
                 backgroundColor:
                     variant === 'primary' ? colors.secondary : colors.white,
                 ...(size === 'md'
@@ -230,7 +234,14 @@ const theme = createTheme({
             },
         }),
         SwitchTabItem: (
-            { variant = 'primary', size = 'md', icon, color, active },
+            {
+                variant = 'primary',
+                size = 'md',
+                icon,
+                color,
+                active,
+                titleStyle,
+            },
             { colors },
         ) => ({
             containerStyle: {
@@ -270,7 +281,7 @@ const theme = createTheme({
                 ...(icon ? { width: 32, height: 32 } : {}),
             }),
             icon: {
-                ...(icon as Partial<IconProps>),
+                // ...(icon as Partial<IconProps>),
                 color: active ? colors.primary : colors.contrastText.secondary,
                 size: active ? 28 : 24,
             },
@@ -298,7 +309,7 @@ const theme = createTheme({
             }),
             titleStyle: (active: boolean) => ({
                 letterSpacing: 0.5,
-                minWidth: 64,
+                minWidth: 84,
                 paddingVertical: 8,
                 color: active
                     ? color === 'primary'
@@ -319,6 +330,7 @@ const theme = createTheme({
                               ? typography.pretendard.medium
                               : typography.pretendard.regular),
                       }),
+                // ...(titleStyle as TextStyle),
             }),
         }),
         StyledSwitch: (
@@ -409,19 +421,68 @@ const theme = createTheme({
                 // min-width: 32,
                 // min-height: 32,
             },
+            avatarStyle: {
+                alignSelf: 'center',
+                ...props.avatarStyle,
+                ...(props.avatarSize === 'xsmall'
+                    ? {
+                          width: 18,
+                          height: 18,
+                      }
+                    : props.avatarSize === 'small'
+                      ? {
+                            width: 26,
+                            height: 26,
+                        }
+                      : props.avatarSize === 'medium'
+                        ? {
+                              width: 34,
+                              height: 34,
+                          }
+                        : props.avatarSize === 'large'
+                          ? {
+                                width: 40,
+                                height: 40,
+                            }
+                          : props.avatarSize === 'xlarge'
+                            ? {
+                                  width: 52,
+                                  height: 52,
+                              }
+                            : props.avatarSize
+                              ? {
+                                    width: props.avatarSize + 24,
+                                    height: props.avatarSize + 24,
+                                }
+                              : {}),
+            },
             ...(props.icon
                 ? {
                       icon: {
                           size:
-                              props.size === 'small'
-                                  ? 24
-                                  : props.size === 'medium'
-                                    ? 30
-                                    : props.size === 'large'
-                                      ? 36
-                                      : props.size === 'xlarge'
-                                        ? 40
-                                        : props.size,
+                              props.icon.type === 'font-awesome-5'
+                                  ? props.avatarSize === 'xsmall'
+                                      ? 14
+                                      : props.avatarSize === 'small'
+                                        ? 18
+                                        : props.avatarSize === 'medium'
+                                          ? 22
+                                          : props.avatarSize === 'large'
+                                            ? 26
+                                            : props.avatarSize === 'xlarge'
+                                              ? 30
+                                              : props.avatarSize
+                                  : props.avatarSize === 'xsmall'
+                                    ? 18
+                                    : props.avatarSize === 'small'
+                                      ? 22
+                                      : props.avatarSize === 'medium'
+                                        ? 26
+                                        : props.avatarSize === 'large'
+                                          ? 30
+                                          : props.avatarSize === 'xlarge'
+                                            ? 34
+                                            : props.avatarSize,
                           color: props.icon.color || colors.primary,
                           ...props.icon,
                       },
@@ -584,7 +645,9 @@ const theme = createTheme({
         }),
         ListSubheader: ({ size = 'medium', ...props }, { colors }) => ({
             style: {
-                justifyContent: 'center',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 16,
                 height:
                     size === 'xlarge'
                         ? 64
@@ -777,15 +840,28 @@ const theme = createTheme({
             checkedIcon: 'check-circle',
             uncheckedIcon: 'radio-button-unchecked',
         }),
+        Tab: ({ indicatorStyle }, { colors }) => ({
+            style: {
+                paddingHorizontal: 16,
+            },
+            indicatorStyle: [
+                {
+                    backgroundColor: colors.text.primary,
+                },
+                indicatorStyle,
+            ],
+        }),
         TabItem: (_, { colors }) => ({
             containerStyle: {
                 backgroundColor: colors.white,
-                paddingVertical: 16,
-                // width: '33.33%',
+                paddingVertical: 8,
             },
             titleStyle: (active: boolean) => ({
-                ...typography.pretendard.regular,
                 fontSize: 17,
+                paddingHorizontal: 0,
+                ...(active
+                    ? typography.pretendard.semiBold
+                    : typography.pretendard.regular),
                 color: active ? colors.text.primary : colors.text.secondary,
             }),
         }),

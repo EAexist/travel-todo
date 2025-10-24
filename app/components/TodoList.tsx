@@ -1,18 +1,18 @@
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { useTripStore } from '@/models'
-import { Todo } from '@/models/Todo'
-import { typography } from '@/rneui/theme'
-import { Divider, ListItem, Text, useTheme } from '@rneui/themed'
+import { isCategoryTodo, Todo } from '@/models/Todo'
+import { ListItem, TabView, Text, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
-import { FC, ReactNode, useCallback } from 'react'
+import { FC, ReactNode, useCallback, useState } from 'react'
 import {
     DefaultSectionT,
-    ScrollView,
     SectionList,
     SectionListData,
     SectionListRenderItem,
     View,
 } from 'react-native'
+import { Label } from './Label'
+import SwitchTab, { SwitchTabItem } from './SwitchTab'
 
 interface TodoListProps {
     sections: SectionListData<Todo, DefaultSectionT>[]
@@ -20,6 +20,8 @@ interface TodoListProps {
 }
 export const TodoList: FC<TodoListProps> = observer(
     ({ sections, renderItem }) => {
+        const tripStore = useTripStore()
+
         const {
             theme: { colors },
         } = useTheme()
@@ -32,10 +34,34 @@ export const TodoList: FC<TodoListProps> = observer(
             <Observer render={() => <View>{renderItem(item)}</View>} />
         )
         const renderSectionHeader = useCallback(
-            ({ section: { title, data } }: { section: DefaultSectionT }) => (
+            ({
+                section: { title, data, category },
+            }: {
+                section: DefaultSectionT
+            }) => (
                 <>
-                    <ListSubheader title={title} />
-                    {data.length == 0 && (
+                    {
+                        // category === 'TODO' ? (
+                        //     <ListSubheader
+                        //         title={'할 일'}
+                        //         size="xlarge"
+                        //         rightContent={
+                        //             <Text>{tripStore.numbefOfTodoText}</Text>
+                        //         }
+                        //     />
+                        // ) : category === 'GOODS' ? (
+                        //     <ListSubheader
+                        //         lg
+                        //         title={'짐'}
+                        //         size="xlarge"
+                        //         rightContent={
+                        //             <Text>{tripStore.numbefOfGoodsText}</Text>
+                        //         }
+                        //     />
+                        // ) :
+                        data.length > 0 && <ListSubheader title={title} />
+                    }
+                    {/* {data.length == 0 && (
                         <ListItem>
                             <ListItem.Title
                                 style={{
@@ -45,15 +71,87 @@ export const TodoList: FC<TodoListProps> = observer(
                                 남은 할 일 없음
                             </ListItem.Title>
                         </ListItem>
-                    )}
+                    )} */}
                 </>
             ),
             [],
         )
 
+        const [activeTabIndex, setActiveTabIndex] = useState(0)
+        const handleTabChange = useCallback(
+            (newIndex: number) => {
+                setActiveTabIndex(newIndex)
+            },
+            [setActiveTabIndex],
+        )
+
+        const todoSections = sections.filter(({ category }) =>
+            isCategoryTodo(category),
+        )
+
+        const goodsSections = sections.filter(
+            ({ category }) => !isCategoryTodo(category),
+        )
         return (
-            <ScrollView>
-                <SectionList
+            <View style={{ flex: 1 }}>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                    }}>
+                    <SwitchTab
+                        value={activeTabIndex}
+                        onChange={e => setActiveTabIndex(e)}>
+                        <SwitchTabItem title="할 일" />
+                        <SwitchTabItem title="짐 챙기기" />
+                    </SwitchTab>
+                </View>
+                <View
+                    style={{
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        paddingHorizontal: 24,
+                        paddingVertical: 16,
+                    }}>
+                    <Label
+                        title="완료한 할일 숨기기"
+                        style={{
+                            fontSize: 13,
+                        }}
+                        dense
+                        rightContent={
+                            <ListItem.CheckBox
+                                checked={tripStore.settings.doHideCompletedTodo}
+                                onPress={tripStore.toggleDoHideCompletedTodo}
+                                containerStyle={{ width: 'auto', marginTop: 1 }}
+                                checkedColor={colors.contrastText.secondary}
+                                size={20}
+                            />
+                        }
+                    />
+                </View>
+                <TabView
+                    value={activeTabIndex}
+                    onChange={handleTabChange}
+                    containerStyle={{ overflow: 'hidden' }}>
+                    <TabView.Item style={{ flex: 1 }}>
+                        <SectionList
+                            sections={todoSections}
+                            keyExtractor={item => item.id}
+                            renderItem={renderItem_}
+                            renderSectionHeader={renderSectionHeader}
+                        />
+                    </TabView.Item>
+                    <TabView.Item style={{ flex: 1 }}>
+                        <SectionList
+                            sections={goodsSections}
+                            keyExtractor={item => item.id}
+                            renderItem={renderItem_}
+                            renderSectionHeader={renderSectionHeader}
+                        />
+                    </TabView.Item>
+                </TabView>
+                {/* <SectionList
                     sections={sections.map((section, index) => ({
                         ...section,
                         isLast: index === sections.length - 1,
@@ -61,11 +159,11 @@ export const TodoList: FC<TodoListProps> = observer(
                     keyExtractor={item => item.id}
                     renderItem={renderItem_}
                     renderSectionHeader={renderSectionHeader}
-                    renderSectionFooter={({ section: { isLast } }) => {
-                        return !isLast ? <Divider /> : null
+                    renderSectionFooter={({ section: { category } }) => {
+                        return category === 'FOREIGN' ? <Divider /> : null
                     }}
-                />
-            </ScrollView>
+                /> */}
+            </View>
         )
     },
 )

@@ -14,12 +14,23 @@ import { wait } from './helpers/wait'
 import { withSetPropAction } from './helpers/withSetPropAction'
 import { Icon, IconModel } from './Icon'
 
-export type TodoCategory = 'RESERVATION' | 'FOREIGN' | 'GOODS'
+export type TodoCategory =
+    | 'TODO'
+    | 'RESERVATION'
+    | 'FOREIGN'
+    | 'GOODS'
+    | 'WASH'
+    | 'ELECTRONICS'
+    | 'CLOTHING'
 
 export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
+    TODO: '기타',
     RESERVATION: '예약',
-    FOREIGN: '해외여행',
-    GOODS: '짐',
+    FOREIGN: '해외',
+    WASH: '세면도구',
+    ELECTRONICS: '전자기기',
+    CLOTHING: '옷',
+    GOODS: '기타',
 }
 
 export interface Location {
@@ -86,6 +97,9 @@ export const FlightModel = types.model('Flight').props({
     arrival: AirportModel,
 })
 
+export const isCategoryTodo = (category: TodoCategory) =>
+    category === 'TODO' || category === 'RESERVATION' || category === 'FOREIGN'
+
 /**
  * PresetTodo
  */
@@ -100,6 +114,11 @@ export const TodoContentModel = types
         isStock: types.optional(types.boolean, false),
     })
     .actions(withSetPropAction)
+    .views(item => ({
+        get isTodo() {
+            return isCategoryTodo(item.category)
+        },
+    }))
 
 export interface TodoContent extends Instance<typeof TodoContentModel> {}
 export interface TodoContentSnapshotOut

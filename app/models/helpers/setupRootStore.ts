@@ -33,7 +33,7 @@ export async function setupRootStore(rootStore: RootStore) {
     let restoredState: RootStoreSnapshot | undefined | null
 
     try {
-        storage.clear()
+        // storage.clear()
 
         /**
          * !!Test Only

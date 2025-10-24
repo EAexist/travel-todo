@@ -29,6 +29,7 @@ import {
 import { APIAction, enqueueAction, sync_db } from '@/tasks/BackgroundTask'
 import { differenceInDays, isAfter, startOfDay } from 'date-fns'
 import {
+    applySnapshot,
     getSnapshot,
     Instance,
     SnapshotIn,
@@ -107,7 +108,7 @@ export const TripStoreModel = types
         ),
         customTodoContent: types.array(TodoContentModel),
         activeItem: types.maybeNull(types.reference(TodoModel)),
-        preset: types.map(types.array(TodoPresetItemModel)),
+        preset: types.map(TodoPresetItemModel),
         reservationStore: types.optional(ReservationStoreModel, {}),
         settings: types.optional(SettingsModel, () => SettingsModel.create()),
     })
@@ -296,24 +297,39 @@ export const TripStoreModel = types
         async fetchPreset() {
             console.log('[Tripstore.fetchPreset]')
             await sync_db()
-            return api.getTodoPreset(store.id).then(response => {
-                if (response.kind == 'ok') {
-                    const map = new Map<string, TodoPresetItem[]>()
-                    response.data.forEach(({ isFlaggedToAdd, todoContent }) => {
-                        if (!map.has(todoContent.category)) {
-                            map.set(todoContent.category, [])
-                        }
-                        map.get(todoContent.category)?.push(
-                            TodoPresetItemModel.create({
-                                isFlaggedToAdd,
-                                todoContent: todoContent,
-                            }),
+            if (store.preset.values.length > 0) {
+                return
+            } else {
+                return api.getTodoPreset(store.id).then(response => {
+                    if (response.kind == 'ok') {
+                        const map = new Map<string, TodoPresetItem[]>()
+                        response.data.forEach(
+                            ({ isFlaggedToAdd, todoContent }) => {
+                                if (!map.has(todoContent.category)) {
+                                    map.set(todoContent.category, [])
+                                }
+                                map.get(todoContent.category)?.push(
+                                    TodoPresetItemModel.create({
+                                        isFlaggedToAdd,
+                                        todoContent: todoContent,
+                                    }),
+                                )
+                            },
                         )
-                    })
-                    store.setProp('preset', Object.fromEntries(map.entries()))
-                }
-                return response
-            })
+                        applySnapshot(
+                            store.preset,
+                            response.data.reduce(
+                                (acc, item) => {
+                                    acc[item.todoContent.id] = item
+                                    return acc
+                                },
+                                {} as Record<string, any>,
+                            ),
+                        )
+                    }
+                    return response
+                })
+            }
         },
         // async fetchRecommendedFlight() {
         //   console.log('[fetchRecommendedFlight]')
@@ -617,38 +633,27 @@ export const TripStoreModel = types
             )
         },
         get allTodolistSectionListDataUnsorted() {
-            return Object.entries(
-                [...store.todoMap.values()].reduce(
-                    (
-                        acc: {
-                            [date: string]: Todo[]
-                        },
-                        todo: Todo,
-                    ) => {
-                        const category = todo.category
-                        if (!acc[category]) {
-                            acc[category] = []
-                        }
-
-                        acc[category].push(todo)
-
-                        return acc
-                    },
-                    {},
-                ),
-            )
-                .map(([category, data]) => {
-                    return {
-                        category,
-                        data,
-                    }
-                })
+            return [
+                'TODO',
+                'RESERVATION',
+                'FOREIGN',
+                'GOODS',
+                'WASH',
+                'ELECTRONICS',
+                'CLOTHING',
+            ]
+                .map(category => ({
+                    category: category,
+                    data: [...store.todoMap.values()].filter(
+                        todo => todo.category === category,
+                    ),
+                }))
                 .sort(({ category: categoryA }, { category: categoryB }) => {
                     return 1
                 })
                 .map(({ category, data }) => {
                     return {
-                        key: category,
+                        category,
                         title: TODO_CATEGORY_TO_TITLE[category],
                         data,
                     }
@@ -657,35 +662,56 @@ export const TripStoreModel = types
         /*
          * Add Todo Preset
          */
-        get todolistWithPreset() {
-            return this.sections.map(category => {
-                const addedItems = store.todolist.get(category)
-                const addedStockIds = addedItems
-                    ?.filter(item => item.content.isStock)
-                    .map(item => item.content.id)
-                // const addedItemIds = addedItems?.map(item => item.id) as string[]
-                return {
-                    category,
-                    title: TODO_CATEGORY_TO_TITLE[category],
-                    data: [
-                        ...((addedItems?.map(item => ({
-                            todo: item,
-                        })) as { todo?: Todo; preset?: TodoPresetItem }[]) ||
-                            []),
-                        ...(store.preset
-                            .get(category)
-                            ?.filter(
-                                preset =>
-                                    !addedStockIds?.includes(
-                                        preset.todoContent.id,
-                                    ),
-                            )
-                            .map(preset => ({
-                                preset,
-                            })) || []),
-                    ],
-                }
-            })
+        get numOfTodoToAdd() {
+            return [...store.preset.values()].filter(
+                ({ isFlaggedToAdd, todoContent }) =>
+                    isFlaggedToAdd && todoContent.isTodo,
+            ).length
+        },
+        get numOfGoodsToAdd() {
+            return [...store.preset.values()].filter(
+                ({ isFlaggedToAdd, todoContent }) =>
+                    isFlaggedToAdd && !todoContent.isTodo,
+            ).length
+        },
+        get todosWithPreset() {
+            const addedStockIds = [...store.todoMap.values()]
+                ?.filter(item => item.content.isStock)
+                .map(item => item.content.id)
+
+            const todos =
+                [...store.todoMap.values()]?.map(item => ({
+                    todo: item,
+                })) || []
+            const preset =
+                [...store.preset.values()]
+                    ?.filter(
+                        preset =>
+                            !addedStockIds?.includes(preset.todoContent.id),
+                    )
+                    .map(preset => ({
+                        preset,
+                    })) || []
+
+            return [
+                'TODO',
+                'RESERVATION',
+                'FOREIGN',
+                'WASH',
+                'ELECTRONICS',
+                'CLOTHING',
+                'GOODS',
+            ].map(category => ({
+                category: category,
+                title: TODO_CATEGORY_TO_TITLE[category],
+                data: [
+                    ...todos.filter(({ todo }) => todo.category === category),
+                    ...preset.filter(
+                        ({ preset }) =>
+                            preset.todoContent.category === category,
+                    ),
+                ],
+            }))
         },
         get isActive() {
             return store.activeItem !== null
@@ -708,11 +734,21 @@ export const TripStoreModel = types
         },
     }))
     .views(store => ({
+        get numbefOfTodoText() {
+            return [...store.todoMap.values()].filter(
+                t => !t.isCompleted && t.content.isTodo,
+            ).length
+        },
+        get numbefOfGoodsText() {
+            return [...store.todoMap.values()].filter(
+                t => !t.isCompleted && !t.content.isTodo,
+            ).length
+        },
         get allTodolistSectionListData() {
             return store.allTodolistSectionListDataUnsorted.map(
-                ({ title, data }) => {
+                ({ data, ...section }) => {
                     return {
-                        title,
+                        ...section,
                         data: data.sort((todoA, todoB) => {
                             if (todoA.isCompleted && !todoB.isCompleted) {
                                 return 1
@@ -728,16 +764,16 @@ export const TripStoreModel = types
         },
         get incompleteTodolistSectionListData() {
             return store.allTodolistSectionListDataUnsorted.map(
-                ({ title, data }) => ({
-                    title,
+                ({ data, ...section }) => ({
+                    ...section,
                     data: data.filter(todo => !todo.isCompleted),
                 }),
             )
         },
         get completedTodolistSectionListData() {
             return store.allTodolistSectionListDataUnsorted.map(
-                ({ title, data }) => ({
-                    title,
+                ({ data, ...section }) => ({
+                    ...section,
                     data: data.filter(todo => todo.isCompleted),
                 }),
             )

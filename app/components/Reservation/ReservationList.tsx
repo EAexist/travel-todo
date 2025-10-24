@@ -96,7 +96,7 @@ export const ReservationList: FC<ReservationListProps> = observer(
                             )
                         }>
                         <SwitchTabItem title="날짜순" variant="default" />
-                        <SwitchTabItem title="유형별" />
+                        <SwitchTabItem title="유형별" variant="default" />
                     </SwitchTab>
                 </View>
                 <View

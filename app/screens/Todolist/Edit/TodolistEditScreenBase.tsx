@@ -1,22 +1,25 @@
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
-import { useStores } from '@/models'
-import { Todo } from '@/models/Todo'
-import { Divider } from '@rneui/themed'
+import { isCategoryTodo, Todo } from '@/models/Todo'
+import { typography } from '@/rneui/theme'
+import { IconNode } from '@rneui/base'
+import { TabView, Text } from '@rneui/themed'
+import { Divider, Tab } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import {
     ComponentType,
     PropsWithChildren,
+    ReactNode,
     useCallback,
-    useEffect,
     useState,
 } from 'react'
+import { View } from 'react-native'
 import {
     DefaultSectionT,
+    ScrollView,
     SectionList,
     SectionListProps,
-    SectionListRenderItem,
 } from 'react-native'
 
 export interface TodolistEditScreenBaseProps<SectionT = DefaultSectionT>
@@ -31,6 +34,7 @@ export interface TodolistEditScreenBaseProps<SectionT = DefaultSectionT>
     title: string
     instruction?: string
     Todo?: ComponentType<{ item: Todo }>
+    renderTabIcon?: (isTodo: boolean) => ReactNode
 }
 
 const TodolistEditScreenBase = observer(function <
@@ -46,6 +50,7 @@ const TodolistEditScreenBase = observer(function <
     sections,
     children,
     keyExtractor,
+    renderTabIcon,
 }: PropsWithChildren<TodolistEditScreenBaseProps<SectionT>>) {
     const [activeTabIndex, setActiveTabIndex] = useState(0)
     // Handler for tab changes
@@ -70,36 +75,90 @@ const TodolistEditScreenBase = observer(function <
 
     const keyExtractorInner = useCallback((item: any) => item.id, [])
 
+    const todoSections = sections.filter(({ category }) =>
+        isCategoryTodo(category),
+    )
+
+    const goodsSections = sections.filter(
+        ({ category }) => !isCategoryTodo(category),
+    )
+
+    // const numOfTodoToAdd
+
     return (
         <Screen>
             <ContentTitle title={title} subtitle={instruction} />
-            {/* <Tab
-          value={activeTabIndex}
-          onChange={handleTabChange}
-          // indicatorStyle={tripStyles.TabIndicator}
-        >
-          <FlatList
-            data={sections}
-            renderItem={({ item }) => (
-              <Tab.Item title={<Trans>{item.title}</Trans>} />
-            )}
-            keyExtractor={(item) => item.title}
-          />
-        </Tab> */}
-            <SectionList
-                sections={sections.map((section, index) => ({
-                    ...section,
-                    isLast: index === sections.length - 1,
-                }))}
-                keyExtractor={keyExtractor || keyExtractorInner}
-                renderItem={renderItem}
-                renderSectionHeader={
-                    renderSectionHeader || renderSectionHeaderInner
-                }
-                renderSectionFooter={
-                    renderSectionFooter || renderSectionFooterInner
-                }
-            />
+            <Tab value={activeTabIndex} onChange={handleTabChange}>
+                <Tab.Item
+                    title={'할 일'}
+                    icon={renderTabIcon && (renderTabIcon(true) as IconNode)}
+                    iconRight
+                />
+                <Tab.Item
+                    title={'짐'}
+                    icon={renderTabIcon && (renderTabIcon(false) as IconNode)}
+                    iconRight
+                />
+            </Tab>
+            <View style={{ flex: 1, paddingTop: 16 }}>
+                <TabView
+                    value={activeTabIndex}
+                    onChange={handleTabChange}
+                    containerStyle={{ overflow: 'hidden' }}>
+                    <TabView.Item style={{ flex: 1 }}>
+                        <SectionList
+                            sections={todoSections}
+                            keyExtractor={keyExtractor || keyExtractorInner}
+                            renderItem={renderItem}
+                            renderSectionHeader={
+                                renderSectionHeader || renderSectionHeaderInner
+                            }
+                            renderSectionFooter={
+                                renderSectionFooter || renderSectionFooterInner
+                            }
+                        />
+                    </TabView.Item>
+                    <TabView.Item style={{ flex: 1 }}>
+                        <SectionList
+                            sections={goodsSections}
+                            keyExtractor={keyExtractor || keyExtractorInner}
+                            renderItem={renderItem}
+                            renderSectionHeader={
+                                renderSectionHeader || renderSectionHeaderInner
+                            }
+                            renderSectionFooter={
+                                renderSectionFooter || renderSectionFooterInner
+                            }
+                        />
+                    </TabView.Item>
+                </TabView>
+            </View>
+            {/* <ScrollView>
+                <SectionList
+                    scrollEnabled={false}
+                    sections={todoSections}
+                    keyExtractor={keyExtractor || keyExtractorInner}
+                    renderItem={renderItem}
+                    renderSectionHeader={
+                        renderSectionHeader || renderSectionHeaderInner
+                    }
+                    renderSectionFooter={
+                        renderSectionFooter || renderSectionFooterInner
+                    }
+                />
+                <SectionList
+                    scrollEnabled={false}
+                    sections={goodsSections}
+                    keyExtractor={keyExtractor || keyExtractorInner}
+                    renderItem={renderItem}
+                    renderSectionHeader={
+                        renderSectionHeader || renderSectionHeaderInner
+                    }
+                    renderSectionFooter={
+                        renderSectionFooter || renderSectionFooterInner
+                    }
+                />
+            </ScrollView> */}
             {children}
         </Screen>
     )

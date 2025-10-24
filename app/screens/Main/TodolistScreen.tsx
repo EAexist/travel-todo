@@ -80,47 +80,6 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
 
         return (
             <Screen>
-                {/* <View
-                    style={{
-                        paddingTop: 16,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                    }}>
-                    <SwitchTab
-                        value={tripStore.settings.doHideCompletedTodo ? 0 : 1}
-                        onChange={e =>
-                            tripStore.setDoHideCompletedTodo(
-                                e === 0 ? true : false,
-                            )
-                        }>
-                        <SwitchTabItem title={`남은 할 일`} />
-                        <SwitchTabItem title={`모든 할 일`} />
-                    </SwitchTab>
-                </View> */}
-                <View
-                    style={{
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        paddingHorizontal: 24,
-                        paddingVertical: 16,
-                    }}>
-                    <Label
-                        title="완료한 할일 숨기기"
-                        style={{
-                            fontSize: 13,
-                        }}
-                        dense
-                        rightContent={
-                            <ListItem.CheckBox
-                                checked={tripStore.settings.doHideCompletedTodo}
-                                onPress={tripStore.toggleDoHideCompletedTodo}
-                                containerStyle={{ width: 'auto', marginTop: 1 }}
-                                checkedColor={colors.contrastText.secondary}
-                                size={20}
-                            />
-                        }
-                    />
-                </View>
                 <TodoList
                     sections={tripStore.todolistSectionListData}
                     renderItem={renderItem}

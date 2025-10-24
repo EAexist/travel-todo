@@ -15,7 +15,7 @@ import {
     TodoPresetItem,
 } from '@/models/Todo'
 import { useNavigate } from '@/navigators'
-import { ListItem } from '@rneui/themed'
+import { Divider, ListItem } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
 import { ReactNode, RefObject, useCallback, useEffect, useRef } from 'react'
 import {
@@ -29,6 +29,8 @@ import {
 import TodolistEditScreenBase, {
     TodolistEditScreenBaseProps,
 } from './TodolistEditScreenBase'
+import { Text } from '@rneui/themed'
+import { typography } from '@/rneui/theme'
 
 interface TodolistAddScreenBaseProps
     extends Pick<TodolistEditScreenBaseProps, 'title' | 'instruction'> {
@@ -119,45 +121,71 @@ export const TodolistAddScreenBase = observer(
 
         const renderSectionHeader = useCallback(
             ({
-                section: { category, title },
+                section: { category, title, data },
             }: {
                 section: DefaultSectionT
             }) => {
                 return (
-                    <View>
-                        <ListSubheader title={title} size="xlarge" />
-                        <TodoBase
-                            avatarProps={{
-                                icon: { name: 'add', type: 'material' },
-                            }}
-                            titleStyle={$titleStyleHighlighted}
-                            {...(category === 'RESERVATION'
-                                ? {
-                                      title: '예약 할 일 추가하기',
-                                      subtitle: '항공권 · 기차표 · 입장권',
-                                      onPress: () => {
-                                          bottomSheetRef.current?.present()
-                                      },
-                                  }
-                                : {
-                                      title:
-                                          category === 'FOREIGN'
-                                              ? '해외여행 할 일 추가하기'
-                                              : '짐 추가하기',
-                                      subtitle: '',
-                                      onPress: () =>
-                                          handleAddCutomTodo(
-                                              category,
-                                              'custom',
-                                          ),
-                                  })}
-                        />
-                    </View>
+                    <>
+                        {category === 'TODO' && (
+                            <>
+                                <TodoBase
+                                    avatarProps={{
+                                        icon: { name: 'add', type: 'material' },
+                                    }}
+                                    titleStyle={$titleStyleHighlighted}
+                                    {...{
+                                        title: '직접 추가하기',
+                                        // subtitle: '항공권 · 기차표 · 입장권',
+                                        onPress: () => {
+                                            bottomSheetRef.current?.present()
+                                        },
+                                    }}
+                                />
+                            </>
+                        )}
+                        {category === 'WASH' && (
+                            <>
+                                <TodoBase
+                                    avatarProps={{
+                                        icon: { name: 'add', type: 'material' },
+                                    }}
+                                    titleStyle={$titleStyleHighlighted}
+                                    {...{
+                                        title: '직접 추가하기',
+                                        subtitle: '',
+                                        onPress: () =>
+                                            handleAddCutomTodo(
+                                                category,
+                                                'custom',
+                                            ),
+                                    }}
+                                />
+                            </>
+                        )}
+                        {data.length > 0 && <ListSubheader title={title} />}
+                    </>
                 )
             },
             [handleAddCutomTodo, bottomSheetRef.current],
         )
+        const renderTabIcon = useCallback((isTodo: boolean) => {
+            const numberOfAddFlag = isTodo
+                ? tripStore.numOfTodoToAdd
+                : tripStore.numOfGoodsToAdd
 
+            return numberOfAddFlag > 0 ? (
+                <Text style={{ ...typography.pretendard.medium }} primary>
+                    {`  ${numberOfAddFlag}`}
+                </Text>
+            ) : null
+        }, [])
+
+        const renderSectionFooter = useCallback(
+            ({ section: { category } }: { section: DefaultSectionT }) =>
+                category === 'FOREIGN' ? <Divider /> : null,
+            [],
+        )
         const keyExtractor = useCallback(
             (item: any) =>
                 item.todo
@@ -166,20 +194,16 @@ export const TodolistAddScreenBase = observer(
             [],
         )
 
-        useEffect(() => {
-            console.log(
-                `tripStore.todolistWithPreset: ${JSON.stringify(tripStore.todolistWithPreset)}`,
-            )
-        }, [tripStore.todolistWithPreset])
-
         return (
             <TodolistEditScreenBase
                 title={title}
                 instruction={instruction}
                 renderItem={renderItem}
                 renderSectionHeader={renderSectionHeader}
-                sections={tripStore.todolistWithPreset}
-                keyExtractor={keyExtractor}>
+                renderSectionFooter={() => null}
+                sections={tripStore.todosWithPreset}
+                keyExtractor={keyExtractor}
+                renderTabIcon={renderTabIcon}>
                 {fab}
                 <ReservationTypeDropDownBottomSheet
                     ref={bottomSheetRef}
