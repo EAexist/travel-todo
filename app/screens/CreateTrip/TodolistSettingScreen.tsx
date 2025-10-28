@@ -42,7 +42,7 @@ export const TodolistSettingScreen: FC<
     })
 
     useEffect(() => {
-        if (tripStore.preset.values.length == 0) {
+        if (tripStore.preset.length == 0) {
             async function fetchPreset() {
                 await fetchPresetWithApiStatus()
             }

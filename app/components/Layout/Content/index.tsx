@@ -1,20 +1,9 @@
+import { Avatar } from '@/components/Avatar'
 import { TransText } from '@/components/TransText'
-import { useTheme } from '@rneui/themed'
+import { IconObject } from '@rneui/base'
+import { ListItem, useTheme } from '@rneui/themed'
 import { FC, PropsWithChildren, ReactNode } from 'react'
 import { StyleSheet, View } from 'react-native'
-import * as Fab from '@/components/Fab'
-import { Note } from '@/components/Note'
-import { Screen } from '@/components/Screen'
-import { useTripStore } from '@/models'
-import { useHeader } from '@/utils/useHeader'
-import { withTodo } from '@/utils/withTodo'
-import { Trans } from '@lingui/react/macro'
-import { ListItem } from '@rneui/themed'
-import { useCallback, useState } from 'react'
-import { ViewStyle } from 'react-native'
-import { Icon } from '@/models/Icon'
-import { Avatar } from '@/components/Avatar'
-import { IconObject } from '@rneui/base'
 
 interface TitleProps {
     children: ReactNode

@@ -3,8 +3,15 @@ import BottomSheetModal from '@/components/BottomSheetModal'
 import ContentTitle from '@/components/Layout/Content'
 import { ListItem } from '@rneui/themed'
 import { FC, RefObject, useCallback } from 'react'
-import { FlatList, ListRenderItem, ViewStyle } from 'react-native'
+import {
+    FlatList,
+    ListRenderItem,
+    SectionList,
+    SectionListData,
+    ViewStyle,
+} from 'react-native'
 import { ListItemBase, ListItemBaseProps } from '../ListItem/ListItem'
+import ListSubheader from '../ListItem/ListSubheader'
 
 export interface CategoryListItemProp {
     title: string
@@ -15,11 +22,12 @@ export interface CategoryListItemProp {
 }
 
 export const CategoryMenuBottomSheet: FC<{
-    data: CategoryListItemProp[]
+    data?: CategoryListItemProp[]
+    sections?: SectionListData<CategoryListItemProp, { title: string }>[]
     setCategory: (category: string) => void
     ref: RefObject<BottomSheetModal | null>
     title?: string
-}> = ({ title = '카테고리 선택', data, setCategory, ref }) => {
+}> = ({ title = '카테고리 선택', data, sections, setCategory, ref }) => {
     const renderCategoryListItem: ListRenderItem<CategoryListItemProp> =
         useCallback(
             ({ item }) => {
@@ -48,14 +56,35 @@ export const CategoryMenuBottomSheet: FC<{
             [ref.current],
         )
 
+    const renderSectionHeader = ({
+        section: { title },
+    }: {
+        section: SectionListData<
+            CategoryListItemProp,
+            {
+                title: string
+            }
+        >
+    }) => <ListSubheader title={title} />
     return (
         <BottomSheetModal ref={ref}>
             <ContentTitle title={title} />
-            <FlatList
-                data={data}
-                renderItem={renderCategoryListItem}
-                keyExtractor={item => item.category}
-            />
+            {data ? (
+                <FlatList
+                    data={data}
+                    renderItem={renderCategoryListItem}
+                    keyExtractor={item => item.category}
+                />
+            ) : (
+                sections && (
+                    <SectionList
+                        sections={sections}
+                        renderItem={renderCategoryListItem}
+                        renderSectionHeader={renderSectionHeader}
+                        keyExtractor={item => item.category}
+                    />
+                )
+            )}
         </BottomSheetModal>
     )
 }

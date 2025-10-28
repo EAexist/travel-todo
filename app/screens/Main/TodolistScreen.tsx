@@ -18,7 +18,7 @@ import { Screen } from '@/components/Screen'
 import { AccomodationTodo, CompleteTodo } from '@/components/Todo'
 import {
     DoShowSupplyTodosFirstToggleSwitch,
-    renderTodolistSectionHeader,
+    TodolistSectionHeader,
     TodolistSectionT,
     TodolistTabView,
 } from '@/components/TodoList'
@@ -62,7 +62,9 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
                                 : tripStore.workTodolistSectionListData
                         }
                         renderItem={renderItem}
-                        renderSectionHeader={renderTodolistSectionHeader}
+                        renderSectionHeader={props => (
+                            <TodolistSectionHeader {...props} />
+                        )}
                         keyExtractor={(todo: Todo) => todo.id}
                         ListEmptyComponent={
                             <ListItemBase title={'할 일이 없어요'} />

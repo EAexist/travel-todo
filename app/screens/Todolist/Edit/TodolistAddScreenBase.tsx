@@ -4,12 +4,10 @@ import BottomSheetModal, {
     useNavigationBottomSheet,
 } from '@/components/BottomSheetModal'
 import ContentTitle from '@/components/Layout/Content'
-import { ListItemBase } from '@/components/ListItem/ListItem'
-import ListSubheader from '@/components/ListItem/ListSubheader'
 import { TodoBase } from '@/components/Todo'
 import {
-    renderTodolistSectionHeader,
     TodolistEditContent,
+    TodolistSectionHeader,
     TodolistSectionT,
 } from '@/components/TodoList'
 import { useTripStore } from '@/models'
@@ -21,15 +19,12 @@ import {
 } from '@/models/Todo'
 import { useNavigate } from '@/navigators'
 import { typography } from '@/rneui/theme'
-import { Divider, Icon, ListItem, Text, useTheme } from '@rneui/themed'
+import { Icon, ListItem, Text, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
-import { string } from 'mobx-state-tree/dist/internal'
 import { FC, ReactNode, RefObject, useCallback, useRef, useState } from 'react'
 import {
-    DefaultSectionT,
     FlatList,
     ListRenderItem,
-    ScrollView,
     SectionList,
     SectionListRenderItem,
     StyleSheet,
@@ -43,6 +38,7 @@ interface TodolistAddScreenBaseProps {
     fab: ReactNode
     tripId: string
     callerName: 'TodolistSetting' | 'TodolistAdd'
+    isInitializingScreen?: boolean
 }
 
 export const useAddFlaggedPreset = () => {
@@ -92,7 +88,10 @@ export const useHandleAddCutomTodo = ({
     }
 }
 
-const AddTodo: FC<{ todo: Todo }> = ({ todo }) => {
+const AddedTodo: FC<{ todo: Todo; useDisabledStyle?: boolean }> = ({
+    todo,
+    useDisabledStyle = false,
+}) => {
     const [isAdded, setIsAdded] = useState(true)
 
     const handlePress = useCallback(() => {
@@ -106,12 +105,15 @@ const AddTodo: FC<{ todo: Todo }> = ({ todo }) => {
             onPress={handlePress}
             title={todo.title}
             icon={todo.icon}
-            // useDisabledStyle
+            useDisabledStyle={useDisabledStyle}
         />
     )
 }
 
-const AddPresetTodo: FC<{ preset: TodoPresetItem }> = observer(({ preset }) => {
+const AddPresetTodo: FC<{
+    preset: TodoPresetItem
+    useDisabledStyle?: boolean
+}> = observer(({ preset, useDisabledStyle = false }) => {
     const handlePress = useCallback(() => {
         preset.toggleAddFlag()
     }, [preset])
@@ -135,7 +137,7 @@ const AddPresetTodo: FC<{ preset: TodoPresetItem }> = observer(({ preset }) => {
                 />
             }
             onPress={handlePress}
-            {...(!preset.isFlaggedToAdd && {
+            {...(useDisabledStyle && {
                 avatarProps: { avatarStyle: styles.disabled },
                 contentStyle: styles.disabled,
             })}
@@ -156,6 +158,7 @@ export const TodolistAddScreenBase = observer(
         fab,
         tripId,
         callerName,
+        isInitializingScreen = false,
     }: TodolistAddScreenBaseProps) => {
         const tripStore = useTripStore()
 
@@ -179,9 +182,14 @@ export const TodolistAddScreenBase = observer(
                         <AddPresetTodo
                             preset={preset}
                             key={preset?.todoContent.id}
+                            useDisabledStyle={isInitializingScreen}
                         />
                     ) : (
-                        <AddTodo todo={todo as Todo} key={todo?.id} />
+                        <AddedTodo
+                            todo={todo as Todo}
+                            key={todo?.id}
+                            useDisabledStyle={!isInitializingScreen}
+                        />
                     )
                 }
             />
@@ -203,7 +211,7 @@ export const TodolistAddScreenBase = observer(
         const renderTabViewItem = useCallback(
             (isSupply: boolean) => {
                 return (
-                    <ScrollView style={{ paddingTop: 16 }}>
+                    <View style={{ paddingTop: 16, flex: 1 }}>
                         {isSupply ? (
                             <TodoBase
                                 avatarProps={{
@@ -218,32 +226,55 @@ export const TodolistAddScreenBase = observer(
                                 }}
                             />
                         ) : (
-                            <TodoBase
-                                avatarProps={{
-                                    icon: { name: 'add', type: 'material' },
-                                }}
-                                titleStyle={$titleStyleHighlighted}
-                                {...{
-                                    title: '직접 추가하기',
-                                    // subtitle: '항공권 · 기차표 · 입장권',
-                                    onPress: () => {
-                                        bottomSheetRef.current?.present()
-                                    },
-                                }}
-                            />
+                            <View>
+                                <TodoBase
+                                    avatarProps={{
+                                        icon: { name: 'add', type: 'material' },
+                                    }}
+                                    titleStyle={$titleStyleHighlighted}
+                                    {...{
+                                        title: '직접 추가하기',
+                                        subtitle: '',
+                                        onPress: () =>
+                                            handleAddCutomTodo(
+                                                'WORK',
+                                                'custom',
+                                            ),
+                                    }}
+                                    rightContent={<ListItem.Chevron />}
+                                />
+                                <TodoBase
+                                    avatarProps={{
+                                        icon: { name: '✈️' },
+                                    }}
+                                    titleStyle={$titleStyleHighlighted}
+                                    {...{
+                                        title: '항공권 예약 할 일 추가하기',
+                                        subtitle: '',
+                                        onPress: () =>
+                                            handleAddCutomTodo(
+                                                'SUPPLY',
+                                                'custom',
+                                            ),
+                                    }}
+                                    rightContent={<ListItem.Chevron />}
+                                />
+                            </View>
                         )}
 
                         <SectionList
                             sections={isSupply ? supplySections : workSections}
                             renderItem={renderItem}
-                            renderSectionHeader={renderTodolistSectionHeader}
+                            renderSectionHeader={props => (
+                                <TodolistSectionHeader {...props} />
+                            )}
                             keyExtractor={({ todo, preset }) =>
                                 todo
                                     ? `todo-${todo.id}`
                                     : `preset-${preset?.todoContent.id}` || ''
                             }
                         />
-                    </ScrollView>
+                    </View>
                 )
             },
             [handleAddCutomTodo, bottomSheetRef.current],
