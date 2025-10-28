@@ -476,10 +476,12 @@ export const TripStoreModel = types
          * Delete a destinations.
          */
         deleteDestination(destination: Destination) {
+            const destinationId = destination.id
             store.destinations.remove(destination)
+
             enqueueAction(APIAction.DELETE_DESTINATION, {
                 tripId: store.id,
-                destinationId: destination.id,
+                destinationId,
             } as DeleteDestinationProps)
 
             //   api.deleteDestination(store.id, destinations.id).then(({kind}) => {

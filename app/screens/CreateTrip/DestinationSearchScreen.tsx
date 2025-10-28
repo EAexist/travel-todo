@@ -166,7 +166,7 @@ const GooglePlacesSearchBar = () => {
                     console.log(error)
                 }}
             />
-            {inputText && (
+            {inputText ? (
                 <View style={{ paddingTop: 24 }}>
                     {!isAlreadyAdded ? (
                         <>
@@ -203,7 +203,7 @@ const GooglePlacesSearchBar = () => {
                         </>
                     )}
                 </View>
-            )}
+            ) : null}
         </View>
     )
 }

@@ -783,17 +783,17 @@ export class Api {
      * Gets a list of recent React Native Radio episodes.
      */
     async getDestinations(tripId: string): Promise<ApiResult<Destination[]>> {
-        // make the api call
         const response: ApiResponse<DestinationDTO[]> = await this.apisauce.get(
             `/trip/${tripId}/destination`,
         )
 
         const handledResponse = _handleResponse<DestinationDTO[]>(response)
-        console.log(JSON.stringify(handledResponse))
         return handledResponse.kind === 'ok'
             ? {
                   ...handledResponse,
-                  data: handledResponse.data.map(d => mapToDestination(d)),
+                  data: handledResponse.data.map(destinationDTO =>
+                      mapToDestination(destinationDTO),
+                  ),
               }
             : handledResponse
     }
