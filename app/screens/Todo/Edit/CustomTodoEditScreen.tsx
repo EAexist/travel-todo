@@ -202,10 +202,10 @@ export const CustomTodoEditScreen: FC<{
                         autoFocus={isBeforeInitialization}
                         onBlur={() => setIsFocused(false)}
                         onFocus={() => setIsFocused(true)}
+                        primary={isFocused}
                         inputContainerStyle={{
                             borderBottomWidth: isFocused ? 2 : 0,
                         }}
-                        primary={isFocused}
                         containerStyle={{
                             paddingLeft: 0,
                         }}
