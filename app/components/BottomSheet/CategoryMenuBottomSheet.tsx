@@ -4,7 +4,7 @@ import ContentTitle from '@/components/Layout/Content'
 import { ListItem } from '@rneui/themed'
 import { FC, RefObject, useCallback } from 'react'
 import { FlatList, ListRenderItem, ViewStyle } from 'react-native'
-import { ListItemBase } from '../ListItem/ListItem'
+import { ListItemBase, ListItemBaseProps } from '../ListItem/ListItem'
 
 export interface CategoryListItemProp {
     title: string
@@ -30,7 +30,6 @@ export const CategoryMenuBottomSheet: FC<{
                 return (
                     <ListItemBase
                         onPress={handlePress}
-                        style={$s}
                         avatarProps={item.avatarProps}
                         title={item.title}
                         subtitle={item.subtitle}

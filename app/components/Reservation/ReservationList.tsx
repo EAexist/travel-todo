@@ -9,7 +9,7 @@ import {
 //
 import { Label } from '@/components/Label'
 import ListSubheader from '@/components/ListItem/ListSubheader'
-import SwitchTab, { SwitchTabItem } from '@/components/SwitchTab'
+import * as SwitchTab from '@/components/SwitchTab'
 import { useTripStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { ListItem, Text, useTheme } from '@rneui/themed'
@@ -78,12 +78,8 @@ export const ReservationList: FC<ReservationListProps> = observer(
 
         return (
             <View>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                    }}>
-                    <SwitchTab
+                <SwitchTab.Container>
+                    <SwitchTab.Tab
                         variant="default"
                         value={
                             tripStore.settings.doSortReservationsByCategory
@@ -91,14 +87,14 @@ export const ReservationList: FC<ReservationListProps> = observer(
                                 : 0
                         }
                         onChange={e =>
-                            tripStore.setDoSortReservationsByCategory(
+                            tripStore.settings.setDoSortReservationsByCategory(
                                 e === 0 ? false : true,
                             )
                         }>
-                        <SwitchTabItem title="날짜순" variant="default" />
-                        <SwitchTabItem title="유형별" variant="default" />
-                    </SwitchTab>
-                </View>
+                        <SwitchTab.TabItem title="날짜순" variant="default" />
+                        <SwitchTab.TabItem title="유형별" variant="default" />
+                    </SwitchTab.Tab>
+                </SwitchTab.Container>
                 <View
                     style={{
                         alignItems: 'flex-end',
@@ -119,7 +115,8 @@ export const ReservationList: FC<ReservationListProps> = observer(
                                         .doHideCompletedReservation
                                 }
                                 onPress={
-                                    tripStore.toggleDoHideCompletedReservation
+                                    tripStore.settings
+                                        .toggleDoHideCompletedReservation
                                 }
                                 containerStyle={{ width: 'auto', marginTop: 1 }}
                                 checkedColor={colors.contrastText.secondary}

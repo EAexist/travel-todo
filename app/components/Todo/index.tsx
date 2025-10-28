@@ -1,21 +1,18 @@
 import { useTripStore } from '@/models'
-import { Todo, TodoPresetItem } from '@/models/Todo'
+import { Todo } from '@/models/Todo'
 import { useNavigate } from '@/navigators'
 import { Trans } from '@lingui/react/macro'
-import { useFocusEffect } from '@react-navigation/native'
-import { Icon, ListItem, ListItemProps, useTheme } from '@rneui/themed'
+import { ListItem, ListItemProps, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { FC, ReactNode, useCallback, useEffect, useState } from 'react'
+import { FC, ReactNode, useCallback, useState } from 'react'
 import {
     GestureResponderEvent,
     StyleProp,
-    StyleSheet,
     TextStyle,
     ViewStyle,
 } from 'react-native'
 import { Avatar, AvatarProps } from '../Avatar'
 import { ListItemCaption } from '../ListItem/ListItemCaption'
-import { useDelayedEdit } from '@/utils/useDelayedEdit'
 
 interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
     title: string
@@ -27,6 +24,11 @@ interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
     avatarProps?: AvatarProps
     titleStyle?: TextStyle
     onPressContent?: () => void
+}
+
+export interface CheckBoxItemProps {
+    isChecked: boolean
+    onPress: () => void
 }
 
 export const TodoBase: FC<TodoBaseProps> = ({
@@ -64,69 +66,6 @@ export type TodoProps = { id: string } & Pick<
     TodoBaseProps,
     'icon' | 'title' | 'subtitle'
 >
-
-export const AddTodo: FC<{ todo: Todo }> = ({ todo }) => {
-    const [isAdded, setIsAdded] = useState(true)
-
-    const handlePress = useCallback(() => {
-        setIsAdded(!isAdded)
-    }, [isAdded, setIsAdded])
-
-    return (
-        <TodoBase
-            // caption={'추가함'}
-            subtitle={
-                todo.type == 'flight' || todo.type == 'flightTicket'
-                    ? todo.flightTitle
-                    : undefined
-            }
-            onPress={handlePress}
-            title={todo.title}
-            icon={todo.icon}
-            // useDisabledStyle
-        />
-    )
-}
-
-export const AddPresetTodo: FC<{ preset: TodoPresetItem }> = observer(
-    ({ preset }) => {
-        const handlePress = useCallback(() => {
-            preset.toggleAddFlag()
-        }, [preset])
-
-        const {
-            theme: { colors },
-        } = useTheme()
-        return (
-            <TodoBase
-                rightContent={
-                    <ListItem.CheckBox
-                        onPress={handlePress}
-                        checked={preset.isFlaggedToAdd}
-                        checkedIcon={<Icon name="check-circle" />}
-                        uncheckedIcon={
-                            <Icon
-                                name="check-circle-outline"
-                                color={colors.grey1}
-                            />
-                        }
-                    />
-                }
-                onPress={handlePress}
-                {...(!preset.isFlaggedToAdd && {
-                    avatarProps: { avatarStyle: styles.disabled },
-                    contentStyle: styles.disabled,
-                })}
-                title={preset.todoContent.title}
-                icon={preset.todoContent.icon}
-            />
-        )
-    },
-)
-
-const styles = StyleSheet.create({
-    disabled: { opacity: 0.5 },
-})
 
 export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
     const { navigateWithTrip } = useNavigate()
@@ -277,60 +216,3 @@ export const ReorderTodo: FC<{ todo: Todo }> = ({ todo }) => {
         />
     )
 }
-
-export const DeleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
-    const setComplete = useCallback(
-        (isCompleted: boolean) => {
-            todo.setProp('isFlaggedToDelete', isCompleted)
-        },
-        [todo],
-    )
-
-    const { displayComplete, setDisplayComplete } = useDelayedEdit({
-        setComplete,
-    })
-    const {
-        theme: { colors },
-    } = useTheme()
-    const handlePress = useCallback(() => {
-        setDisplayComplete(prev => !prev)
-    }, [setDisplayComplete])
-
-    return (
-        <TodoBase
-            subtitle={
-                todo.type == 'flight' || todo.type == 'flightTicket'
-                    ? todo.flightTitle
-                    : todo.note !== ''
-                      ? todo.note
-                      : undefined
-            }
-            rightContent={
-                <ListItem.CheckBox
-                    onPress={handlePress}
-                    checked={displayComplete}
-                    checkedIcon={
-                        <Icon
-                            name="undo"
-                            type="material"
-                            color={colors.text.secondary}
-                        />
-                    }
-                    uncheckedIcon={
-                        <Icon name="do-not-disturb-on" color={colors.error} />
-                    }
-                />
-            }
-            onPress={handlePress}
-            caption={displayComplete ? '삭제함' : undefined}
-            {...(displayComplete && {
-                contentStyle: styles.disabled,
-                avatarProps: {
-                    containerStyle: styles.disabled,
-                },
-            })}
-            title={todo.title}
-            icon={todo.icon}
-        />
-    )
-})

@@ -58,8 +58,8 @@ const preset: { [id: string]: TodoSnapshotIn } = {
     },
     '8': {
         id: '8',
-        type: 'GOODS',
-        category: 'GOODS',
+        type: 'SUPPLY',
+        category: 'SUPPLY',
         title: '세면도구',
         iconId: '🧴',
         note: '',
@@ -67,8 +67,8 @@ const preset: { [id: string]: TodoSnapshotIn } = {
     },
     '9': {
         id: '9',
-        type: 'GOODS',
-        category: 'GOODS',
+        type: 'SUPPLY',
+        category: 'SUPPLY',
         title: '어댑터',
         iconId: '🔌',
         note: '',
@@ -76,8 +76,8 @@ const preset: { [id: string]: TodoSnapshotIn } = {
     },
     '10': {
         id: '10',
-        type: 'GOODS',
-        category: 'GOODS',
+        type: 'SUPPLY',
+        category: 'SUPPLY',
         title: '선글라스',
         iconId: '🕶',
         note: '',
@@ -85,8 +85,8 @@ const preset: { [id: string]: TodoSnapshotIn } = {
     },
     '11': {
         id: '11',
-        type: 'GOODS',
-        category: 'GOODS',
+        type: 'SUPPLY',
+        category: 'SUPPLY',
         title: '캐리어',
         iconId: '🧳',
         note: '',
@@ -94,8 +94,8 @@ const preset: { [id: string]: TodoSnapshotIn } = {
     },
     '12': {
         id: '12',
-        type: 'GOODS',
-        category: 'GOODS',
+        type: 'SUPPLY',
+        category: 'SUPPLY',
         title: '우산',
         iconId: '☂️',
         note: '',
@@ -108,7 +108,7 @@ export const defaultTrip = {
     todolist: {
         reservation: [],
         FOREIGN: [],
-        GOODS: [],
+        SUPPLY: [],
     } as { [cateogry: string]: string[] },
     preset: Object.keys(preset).map(id => ({
         isFlaggedToAdd: true,

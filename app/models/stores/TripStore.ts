@@ -6,9 +6,11 @@ import {
 } from '@/models/Destination'
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
 import {
+    isSupplyCategory,
     Todo,
     TODO_CATEGORY_TO_TITLE,
     TodoCategory,
+    todoCategoryList,
     TodoContent,
     TodoContentModel,
     TodoModel,
@@ -43,6 +45,12 @@ import {
     ReservationModel,
 } from '../Reservation/Reservation'
 import { ReservationStoreModel } from './ReservationStore'
+import { TodolistSectionT } from '@/components/TodoList'
+import {
+    SectionListData,
+    SectionListRenderItem,
+    SectionListRenderItemInfo,
+} from 'react-native'
 
 export const TripSummaryModel = types
     .model('TripSummary')
@@ -73,7 +81,9 @@ export const TripSummaryModel = types
         },
     }))
 
-export const SettingsModel = types
+export interface TripSummary extends Instance<typeof TripSummaryModel> {}
+
+export const TripSettingsModel = types
     .model('Settings')
     .props({
         id: types.optional(types.identifier, () => uuidv4()),
@@ -81,12 +91,38 @@ export const SettingsModel = types
         doSortReservationsByCategory: types.optional(types.boolean, false),
         doHideCompletedTodo: types.optional(types.boolean, true),
         doHideCompletedReservation: types.optional(types.boolean, true),
+        doShowSupplyTodosFirst: types.optional(types.boolean, false),
+        categoryKeyToIndex: types.map(types.number),
     })
     .actions(withSetPropAction)
     .views(store => ({}))
-    .actions(store => ({}))
+    .actions(store => ({
+        setDoSortReservationsByCategory(value: boolean) {
+            store.setProp('doSortReservationsByCategory', value)
+        },
+        setDoShowSupplyTodosFirst(value: boolean) {
+            store.setProp('doShowSupplyTodosFirst', value)
+        },
+        toggleDoHideCompletedReservation() {
+            store.setProp(
+                'doHideCompletedReservation',
+                !store.doHideCompletedReservation,
+            )
+        },
+        toggleDoHideCompletedTodo() {
+            store.setProp('doHideCompletedTodo', !store.doHideCompletedTodo)
+        },
+        toggleDoShowSupplyTodosFirst() {
+            store.setProp(
+                'doShowSupplyTodosFirst',
+                !store.doShowSupplyTodosFirst,
+            )
+        },
+    }))
 
-export interface TripSummary extends Instance<typeof TripSummaryModel> {}
+export interface TripSettings extends Instance<typeof TripSettingsModel> {}
+export interface TripSettingsSnapshot
+    extends SnapshotOut<typeof TripSettingsModel> {}
 
 export const TripStoreModel = types
     .model('TripStore')
@@ -98,39 +134,15 @@ export const TripStoreModel = types
         endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         destinations: types.array(DestinationModel),
         todoMap: types.map(TodoModel),
-        todolist: types.optional(
-            types.map(types.array(types.reference(TodoModel))),
-            {
-                RESERVATION: [],
-                FOREIGN: [],
-                GOODS: [],
-            },
-        ),
         customTodoContent: types.array(TodoContentModel),
         activeItem: types.maybeNull(types.reference(TodoModel)),
         preset: types.map(TodoPresetItemModel),
         reservationStore: types.optional(ReservationStoreModel, {}),
-        settings: types.optional(SettingsModel, () => SettingsModel.create()),
+        settings: types.optional(TripSettingsModel, () =>
+            TripSettingsModel.create(),
+        ),
     })
     .actions(withSetPropAction)
-    .actions(store => ({
-        syncOrderInCategory(category: TodoCategory) {
-            store.todolist
-                .get(category)
-                ?.sort((a, b) => a.orderKey - b.orderKey)
-        },
-        addDestinations(destinations: Destination[]) {
-            store.destinations.clear()
-            store.destinations.push(...destinations)
-        },
-    }))
-    .actions(store => ({
-        syncOrder() {
-            store.todolist.forEach((v, k) => {
-                store.syncOrderInCategory(k.toString() as TodoCategory)
-            })
-        },
-    }))
     .actions(store => ({
         createCustomReservation(category?: ReservationCategory) {
             const reservation = store.reservationStore.addReservation(
@@ -182,7 +194,7 @@ export const TripStoreModel = types
                     title = '새 할 일'
                     icon = { name: '⭐️', type: 'tossface' }
                     break
-                case 'GOODS':
+                case 'SUPPLY':
                     title = '새 짐'
                     icon = { name: '🧳', type: 'tossface' }
                     break
@@ -200,10 +212,6 @@ export const TripStoreModel = types
         },
         addTodo(todo: Todo) {
             store.todoMap.put(todo)
-            if (!store.todolist.has(todo.category)) {
-                store.todolist.set(todo.category, [])
-            }
-            store.todolist.get(todo.category)?.push(todo.id)
             return todo
         },
         set(trip: TripStoreSnapshot) {
@@ -213,33 +221,9 @@ export const TripStoreModel = types
             store.setProp('destinations', trip.destinations)
             store.setProp('startDateIsoString', trip.startDateIsoString)
             store.setProp('endDateIsoString', trip.endDateIsoString)
-            store.setProp(
-                'todoMap',
-                trip.todoMap,
-                // Object.fromEntries(
-                //   trip.todolist.map(item => [item.id, item]),
-                // ),
-            )
-            store.setProp('todolist', {
-                reservation: [],
-                FOREIGN: [],
-                GOODS: [],
-            })
-            //   Object.values(trip.todoMap).forEach(todo => {
-            Object.values(store.todoMap).forEach(todo => {
-                if (!store.todolist.has(todo.category)) {
-                    store.todolist.set(todo.category, [])
-                }
-                store.todolist.get(todo.category)?.push(todo.id)
-            })
-            store.syncOrder()
+            store.setProp('todoMap', trip.todoMap)
             /* Nested Object: UseSetProps */
             store.setProp('preset', trip.preset)
-        },
-        resetAllDeleteFlag() {
-            ;[...store.todoMap.values()].forEach(todo =>
-                todo.setProp('isFlaggedToDelete', false),
-            )
         },
         setTodo(todo: Todo) {
             store.todoMap.set(todo.id, todo)
@@ -253,7 +237,6 @@ export const TripStoreModel = types
             store.setProp('activeItem', undefined)
         },
         _deleteTodo(todo: Todo) {
-            store.todolist.get(todo.category)?.remove(todo)
             store.todoMap.delete(todo.id)
         },
         _deleteDestination(destination: Destination) {
@@ -288,6 +271,10 @@ export const TripStoreModel = types
         },
         addDestination(destination: DestinationSnapshotIn) {
             store.destinations.push(destination)
+        },
+        addDestinations(destinations: Destination[]) {
+            store.destinations.clear()
+            store.destinations.push(...destinations)
         },
     }))
     .actions(store => ({
@@ -436,8 +423,8 @@ export const TripStoreModel = types
                         case 'RESERVATION':
                             title = '새 예약'
                             break
-                        case 'GOODS':
-                            title = '새 짐 챙기기'
+                        case 'SUPPLY':
+                            title = '새 짐 준비'
                             break
                         default:
                             title = '새 할 일'
@@ -474,11 +461,11 @@ export const TripStoreModel = types
         /**
          * Delete a todo.
          */
-        deleteTodo(todo: Todo) {
-            store._deleteTodo(todo)
+        deleteTodo(todoId: string) {
+            store.todoMap.delete(todoId)
             enqueueAction(APIAction.DELETE_TODO, {
                 tripId: store.id,
-                todoId: todo.id,
+                todoId: todoId,
             } as DeleteTodoProps)
             //   await api.deleteTodo(store.id, todo.id).then(({kind}) => {
             //     if (kind == 'ok') {
@@ -582,15 +569,6 @@ export const TripStoreModel = types
             return store.destinations.map(item => item.title)
             // return store.destinations.map((item) => item.title).join(', ')
         },
-        get numOfTodo() {
-            return store.todoMap.size
-            // return store.destinations.map((item) => item.title).join(', ')
-        },
-        get numOfIncompleteTodo() {
-            return [...store.todoMap.values()].filter(item => !item.isCompleted)
-                .length
-            // return store.destinations.map((item) => item.title).join(', ')
-        },
         get passportExpiryRequiredAfterThisDate() {
             const daysPadding = 1
             const passportExpiryRequiredAfterThisDate = this.endDate?.setDate(
@@ -608,49 +586,116 @@ export const TripStoreModel = types
                 ? `${date} ${monthLocale && `${monthLocale}/`}${month} ${year}`
                 : '여행이 끝나는 날'
         },
+        get isActive() {
+            return store.activeItem !== null
+        },
+    }))
+    .views(store => ({
         /*
-         * Todolist
+         * Presets
          */
-        get nonEmptysections() {
-            return Array.from(store.todolist.entries())
-                .filter(([category, data]) => data.length > 0)
-                .map(([category, _]) => ({
-                    category,
-                    title: TODO_CATEGORY_TO_TITLE[category],
-                    data: [category],
-                }))
+        get presets() {
+            return [...store.preset.values()]
         },
-        get sections() {
-            return ['RESERVATION', 'FOREIGN', 'GOODS']
+        get numOfAddFlags() {
+            return this.presets.filter(preset => preset.isFlaggedToAdd).length
         },
-        get sectionedTrip() {
-            return Array.from(store.todolist.entries()).map(
-                ([category, data]) => ({
-                    category,
-                    title: TODO_CATEGORY_TO_TITLE[category],
-                    data,
-                }),
-            )
+        get numOfTodoToAdd() {
+            return this.presets.filter(
+                ({ isFlaggedToAdd, todoContent }) =>
+                    isFlaggedToAdd && todoContent.isTodo,
+            ).length
         },
-        get allTodolistSectionListDataUnsorted() {
-            return [
-                'TODO',
-                'RESERVATION',
-                'FOREIGN',
-                'GOODS',
-                'WASH',
-                'ELECTRONICS',
-                'CLOTHING',
-            ]
+        get numOfGoodsToAdd() {
+            return this.presets.filter(
+                ({ isFlaggedToAdd, todoContent }) =>
+                    isFlaggedToAdd && !todoContent.isTodo,
+            ).length
+        },
+        /*
+         * Todos
+         */
+        get todos() {
+            return [...store.todoMap.values()]
+        },
+        get numOfTodo() {
+            return store.todoMap.size
+            // return store.destinations.map((item) => item.title).join(', ')
+        },
+        get numOfIncompleteTodo() {
+            return this.todos.filter(item => !item.isCompleted).length
+            // return store.destinations.map((item) => item.title).join(', ')
+        },
+        get numbefOfTodoText() {
+            return this.todos.filter(t => !t.isCompleted && t.content.isTodo)
+                .length
+        },
+        get numbefOfGoodsText() {
+            return this.todos.filter(t => !t.isCompleted && !t.content.isTodo)
+                .length
+        },
+        // get nonEmptysections() {
+        //     return Array.from(store.todolist.entries())
+        //         .filter(([category, data]) => data.length > 0)
+        //         .map(([category, _]) => ({
+        //             category,
+        //             title: TODO_CATEGORY_TO_TITLE[category],
+        //             data: [category],
+        //         }))
+        // },
+        // get sections() {
+        //     return ['RESERVATION', 'FOREIGN', 'SUPPLY']
+        // },
+        // get sectionedTrip() {
+        //     return Array.from(store.todolist.entries()).map(
+        //         ([category, data]) => ({
+        //             category,
+        //             title: TODO_CATEGORY_TO_TITLE[category],
+        //             data,
+        //         }),
+        //     )
+        // },
+        get allTodolistSectionListDataUnsorted(): SectionListData<
+            Todo,
+            TodolistSectionT
+        >[] {
+            return todoCategoryList
                 .map(category => ({
                     category: category,
-                    data: [...store.todoMap.values()].filter(
-                        todo => todo.category === category,
-                    ),
+                    data: this.todos
+                        .filter(todo => todo.category === category)
+                        .sort((a, b) => a.orderKey - b.orderKey),
                 }))
-                .sort(({ category: categoryA }, { category: categoryB }) => {
-                    return 1
-                })
+                .filter(({ data }) => data.length > 0)
+                .sort(
+                    (
+                        { category: categoryA, data: dataA },
+                        { category: categoryB, data: dataB },
+                    ) => {
+                        if (
+                            dataA.filter(todo => !todo.isCompleted).length ==
+                                0 &&
+                            dataB.filter(todo => !todo.isCompleted).length > 0
+                        ) {
+                            return 1
+                        } else if (
+                            dataA.filter(todo => !todo.isCompleted).length >
+                                0 &&
+                            dataB.filter(todo => !todo.isCompleted).length == 0
+                        ) {
+                            return -1
+                        } else {
+                            return (
+                                (store.settings.categoryKeyToIndex.get(
+                                    categoryA,
+                                ) || -1) -
+                                (store.settings.categoryKeyToIndex.get(
+                                    categoryB,
+                                ) || -1)
+                            )
+                        }
+                    },
+                )
                 .map(({ category, data }) => {
                     return {
                         category,
@@ -659,32 +704,86 @@ export const TripStoreModel = types
                     }
                 })
         },
-        /*
-         * Add Todo Preset
-         */
-        get numOfTodoToAdd() {
-            return [...store.preset.values()].filter(
-                ({ isFlaggedToAdd, todoContent }) =>
-                    isFlaggedToAdd && todoContent.isTodo,
-            ).length
+        get allTodolistSectionListData() {
+            return this.allTodolistSectionListDataUnsorted.map(
+                ({ data, ...section }) => {
+                    return {
+                        ...section,
+                        data: [...data].sort((todoA, todoB) => {
+                            if (todoA.isCompleted && !todoB.isCompleted) {
+                                return 1
+                            }
+                            if (!todoA.isCompleted && todoB.isCompleted) {
+                                return -1
+                            }
+                            return 0
+                        }),
+                    }
+                },
+            )
         },
-        get numOfGoodsToAdd() {
-            return [...store.preset.values()].filter(
-                ({ isFlaggedToAdd, todoContent }) =>
-                    isFlaggedToAdd && !todoContent.isTodo,
-            ).length
+        get incompleteTodolistSectionListData() {
+            return this.allTodolistSectionListDataUnsorted
+                .map(({ data, ...section }) => ({
+                    ...section,
+                    data: data.filter(todo => !todo.isCompleted),
+                }))
+                .filter(({ data }) => data.length > 0)
+        },
+        // get completedTodolistSectionListData() {
+        //     return store.allTodolistSectionListDataUnsorted.map(
+        //         ({ data, ...section }) => ({
+        //             ...section,
+        //             data: data.filter(todo => todo.isCompleted),
+        //         }),
+        //     )
+        // },
+        get dDay() {
+            const today = new Date()
+            today.setMilliseconds(0)
+            today.setSeconds(0)
+            today.setMinutes(0)
+            today.setHours(0)
+            console.log('today: ', today, store.startDate)
+            const dday = store.startDate
+                ? Math.floor(
+                      (store.startDate.getTime() - today.getTime()) /
+                          (1000 * 60 * 60 * 24),
+                  )
+                : null
+            return dday
+        },
+        get hasAccomodationTodo() {
+            return this.todos.some(item => item.type === 'accomodation')
+        },
+        get accomodationTodoStatusText() {
+            return store.endDate && store.startDate
+                ? `${store.reservationStore.reservedNights}박/${differenceInDays(startOfDay(store.endDate), startOfDay(store?.startDate))}박`
+                : `${store.reservationStore.reservedNights}박 예약 완료`
+        },
+        get workTodoStatusText() {
+            const todos = this.todos.filter(
+                todo => !isSupplyCategory(todo.category),
+            )
+            return `${todos?.filter(todo => todo.isCompleted).length} / ${todos?.length}`
+        },
+        get supplyTodoStatusText() {
+            const todos = this.todos.filter(todo =>
+                isSupplyCategory(todo.category),
+            )
+            return `${todos?.filter(todo => todo.isCompleted).length} / ${todos?.length}`
         },
         get todosWithPreset() {
-            const addedStockIds = [...store.todoMap.values()]
+            const addedStockIds = this.todos
                 ?.filter(item => item.content.isStock)
                 .map(item => item.content.id)
 
             const todos =
-                [...store.todoMap.values()]?.map(item => ({
+                this.todos?.map(item => ({
                     todo: item,
                 })) || []
             const preset =
-                [...store.preset.values()]
+                this.presets
                     ?.filter(
                         preset =>
                             !addedStockIds?.includes(preset.todoContent.id),
@@ -693,15 +792,7 @@ export const TripStoreModel = types
                         preset,
                     })) || []
 
-            return [
-                'TODO',
-                'RESERVATION',
-                'FOREIGN',
-                'WASH',
-                'ELECTRONICS',
-                'CLOTHING',
-                'GOODS',
-            ].map(category => ({
+            return todoCategoryList.map(category => ({
                 category: category,
                 title: TODO_CATEGORY_TO_TITLE[category],
                 data: [
@@ -710,11 +801,8 @@ export const TripStoreModel = types
                         ({ preset }) =>
                             preset.todoContent.category === category,
                     ),
-                ],
+                ] as { todo?: Todo; preset?: TodoPresetItem }[],
             }))
-        },
-        get isActive() {
-            return store.activeItem !== null
         },
         /*
          * Reservation
@@ -731,86 +819,6 @@ export const TripStoreModel = types
                 }))
             }
             return data.filter(({ title, data }) => data.length > 0)
-        },
-    }))
-    .views(store => ({
-        get numbefOfTodoText() {
-            return [...store.todoMap.values()].filter(
-                t => !t.isCompleted && t.content.isTodo,
-            ).length
-        },
-        get numbefOfGoodsText() {
-            return [...store.todoMap.values()].filter(
-                t => !t.isCompleted && !t.content.isTodo,
-            ).length
-        },
-        get allTodolistSectionListData() {
-            return store.allTodolistSectionListDataUnsorted.map(
-                ({ data, ...section }) => {
-                    return {
-                        ...section,
-                        data: data.sort((todoA, todoB) => {
-                            if (todoA.isCompleted && !todoB.isCompleted) {
-                                return 1
-                            }
-                            if (!todoA.isCompleted && todoB.isCompleted) {
-                                return -1
-                            }
-                            return 0
-                        }),
-                    }
-                },
-            )
-        },
-        get incompleteTodolistSectionListData() {
-            return store.allTodolistSectionListDataUnsorted.map(
-                ({ data, ...section }) => ({
-                    ...section,
-                    data: data.filter(todo => !todo.isCompleted),
-                }),
-            )
-        },
-        get completedTodolistSectionListData() {
-            return store.allTodolistSectionListDataUnsorted.map(
-                ({ data, ...section }) => ({
-                    ...section,
-                    data: data.filter(todo => todo.isCompleted),
-                }),
-            )
-        },
-        get dDay() {
-            const today = new Date()
-            today.setMilliseconds(0)
-            today.setSeconds(0)
-            today.setMinutes(0)
-            today.setHours(0)
-            console.log('today: ', today, store.startDate)
-            const dday = store.startDate
-                ? Math.floor(
-                      (store.startDate.getTime() - today.getTime()) /
-                          (1000 * 60 * 60 * 24),
-                  )
-                : null
-            return dday
-        },
-        get reservationTodoStatusText() {
-            const todos = store.todolist
-                .get('RESERVATION')
-                ?.filter(todo => todo.type !== 'accomodation')
-            return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
-        },
-        get accomodationTodoStatusText() {
-            return store.endDate && store.startDate
-                ? `${store.reservationStore.reservedNights}박/${differenceInDays(startOfDay(store.endDate), startOfDay(store?.startDate))}박`
-                : `${store.reservationStore.reservedNights}박 예약 완료`
-        },
-        get foreignTodoStatusText() {
-            const todos = store.todolist.get('FOREIGN')
-            return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
-        },
-        get goodsTodoStatusText() {
-            const todos = store.todolist.get('GOODS')
-            return `${todos?.filter(todo => todo.isCompleted).length}/${todos?.length}`
         },
     }))
     .views(store => ({
@@ -836,6 +844,26 @@ export const TripStoreModel = types
         },
     }))
     .views(store => ({
+        get incompleteWorkTodolistSectionListData() {
+            return store.incompleteTodolistSectionListData.filter(
+                ({ category }) => !isSupplyCategory(category),
+            )
+        },
+        get incompleteSupplyTodolistSectionListData() {
+            return store.incompleteTodolistSectionListData.filter(
+                ({ category }) => isSupplyCategory(category),
+            )
+        },
+        get workTodolistSectionListData() {
+            return store.todolistSectionListData.filter(
+                ({ category }) => !isSupplyCategory(category),
+            )
+        },
+        get supplyTodolistSectionListData() {
+            return store.todolistSectionListData.filter(({ category }) =>
+                isSupplyCategory(category),
+            )
+        },
         /*
          * Delete Todo
          */
@@ -844,40 +872,16 @@ export const TripStoreModel = types
         },
     }))
     .actions(store => ({
+        reorderTodoCategories(keyToIndex: Record<string, number>) {
+            store.settings.setProp('categoryKeyToIndex', keyToIndex)
+            store.patch({
+                settings: getSnapshot(store.settings),
+            })
+        },
         toggleIsTripMode() {
             store.settings.setProp('isTripMode', !store.settings.isTripMode)
             store.patch({
-                settings: store.settings,
-            })
-        },
-        setDoSortReservationsByCategory(value: boolean) {
-            store.settings.setProp('doSortReservationsByCategory', value)
-            store.patch({
-                settings: store.settings,
-            })
-        },
-        // setDoHideCompletedTodo(value: boolean) {
-        //     store.settings.setProp('doHideCompletedTodo', value)
-        //     store.patch({
-        //         settings: store.settings,
-        //     })
-        // },
-        toggleDoHideCompletedReservation() {
-            store.settings.setProp(
-                'doHideCompletedReservation',
-                !store.settings.doHideCompletedReservation,
-            )
-            store.patch({
-                settings: store.settings,
-            })
-        },
-        toggleDoHideCompletedTodo() {
-            store.settings.setProp(
-                'doHideCompletedTodo',
-                !store.settings.doHideCompletedTodo,
-            )
-            store.patch({
-                settings: store.settings,
+                settings: getSnapshot(store.settings),
             })
         },
     }))
@@ -904,10 +908,10 @@ export const TripStoreModel = types
                 }
             }
         },
-        deleteTodos() {
-            Array.from(store.todoMap.values())
-                .filter(item => item.isFlaggedToDelete)
-                .forEach(item => store.deleteTodo(item))
+        resetAddFlags() {
+            store.presets.forEach(preset => {
+                preset.setProp('isFlaggedToAdd', false)
+            })
         },
         addFlaggedPreset() {
             ;(Array.from(store.preset.values()).flat() as TodoPresetItem[])
@@ -925,32 +929,14 @@ export const TripStoreModel = types
                         todoDTO: mapToTodoPatchDTO(todo),
                     })
                     preset.setProp('isFlaggedToAdd', false)
-
-                    // const response = await api.createTodo({
-                    //   tripId: store.id,
-                    //   todo: {
-                    //     ...preset.content,
-                    //     id: undefined,
-                    //     presetId: Number(preset.content.id),
-                    //   },
-                    // })
-                    // if (response.kind === 'ok') {
-                    //   const todo = response.data
-                    //   store.addTodo(todo)
-                    // }
-                    // preset.setProp('isFlaggedToAdd', false)
                 })
-            store.syncOrder()
         },
-        async reorder(category: string, keyToIndex: Record<string, number>) {
-            await Promise.all(
-                Object.entries(keyToIndex).map(([todoId, index]) => {
-                    const todo = store.todoMap.get(todoId) as Todo
-                    todo.setProp('orderKey', index)
-                    todo.patch()
-                }),
-            )
-            store.syncOrder()
+        reorderTodos(keyToIndex: Record<string, number>) {
+            Object.entries(keyToIndex).forEach(([todoId, index]) => {
+                const todo = store.todoMap.get(todoId) as Todo
+                todo.setProp('orderKey', index)
+                todo.patch()
+            })
         },
         // setPreset() {
         //   store.setProp('_presets', [])

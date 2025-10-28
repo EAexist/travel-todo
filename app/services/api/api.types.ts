@@ -17,6 +17,8 @@ import {
 } from '@/models/Todo'
 import { ReservationStoreModel } from '@/models/stores/ReservationStore'
 import {
+    TripSettings,
+    TripSettingsSnapshot,
     TripStore,
     TripStoreModel,
     TripStoreSnapshot,
@@ -72,10 +74,15 @@ export interface TripPatchDTO
     extends Partial<
         Omit<
             TripStoreSnapshot,
-            'todoMap' | 'todolist' | 'destinations' | 'reservationStore'
+            | 'todoMap'
+            | 'todolist'
+            | 'destinations'
+            | 'reservationStore'
+            | 'settings'
         >
     > {
     id: string
+    settings?: Partial<TripSettingsSnapshot>
 }
 
 export interface TodoDTO
@@ -261,7 +268,12 @@ export const mapToTripPatchDTO: (
     title: trip.title,
     startDateIsoString: trip.startDateIsoString,
     endDateIsoString: trip.endDateIsoString,
-    settings: trip.settings,
+    settings: trip.settings
+        ? {
+              isTripMode: trip.settings.isTripMode,
+              categoryKeyToIndex: trip.settings.categoryKeyToIndex,
+          }
+        : undefined,
 })
 
 export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = ({

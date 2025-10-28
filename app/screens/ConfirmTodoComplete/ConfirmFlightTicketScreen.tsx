@@ -56,7 +56,7 @@ export const ConfirmFlightTicketScreen = withTodo<'ConfirmFlightTicket'>(
                             name: 'Main',
                             params: { screen: 'Todolist' },
                         }}
-                        title={'올리지 않고 할일 완료하기'}
+                        title={'올리지 않고 할 일 완료하기'}
                         color={'secondary'}
                         promiseBeforeNavigate={confirmCompleteTodo}
                     />

@@ -27,6 +27,8 @@ import { MainTabScreenProps, useNavigate } from '@/navigators'
 import { useMainScreenHeader } from '@/utils/useHeader'
 import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
+import { ListItemCaption } from '@/components/ListItem/ListItemCaption'
+import { typography } from '@/rneui/theme'
 
 export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
     observer(({}) => {
@@ -87,57 +89,64 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
 
         const { navigateWithTrip } = useNavigate()
 
-        const handleViewTodolist = useCallback(() => {
-            navigateWithTrip('Main', { screen: 'Todolist' })
-        }, [])
-
         const handleViewAccomodationPlan = useCallback(() => {
             navigateWithTrip('AccomodationPlan')
         }, [])
 
-        const todoStatusGridData = [
+        const handleViewWorkTodolist = useCallback(() => {
+            tripStore.settings.setDoShowSupplyTodosFirst(false)
+            navigateWithTrip('Main', { screen: 'Todolist' })
+        }, [])
+
+        const handleViewSupplyTodolist = useCallback(() => {
+            tripStore.settings.setDoShowSupplyTodosFirst(true)
+            navigateWithTrip('Main', { screen: 'Todolist' })
+        }, [])
+
+        const todoStatusData = [
+            ...(tripStore.hasAccomodationTodo
+                ? [
+                      {
+                          title: '숙박 예약',
+                          icon: { name: '🛌' },
+                          content: tripStore.accomodationTodoStatusText,
+                          onPress: handleViewAccomodationPlan,
+                      },
+                  ]
+                : []),
             {
-                id: '0',
-                category: '숙박 예약',
-                icon: { name: '🛌' },
-                title: tripStore.accomodationTodoStatusText,
-                onPress: handleViewAccomodationPlan,
+                title: '할 일',
+                icon: { name: '🎯' },
+                content: tripStore.workTodoStatusText,
+                onPress: handleViewWorkTodolist,
             },
             {
-                id: '1',
-                category: '해외여행 준비',
-                icon: { name: '🌐' },
-                title: tripStore.foreignTodoStatusText,
-                onPress: handleViewTodolist,
-            },
-            {
-                id: '2',
-                category: '예약 준비',
-                icon: { name: '🎫' },
-                title: tripStore.reservationTodoStatusText,
-                onPress: handleViewTodolist,
-            },
-            {
-                id: '3',
-                category: '짐 챙기기',
-                icon: { name: '💼' },
-                title: tripStore.goodsTodoStatusText,
-                onPress: handleViewTodolist,
+                title: '준비할 짐',
+                icon: { name: '🧳' },
+                content: tripStore.supplyTodoStatusText,
+                onPress: handleViewSupplyTodolist,
             },
         ]
 
         const renderTodoStatusGridItem: ListRenderItem<
-            (typeof todoStatusGridData)[0]
+            (typeof todoStatusData)[0]
         > = ({ item }) => (
             <ListItem
-                style={$gridItemStyle}
-                containerStyle={$gridListItemContainerStyle}
+                // style={$gridItemStyle}
+                // containerStyle={$gridListItemContainerStyle}
                 onPress={item.onPress}>
                 <Avatar icon={item.icon} />
                 <ListItem.Content>
-                    <ListItem.Title>{item.title}</ListItem.Title>
-                    <ListItem.Subtitle>{item.category}</ListItem.Subtitle>
+                    {/* <ListItemCaption>{item.category}</ListItemCaption> */}
+                    <ListItem.Title
+                        style={{
+                            fontSize: 16,
+                            ...typography.pretendard.light,
+                        }}>
+                        {item.title}
+                    </ListItem.Title>
                 </ListItem.Content>
+                <ListItem.Title>{item.content}</ListItem.Title>
             </ListItem>
         )
 
@@ -246,17 +255,11 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                         </View> */}
                     </SectionCard>
                     <SectionCard>
-                        <ListSubheader title="완료한 할 일" dense />
+                        <ListSubheader title="할 일 진행" dense />
                         <FlatList
-                            data={todoStatusGridData}
+                            data={todoStatusData}
                             renderItem={renderTodoStatusGridItem}
-                            keyExtractor={item => item.id}
-                            numColumns={2}
-                            contentContainerStyle={{
-                                width: '100%',
-                                paddingHorizontal: 20,
-                            }}
-                            columnWrapperStyle={{}}
+                            keyExtractor={item => item.title}
                         />
                     </SectionCard>
                     {/* <SectionCard containerStyle={{ marginBottom: 15 }}>

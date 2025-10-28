@@ -156,7 +156,7 @@ export const CustomTodoEditScreen: FC<{
             case 'FOREIGN':
                 icon = { name: '🌐' }
                 break
-            case 'GOODS':
+            case 'SUPPLY':
                 icon = { name: '💼' }
                 break
             default:

@@ -26,7 +26,7 @@ export const ScheduleText: FC<{ startDate?: Date; endDate?: Date }> = ({
             <TransText style={$scheduleTextStyle} disabled={!startDate}>
                 {toLocaleDateMonthString(startDate) || '떠나는 날'}
             </TransText>
-            <Text style={{ ...$scheduleTextStyle, opacity: 0.5 }}>{' - '}</Text>
+            <Text style={{ ...$scheduleTextStyle, opacity: 0.4 }}>{' - '}</Text>
             <TransText style={$scheduleTextStyle} disabled={!endDate}>
                 {toLocaleDateMonthString(endDate) || '돌아오는 날'}
             </TransText>

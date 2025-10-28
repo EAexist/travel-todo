@@ -156,6 +156,20 @@ export async function setupRootStore(rootStore: RootStore) {
     })
     autorun(() => {
         console.log(
+            '[Preset changed:]',
+            rootStore?.userStore
+                ? JSON.stringify(
+                      rootStore.userStore.activeTrip?.preset && {
+                          ...getSnapshot(
+                              rootStore.userStore.activeTrip?.preset,
+                          ),
+                      },
+                  )
+                : '',
+        )
+    })
+    autorun(() => {
+        console.log(
             '[ReservationStore changed:]',
             rootStore?.userStore?.activeTrip
                 ? JSON.stringify(

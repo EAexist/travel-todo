@@ -194,7 +194,7 @@ const RoundTripSettingScreen = withTodo<'RoundTripSetting'>(
         return (
             <Screen>
                 <ContentTitle
-                    title={'돌아오는 항공권 예매도\n할일로 추가할까요?'}
+                    title={'돌아오는 항공권 예매도\n할 일로 추가할까요?'}
                 />
                 <View style={{ paddingVertical: 8 }}>
                     <ListSubheader title={'내 할 일'} />
