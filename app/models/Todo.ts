@@ -18,19 +18,28 @@ export type TodoCategory =
     | 'TODO'
     | 'RESERVATION'
     | 'FOREIGN'
-    | 'GOODS'
+    | 'SUPPLY'
     | 'WASH'
     | 'ELECTRONICS'
     | 'CLOTHING'
+export const todoCategoryList: TodoCategory[] = [
+    'TODO',
+    'RESERVATION',
+    'FOREIGN',
+    'SUPPLY',
+    'WASH',
+    'ELECTRONICS',
+    'CLOTHING',
+]
 
 export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
     TODO: '기타',
     RESERVATION: '예약',
     FOREIGN: '해외',
+    SUPPLY: '기타',
     WASH: '세면도구',
     ELECTRONICS: '전자기기',
     CLOTHING: '옷',
-    GOODS: '기타',
 }
 
 export interface Location {
@@ -97,8 +106,11 @@ export const FlightModel = types.model('Flight').props({
     arrival: AirportModel,
 })
 
-export const isCategoryTodo = (category: TodoCategory) =>
-    category === 'TODO' || category === 'RESERVATION' || category === 'FOREIGN'
+export const isSupplyCategory = (category: TodoCategory) =>
+    category === 'SUPPLY' ||
+    category === 'WASH' ||
+    category === 'ELECTRONICS' ||
+    category === 'CLOTHING'
 
 /**
  * PresetTodo
@@ -116,7 +128,7 @@ export const TodoContentModel = types
     .actions(withSetPropAction)
     .views(item => ({
         get isTodo() {
-            return isCategoryTodo(item.category)
+            return isSupplyCategory(item.category)
         },
     }))
 
@@ -200,6 +212,9 @@ export const TodoModel = types
             //   return item.presetTodoContent !== null
             //     ? item.presetTodoContent.icon
             //     : item.customTodoContent?.icon
+        },
+        get subtitle() {
+            return item.note
         },
     }))
     .views(item => ({

@@ -1,37 +1,101 @@
 import { Screen } from '@/components'
+import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import SwitchTab, { SwitchTabItem } from '@/components/SwitchTab'
-import { DeleteTodo } from '@/components/Todo'
-import { TodoList } from '@/components/TodoList'
+import { CheckBoxItemProps, TodoBase } from '@/components/Todo'
+import {
+    renderTodolistSectionHeader,
+    TodolistEditContent,
+    TodolistSectionT,
+} from '@/components/TodoList'
 import { useTripStore } from '@/models'
-import { Todo } from '@/models/Todo'
-import { goBack } from '@/navigators'
+import { isSupplyCategory, Todo } from '@/models/Todo'
+import { useCheckedList } from '@/utils/useCheckedList'
 import { useHeader } from '@/utils/useHeader'
+import { ListItem, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
-import { useCallback, useState } from 'react'
-import { View } from 'react-native'
+import { FC, useCallback } from 'react'
+import { SectionList, SectionListRenderItem, StyleSheet } from 'react-native'
+
+const DeleteTodo: FC<CheckBoxItemProps & { todo: Todo }> = observer(
+    ({ todo, isChecked, onPress }) => {
+        const {
+            theme: { colors },
+        } = useTheme()
+
+        return (
+            <TodoBase
+                subtitle={todo.subtitle}
+                rightContent={
+                    <ListItem.CheckBox
+                        onPress={onPress}
+                        checked={isChecked}
+                        checkedColor={colors.contrastText.secondary}
+                    />
+                }
+                onPress={onPress}
+                caption={todo.isCompleted ? '완료함' : undefined}
+                {...(todo.isCompleted && {
+                    contentStyle: styles.disabled,
+                    avatarProps: {
+                        containerStyle: styles.disabled,
+                    },
+                })}
+                title={todo.title}
+                icon={todo.icon}
+            />
+        )
+    },
+)
 
 export const TodolistDeleteScreen = observer(() => {
     const tripStore = useTripStore()
 
-    const handleCompletePress = useCallback(() => {
-        tripStore.deleteTodos()
-        goBack()
-    }, [tripStore])
+    const {
+        checkedlist: deleteList,
+        handlePress,
+        numOfCheckedItem: numOfDeleteFlags,
+    } = useCheckedList([...tripStore.todoMap.keys()])
 
-    const renderItem = (todo: Todo) => (
-        <Observer render={() => <DeleteTodo todo={todo} key={todo?.id} />} />
+    const handleCompletePress = useCallback(async () => {
+        Object.entries(deleteList)
+            .filter(([_, isChecked]) => isChecked)
+            .forEach(([id, _]) => {
+                console.log('DELETE' + id)
+                tripStore.deleteTodo(id)
+            })
+    }, [deleteList])
+
+    const renderItem: SectionListRenderItem<Todo, TodolistSectionT> = ({
+        item: todo,
+    }) => (
+        <Observer
+            render={() => (
+                <DeleteTodo
+                    todo={todo}
+                    key={todo?.id}
+                    isChecked={deleteList[todo.id]}
+                    onPress={() => handlePress(todo.id)}
+                />
+            )}
+        />
     )
-
-    useHeader({
-        rightActionTitle: '완료',
-        onRightPress: handleCompletePress,
-        onBackPressBeforeNavigate: async () => {
-            tripStore.resetAllDeleteFlag()
+    const renderTabViewItem = useCallback(
+        (isSupply: boolean) => {
+            return (
+                <SectionList
+                    sections={
+                        isSupply
+                            ? tripStore.supplyTodolistSectionListData
+                            : tripStore.workTodolistSectionListData
+                    }
+                    renderItem={renderItem}
+                    renderSectionHeader={renderTodolistSectionHeader}
+                    keyExtractor={(todo: Todo) => todo.id}
+                />
+            )
         },
-    })
-
-    // const [showIncompleteTodolist, setShowIncompleteTodolist] = useState(true)
+        [deleteList],
+    )
 
     return (
         <Screen>
@@ -39,29 +103,22 @@ export const TodolistDeleteScreen = observer(() => {
                 title={'할 일 삭제하기'}
                 subtitle={'관리하지 않아도 되늗 할 일을 지울 수 있어요'}
             />
-            {/* <View
-                style={{
-                    paddingTop: 16,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                }}>
-                <SwitchTab
-                    value={showIncompleteTodolist ? 0 : 1}
-                    onChange={e =>
-                        setShowIncompleteTodolist(e === 0 ? true : false)
-                    }>
-                    <SwitchTabItem title={`남은 할 일`} />
-                    <SwitchTabItem title={`완료한 할 일`} />
-                </SwitchTab>
-            </View> */}
-            <TodoList
-                sections={tripStore// showIncompleteTodolist
-                // ? tripStore.incompleteTodolistSectionListData
-                // : tripStore.completedTodolistSectionListData
-                .todolistSectionListData
-                    .filter(section => section.data.length > 0)}
-                renderItem={renderItem}
-            />
+            <TodolistEditContent renderTabViewItem={renderTabViewItem} />
+            <Fab.Container>
+                <Fab.GoBackButton
+                    title={
+                        numOfDeleteFlags > 0
+                            ? `${numOfDeleteFlags}개 할 일 삭제`
+                            : '확인'
+                    }
+                    promiseBeforeNavigate={handleCompletePress}
+                    disabled={numOfDeleteFlags <= 0}
+                />
+            </Fab.Container>
         </Screen>
     )
+})
+
+const styles = StyleSheet.create({
+    disabled: { opacity: 0.4 },
 })

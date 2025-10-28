@@ -241,6 +241,7 @@ const theme = createTheme({
                 color,
                 active,
                 titleStyle,
+                iconRight,
             },
             { colors },
         ) => ({
@@ -274,20 +275,21 @@ const theme = createTheme({
                 flexGrow: 0,
                 flexBasis: 'auto',
             },
-            iconContainerStyle: (active: boolean) => ({
-                aspectRatio: 1,
-                marginHorizontal: 0,
-                justifyContent: 'center',
-                ...(icon ? { width: 32, height: 32 } : {}),
-            }),
-            icon: {
-                // ...(icon as Partial<IconProps>),
-                color: active ? colors.primary : colors.contrastText.secondary,
-                size: active ? 28 : 24,
-            },
+            // iconContainerStyle: (active: boolean) => ({
+            //     aspectRatio: 1,
+            //     marginHorizontal: 0,
+            //     justifyContent: 'center',
+            //     ...(icon ? { width: 32, height: 32 } : {}),
+            // }),
+            // icon: {
+            //     // ...(icon as Partial<IconProps>),
+            //     color: active ? colors.primary : colors.contrastText.secondary,
+            //     size: active ? 28 : 24,
+            // },
             buttonStyle: (active: boolean) => ({
                 // backgroundColor: active ? colors.white : 'transparent',
-                flexDirection: 'row',
+                minWidth: 84,
+                flexDirection: iconRight ? 'row-reverse' : 'row',
                 backgroundColor: active
                     ? variant === 'primary'
                         ? colors.white
@@ -309,7 +311,7 @@ const theme = createTheme({
             }),
             titleStyle: (active: boolean) => ({
                 letterSpacing: 0.5,
-                minWidth: 84,
+                paddingHorizontal: 8,
                 paddingVertical: 8,
                 color: active
                     ? color === 'primary'
@@ -332,6 +334,12 @@ const theme = createTheme({
                       }),
                 // ...(titleStyle as TextStyle),
             }),
+            // variant,
+            // size,
+            // icon,
+            // color,
+            // active,
+            // iconRight,
         }),
         StyledSwitch: (
             { variant = 'default', size = 'md', ...props },
@@ -535,7 +543,7 @@ const theme = createTheme({
                 letterSpacing: 0.15,
                 // textDecoration: 'none',
                 textTransform: 'none',
-                ...(props.disabled ? { opacity: 0.5 } : {}),
+                ...(props.disabled ? { opacity: 0.4 } : {}),
             },
             h2Style: {
                 ...typography.pretendard.bold,
@@ -692,7 +700,7 @@ const theme = createTheme({
                       color: colors.text.primary,
                       width: width,
                       style: {
-                          opacity: 0.5,
+                          opacity: 0.4,
                           marginVertical: 8,
                           marginHorizontal: 16,
                       },
@@ -779,7 +787,7 @@ const theme = createTheme({
         }),
         ListItem: (props, { colors }) => ({
             style: {
-                ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
+                ...(props.useDisabledStyle ? { opacity: 0.4 } : {}),
             },
             containerStyle: {
                 height: props.dense === false ? 64 : 52,
@@ -830,7 +838,7 @@ const theme = createTheme({
             size: 28,
             color: primary ? colors.primary : colors.text.secondary,
         }),
-        ListItemCheckBox: (_, { colors }) => ({
+        ListItemCheckBox: (props, { colors }) => ({
             containerStyle: {
                 width: 32,
                 alignItems: 'center',
@@ -839,6 +847,7 @@ const theme = createTheme({
             iconType: 'material',
             checkedIcon: 'check-circle',
             uncheckedIcon: 'radio-button-unchecked',
+            // ...props,
         }),
         Tab: ({ indicatorStyle }, { colors }) => ({
             style: {

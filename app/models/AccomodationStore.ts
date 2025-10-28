@@ -125,7 +125,7 @@ export const AccomodationStoreModel = types
         //     [
         //       { category: 'reservation', title: '예약' },
         //       { category: 'FOREIGN', title: '해외여행' },
-        //     ] as { category: 'reservation' | 'FOREIGN' | 'GOODS'; title: string }[]
+        //     ] as { category: 'reservation' | 'FOREIGN' | 'SUPPLY'; title: string }[]
         //   ).map(({ category, title }) => ({
         //     category,
         //     title,

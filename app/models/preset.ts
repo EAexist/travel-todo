@@ -51,31 +51,31 @@ const presetList: TodoSnapshotIn[] = [
         id: '8',
         title: '세면도구',
         iconId: '🧴',
-        type: 'GOODS',
+        type: 'SUPPLY',
     },
     {
         id: '9',
         title: '어댑터',
         iconId: '🔌',
-        type: 'GOODS',
+        type: 'SUPPLY',
     },
     {
         id: '10',
         title: '선글라스',
         iconId: '🕶',
-        type: 'GOODS',
+        type: 'SUPPLY',
     },
     {
         id: '11',
         title: '캐리어',
         iconId: '🧳',
-        type: 'GOODS',
+        type: 'SUPPLY',
     },
     {
         id: '12',
         title: '우산',
         iconId: '☂️',
-        type: 'GOODS',
+        type: 'SUPPLY',
     },
 ]
 export const CHECKLISTITEM_PRESET = Object.fromEntries(

@@ -182,39 +182,39 @@
             "type_id": "military-approvement"
         },
         {
-            "category": "GOODS",
+            "category": "SUPPLY",
             "id": "8",
             "title": "세면도구",
             "iconId": "🧴",
-            "type_id": "GOODS"
+            "type_id": "SUPPLY"
         },
         {
-            "category": "GOODS",
+            "category": "SUPPLY",
             "id": "9",
             "title": "어댑터",
             "iconId": "🔌",
-            "type_id": "GOODS"
+            "type_id": "SUPPLY"
         },
         {
-            "category": "GOODS",
+            "category": "SUPPLY",
             "id": "10",
             "title": "선글라스",
             "iconId": "🕶",
-            "type_id": "GOODS"
+            "type_id": "SUPPLY"
         },
         {
-            "category": "GOODS",
+            "category": "SUPPLY",
             "id": "11",
             "title": "캐리어",
             "iconId": "🧳",
-            "type_id": "GOODS"
+            "type_id": "SUPPLY"
         },
         {
-            "category": "GOODS",
+            "category": "SUPPLY",
             "id": "12",
             "title": "우산",
             "iconId": "☂️",
-            "type_id": "GOODS"
+            "type_id": "SUPPLY"
         }
     ],
     "todo": [
@@ -289,8 +289,8 @@
             "orderKey": "8",
             "preset_id": "8",
             "trip_id": "1",
-            "type": "GOODS",
-            "category": "GOODS",
+            "type": "SUPPLY",
+            "category": "SUPPLY",
             "title": "세면도구",
             "iconId": "🧴",
             "note": ""
@@ -300,8 +300,8 @@
             "orderKey": "9",
             "preset_id": "9",
             "trip_id": "1",
-            "type": "GOODS",
-            "category": "GOODS",
+            "type": "SUPPLY",
+            "category": "SUPPLY",
             "title": "어댑터",
             "iconId": "🔌",
             "note": ""
@@ -311,8 +311,8 @@
             "orderKey": "10",
             "preset_id": "10",
             "trip_id": "1",
-            "type": "GOODS",
-            "category": "GOODS",
+            "type": "SUPPLY",
+            "category": "SUPPLY",
             "title": "선글라스",
             "iconId": "🕶",
             "note": ""
@@ -322,8 +322,8 @@
             "orderKey": "11",
             "preset_id": "11",
             "trip_id": "1",
-            "type": "GOODS",
-            "category": "GOODS",
+            "type": "SUPPLY",
+            "category": "SUPPLY",
             "title": "캐리어",
             "iconId": "🧳",
             "note": ""
@@ -333,8 +333,8 @@
             "orderKey": "12",
             "preset_id": "12",
             "trip_id": "1",
-            "type": "GOODS",
-            "category": "GOODS",
+            "type": "SUPPLY",
+            "category": "SUPPLY",
             "title": "우산",
             "iconId": "☂️",
             "note": ""

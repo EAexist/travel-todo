@@ -5,10 +5,11 @@ import { ListItemBase } from '@/components/ListItem/ListItem'
 import { useReservationStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { AuthenticatedStackScreenProps } from '@/navigators'
+import { useCheckedList } from '@/utils/useCheckedList'
 import { useHeader } from '@/utils/useHeader'
 import { ListItem } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback } from 'react'
 import { ScrollView } from 'react-native'
 import { ReservationList } from '../../components/Reservation/ReservationList'
 
@@ -28,7 +29,11 @@ const ReservationDeleteItem: FC<ReservationDeleteItemProps> = ({
             title={reservation.title}
             onPress={onPress}
             rightContent={
-                <ListItem.CheckBox checked={isChecked} onPress={onPress} />
+                <ListItem.CheckBox
+                    checked={isChecked}
+                    onPress={onPress}
+                    checkedColor={'red'}
+                />
             }
         />
     )
@@ -39,15 +44,12 @@ export const ReservationDeleteScreen: FC<
 > = observer(() => {
     const reservationStore = useReservationStore()
 
-    const [deleteList, setDeleteList] = useState<{ [key: string]: boolean }>(
-        Object.fromEntries(
-            [...reservationStore.reservations.keys()].map(id => [id, false]),
-        ),
-    )
-
-    const numberOfDeletion = Object.values(deleteList).filter(
-        isChecked => isChecked,
-    ).length
+    const {
+        checkedlist: deleteList,
+        handlePress,
+        setCheckedList: setDeleteList,
+        numOfCheckedItem: numOfDeleteFlags,
+    } = useCheckedList([...reservationStore.reservations.keys()])
 
     const handleCompletePress = useCallback(async () => {
         Object.entries(deleteList)
@@ -58,17 +60,7 @@ export const ReservationDeleteScreen: FC<
             })
     }, [deleteList])
 
-    const handlePress = useCallback(
-        (reservationId: string) => {
-            setDeleteList(prev => ({
-                ...prev,
-                [reservationId]: !prev[reservationId],
-            }))
-        },
-        [setDeleteList],
-    )
-
-    const renderItem_ = useCallback(
+    const renderItem = useCallback(
         (reservation: Reservation) => (
             <ReservationDeleteItem
                 reservation={reservation}
@@ -89,7 +81,7 @@ export const ReservationDeleteScreen: FC<
 
     useHeader(
         {
-            ...(numberOfDeletion <= 0
+            ...(numOfDeleteFlags <= 0
                 ? {}
                 : {
                       rightActionTitle: '선택 해제',
@@ -97,7 +89,7 @@ export const ReservationDeleteScreen: FC<
                   }),
             backgroundColor: 'secondary',
         },
-        [numberOfDeletion],
+        [numOfDeleteFlags],
     )
 
     return (
@@ -107,17 +99,17 @@ export const ReservationDeleteScreen: FC<
                 subtitle={'관리하지 않아도 되늗 예약을 지울 수 있어요'}
             />
             <ScrollView>
-                <ReservationList renderItem={renderItem_} />
+                <ReservationList renderItem={renderItem} />
             </ScrollView>
             <Fab.Container>
                 <Fab.GoBackButton
                     title={
-                        numberOfDeletion > 0
-                            ? `${numberOfDeletion}개 예약 삭제`
+                        numOfDeleteFlags > 0
+                            ? `${numOfDeleteFlags}개 예약 삭제`
                             : '확인'
                     }
                     promiseBeforeNavigate={handleCompletePress}
-                    disabled={numberOfDeletion <= 0}
+                    disabled={numOfDeleteFlags <= 0}
                 />
             </Fab.Container>
         </Screen>

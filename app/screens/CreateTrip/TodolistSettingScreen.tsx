@@ -23,10 +23,9 @@ export const TodolistSettingScreen: FC<
     const { navigateWithTrip } = useNavigate()
     const addFlaggedPreset = useAddFlaggedPreset()
 
-    const handlePressNext = useCallback(() => {
-        return addFlaggedPreset().then(() => {
-            tripStore.initialize()
-        })
+    const handlePressNext = useCallback(async () => {
+        addFlaggedPreset()
+        tripStore.initialize()
     }, [])
 
     // useEffect(() => {
@@ -57,18 +56,22 @@ export const TodolistSettingScreen: FC<
 
     return (
         <TodolistAddScreenBase
-            title={'할 일 추가하기'}
-            instruction={'관리하고 싶은 할 일과 짐을 추가하세요'}
+            title={'새 할 일'}
+            instruction={'관리하고 싶은 할 일과\n준비가 필요한 짐을 추가하세요'}
             tripId={route.params.tripId}
             fab={
                 <Fab.Container>
                     <Fab.NextButton
-                        title={'확인'}
                         navigateProps={{
                             name: 'Main',
                             params: { screen: 'Todolist' },
                         }}
                         promiseBeforeNavigate={handlePressNext}
+                        title={
+                            tripStore.numOfAddFlags > 0
+                                ? `${tripStore.numOfAddFlags}개 예약 추가`
+                                : '확인'
+                        }
                     />
                 </Fab.Container>
             }

@@ -1,5 +1,10 @@
 import { FC, useCallback, useRef } from 'react'
-import { TouchableOpacity, View } from 'react-native'
+import {
+    SectionList,
+    SectionListRenderItem,
+    TouchableOpacity,
+    View,
+} from 'react-native'
 //
 import {
     NavigateListItemProp,
@@ -7,16 +12,22 @@ import {
 } from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import { BottomSheetModal } from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
+import { Label } from '@/components/Label'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import { Screen } from '@/components/Screen'
 import { AccomodationTodo, CompleteTodo } from '@/components/Todo'
-import { TodoList } from '@/components/TodoList'
+import {
+    DoShowSupplyTodosFirstToggleSwitch,
+    renderTodolistSectionHeader,
+    TodolistSectionT,
+    TodolistTabView,
+} from '@/components/TodoList'
 import { useTripStore } from '@/models'
 import { Todo } from '@/models/Todo'
 import { MainTabScreenProps } from '@/navigators'
 import { useMainScreenHeader } from '@/utils/useHeader'
-import { Observer, observer } from 'mobx-react-lite'
-import { Label } from '@/components/Label'
 import { ListItem, useTheme } from '@rneui/themed'
+import { Observer, observer } from 'mobx-react-lite'
 
 export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
     ({}) => {
@@ -25,7 +36,10 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
         const {
             theme: { colors },
         } = useTheme()
-        const renderItem = (todo: Todo) => (
+
+        const renderItem: SectionListRenderItem<Todo, TodolistSectionT> = ({
+            item: todo,
+        }) => (
             <Observer
                 render={() => {
                     switch (todo.type) {
@@ -38,6 +52,29 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
             />
         )
 
+        const renderTabViewItem = useCallback(
+            (isSupply: boolean) => {
+                return (
+                    <SectionList
+                        sections={
+                            isSupply
+                                ? tripStore.supplyTodolistSectionListData
+                                : tripStore.workTodolistSectionListData
+                        }
+                        renderItem={renderItem}
+                        renderSectionHeader={renderTodolistSectionHeader}
+                        keyExtractor={(todo: Todo) => todo.id}
+                        ListEmptyComponent={
+                            <ListItemBase title={'할 일이 없어요'} />
+                        }
+                    />
+                )
+            },
+            [
+                tripStore.supplyTodolistSectionListData,
+                tripStore.workTodolistSectionListData,
+            ],
+        )
         /* Menu */
         const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
@@ -46,7 +83,6 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
         }, [settingsMenuBottomSheetRef])
 
         useMainScreenHeader({
-            //   title: tripStore.title,
             title: '여행 준비',
             rightComponent: (
                 <View style={{ flexDirection: 'row' }}>
@@ -80,9 +116,47 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
 
         return (
             <Screen>
-                <TodoList
-                    sections={tripStore.todolistSectionListData}
-                    renderItem={renderItem}
+                <DoShowSupplyTodosFirstToggleSwitch
+                    value={tripStore.settings.doShowSupplyTodosFirst}
+                    onChange={tripStore.settings.toggleDoShowSupplyTodosFirst}
+                />
+                <View
+                    style={{
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        paddingHorizontal: 24,
+                        paddingVertical: 16,
+                    }}>
+                    <Label
+                        title="완료한 할 일 숨기기"
+                        style={{
+                            fontSize: 13,
+                        }}
+                        dense
+                        rightContent={
+                            <ListItem.CheckBox
+                                checked={tripStore.settings.doHideCompletedTodo}
+                                onPress={
+                                    tripStore.settings.toggleDoHideCompletedTodo
+                                }
+                                containerStyle={{
+                                    width: 'auto',
+                                    marginTop: 1,
+                                }}
+                                checkedColor={colors.contrastText.secondary}
+                                size={20}
+                            />
+                        }
+                    />
+                </View>
+                <TodolistTabView
+                    renderTabViewItem={renderTabViewItem}
+                    doShowSupplyTodosFirst={
+                        tripStore.settings.doShowSupplyTodosFirst
+                    }
+                    toggleDoShowSupplyTodosFirst={
+                        tripStore.settings.toggleDoShowSupplyTodosFirst
+                    }
                 />
                 <NavigateMenuBottomSheet
                     data={settingsOption}

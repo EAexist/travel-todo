@@ -1,39 +1,45 @@
+import { Screen } from '@/components'
 import { Avatar, AvatarProps } from '@/components/Avatar'
 import BottomSheetModal, {
-    GestureHandlerRootViewWrapper,
     useNavigationBottomSheet,
 } from '@/components/BottomSheetModal'
 import ContentTitle from '@/components/Layout/Content'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
-import { AddPresetTodo, AddTodo, TodoBase } from '@/components/Todo'
+import { TodoBase } from '@/components/Todo'
+import {
+    renderTodolistSectionHeader,
+    TodolistEditContent,
+    TodolistSectionT,
+} from '@/components/TodoList'
 import { useTripStore } from '@/models'
 import {
+    isSupplyCategory,
     Todo,
     TodoCategory,
-    TodoContent,
-    TodoContentSnapshotIn,
     TodoPresetItem,
 } from '@/models/Todo'
 import { useNavigate } from '@/navigators'
-import { Divider, ListItem } from '@rneui/themed'
+import { typography } from '@/rneui/theme'
+import { Divider, Icon, ListItem, Text, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
-import { ReactNode, RefObject, useCallback, useEffect, useRef } from 'react'
+import { string } from 'mobx-state-tree/dist/internal'
+import { FC, ReactNode, RefObject, useCallback, useRef, useState } from 'react'
 import {
     DefaultSectionT,
     FlatList,
     ListRenderItem,
+    ScrollView,
+    SectionList,
     SectionListRenderItem,
+    StyleSheet,
     TextStyle,
     View,
 } from 'react-native'
-import TodolistEditScreenBase, {
-    TodolistEditScreenBaseProps,
-} from './TodolistEditScreenBase'
-import { Text } from '@rneui/themed'
-import { typography } from '@/rneui/theme'
 
-interface TodolistAddScreenBaseProps
-    extends Pick<TodolistEditScreenBaseProps, 'title' | 'instruction'> {
+interface TodolistAddScreenBaseProps {
+    title: string
+    instruction: string
     fab: ReactNode
     tripId: string
     callerName: 'TodolistSetting' | 'TodolistAdd'
@@ -41,8 +47,8 @@ interface TodolistAddScreenBaseProps
 
 export const useAddFlaggedPreset = () => {
     const tripStore = useTripStore()
-    const addFlaggedPreset = useCallback(async () => {
-        await tripStore.addFlaggedPreset()
+    const addFlaggedPreset = useCallback(() => {
+        tripStore.addFlaggedPreset()
     }, [tripStore])
     return addFlaggedPreset
 }
@@ -86,6 +92,63 @@ export const useHandleAddCutomTodo = ({
     }
 }
 
+const AddTodo: FC<{ todo: Todo }> = ({ todo }) => {
+    const [isAdded, setIsAdded] = useState(true)
+
+    const handlePress = useCallback(() => {
+        setIsAdded(!isAdded)
+    }, [isAdded, setIsAdded])
+
+    return (
+        <TodoBase
+            // caption={'추가함'}
+            subtitle={todo.subtitle}
+            onPress={handlePress}
+            title={todo.title}
+            icon={todo.icon}
+            // useDisabledStyle
+        />
+    )
+}
+
+const AddPresetTodo: FC<{ preset: TodoPresetItem }> = observer(({ preset }) => {
+    const handlePress = useCallback(() => {
+        preset.toggleAddFlag()
+    }, [preset])
+
+    const {
+        theme: { colors },
+    } = useTheme()
+    return (
+        <TodoBase
+            rightContent={
+                <ListItem.CheckBox
+                    onPress={handlePress}
+                    checked={preset.isFlaggedToAdd}
+                    checkedIcon={<Icon name="check-circle" />}
+                    uncheckedIcon={
+                        <Icon
+                            name="check-circle-outline"
+                            color={colors.grey1}
+                        />
+                    }
+                />
+            }
+            onPress={handlePress}
+            {...(!preset.isFlaggedToAdd && {
+                avatarProps: { avatarStyle: styles.disabled },
+                contentStyle: styles.disabled,
+            })}
+            title={preset.todoContent.title}
+            icon={preset.todoContent.icon}
+        />
+    )
+})
+
+const styles = StyleSheet.create({
+    disabled: { opacity: 0.4 },
+})
+
 export const TodolistAddScreenBase = observer(
     ({
         title,
@@ -98,9 +161,17 @@ export const TodolistAddScreenBase = observer(
 
         const { handleAddCutomTodo } = useHandleAddCutomTodo({})
 
+        const workSections = tripStore.todosWithPreset.filter(
+            ({ category }) => !isSupplyCategory(category),
+        )
+
+        const supplySections = tripStore.todosWithPreset.filter(
+            ({ category }) => isSupplyCategory(category),
+        )
+
         const renderItem: SectionListRenderItem<
             { todo?: Todo; preset?: TodoPresetItem },
-            DefaultSectionT
+            TodolistSectionT
         > = ({ item: { preset, todo } }) => (
             <Observer
                 render={() =>
@@ -115,60 +186,8 @@ export const TodolistAddScreenBase = observer(
                 }
             />
         )
-
         /* BottomSheet */
         const bottomSheetRef = useRef<BottomSheetModal>(null)
-
-        const renderSectionHeader = useCallback(
-            ({
-                section: { category, title, data },
-            }: {
-                section: DefaultSectionT
-            }) => {
-                return (
-                    <>
-                        {category === 'TODO' && (
-                            <>
-                                <TodoBase
-                                    avatarProps={{
-                                        icon: { name: 'add', type: 'material' },
-                                    }}
-                                    titleStyle={$titleStyleHighlighted}
-                                    {...{
-                                        title: '직접 추가하기',
-                                        // subtitle: '항공권 · 기차표 · 입장권',
-                                        onPress: () => {
-                                            bottomSheetRef.current?.present()
-                                        },
-                                    }}
-                                />
-                            </>
-                        )}
-                        {category === 'WASH' && (
-                            <>
-                                <TodoBase
-                                    avatarProps={{
-                                        icon: { name: 'add', type: 'material' },
-                                    }}
-                                    titleStyle={$titleStyleHighlighted}
-                                    {...{
-                                        title: '직접 추가하기',
-                                        subtitle: '',
-                                        onPress: () =>
-                                            handleAddCutomTodo(
-                                                category,
-                                                'custom',
-                                            ),
-                                    }}
-                                />
-                            </>
-                        )}
-                        {data.length > 0 && <ListSubheader title={title} />}
-                    </>
-                )
-            },
-            [handleAddCutomTodo, bottomSheetRef.current],
-        )
         const renderTabIcon = useCallback((isTodo: boolean) => {
             const numberOfAddFlag = isTodo
                 ? tripStore.numOfTodoToAdd
@@ -181,35 +200,65 @@ export const TodolistAddScreenBase = observer(
             ) : null
         }, [])
 
-        const renderSectionFooter = useCallback(
-            ({ section: { category } }: { section: DefaultSectionT }) =>
-                category === 'FOREIGN' ? <Divider /> : null,
-            [],
-        )
-        const keyExtractor = useCallback(
-            (item: any) =>
-                item.todo
-                    ? `todo-${item.todo.id}`
-                    : `preset-${item.preset.todoContent.id}`,
-            [],
+        const renderTabViewItem = useCallback(
+            (isSupply: boolean) => {
+                return (
+                    <ScrollView style={{ paddingTop: 16 }}>
+                        {isSupply ? (
+                            <TodoBase
+                                avatarProps={{
+                                    icon: { name: 'add', type: 'material' },
+                                }}
+                                titleStyle={$titleStyleHighlighted}
+                                {...{
+                                    title: '직접 추가하기',
+                                    subtitle: '',
+                                    onPress: () =>
+                                        handleAddCutomTodo('SUPPLY', 'custom'),
+                                }}
+                            />
+                        ) : (
+                            <TodoBase
+                                avatarProps={{
+                                    icon: { name: 'add', type: 'material' },
+                                }}
+                                titleStyle={$titleStyleHighlighted}
+                                {...{
+                                    title: '직접 추가하기',
+                                    // subtitle: '항공권 · 기차표 · 입장권',
+                                    onPress: () => {
+                                        bottomSheetRef.current?.present()
+                                    },
+                                }}
+                            />
+                        )}
+
+                        <SectionList
+                            sections={isSupply ? supplySections : workSections}
+                            renderItem={renderItem}
+                            renderSectionHeader={renderTodolistSectionHeader}
+                            keyExtractor={({ todo, preset }) =>
+                                todo
+                                    ? `todo-${todo.id}`
+                                    : `preset-${preset?.todoContent.id}` || ''
+                            }
+                        />
+                    </ScrollView>
+                )
+            },
+            [handleAddCutomTodo, bottomSheetRef.current],
         )
 
         return (
-            <TodolistEditScreenBase
-                title={title}
-                instruction={instruction}
-                renderItem={renderItem}
-                renderSectionHeader={renderSectionHeader}
-                renderSectionFooter={() => null}
-                sections={tripStore.todosWithPreset}
-                keyExtractor={keyExtractor}
-                renderTabIcon={renderTabIcon}>
+            <Screen>
+                <ContentTitle title={title} subtitle={instruction} />
+                <TodolistEditContent renderTabViewItem={renderTabViewItem} />
                 {fab}
                 <ReservationTypeDropDownBottomSheet
                     ref={bottomSheetRef}
                     callerName={callerName}
                 />
-            </TodolistEditScreenBase>
+            </Screen>
         )
     },
 )
