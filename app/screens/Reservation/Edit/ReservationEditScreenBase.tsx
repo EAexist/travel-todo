@@ -370,31 +370,29 @@ export const ReservationEditScreenBase: FC<{
                 title={
                     reservation.category === 'ACCOMODATION' ||
                     reservation.category === 'GENERAL' ? (
-                        <View style={{ flex: 1 }}>
-                            <ControlledListItemInput
-                                onChangeText={(text: string) => {
-                                    reservation.setTitle(text)
-                                }}
-                                value={reservation.title}
-                                placeholder={'예약 이름 입력'}
-                                autoFocus={isBeforeInitialization}
-                                onBlur={() => setIsTitleFocused(false)}
-                                onFocus={() => setIsTitleFocused(true)}
-                                // inputContainerStyle={{
-                                //   borderBottomWidth: isTitleFocused ? 2 : 0,
-                                // }}
-                                primary={isTitleFocused}
-                                rightIcon={
-                                    !isTitleFocused && (
-                                        <Icon
-                                            color={'secondary'}
-                                            name="edit"
-                                            type="material"
-                                        />
-                                    )
-                                }
-                            />
-                        </View>
+                        <ControlledListItemInput
+                            onChangeText={(text: string) => {
+                                reservation.setTitle(text)
+                            }}
+                            value={reservation.title}
+                            placeholder={'예약 이름 입력'}
+                            autoFocus={isBeforeInitialization}
+                            onBlur={() => setIsTitleFocused(false)}
+                            onFocus={() => setIsTitleFocused(true)}
+                            // inputContainerStyle={{
+                            //   borderBottomWidth: isTitleFocused ? 2 : 0,
+                            // }}
+                            primary={isTitleFocused}
+                            rightIcon={
+                                !isTitleFocused && (
+                                    <Icon
+                                        color={'secondary'}
+                                        name="edit"
+                                        type="material"
+                                    />
+                                )
+                            }
+                        />
                     ) : (
                         <Text h2>{reservation.title}</Text>
                     )
@@ -490,7 +488,7 @@ export const ReservationEditScreenBase: FC<{
                     onPress={handleConfirmPress}
                     title={
                         reservation.title.length === 0
-                            ? '제목을 입력해주세요'
+                            ? '예약 이름을 입력해주세요'
                             : reservation.isAccomodationWithoutSchedule
                               ? '체크인 · 체크아웃 날짜를 선택하세요'
                               : '확인'

@@ -115,7 +115,6 @@ export type TodoAuthenticatedStackParamList = {
     }
 
     /* Edit Todo */
-    TodoTitle: TodoStackProps
     TodoNote: TodoStackProps
     TodoEdit: TodoStackProps
 

@@ -6,15 +6,12 @@ import {
 import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import { ControlledListItemInput } from '@/components/Input'
-import { Label } from '@/components/Label'
 import ContentTitle from '@/components/Layout/Content'
-import { ListItemBase } from '@/components/ListItem/ListItem'
 import { Screen } from '@/components/Screen'
 import StyledSwitch from '@/components/StyledSwitch'
 import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
 import { useTripStore } from '@/models'
-import { Icon } from '@/models/Icon'
 import {
     TODO_CATEGORY_TO_ICON,
     TODO_CATEGORY_TO_TITLE,
@@ -23,19 +20,12 @@ import {
     isSupplyCategory,
 } from '@/models/Todo'
 import { goBack, useNavigate } from '@/navigators'
+import { typography } from '@/rneui/theme'
 import { useHeader } from '@/utils/useHeader'
-import { IconObject } from '@rneui/base'
-import { ListItem, Text, useTheme } from '@rneui/themed'
+import { ListItem, Text } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
-import {
-    FlatList,
-    ListRenderItem,
-    SectionListData,
-    TouchableOpacity,
-    View,
-    ViewStyle,
-} from 'react-native'
+import { TouchableOpacity, ViewStyle } from 'react-native'
 
 export const CustomTodoEditScreen: FC<{
     todo: Todo
@@ -218,6 +208,9 @@ export const CustomTodoEditScreen: FC<{
                         primary={isFocused}
                         containerStyle={{
                             paddingLeft: 0,
+                        }}
+                        inputStyle={{
+                            ...typography.pretendard.bold,
                         }}
                     />
                 }

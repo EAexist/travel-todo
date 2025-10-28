@@ -199,10 +199,6 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
                 component={Screens.Todo.Note}
             />
             <AuthenticatedStack.Screen
-                name="TodoTitle"
-                component={Screens.Todo.Title}
-            />
-            <AuthenticatedStack.Screen
                 name="DepartureAirportSetting"
                 component={Screens.Todo.Flight.DepartureAirportSetting}
             />

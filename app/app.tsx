@@ -87,7 +87,6 @@ const config = {
         CreateFlightTicketTodo:
             'trip/:tripId?/todo/:todoId?/createFlightTicket',
         TodoEdit: 'trip/:tripId?/todo/:todoId?/edit',
-        TodoTitle: 'trip/:tripId?/todo/:todoId?/title',
         TodoNote: 'trip/:tripId?/todo/:todoId?/note',
 
         /*  */

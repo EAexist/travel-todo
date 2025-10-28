@@ -52,11 +52,10 @@ export const ReservationDetailListItem: FC<{
                                     ? 'link'
                                     : 'chevron-right'
                             }
+                            primary={!!reservation.primaryHrefLink}
                         />
                     }>
-                    <TransText
-                        primary={!reservation.primaryHrefLink}
-                        numberOfLines={1}>
+                    <TransText primary numberOfLines={1}>
                         {reservation.primaryHrefLink ||
                             reservation.addLinkInstruction}
                     </TransText>
