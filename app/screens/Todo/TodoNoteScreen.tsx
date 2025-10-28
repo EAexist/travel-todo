@@ -1,43 +1,18 @@
-import * as Fab from '@/components/Fab'
-import ContentTitle from '@/components/Layout/Content'
-import { Note } from '@/components/Note'
-import { Screen } from '@/components/Screen'
-import { useTripStore } from '@/models'
-import { useHeader } from '@/utils/useHeader'
 import { withTodo } from '@/utils/withTodo'
-import { useCallback, useState } from 'react'
 import { ViewStyle } from 'react-native'
+import { NoteEditScreenBase } from '../NoteEditScreenBase'
 
 export const TodoNoteScreen = withTodo<'TodoNote'>(({ todo }) => {
-    const onBackPressBeforeNavigate = useCallback(async () => {
-        todo.patch({ note: todo.note })
-    }, [todo])
-
-    useHeader({ onBackPressBeforeNavigate })
-
-    const [isFocused, setIsFocused] = useState(false)
-    const handleChangeNote = (value: string) => todo.setProp('note', value)
-
     return (
-        <Screen>
-            <ContentTitle
-                variant="listItem"
-                title={todo.title}
-                subtitle={todo.categoryTitle}
-                icon={todo.icon}
-            />
-            <Note
-                onChangeText={handleChangeNote}
-                initialValue={todo.note}
-                isFocused={isFocused}
-                setIsFocused={setIsFocused}
-            />
-            {isFocused && (
-                <Fab.Container>
-                    <Fab.Button title={'확인'} />
-                </Fab.Container>
-            )}
-        </Screen>
+        <NoteEditScreenBase
+            initialValue={todo.note}
+            onConfirm={(value: string) => todo.setProp('note', value)}
+            contentTitleProps={{
+                title: todo.title,
+                subtitle: todo.categoryTitle,
+                icon: todo.icon,
+            }}
+        />
     )
 })
 

@@ -73,7 +73,8 @@ export default function ContentTitle({
                                 ) : null}
                                 {subtitle}
                             </ListItem.Subtitle>
-                            <ListItem.Title>
+                            <ListItem.Title
+                                style={{ minHeight: 40, alignItems: 'center' }}>
                                 {typeof title === 'string' ? (
                                     <TransText h2>{title}</TransText>
                                 ) : (
