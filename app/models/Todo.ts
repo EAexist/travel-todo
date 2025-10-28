@@ -15,7 +15,7 @@ import { withSetPropAction } from './helpers/withSetPropAction'
 import { Icon, IconModel } from './Icon'
 
 export type TodoCategory =
-    | 'TODO'
+    | 'WORK'
     | 'RESERVATION'
     | 'FOREIGN'
     | 'SUPPLY'
@@ -23,23 +23,33 @@ export type TodoCategory =
     | 'ELECTRONICS'
     | 'CLOTHING'
 export const todoCategoryList: TodoCategory[] = [
-    'TODO',
     'RESERVATION',
     'FOREIGN',
-    'SUPPLY',
+    'WORK',
     'WASH',
     'ELECTRONICS',
     'CLOTHING',
+    'SUPPLY',
 ]
 
 export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
-    TODO: '기타',
     RESERVATION: '예약',
     FOREIGN: '해외',
-    SUPPLY: '기타',
+    WORK: '기타',
     WASH: '세면도구',
+    SUPPLY: '기타',
     ELECTRONICS: '전자기기',
     CLOTHING: '옷',
+}
+
+export const TODO_CATEGORY_TO_ICON: { [key: string]: Icon } = {
+    RESERVATION: { name: '🎫' },
+    FOREIGN: { name: '🌐' },
+    WORK: { name: '🎯' },
+    SUPPLY: { name: '💼' },
+    WASH: { name: '💧' },
+    ELECTRONICS: { name: '⚡' },
+    CLOTHING: { name: '🩳' },
 }
 
 export interface Location {
@@ -234,6 +244,7 @@ export const TodoModel = types
         },
         setCategory(category: TodoCategory) {
             item.content.setProp('category', category)
+            item.content.setProp('icon', TODO_CATEGORY_TO_ICON[category])
         },
         patch(todoDTO?: Partial<TodoSnapshotIn>) {
             enqueueAction(APIAction.PATCH_TODO, {

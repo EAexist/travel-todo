@@ -7,11 +7,14 @@ import {
 import { AccomodationSnapshotIn } from '@/models/Reservation/Accomodation'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import {
+    PresetTodoContentModel,
     Todo,
+    TodoContent,
     TodoContentModel,
     TodoContentSnapshotIn,
     TodoModel,
     TodoPresetItem,
+    TodoPresetItemModel,
     TodoPresetItemSnapshotIn,
     TodoSnapshotIn,
 } from '@/models/Todo'
@@ -61,15 +64,17 @@ export interface UserAccountDTO extends UserStoreSnapshot {}
 //   id?: number
 // }
 
-export interface TripDTO
+export interface TripFetchDTO
     extends Omit<
         TripStoreSnapshot,
-        'todoMap' | 'todolist' | 'destinations' | 'reservationStore'
+        'todoMap' | 'todolist' | 'destinations' | 'reservationStore' | 'preset'
     > {
     todolist: TodoDTO[]
     destinations: DestinationDTO[]
     reservations: ReservationDTO[]
+    stockTodoContents: TodoContentSnapshotIn[]
 }
+
 export interface TripPatchDTO
     extends Partial<
         Omit<
@@ -196,6 +201,7 @@ export interface DeleteReservationProps {
  * Mapper
  */
 
+/* UserAccount */
 export const mapToUserAccount: (
     userAccountDTO: UserAccountDTO,
 ) => UserStoreSnapshot = userAccountDTO => {
@@ -208,6 +214,67 @@ export const mapToUserAccount: (
     else throw Error
 }
 
+/* Trip */
+export const mapToTripPatchDTO: (
+    trip: Partial<TripStoreSnapshot> & { id: string },
+) => TripPatchDTO = trip => ({
+    id: trip.id,
+    isInitialized: trip.isInitialized,
+    title: trip.title,
+    startDateIsoString: trip.startDateIsoString,
+    endDateIsoString: trip.endDateIsoString,
+    settings: trip.settings
+        ? {
+              isTripMode: trip.settings.isTripMode,
+              categoryKeyToIndex: trip.settings.categoryKeyToIndex,
+          }
+        : undefined,
+})
+
+export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshot = ({
+    todolist,
+    destinations,
+    reservations,
+    stockTodoContents,
+    ...tripDTO
+}) => {
+    const categories = [
+        ...new Set(todolist?.map(todo => todo.content?.category)),
+    ].filter(c => c !== undefined)
+
+    return {
+        ...tripDTO,
+        todoMap: todolist
+            ? todolist.reduce((acc: { [key: string]: any }, todoDTO) => {
+                  if (todoDTO.id)
+                      acc[todoDTO.id?.toString()] = mapToTodo(todoDTO)
+                  return acc
+              }, {})
+            : {},
+        destinations: destinations.map(dest => mapToDestination(dest)),
+        reservationStore: ReservationStoreModel.create({
+            reservations: reservations
+                ? reservations.reduce(
+                      (acc: { [key: string]: any }, reservationDTO) => {
+                          if (reservationDTO.id)
+                              acc[reservationDTO.id?.toString()] =
+                                  mapToReservation(reservationDTO)
+                          return acc
+                      },
+                      {},
+                  )
+                : {},
+        }),
+        preset: stockTodoContents.map(stockTodoContent =>
+            TodoPresetItemModel.create({
+                isFlaggedToAdd: false,
+                todoContent: PresetTodoContentModel.create(stockTodoContent),
+            }),
+        ),
+    }
+}
+
+/* Destination */
 export const mapToDestinationDTO: (
     destination: Destination,
 ) => DestinationDTO = destination => ({
@@ -222,6 +289,7 @@ export const mapToDestination: (
     else throw Error
 }
 
+/* Todo */
 export const mapToTodoPatchDTO: (
     todo: Partial<TodoSnapshotIn> & {
         id: string
@@ -242,7 +310,7 @@ export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
         ),
     })
 
-// export const mapToTripDTO: (trip: Partial<TripStore>) => Partial<TripDTO> = ({
+// export const mapFetchToTripDTO: (trip: Partial<TripStore>) => PartiaFetchl<TripDTO> = ({
 //     todolist,
 //     destination,
 //     ...trip
@@ -259,70 +327,6 @@ export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
 //         : undefined,
 //     destination: destination?.map(dest => mapToDestinationDTO(dest)),
 // })
-
-export const mapToTripPatchDTO: (
-    trip: Partial<TripStoreSnapshot> & { id: string },
-) => TripPatchDTO = trip => ({
-    id: trip.id,
-    isInitialized: trip.isInitialized,
-    title: trip.title,
-    startDateIsoString: trip.startDateIsoString,
-    endDateIsoString: trip.endDateIsoString,
-    settings: trip.settings
-        ? {
-              isTripMode: trip.settings.isTripMode,
-              categoryKeyToIndex: trip.settings.categoryKeyToIndex,
-          }
-        : undefined,
-})
-
-export const mapToTrip: (tripDTO: TripDTO) => TripStoreSnapshot = ({
-    todolist,
-    destinations,
-    reservations,
-    ...tripDTO
-}) => {
-    const categories = [
-        ...new Set(todolist?.map(todo => todo.content?.category)),
-    ].filter(c => c !== undefined)
-
-    return {
-        ...tripDTO,
-        todoMap: todolist
-            ? todolist.reduce((acc: { [key: string]: any }, todoDTO) => {
-                  if (todoDTO.id)
-                      acc[todoDTO.id?.toString()] = mapToTodo(todoDTO)
-                  return acc
-              }, {})
-            : {},
-        todolist: todolist
-            ? categories.reduce((acc: { [key: string]: any }, category) => {
-                  acc[category] = todolist
-                      ?.filter(todo => todo.content?.category === category)
-                      .toSorted(
-                          (a, b) =>
-                              (a.orderKey as number) - (b.orderKey as number),
-                      )
-                      .map(todo => todo.id?.toString())
-                  return acc
-              }, {})
-            : {},
-        destinations: destinations.map(dest => mapToDestination(dest)),
-        reservationStore: ReservationStoreModel.create({
-            reservations: reservations
-                ? reservations.reduce(
-                      (acc: { [key: string]: any }, reservationDTO) => {
-                          if (reservationDTO.id)
-                              acc[reservationDTO.id?.toString()] =
-                                  mapToReservation(reservationDTO)
-                          return acc
-                      },
-                      {},
-                  )
-                : {},
-        }),
-    }
-}
 export const mapToPreset: (
     preset: PresetDTO,
 ) => TodoPresetItemSnapshotIn = preset => ({

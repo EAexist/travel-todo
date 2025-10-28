@@ -15,7 +15,13 @@ import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
 import { useTripStore } from '@/models'
 import { Icon } from '@/models/Icon'
-import { TODO_CATEGORY_TO_TITLE, Todo, TodoCategory } from '@/models/Todo'
+import {
+    TODO_CATEGORY_TO_ICON,
+    TODO_CATEGORY_TO_TITLE,
+    Todo,
+    TodoCategory,
+    isSupplyCategory,
+} from '@/models/Todo'
 import { goBack, useNavigate } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { IconObject } from '@rneui/base'
@@ -25,6 +31,7 @@ import { FC, useCallback, useRef, useState } from 'react'
 import {
     FlatList,
     ListRenderItem,
+    SectionListData,
     TouchableOpacity,
     View,
     ViewStyle,
@@ -64,118 +71,131 @@ export const CustomTodoEditScreen: FC<{
     }, [categoryBottomSheetModalRef])
 
     /* IconMenu */
-    const [icon, setIcon] = useState<Icon>(todo.icon)
+    // const [icon, setIcon] = useState<Icon>(todo.icon)
 
-    const ICONS = [
-        { name: '🛌', type: 'tossface' },
-        { name: '💱', type: 'tossface' },
-        { name: '💲', type: 'tossface' },
-        { name: '📶', type: 'tossface' },
-        { name: '📝', type: 'tossface' },
-        { name: '🔌', type: 'tossface' },
-        { name: '🧳', type: 'tossface' },
-        { name: '🎒', type: 'tossface' },
-        { name: '📸', type: 'tossface' },
-        { name: '☂️', type: 'tossface' },
-        // {name: '💊', type: 'tossface'},
-        // {name: '🧴', type: 'tossface'},
-        // {name: '💄', type: 'tossface'},
-        // {name: '🪒', type: 'tossface'},
-        // {name: '🕶', type: 'tossface'},
-        // {name: '✈️', type: 'tossface'},
-        // {name: '🛫', type: 'tossface'},
-        // {name: '🚄', type: 'tossface'},
-        // {name: '🚆', type: 'tossface'},
-        // {name: '🚕', type: 'tossface'},
-        // {name: '⛴', type: 'tossface'},
-        // {name: '🎢', type: 'tossface'},
-        // {name: '⛩', type: 'tossface'},
-        // {name: '🐶', type: 'tossface'},
-        // {name: '🐱', type: 'tossface'},
-        // {name: '⭐️', type: 'tossface'},
-    ]
+    // const ICONS = [
+    //     { name: '🛌', type: 'tossface' },
+    //     { name: '💱', type: 'tossface' },
+    //     { name: '💲', type: 'tossface' },
+    //     { name: '📶', type: 'tossface' },
+    //     { name: '📝', type: 'tossface' },
+    //     { name: '🔌', type: 'tossface' },
+    //     { name: '🧳', type: 'tossface' },
+    //     { name: '🎒', type: 'tossface' },
+    //     { name: '📸', type: 'tossface' },
+    //     { name: '☂️', type: 'tossface' },
+    //     // {name: '💊', type: 'tossface'},
+    //     // {name: '🧴', type: 'tossface'},
+    //     // {name: '💄', type: 'tossface'},
+    //     // {name: '🪒', type: 'tossface'},
+    //     // {name: '🕶', type: 'tossface'},
+    //     // {name: '✈️', type: 'tossface'},
+    //     // {name: '🛫', type: 'tossface'},
+    //     // {name: '🚄', type: 'tossface'},
+    //     // {name: '🚆', type: 'tossface'},
+    //     // {name: '🚕', type: 'tossface'},
+    //     // {name: '⛴', type: 'tossface'},
+    //     // {name: '🎢', type: 'tossface'},
+    //     // {name: '⛩', type: 'tossface'},
+    //     // {name: '🐶', type: 'tossface'},
+    //     // {name: '🐱', type: 'tossface'},
+    //     // {name: '⭐️', type: 'tossface'},
+    // ]
 
-    const iconMenu: { icon: Icon }[] = ICONS.map(icon => ({ icon }))
+    // const iconMenu: { icon: Icon }[] = ICONS.map(icon => ({ icon }))
 
-    const handlePressNewIcon = useCallback(
-        (icon: Icon) => {
-            setIcon(icon)
-        },
-        [setIcon],
-    )
-    const {
-        theme: { colors },
-    } = useTheme()
+    // const handlePressNewIcon = useCallback(
+    //     (icon: Icon) => {
+    //         setIcon(icon)
+    //     },
+    //     [setIcon],
+    // )
+    // const {
+    //     theme: { colors },
+    // } = useTheme()
 
-    const renderIconListItem: ListRenderItem<{ icon: Icon }> = useCallback(
-        ({ item }) => {
-            return (
-                <TouchableOpacity onPress={() => handlePressNewIcon(item.icon)}>
-                    <Avatar
-                        size="medium"
-                        icon={item.icon}
-                        // containerStyle={
-                        //   item.icon.name === todo.icon.name
-                        //     ? {
-                        //         backgroundColor: 'bisque',
-                        //       }
-                        //     : {}
-                        // }
-                        // containerStyle={$iconAvataContainerStyle}
-                    />
-                    {/* <RNEAvatar.Accessory
-                  iconProps={{name: 'check'}}
-                  avatarSize={20}
-                  style={{
-                    bottom: -20,
-                    right: -20,
-                    transform: [{translateX: '-50%'}, {translateY: '-50%'}],
-                  }}
-                />
-              </Avatar> */}
-                </TouchableOpacity>
-            )
-        },
-        [],
-    )
+    // const renderIconListItem: ListRenderItem<{ icon: Icon }> = useCallback(
+    //     ({ item }) => {
+    //         return (
+    //             <TouchableOpacity onPress={() => handlePressNewIcon(item.icon)}>
+    //                 <Avatar
+    //                     size="medium"
+    //                     icon={item.icon}
+    //                     // containerStyle={
+    //                     //   item.icon.name === todo.icon.name
+    //                     //     ? {
+    //                     //         backgroundColor: 'bisque',
+    //                     //       }
+    //                     //     : {}
+    //                     // }
+    //                     // containerStyle={$iconAvataContainerStyle}
+    //                 />
+    //                 {/* <RNEAvatar.Accessory
+    //               iconProps={{name: 'check'}}
+    //               avatarSize={20}
+    //               style={{
+    //                 bottom: -20,
+    //                 right: -20,
+    //                 transform: [{translateX: '-50%'}, {translateY: '-50%'}],
+    //               }}
+    //             />
+    //           </Avatar> */}
+    //             </TouchableOpacity>
+    //         )
+    //     },
+    //     [],
+    // )
 
-    const handleCloseIconBottomSheet = useCallback(() => {
-        todo.setIcon(icon)
-        iconBottomSheetModalRef.current?.close()
-    }, [todo, iconBottomSheetModalRef.current])
+    // const handleCloseIconBottomSheet = useCallback(() => {
+    //     todo.setIcon(icon)
+    //     iconBottomSheetModalRef.current?.close()
+    // }, [todo, iconBottomSheetModalRef.current])
 
     /* categoryMenu */
-    const categoryMenuData: CategoryListItemProp[] = Object.entries(
-        TODO_CATEGORY_TO_TITLE,
-    ).map(([category, title]) => {
-        let icon: IconObject
-        switch (category) {
-            case 'RESERVATION':
-                icon = { name: '🎫' }
-                break
-            case 'FOREIGN':
-                icon = { name: '🌐' }
-                break
-            case 'SUPPLY':
-                icon = { name: '💼' }
-                break
-            default:
-                icon = { name: '' }
-                break
-        }
-        return {
-            category: category,
-            title,
-            avatarProps: {
-                icon,
-            },
-            isActive: category === todo.category,
-        }
-    })
+    const categoryMenuSections = Object.values(
+        Object.entries(TODO_CATEGORY_TO_TITLE)
+            .map(([category, title]) => {
+                return {
+                    category: category,
+                    title,
+                    avatarProps: {
+                        icon: TODO_CATEGORY_TO_ICON[category],
+                    },
+                    isActive: category === todo.category,
+                }
+            })
+            .reduce(
+                (
+                    acc: Record<
+                        string,
+                        { title: string; data: CategoryListItemProp[] }
+                    >,
+                    currentItem: CategoryListItemProp,
+                ) => {
+                    // Determine the category for the current item
+                    const section = isSupplyCategory(
+                        currentItem.category as TodoCategory,
+                    )
+                        ? 'SUPPLY'
+                        : 'WORK'
+                    if (!acc[section]) {
+                        acc[section] = {
+                            title: section === 'SUPPLY' ? '준비할 짐' : '할 일',
+                            data: [],
+                        }
+                    }
+                    acc[section].data.push(currentItem)
+
+                    return acc
+                },
+                {},
+            ),
+    )
 
     const handleBackPressBeforeNavigate = useCallback(async () => {
-        if (!isConfirmed && isBeforeInitialization) tripStore.deleteTodo(todo)
-    }, [tripStore, todo])
+        if (!isConfirmed && isBeforeInitialization)
+            tripStore.deleteTodo(todo.id)
+    }, [])
 
     useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
 
@@ -196,12 +216,16 @@ export const CustomTodoEditScreen: FC<{
                             borderBottomWidth: isFocused ? 2 : 0,
                         }}
                         primary={isFocused}
+                        containerStyle={{
+                            paddingLeft: 0,
+                        }}
                     />
                 }
+                subtitle={todo.content.isStock ? todo.categoryTitle : undefined}
                 leftComponent={
                     <Observer
                         render={() => (
-                            <TouchableOpacity onPress={handleIconPress}>
+                            <TouchableOpacity>
                                 <Avatar
                                     icon={todo.icon}
                                     avatarSize={'xlarge'}
@@ -231,12 +255,16 @@ export const CustomTodoEditScreen: FC<{
                 }>
                 <Text>{todo.isCompleted ? '완료' : '미완료'}</Text>
             </TextInfoListItem>
-            <TextInfoListItem
-                title={'카테고리'}
-                rightContent={<ListItem.Chevron />}
-                onPress={handleCategoryPress}>
-                <TransText>{todo.categoryTitle || '카테고리 선택'}</TransText>
-            </TextInfoListItem>
+            {!todo.content.isStock && (
+                <TextInfoListItem
+                    title={'카테고리'}
+                    rightContent={<ListItem.Chevron />}
+                    onPress={handleCategoryPress}>
+                    <TransText>
+                        {todo.categoryTitle || '카테고리 선택'}
+                    </TransText>
+                </TextInfoListItem>
+            )}
             <TextInfoListItem
                 onPress={handleNotePress}
                 title={'메모'}
@@ -252,36 +280,10 @@ export const CustomTodoEditScreen: FC<{
                     title={'확인'}
                 />
             </Fab.Container>
-            <IconDropdownBottomSheet />
             <CategoryDropdownBottomSheet />
-            <BottomSheetModal ref={iconBottomSheetModalRef}>
-                <ContentTitle title={'아이콘 선택'} />
-                <View
-                    style={{
-                        paddingTop: 12,
-                        paddingBottom: 24,
-                        alignItems: 'center',
-                    }}>
-                    <Avatar icon={icon} avatarSize={64} rounded={true} />
-                </View>
-                <FlatList
-                    data={iconMenu}
-                    renderItem={renderIconListItem}
-                    keyExtractor={item => item.icon.name}
-                    numColumns={5}
-                    columnWrapperStyle={$d}
-                    contentContainerStyle={$s}
-                />
-                <Fab.Container fixed={false} dense>
-                    <Fab.Button
-                        title={'저장'}
-                        onPress={handleCloseIconBottomSheet}
-                    />
-                </Fab.Container>
-            </BottomSheetModal>
             <CategoryMenuBottomSheet
                 ref={categoryBottomSheetModalRef}
-                data={categoryMenuData}
+                sections={categoryMenuSections}
                 setCategory={(category: string) => {
                     todo.setCategory(category as TodoCategory)
                 }}
@@ -290,9 +292,34 @@ export const CustomTodoEditScreen: FC<{
     )
 })
 
-const IconDropdownBottomSheet = () => {
-    return <></>
-}
+// const IconDropdownBottomSheet = () => {
+//     return
+//             <BottomSheetModal ref={iconBottomSheetModalRef}>
+//                 <ContentTitle title={'아이콘 선택'} />
+//                 <View
+//                     style={{
+//                         paddingTop: 12,
+//                         paddingBottom: 24,
+//                         alignItems: 'center',
+//                     }}>
+//                     <Avatar icon={icon} avatarSize={64} rounded={true} />
+//                 </View>
+//                 <FlatList
+//                     data={iconMenu}
+//                     renderItem={renderIconListItem}
+//                     keyExtractor={item => item.icon.name}
+//                     numColumns={5}
+//                     columnWrapperStyle={$d}
+//                     contentContainerStyle={$s}
+//                 />
+//                 <Fab.Container fixed={false} dense>
+//                     <Fab.Button
+//                         title={'저장'}
+//                         onPress={handleCloseIconBottomSheet}
+//                     />
+//                 </Fab.Container>
+//             </BottomSheetModal>
+// }
 
 const CategoryDropdownBottomSheet = () => {
     return <></>

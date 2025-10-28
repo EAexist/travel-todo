@@ -17,7 +17,7 @@ import { ListItemCaption } from '../ListItem/ListItemCaption'
 interface TodoBaseProps extends Pick<AvatarProps, 'icon'>, ListItemProps {
     title: string
     subtitle?: string
-    caption?: string
+    caption?: ReactNode
     rightContent?: ReactNode
     avatarStyle?: StyleProp<ViewStyle>
     contentStyle?: StyleProp<ViewStyle>
@@ -49,7 +49,11 @@ export const TodoBase: FC<TodoBaseProps> = ({
             <ListItem.Content style={contentStyle || {}}>
                 <ListItem.Title style={titleStyle || {}}>
                     <Trans>{title}</Trans>
-                    {!!caption && <ListItemCaption>{caption}</ListItemCaption>}
+                    {!!caption && typeof caption === 'string' ? (
+                        <ListItemCaption>{caption}</ListItemCaption>
+                    ) : (
+                        caption
+                    )}
                 </ListItem.Title>
                 {!!subtitle && (
                     <ListItem.Subtitle>

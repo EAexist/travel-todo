@@ -81,14 +81,11 @@ export interface TodolistSectionT extends DefaultSectionT {
     category: TodoCategory
 }
 
-export const renderTodolistSectionHeader = ({
-    section: { title, data, category },
-}: {
+export const TodolistSectionHeader: FC<{
     section: TodolistSectionT
-}) =>
-    category !== 'TODO' && category !== 'SUPPLY' && data.length > 0 ? (
-        <ListSubheader title={title} />
-    ) : null
+}> = ({ section: { title, data, category } }) =>
+    // category !== 'WORK' && category !== 'SUPPLY' &&
+    data.length > 0 ? <ListSubheader title={title} /> : null
 
 export const TodolistTabView_ = observer(
     <T extends {}>({
@@ -106,7 +103,7 @@ export const TodolistTabView_ = observer(
             }: {
                 section: TodolistSectionT
             }) =>
-                category !== 'TODO' &&
+                category !== 'WORK' &&
                 category !== 'SUPPLY' &&
                 data.length > 0 ? (
                     <ListSubheader title={title} />
