@@ -109,6 +109,20 @@ export async function setupRootStore(rootStore: RootStore) {
     _disposer = onSnapshot(rootStore, snapshot =>
         storage.save(ROOT_STATE_STORAGE_KEY, snapshot),
     )
+    autorun(() => {
+        console.log(
+            '[Preset changed:]',
+            rootStore?.userStore
+                ? JSON.stringify(
+                      rootStore.userStore.activeTrip?.todoPreset && {
+                          ...getSnapshot(
+                              rootStore.userStore.activeTrip?.todoPreset,
+                          ),
+                      },
+                  )
+                : '',
+        )
+    })
 
     const unsubscribe = () => {
         _disposer?.()

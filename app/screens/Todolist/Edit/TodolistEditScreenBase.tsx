@@ -82,7 +82,7 @@
 //         ({ category }) => !isSupplyCategory(category),
 //     )
 
-//     // const numOfTodoToAdd
+//     // const numOfWorkToAdd
 
 //     return (
 //         <Screen>

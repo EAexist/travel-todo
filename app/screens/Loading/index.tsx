@@ -141,16 +141,16 @@ export const useLoadingScreen = (
     }, [apiStatus])
 }
 
-export const useLoadingScreen_ = (
-    props: AppStackScreenProps<'Loading'>['route']['params'],
-) => {
-    const { apiStatus } = useApiStatus()
+// export const useLoadingScreen_ = (
+//     props: AppStackScreenProps<'Loading'>['route']['params'],
+// ) => {
+//     const { apiStatus } = useApiStatus()
 
-    useEffect(() => {
-        console.log(`[useLoadingScreen] apiStatus=${apiStatus}`)
-        if (apiStatus === ApiStatus.PENDING) navigate('Loading', props)
-    }, [apiStatus])
-}
+//     useEffect(() => {
+//         console.log(`[useLoadingScreen] apiStatus=${apiStatus}`)
+//         if (apiStatus === ApiStatus.PENDING) navigate('Loading', props)
+//     }, [apiStatus])
+// }
 
 export const RequireConnectionScreen: FC<
     AppStackScreenProps<'RequireConnection'>

@@ -122,7 +122,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
             },
             {
                 title: '준비할 짐',
-                icon: { name: '🧳' },
+                icon: { name: '🛍️' },
                 content: tripStore.supplyTodoStatusText,
                 onPress: handleViewSupplyTodolist,
             },
@@ -211,7 +211,7 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
                     <SectionCard>
                         {/* <ListSubheader title="시작 탭" dense /> */}
                         <ListItemBase
-                            title={'예약 탭에서 시작하기'}
+                            title={'앱을 시작할 때 예약 탭 열기'}
                             rightContent={
                                 <StyledSwitch
                                     isActive={tripStore.settings.isTripMode}

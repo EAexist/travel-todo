@@ -8,14 +8,10 @@ import {
 import Config from '../config'
 import type { PersistNavigationConfig } from '../config/config.base'
 import { useIsMounted } from '../utils/useIsMounted'
-import type {
-    AuthenticatedStackParamList,
-    NavigationProps,
-} from './AppNavigator'
 
 import * as storage from '../utils/storage'
 import { useStores, useTripStore } from '@/models'
-import { MainTabParamList } from './MainTabNavigator'
+import { AuthenticatedStackParamList, NavigationProps } from './navigationTypes'
 
 type Storage = typeof storage
 
@@ -232,7 +228,7 @@ export type NavigateProps = {
  * @param {object} unknown - The params to pass to the route.
  */
 export function useNavigate(todoId?: string) {
-    const tripStore = useTripStore()
+    const tripId = useTripStore()?.id
 
     const navigateWithTrip = useCallback(
         (
@@ -242,10 +238,10 @@ export function useNavigate(todoId?: string) {
             ignoreTrip?: boolean,
         ) => {
             console.log(
-                `[navigateWithTrip] ${JSON.stringify(name)} ${tripStore?.id} ${JSON.stringify(params)}`,
+                `[navigateWithTrip] name:${JSON.stringify(name)}, params:${JSON.stringify(params)}`,
             )
             const _params = {
-                tripId: ignoreTrip ? undefined : tripStore?.id,
+                tripId: ignoreTrip ? undefined : tripId,
                 todoId,
             }
             const _navigate = () =>
@@ -269,7 +265,7 @@ export function useNavigate(todoId?: string) {
                 })
             else _navigate()
         },
-        [tripStore?.id],
+        [tripId],
     )
 
     //   const navigateWithTrip = () => navigateWithTodo()

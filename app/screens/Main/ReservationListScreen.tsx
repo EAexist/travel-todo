@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { DefaultSectionT, TouchableOpacity, View } from 'react-native'
 //
 import {
@@ -39,6 +39,10 @@ const ReservationListItem: FC<{ reservation: Reservation }> = observer(
             setDisplayComplete(prev => !prev)
             reservation.toggleIsCompletedDelayed()
         }, [])
+
+        useEffect(() => {
+            setDisplayComplete(reservation.isCompleted)
+        }, [reservation.isCompleted])
 
         return (
             <ListItemBase

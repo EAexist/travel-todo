@@ -9,10 +9,11 @@ import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
 import { FC, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
+import { useReservationCreateTexts } from './ReservationCreateScreen'
 
 export const ReservationCreateFromTextScreen: FC<
     AuthenticatedStackScreenProps<'ReservationCreateFromText'>
-> = () => {
+> = ({ route: { params } }) => {
     const { createReservationFromTextWithApiStatus } = useActionsWithApiStatus()
 
     const { navigateWithTrip } = useNavigate()
@@ -22,20 +23,15 @@ export const ReservationCreateFromTextScreen: FC<
 
     const inputRef = useRef<TextInput>(null)
 
-    const reservationStore = useReservationStore()
-
     const isTextTooShort = value.length < 10
 
     const handlePressReservationCreateButton = useCallback(async () => {
         setIsTextChanged(false)
         if (!isTextTooShort) {
-            //   const response = await reservationStore.createReservationFromText(value)
-            const { kind, data: reservationIdList } =
-                await createReservationFromTextWithApiStatus({
-                    args: value,
-                    onSuccess: () =>
-                        navigateWithTrip('ReservationConfirmFromText'),
-                })
+            await createReservationFromTextWithApiStatus({
+                args: value,
+                onSuccess: () => navigateWithTrip('ReservationConfirmFromText'),
+            })
             //   if (kind === 'ok') {
             //     if (reservationIdList && reservationIdList?.length > 0) {
             //       navigateWithTrip('ReservationConfirmFromText', { reservationIdList })
@@ -70,13 +66,14 @@ export const ReservationCreateFromTextScreen: FC<
         [isFocused, value.length],
     )
 
+    const { instruction, placeholder } = useReservationCreateTexts(
+        params.category,
+    )
     return (
         <Screen>
             <ContentTitle
                 // title={'새 예약'}
-                subtitle={
-                    '알림톡, 이메일, 또는 웹사이트에서\n예약 내역 글 전체를 복사해 붙여넣은 후\n확인 버튼을 눌러주세요.'
-                }
+                subtitle={instruction}
             />
             <Note_
                 autoFocus
@@ -91,7 +88,7 @@ export const ReservationCreateFromTextScreen: FC<
                     setIsTextChanged(true)
                     setValue(text)
                 }}
-                placeholder="예약 내역 붙여넣기"
+                placeholder={placeholder}
                 ref={inputRef}
             />
             <Fab.Container>
@@ -105,12 +102,6 @@ export const ReservationCreateFromTextScreen: FC<
                     }
                 />
             </Fab.Container>
-            {/* <ControlledInput
-        value={rawText}
-        setValue={setrawText}
-        containerStyle={{ marginVertical: 24 }}
-        placeholder="예약 내역 텍스트 붙여넣기"
-      /> */}
         </Screen>
     )
 }

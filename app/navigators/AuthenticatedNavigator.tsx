@@ -155,6 +155,10 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
                 component={Screens.Confirm.Passport}
             />
             <AuthenticatedStack.Screen
+                name="ConfirmVisitJapan"
+                component={Screens.Confirm.VisitJapan}
+            />
+            <AuthenticatedStack.Screen
                 name="ConfirmFlight"
                 component={Screens.Confirm.Flight}
             />

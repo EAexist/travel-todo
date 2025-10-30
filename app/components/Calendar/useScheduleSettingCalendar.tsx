@@ -100,7 +100,7 @@ export const useScheduleSettingCalendar = ({
                     startingDay: true,
                     endingDay: endDate ? undefined : true,
                     color: colors.light1,
-                    titleColor: colors.contrastText.primary,
+                    textColor: colors.contrastText.primary,
                     customContainerStyle,
                 }
             }
@@ -108,7 +108,7 @@ export const useScheduleSettingCalendar = ({
                 o[toCalendarString(endDate)] = {
                     endingDay: true,
                     color: colors.light1,
-                    titleColor: colors.contrastText.primary,
+                    textColor: colors.contrastText.primary,
                     customContainerStyle,
                 }
             }

@@ -2,20 +2,15 @@ import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { Screen } from '@/components/Screen'
 import { TransText } from '@/components/TransText'
-import { useStores, useTripStore } from '@/models'
-import { useHeader } from '@/utils/useHeader'
+import { useTripStore } from '@/models'
 import { withTodo } from '@/utils/withTodo'
 import { useCallback } from 'react'
 
 export const ConfirmFlightScreen = withTodo<'ConfirmFlight'>(({ todo }) => {
     const { completeAndPatchTodo } = useTripStore()
-    const handleUploadPress = useCallback(() => {
-        // Handle next button press
-        console.log('Next button pressed')
-    }, [])
 
     const instruction =
-        '탑승권 발급과 좌석 선택을 미리 할 수 있도록 사전 체크인 알림을 보내드릴게요.'
+        '탑승권 발급과 좌석 선택을 미리 할 수 있도록\n사전 체크인 알림을 보내드릴게요.'
 
     const confirmCompleteTodo = useCallback(async () => {
         completeAndPatchTodo(todo)
@@ -28,26 +23,26 @@ export const ConfirmFlightScreen = withTodo<'ConfirmFlight'>(({ todo }) => {
                     <TransText h2>
                         {todo.departure
                             ? `${todo.flightTitleWithCode} 항공권\n`
-                            : '항공권 '}
-                        <TransText h2 primary>
-                            예약 내역 화면을 캡쳐
-                        </TransText>
-                        {'해서 올려주세요.'}
+                            : '항공권'}
+                        {'을 저장해주세요.'}
                     </TransText>
                 }
                 subtitle={instruction}
             />
             <Fab.Container>
-                <Fab.Button
-                    onPress={handleUploadPress}
-                    title={'화면 캡쳐 올리기'}
+                <Fab.NextButton
+                    navigateProps={{
+                        name: 'ReservationCreate',
+                        params: { category: 'FLIGHT_BOOKING' },
+                    }}
+                    title={'항공권 저장'}
                 />
                 <Fab.NextButton
                     navigateProps={{
                         name: 'Main',
                         params: { screen: 'Todolist' },
                     }}
-                    title={'올리지 않고 할 일 완료하기'}
+                    title={'저장하지 않고 할 일 완료하기'}
                     color={'secondary'}
                     promiseBeforeNavigate={confirmCompleteTodo}
                 />

@@ -18,10 +18,10 @@ export type TodoCategory =
     | 'WORK'
     | 'RESERVATION'
     | 'FOREIGN'
-    | 'SUPPLY'
     | 'WASH'
     | 'ELECTRONICS'
     | 'CLOTHING'
+    | 'SUPPLY'
 export const todoCategoryList: TodoCategory[] = [
     'RESERVATION',
     'FOREIGN',
@@ -35,21 +35,21 @@ export const todoCategoryList: TodoCategory[] = [
 export const TODO_CATEGORY_TO_TITLE: { [key: string]: string } = {
     RESERVATION: '예약',
     FOREIGN: '해외',
-    WORK: '기타',
+    WORK: '할 일',
     WASH: '세면도구',
-    SUPPLY: '기타',
     ELECTRONICS: '전자기기',
     CLOTHING: '옷',
+    SUPPLY: '준비할 짐',
 }
 
 export const TODO_CATEGORY_TO_ICON: { [key: string]: Icon } = {
     RESERVATION: { name: '🎫' },
     FOREIGN: { name: '🌐' },
     WORK: { name: '🎯' },
-    SUPPLY: { name: '💼' },
     WASH: { name: '💧' },
     ELECTRONICS: { name: '⚡' },
     CLOTHING: { name: '🩳' },
+    SUPPLY: { name: '🛍️' },
 }
 
 export interface Location {
@@ -130,14 +130,15 @@ export const TodoContentModel = types
     .props({
         id: types.optional(types.identifier, () => uuidv4()),
         category: createEnumType<TodoCategory>('TodoCategory'),
-        type: types.maybeNull(types.string),
+        type: types.string,
         title: types.string,
+        subtitle: types.maybe(types.string),
         icon: IconModel,
         isStock: types.optional(types.boolean, false),
     })
     .actions(withSetPropAction)
     .views(item => ({
-        get isTodo() {
+        get isSupply() {
             return isSupplyCategory(item.category)
         },
     }))
@@ -163,7 +164,8 @@ export const PresetTodoContentModel = TodoContentModel.named(
         id: types.string,
     })
     .actions(withSetPropAction)
-
+export interface PresetTodoContentSnapshotIn
+    extends SnapshotIn<typeof PresetTodoContentModel> {}
 /**
  * TodoPresetItem
  */
@@ -171,7 +173,7 @@ export const TodoPresetItemModel = types
     .model('Preset')
     .props({
         isFlaggedToAdd: types.boolean,
-        todoContent: PresetTodoContentModel,
+        content: PresetTodoContentModel,
     })
     .actions(withSetPropAction)
     .actions(presetItem => ({
@@ -182,7 +184,7 @@ export const TodoPresetItemModel = types
 
 export interface TodoPresetItem extends Instance<typeof TodoPresetItemModel> {}
 export interface TodoPresetItemSnapshotIn
-    extends SnapshotOut<typeof TodoPresetItemModel> {}
+    extends SnapshotIn<typeof TodoPresetItemModel> {}
 
 /**
  * Todo
@@ -199,6 +201,9 @@ export const TodoModel = types
     })
     .actions(withSetPropAction)
     .views(item => ({
+        get subtitle() {
+            return item.content.subtitle
+        },
         get category() {
             return item.content.category
             //       return item.presetTodoContent !== null
@@ -222,9 +227,6 @@ export const TodoModel = types
             //   return item.presetTodoContent !== null
             //     ? item.presetTodoContent.icon
             //     : item.customTodoContent?.icon
-        },
-        get subtitle() {
-            return item.note
         },
     }))
     .views(item => ({

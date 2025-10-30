@@ -2,7 +2,8 @@ import { useTripStore } from '@/models'
 import { TripSummary } from '@/models/stores/TripStore'
 import { Chip, ListItem, useTheme } from '@rneui/themed'
 import { BookmarkCheck } from 'lucide-react-native'
-import { FC, ReactElement, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { FC, ReactElement } from 'react'
 
 export interface TripListItemProps {
     item: TripSummary
@@ -14,58 +15,66 @@ export interface TripListItemProps {
     disabled?: boolean
 }
 
-export const TripListItem: FC<TripListItemProps> = ({
-    item,
-    leftContent,
-    renderRightContent,
-    onPress,
-    subtitle,
-    asCard = true,
-    disabled = false,
-}) => {
-    const tripStore = useTripStore()
-    const isActive = tripStore !== null && item.id === tripStore.id
+export const TripListItem: FC<TripListItemProps> = observer(
+    ({
+        item,
+        leftContent,
+        renderRightContent,
+        onPress,
+        subtitle,
+        asCard = true,
+        disabled = false,
+    }) => {
+        const tripStore = useTripStore()
+        const isActive = tripStore !== null && item.id === tripStore.id
 
-    const {
-        theme: { colors },
-    } = useTheme()
+        const {
+            theme: { colors },
+        } = useTheme()
 
-    return (
-        <ListItem
-            useDisabledStyle={disabled}
-            onPress={onPress ? () => onPress(item) : undefined}
-            disabled={disabled || !onPress}
-            asCard={asCard}>
-            {leftContent && leftContent}
-            {isActive && <BookmarkCheck color={colors.primary} size={28} />}
-            <ListItem.Content>
-                <ListItem.Title>{item.title || '새 여행'}</ListItem.Title>
-                {item.isInitialized &&
-                    (item.destinationTitles.length > 0 ||
-                        item.scheduleText.length > 0) && (
-                        <ListItem.Subtitle>
-                            {(item.destinationTitles.length > 0
-                                ? [item.destinationTitles.slice(0, 2).join(' ')]
-                                : []
-                            )
-                                .concat(
-                                    item.scheduleText.length > 0
-                                        ? [item.scheduleText]
-                                        : [],
+        return (
+            <ListItem
+                useDisabledStyle={disabled}
+                onPress={onPress ? () => onPress(item) : undefined}
+                disabled={disabled || !onPress}
+                asCard={asCard}>
+                {leftContent && leftContent}
+                {isActive && <BookmarkCheck color={colors.primary} size={28} />}
+                <ListItem.Content>
+                    <ListItem.Title>{item.title || '새 여행'}</ListItem.Title>
+                    {item.isInitialized &&
+                        (item.destinationTitles.length > 0 ||
+                            item.scheduleText.length > 0) && (
+                            <ListItem.Subtitle>
+                                {(item.destinationTitles.length > 0
+                                    ? [
+                                          item.destinationTitles
+                                              .slice(0, 2)
+                                              .join(' '),
+                                      ]
+                                    : []
                                 )
-                                .join('ㆍ')}
+                                    .concat(
+                                        item.scheduleText.length > 0
+                                            ? [item.scheduleText]
+                                            : [],
+                                    )
+                                    .join('ㆍ')}
+                            </ListItem.Subtitle>
+                        )}
+                    {!item.isInitialized && (
+                        <ListItem.Subtitle>
+                            {`${new Date(item.createDateIsoString).toLocaleString()} 생성`}
                         </ListItem.Subtitle>
                     )}
-                {!item.isInitialized && (
-                    <ListItem.Subtitle>
-                        {`${new Date(item.createDateIsoString).toLocaleString()} 생성`}
-                    </ListItem.Subtitle>
-                )}
-                {subtitle && <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>}
-            </ListItem.Content>
-            {!item.isInitialized && <Chip title={'설정 중'} size="sm" />}
-            {item.isCompleted && <Chip title={'종료'} size="sm" />}
-            {renderRightContent && renderRightContent(item)}
-        </ListItem>
-    )
-}
+                    {subtitle && (
+                        <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>
+                    )}
+                </ListItem.Content>
+                {!item.isInitialized && <Chip title={'설정 중'} size="sm" />}
+                {item.isCompleted && <Chip title={'종료'} size="sm" />}
+                {renderRightContent && renderRightContent(item)}
+            </ListItem>
+        )
+    },
+)

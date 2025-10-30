@@ -130,7 +130,7 @@ export const TripStoreModel = types
         todoMap: types.map(TodoModel),
         customTodoContent: types.array(TodoContentModel),
         activeItem: types.maybeNull(types.reference(TodoModel)),
-        preset: types.array(TodoPresetItemModel),
+        todoPreset: types.array(TodoPresetItemModel),
         reservationStore: types.optional(ReservationStoreModel, {}),
         settings: types.optional(TripSettingsModel, () =>
             TripSettingsModel.create(),
@@ -217,7 +217,7 @@ export const TripStoreModel = types
             store.setProp('endDateIsoString', trip.endDateIsoString)
             store.setProp('todoMap', trip.todoMap)
             /* Nested Object: UseSetProps */
-            store.setProp('preset', trip.preset)
+            store.setProp('todoPreset', trip.todoPreset)
         },
         setTodo(todo: Todo) {
             store.todoMap.set(todo.id, todo)
@@ -247,7 +247,7 @@ export const TripStoreModel = types
         //   store.setProp(
         //     'preset',
         //     Object.fromEntries(
-        //       Array.from(store.preset.entries())
+        //       Array.from(store.todoPreset.entries())
         //         .map(([category, presets]) => [
         //           category,
         //           presets.filter(preset => !usedPresetIds.includes(preset.content.id)),
@@ -275,38 +275,15 @@ export const TripStoreModel = types
         /*
          * Backend API calls
          */
-        async fetchPreset() {
-            console.log('[Tripstore.fetchPreset]')
+        async fetchTodoPreset() {
+            console.log('[Tripstore.fetchTodoPreset]')
             await sync_db()
-            if (store.preset.values.length > 0) {
+            if (store.todoPreset.values.length > 0) {
                 return
             } else {
                 return api.getTodoPreset(store.id).then(response => {
                     if (response.kind == 'ok') {
-                        const map = new Map<string, TodoPresetItem[]>()
-                        response.data.forEach(
-                            ({ isFlaggedToAdd, todoContent }) => {
-                                if (!map.has(todoContent.category)) {
-                                    map.set(todoContent.category, [])
-                                }
-                                map.get(todoContent.category)?.push(
-                                    TodoPresetItemModel.create({
-                                        isFlaggedToAdd,
-                                        todoContent: todoContent,
-                                    }),
-                                )
-                            },
-                        )
-                        applySnapshot(
-                            store.preset,
-                            response.data.reduce(
-                                (acc, item) => {
-                                    acc[item.todoContent.id] = item
-                                    return acc
-                                },
-                                {} as Record<string, any>,
-                            ),
-                        )
+                        applySnapshot(store.todoPreset, response.data)
                     }
                     return response
                 })
@@ -401,18 +378,12 @@ export const TripStoreModel = types
          */
         createCustomTodo(category: TodoCategory, type: string) {
             let title: string
-            let icon: Icon
+            let icon: Icon = TODO_CATEGORY_TO_ICON[category]
             switch (type) {
-                case 'flight':
-                    title = '항공권 예약'
-                    icon = { name: '✈️', type: 'tossface' }
-                    break
-                case 'flightTicket':
-                    title = '체크인'
-                    icon = { name: '🛫', type: 'tossface' }
+                case 'FLIGHT_TICKET':
+                    title = '탑승 수속'
                     break
                 default:
-                    icon = TODO_CATEGORY_TO_ICON[category]
                     switch (category) {
                         case 'RESERVATION':
                             title = '새 예약'
@@ -591,18 +562,19 @@ export const TripStoreModel = types
          * Presets
          */
         get numOfAddFlags() {
-            return store.preset.filter(preset => preset.isFlaggedToAdd).length
+            return store.todoPreset.filter(preset => preset.isFlaggedToAdd)
+                .length
         },
-        get numOfTodoToAdd() {
-            return store.preset.filter(
-                ({ isFlaggedToAdd, todoContent }) =>
-                    isFlaggedToAdd && todoContent.isTodo,
+        get numOfWorkToAdd() {
+            return store.todoPreset.filter(
+                ({ isFlaggedToAdd, content }) =>
+                    isFlaggedToAdd && !content.isSupply,
             ).length
         },
-        get numOfGoodsToAdd() {
-            return store.preset.filter(
-                ({ isFlaggedToAdd, todoContent }) =>
-                    isFlaggedToAdd && !todoContent.isTodo,
+        get numOfSupplyToAdd() {
+            return store.todoPreset.filter(
+                ({ isFlaggedToAdd, content }) =>
+                    isFlaggedToAdd && content.isSupply,
             ).length
         },
         /*
@@ -618,14 +590,6 @@ export const TripStoreModel = types
         get numOfIncompleteTodo() {
             return this.todos.filter(item => !item.isCompleted).length
             // return store.destinations.map((item) => item.title).join(', ')
-        },
-        get numbefOfTodoText() {
-            return this.todos.filter(t => !t.isCompleted && t.content.isTodo)
-                .length
-        },
-        get numbefOfGoodsText() {
-            return this.todos.filter(t => !t.isCompleted && !t.content.isTodo)
-                .length
         },
         // get nonEmptysections() {
         //     return Array.from(store.todolist.entries())
@@ -747,11 +711,11 @@ export const TripStoreModel = types
             return dday
         },
         get hasAccomodationTodo() {
-            return this.todos.some(item => item.type === 'accomodation')
+            return this.todos.some(item => item.type === 'ACCOMODATION')
         },
         get accomodationTodoStatusText() {
             return store.endDate && store.startDate
-                ? `${store.reservationStore.reservedNights}박/${differenceInDays(startOfDay(store.endDate), startOfDay(store?.startDate))}박`
+                ? `${store.reservationStore.reservedNights}박 / ${differenceInDays(startOfDay(store.endDate), startOfDay(store?.startDate))}박`
                 : `${store.reservationStore.reservedNights}박 예약 완료`
         },
         get workTodoStatusText() {
@@ -768,18 +732,22 @@ export const TripStoreModel = types
         },
         get todosWithPreset() {
             const addedStockIds = this.todos
-                ?.filter(item => item.content.isStock)
+                ?.filter(
+                    item =>
+                        item.content.isStock ||
+                        item.content.type === 'FLIGHT_OUTBOUND' ||
+                        item.content.type === 'FLIGHT_RETURN',
+                )
                 .map(item => item.content.id)
 
             const todos =
                 this.todos?.map(item => ({
                     todo: item,
                 })) || []
-            const preset =
-                store.preset
+            const todoPreset =
+                store.todoPreset
                     ?.filter(
-                        preset =>
-                            !addedStockIds?.includes(preset.todoContent.id),
+                        preset => !addedStockIds?.includes(preset.content.id),
                     )
                     .map(preset => ({
                         preset,
@@ -790,9 +758,8 @@ export const TripStoreModel = types
                 title: TODO_CATEGORY_TO_TITLE[category],
                 data: [
                     ...todos.filter(({ todo }) => todo.category === category),
-                    ...preset.filter(
-                        ({ preset }) =>
-                            preset.todoContent.category === category,
+                    ...todoPreset.filter(
+                        ({ preset }) => preset.content.category === category,
                     ),
                 ] as { todo?: Todo; preset?: TodoPresetItem }[],
             }))
@@ -891,29 +858,34 @@ export const TripStoreModel = types
                 todo.patch({
                     completeDateIsoString: todo.completeDateIsoString,
                 })
-                if (todo.type == 'flight') {
+                if (
+                    todo.type == 'FLIGHT_OUTBOUND' ||
+                    todo.type == 'FLIGHT_RETURN'
+                ) {
                     const newTodo = store.createCustomTodo(
                         'RESERVATION',
-                        'flightTicket',
+                        'FLIGHT_TICKET',
                     )
-                    newTodo.setTitle(todo.title)
+                    newTodo.content.setProp('subtitle', todo.content.subtitle)
+                    applySnapshot(newTodo.content.icon, todo.content.icon)
+                    // newTodo.content.setProp('icon', todo.content.icon)
                     newTodo.patch()
                 }
             }
         },
         resetAddFlags() {
-            store.preset.forEach(preset => {
+            store.todoPreset.forEach(preset => {
                 preset.setProp('isFlaggedToAdd', false)
             })
         },
         addFlaggedPreset() {
-            ;(store.preset.flat() as TodoPresetItem[])
+            ;(store.todoPreset.flat() as TodoPresetItem[])
                 .filter(preset => preset.isFlaggedToAdd)
                 .forEach(preset => {
                     const todo = store.addTodo(
                         TodoModel.create({
                             content: TodoContentModel.create(
-                                getSnapshot(preset.todoContent),
+                                getSnapshot(preset.content),
                             ),
                         }),
                     )

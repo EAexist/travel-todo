@@ -16,11 +16,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 
 export type AppStackParamList = {
     /* Common */
-    Loading: {
-        pendingIndicatorTitle?: string[]
-        onProblem?: () => void
-        onSuccess?: () => void
-    }
+    Loading: {}
     RequireConnection: { title?: string }
     Auth: NavigatorScreenParams<AuthStackParamList>
     App: NavigatorScreenParams<AuthenticatedStackParamList>
@@ -69,9 +65,11 @@ export type AuthenticatedStackParamList = {
     ReservationEditList: TripStackProps
     ReservationDelete: TripStackProps
     ReservationCreate: TripStackProps & {
-        defaultCategory?: ReservationCategory
+        category?: ReservationCategory
     }
-    ReservationCreateFromText: TripStackProps
+    ReservationCreateFromText: TripStackProps & {
+        category?: ReservationCategory
+    }
     ReservationConfirmFromText: TripStackProps & { reservationIdList: string[] }
     ReservationNotFoundFromText: TripStackProps
     FullScreenImage: TripStackProps & {
@@ -104,6 +102,7 @@ export type TodoAuthenticatedStackParamList = {
     /* Confirm */
     //   ConfirmReservationTodo: TodoStackProps
     ConfirmPassport: TodoStackProps
+    ConfirmVisitJapan: TodoStackProps
     ConfirmFlight: TodoStackProps
     ConfirmFlightTicket: TodoStackProps
 

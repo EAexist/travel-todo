@@ -117,7 +117,7 @@ export const UserStoreModel = types
         }),
     }))
     .actions(store => ({
-        createTrip: async () => {
+        createTrip: withDbSync(async () => {
             console.log('[UserStore.createTrip]')
             return api.createTrip({ userId: store.id }).then(async response => {
                 console.log(
@@ -131,7 +131,7 @@ export const UserStoreModel = types
                 }
                 return response
             })
-        },
+        }),
         deleteTrip: (tripId: string) => {
             console.log('[UserStore.deleteTrip]')
             const trip = store.tripSummary.find(t => t.id === tripId)
@@ -206,8 +206,17 @@ export const UserStoreModel = types
             return [
                 ...store.tripSummary
                     .filter(t => t.id !== store.activeTrip?.id)
-                    .toSorted(),
-            ]
+                    .sort(),
+            ].sort(
+                (
+                    { createDateIsoString: createDateIsoStringA },
+                    { createDateIsoString: createDateIsoStringB },
+                ) => {
+                    const dateA = new Date(createDateIsoStringA)
+                    const dateB = new Date(createDateIsoStringB)
+                    return dateB.getTime() - dateA.getTime()
+                },
+            )
         },
         get activeTripSumamry() {
             return store.tripSummary.filter(
@@ -216,11 +225,6 @@ export const UserStoreModel = types
         },
         get hasReachedTripNumberLimit() {
             return store.tripSummary.length == store.maxNumberOfTrip
-        },
-    }))
-    .views(store => ({
-        get tripSummaryList() {
-            return [store.activeTripSumamry, ...store.otherTripSummaryList]
         },
     }))
 

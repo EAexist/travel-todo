@@ -43,7 +43,7 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
             <Observer
                 render={() => {
                     switch (todo.type) {
-                        case 'accomodation':
+                        case 'ACCOMODATION':
                             return <AccomodationTodo todo={todo} />
                         default:
                             return <CompleteTodo todo={todo} />

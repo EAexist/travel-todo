@@ -1,5 +1,5 @@
 import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
-import { GooglePlacesSearchBarInput } from '@/components/Input'
+import { GooglePlacesSearchBarInput, InputIcon } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
 import { LoadingScreen } from '@/screens/Loading'
 import { Screen } from '@/components/Screen'
@@ -152,12 +152,16 @@ const GooglePlacesSearchBar = () => {
                 onPress={() => {}}
                 textInputProps={{
                     InputComp: GooglePlacesSearchBarInput,
-                    leftIcon: {
-                        name: 'search',
-                    },
+                    leftIcon: (
+                        // name: 'search',
+                        <InputIcon size={24} name={'search'} />
+                    ),
                     autoFocus: true,
                     value: inputText,
                     onChangeText: handleTextChange,
+                    style: {
+                        fontSize: 17,
+                    },
                 }}
                 placeholder={t`도시 또는 국가 검색`}
                 query={PlacesAutoCompleteQuery}

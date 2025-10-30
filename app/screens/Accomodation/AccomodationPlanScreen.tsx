@@ -106,7 +106,7 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
                     navigateProps={{
                         name: 'ReservationCreate',
                         params: {
-                            defaultCategory: 'ACCOMODATION',
+                            category: 'ACCOMODATION',
                         },
                     }}
                 />
