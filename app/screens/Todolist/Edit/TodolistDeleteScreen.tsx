@@ -3,14 +3,13 @@ import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { CheckBoxItemProps, TodoBase } from '@/components/Todo'
 import {
-    renderTodolistSectionHeader,
     TodolistEditContent,
+    TodolistSectionHeader,
     TodolistSectionT,
 } from '@/components/TodoList'
 import { useTripStore } from '@/models'
-import { isSupplyCategory, Todo } from '@/models/Todo'
+import { Todo } from '@/models/Todo'
 import { useCheckedList } from '@/utils/useCheckedList'
-import { useHeader } from '@/utils/useHeader'
 import { ListItem, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
 import { FC, useCallback } from 'react'
@@ -24,7 +23,6 @@ const DeleteTodo: FC<CheckBoxItemProps & { todo: Todo }> = observer(
 
         return (
             <TodoBase
-                subtitle={todo.subtitle}
                 rightContent={
                     <ListItem.CheckBox
                         onPress={onPress}
@@ -41,6 +39,7 @@ const DeleteTodo: FC<CheckBoxItemProps & { todo: Todo }> = observer(
                     },
                 })}
                 title={todo.title}
+                subtitle={todo.subtitle}
                 icon={todo.icon}
             />
         )
@@ -89,7 +88,9 @@ export const TodolistDeleteScreen = observer(() => {
                             : tripStore.workTodolistSectionListData
                     }
                     renderItem={renderItem}
-                    renderSectionHeader={renderTodolistSectionHeader}
+                    renderSectionHeader={({ section }) => (
+                        <TodolistSectionHeader section={section} />
+                    )}
                     keyExtractor={(todo: Todo) => todo.id}
                 />
             )

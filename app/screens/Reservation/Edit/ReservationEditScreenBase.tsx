@@ -448,7 +448,7 @@ export const ReservationEditScreenBase: FC<{
                 </TextInfoListItem>
                 {reservation.category === 'ACCOMODATION' && (
                     <>
-                        <ListSubheader title={'체크인 · 체크아웃 날짜'} dense />
+                        <ListSubheader title={'체크인 · 체크아웃 날짜'} />
                         <ListItem
                             onPress={() => {
                                 accomodationScheduleBottomSheetModalRef.current?.present()
@@ -475,6 +475,7 @@ export const ReservationEditScreenBase: FC<{
                             data={data}
                             renderItem={renderReservationDetail}
                             keyExtractor={item => item.id}
+                            contentContainerStyle={{ paddingTop: 24 }}
                         />
                     </>
                 )}

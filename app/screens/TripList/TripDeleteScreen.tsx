@@ -12,6 +12,7 @@ import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, ListRenderItem, TouchableOpacity } from 'react-native'
 import { TripListItem, TripListItemProps } from './TripListitem'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 
 const TripDeleteListItem: FC<Omit<TripListItemProps, 'renderRightContent'>> =
     observer(({ item, onPress, ...props }) => {
@@ -75,9 +76,13 @@ export const TripDeleteScreen: FC<AuthenticatedStackScreenProps<'TripDelete'>> =
             <Screen backgroundColor={'secondary'}>
                 <ContentTitle title={t`여행 삭제하기`} />
                 <>
+                    <ListSubheader
+                        title={'사용 중인 여행은 삭제할 수 없어요.'}
+                        dense
+                    />
                     <TripListItem
                         item={userStore.activeTripSumamry}
-                        subtitle={'사용 중인 여행은 삭제할 수 없어요.'}
+                        // subtitle={'사용 중인 여행은 삭제할 수 없어요.'}
                         disabled={true}
                     />
                     {userStore.otherTripSummaryList.length > 0 && (

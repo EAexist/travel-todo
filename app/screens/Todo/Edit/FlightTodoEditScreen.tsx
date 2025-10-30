@@ -29,26 +29,26 @@ import {
 } from '../TodoConfirmListItem'
 
 const FlightRecommendation: FC<{ todoId: string }> = ({ todoId }) => {
-    const {
-        tripStore: { id: tripId },
-    } = useStores()
+    const tripStore = useTripStore()
 
     const [sections, setSections] =
         useState<SectionListData<Airline, DefaultSectionT>[]>()
 
     useEffect(() => {
         const getRecommendedFlightRoute = async () => {
-            api.getRecommendedFlightRoute(tripId, todoId).then(response => {
-                if (response.kind == 'ok') {
-                    setSections(
-                        response.data.map(flightRoute => ({
-                            title: `${flightRoute.departureAirport.airportName} > ${flightRoute.arrivalAirport.airportName}`,
-                            reservationLinks: flightRoute.reservationLinks,
-                            data: flightRoute.airlines,
-                        })),
-                    )
-                }
-            })
+            api.getRecommendedFlightRoute(tripStore.id, todoId).then(
+                response => {
+                    if (response.kind == 'ok') {
+                        setSections(
+                            response.data.map(flightRoute => ({
+                                title: `${flightRoute.departureAirport.airportName} > ${flightRoute.arrivalAirport.airportName}`,
+                                reservationLinks: flightRoute.reservationLinks,
+                                data: flightRoute.airlines,
+                            })),
+                        )
+                    }
+                },
+            )
         }
         getRecommendedFlightRoute()
     }, [setSections])

@@ -5,9 +5,13 @@ import {
     DestinationSnapshotIn,
 } from '@/models/Destination'
 import { AccomodationSnapshotIn } from '@/models/Reservation/Accomodation'
-import { ReservationSnapshot } from '@/models/Reservation/Reservation'
+import {
+    ReservationModel,
+    ReservationSnapshot,
+} from '@/models/Reservation/Reservation'
 import {
     PresetTodoContentModel,
+    PresetTodoContentSnapshotIn,
     Todo,
     TodoContent,
     TodoContentModel,
@@ -72,7 +76,7 @@ export interface TripFetchDTO
     todolist: TodoDTO[]
     destinations: DestinationDTO[]
     reservations: ReservationDTO[]
-    stockTodoContents: TodoContentSnapshotIn[]
+    stockTodoContents: TodoContentDTO[]
 }
 
 export interface TripPatchDTO
@@ -89,16 +93,28 @@ export interface TripPatchDTO
     id: string
     settings?: Partial<TripSettingsSnapshot>
 }
-
 export interface TodoDTO
     extends Partial<Omit<TodoSnapshotIn, 'isFlaggedToDelete' | 'content'>> {
-    content: TodoContentSnapshotIn
+    content: TodoContentDTO
 }
 
 export interface TodoPatchDTO
     extends Partial<Omit<TodoSnapshotIn, 'isFlaggedToDelete' | 'content'>> {
     content?: TodoContentSnapshotIn
     id: string
+}
+
+export interface TodoPresetDTO
+    extends Omit<TodoPresetItemSnapshotIn, 'content'> {
+    content: PresetTodoContentDTO
+}
+
+interface TodoContentDTO extends Omit<TodoContentSnapshotIn, 'subtitle'> {
+    subtitle: string | null
+}
+interface PresetTodoContentDTO
+    extends Omit<PresetTodoContentSnapshotIn, 'subtitle'> {
+    subtitle: string | null
 }
 
 export interface ReservationDTO extends ReservationSnapshot {}
@@ -115,18 +131,9 @@ export interface ReservationPatchDTO extends Partial<ReservationSnapshot> {
 export interface DestinationDTO extends Omit<DestinationSnapshotIn, 'id'> {
     id?: string
 }
-export interface PresetDTO extends TodoPresetItemSnapshotIn {}
-//   extends Omit<TodoPresetItemSnapshotIn, 'todoContent'> {
-//   todoContent: PresetTodoContentDTO
-// }
-
-// export interface PresetTodoContentDTO extends TodoPresetItem {}
-export interface PresetTodoContentDTO extends Omit<TodoPresetItem, 'id'> {
-    id: string
-}
 
 export interface ApiPresetResponse {
-    preset: PresetDTO[]
+    preset: TodoPresetDTO[]
     status: string
 }
 
@@ -253,24 +260,20 @@ export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshot = ({
             : {},
         destinations: destinations.map(dest => mapToDestination(dest)),
         reservationStore: ReservationStoreModel.create({
-            reservations: reservations
-                ? reservations.reduce(
-                      (acc: { [key: string]: any }, reservationDTO) => {
-                          if (reservationDTO.id)
-                              acc[reservationDTO.id?.toString()] =
-                                  mapToReservation(reservationDTO)
-                          return acc
-                      },
-                      {},
-                  )
-                : {},
+            reservations: reservations.reduce(
+                (acc: { [key: string]: any }, reservationDTO) => {
+                    if (reservationDTO.id)
+                        acc[reservationDTO.id?.toString()] =
+                            mapToReservation(reservationDTO)
+                    return acc
+                },
+                {},
+            ),
         }),
-        preset: stockTodoContents.map(stockTodoContent =>
-            TodoPresetItemModel.create({
-                isFlaggedToAdd: false,
-                todoContent: PresetTodoContentModel.create(stockTodoContent),
-            }),
-        ),
+        preset: stockTodoContents.map(stockTodoContent => ({
+            isFlaggedToAdd: false,
+            content: mapToTodoContent(stockTodoContent),
+        })),
     }
 }
 
@@ -302,13 +305,24 @@ export const mapToTodoPatchDTO: (
     content: todo.content,
 })
 
-export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
-    TodoModel.create({
-        ...todoDTO,
-        content: TodoContentModel.create(
-            todoDTO.content as TodoContentSnapshotIn,
-        ),
-    })
+const mapToTodoContent: (
+    todoContentDTO: TodoContentDTO,
+) => TodoContentSnapshotIn = todoContentDTO => ({
+    ...todoContentDTO,
+    subtitle: todoContentDTO.subtitle || undefined,
+})
+
+const mapToPresetTodoContent: (
+    todoContentDTO: PresetTodoContentDTO,
+) => PresetTodoContentSnapshotIn = todoContentDTO => ({
+    ...todoContentDTO,
+    subtitle: todoContentDTO.subtitle || undefined,
+})
+
+export const mapToTodo: (todoDTO: TodoDTO) => TodoSnapshotIn = todoDTO => ({
+    ...todoDTO,
+    content: mapToTodoContent(todoDTO.content),
+})
 
 // export const mapFetchToTripDTO: (trip: Partial<TripStore>) => PartiaFetchl<TripDTO> = ({
 //     todolist,
@@ -327,14 +341,11 @@ export const mapToTodo: (todoDTO: TodoDTO) => Todo = todoDTO =>
 //         : undefined,
 //     destination: destination?.map(dest => mapToDestinationDTO(dest)),
 // })
-export const mapToPreset: (
-    preset: PresetDTO,
-) => TodoPresetItemSnapshotIn = preset => ({
-    ...preset,
-    todoContent: {
-        ...preset.todoContent,
-        // id: preset.todoContent.id.toString(),
-    },
+export const mapToTodoPreset: (
+    todoPresetDTO: TodoPresetDTO,
+) => TodoPresetItemSnapshotIn = todoPresetDTO => ({
+    ...todoPresetDTO,
+    content: mapToPresetTodoContent(todoPresetDTO.content),
 })
 
 export const mapToReservation: (

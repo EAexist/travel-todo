@@ -1,11 +1,10 @@
-import { Label } from '@/components/Label'
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { ToggleSwitchTab, ToggleSwitchTabProps } from '@/components/SwitchTab'
 import { useTripStore } from '@/models'
 import { isSupplyCategory, Todo, TodoCategory } from '@/models/Todo'
-import { ListItem, TabView, Text, useTheme } from '@rneui/themed'
-import { Observer, observer } from 'mobx-react-lite'
+import { TabView } from '@rneui/themed'
+import { observer } from 'mobx-react-lite'
 import { FC, ReactNode, useCallback, useState } from 'react'
 import {
     DefaultSectionT,
@@ -16,25 +15,32 @@ import {
     View,
 } from 'react-native'
 
-export const DoShowSupplyTodosFirstToggleSwitch: FC<
-    Pick<ToggleSwitchTabProps, 'value' | 'onChange' | 'variant'>
-> = observer(props => {
-    const tripStore = useTripStore()
+export interface DoShowSupplyTodosFirstToggleSwitchProps
+    extends Pick<ToggleSwitchTabProps, 'value' | 'onChange' | 'variant'>,
+        Partial<Pick<ToggleSwitchTabProps, 'tabItemProps'>> {}
 
+export const DoShowSupplyTodosFirstToggleSwitch: FC<
+    DoShowSupplyTodosFirstToggleSwitchProps
+> = ({ tabItemProps, ...props }) => {
     return (
         <ToggleSwitchTab
             {...props}
             tabItemProps={{
+                ...tabItemProps,
                 false: {
+                    iconRight: true,
                     title: '할 일',
+                    ...tabItemProps?.false,
                 },
                 true: {
+                    iconRight: true,
                     title: '준비할 짐',
+                    ...tabItemProps?.true,
                 },
             }}
         />
     )
-})
+}
 
 interface TodoListTabViewProps {
     doShowSupplyTodosFirst: boolean
@@ -164,30 +170,31 @@ export const TodolistTabView_ = observer(
         )
     },
 )
-export const TodolistEditContent = observer(
-    ({
-        renderTabViewItem,
-        variant,
-    }: Pick<TodoListTabViewProps, 'renderTabViewItem'> &
-        Pick<ToggleSwitchTabProps, 'variant'>) => {
-        const [doShowSupplyTodosFirst, setDoShowSupplyTodosFirst] =
-            useState(false)
+export const TodolistEditContent = ({
+    renderTabViewItem,
+    variant,
+    toggleSwitchTabProps,
+}: Pick<TodoListTabViewProps, 'renderTabViewItem'> &
+    Pick<ToggleSwitchTabProps, 'variant'> & {
+        toggleSwitchTabProps?: Partial<DoShowSupplyTodosFirstToggleSwitchProps>
+    }) => {
+    const [doShowSupplyTodosFirst, setDoShowSupplyTodosFirst] = useState(false)
 
-        return (
-            <View style={{ flex: 1 }}>
-                <DoShowSupplyTodosFirstToggleSwitch
-                    value={doShowSupplyTodosFirst}
-                    onChange={() => setDoShowSupplyTodosFirst(prev => !prev)}
-                    variant={variant}
-                />
-                <TodolistTabView
-                    doShowSupplyTodosFirst={doShowSupplyTodosFirst}
-                    toggleDoShowSupplyTodosFirst={() =>
-                        setDoShowSupplyTodosFirst(prev => !prev)
-                    }
-                    renderTabViewItem={renderTabViewItem}
-                />
-            </View>
-        )
-    },
-)
+    return (
+        <View style={{ flex: 1 }}>
+            <DoShowSupplyTodosFirstToggleSwitch
+                {...toggleSwitchTabProps}
+                value={doShowSupplyTodosFirst}
+                onChange={() => setDoShowSupplyTodosFirst(prev => !prev)}
+                variant={variant}
+            />
+            <TodolistTabView
+                doShowSupplyTodosFirst={doShowSupplyTodosFirst}
+                toggleDoShowSupplyTodosFirst={() =>
+                    setDoShowSupplyTodosFirst(prev => !prev)
+                }
+                renderTabViewItem={renderTabViewItem}
+            />
+        </View>
+    )
+}

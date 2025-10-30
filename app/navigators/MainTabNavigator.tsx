@@ -77,7 +77,6 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                     tabBarInactiveTintColor: theme.colors.inactive,
                     tabBarLabelStyle: $tabBarLabel,
                     tabBarItemStyle: $tabBarItemStyle,
-                    // sceneStyle: $sceneStyle,
                 }}>
                 <Tab.Screen
                     name="Todolist"
@@ -151,8 +150,8 @@ const $tabBarHeight = 68
 // }
 const $tabBarStyle: ViewStyle = {
     height: $tabBarHeight,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    // borderTopLeftRadius: 24,
+    // borderTopRightRadius: 24,
 }
 
 const $tabBarItemStyle: ViewStyle = {

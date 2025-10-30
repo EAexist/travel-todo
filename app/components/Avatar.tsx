@@ -6,8 +6,9 @@ import {
 import * as pajamas from 'assets/images/icon/pajamas.png'
 import * as powerBank from 'assets/images/icon/power-bank.png'
 import * as sandals from 'assets/images/icon/sandals.png'
-import * as smartphone from 'assets/images/icon/smartphone.png'
+import * as charger from 'assets/images/icon/charger.png'
 import * as towel from 'assets/images/icon/towel.png'
+import * as visit_japan_logo from 'assets/images/third-party/visit-japan-logo.png'
 import { PropsWithChildren } from 'react'
 import { ImageSourcePropType, StyleSheet } from 'react-native'
 
@@ -25,6 +26,34 @@ export const Avatar = ({
 }: PropsWithChildren<AvatarProps>) => {
     let avatarProps: Partial<RNEAvatarProps>
 
+    let fontSize,
+        width: number = 16
+
+    switch (avatarSize) {
+        case 'xsmall':
+            fontSize = 16
+            width = 20
+            break
+        case 'small':
+            fontSize = 18
+            width = 22
+            break
+        case 'medium':
+            fontSize = 24
+            width = 28
+            break
+        case 'large':
+            fontSize = 28
+            width = 32
+            break
+        case 'xlarge':
+            fontSize = 32
+            width = 36
+            break
+        default:
+            fontSize = avatarSize
+    }
+
     switch (icon?.type || 'tossface') {
         case 'tossface':
             avatarProps = {
@@ -32,18 +61,7 @@ export const Avatar = ({
                     <Text
                         style={{
                             ...styles.titleStyle,
-                            fontSize:
-                                avatarSize === 'xsmall'
-                                    ? 16
-                                    : avatarSize === 'small'
-                                      ? 18
-                                      : avatarSize === 'medium'
-                                        ? 24
-                                        : avatarSize === 'large'
-                                          ? 28
-                                          : avatarSize === 'xlarge'
-                                            ? 32
-                                            : avatarSize,
+                            fontSize,
                         }}>
                         {icon?.name}
                     </Text>
@@ -65,8 +83,11 @@ export const Avatar = ({
                 case 'sandals':
                     source = sandals
                     break
-                case 'smartphone':
-                    source = smartphone
+                case 'charger':
+                    source = charger
+                    break
+                case 'visit-japan':
+                    source = visit_japan_logo
                     break
                 default:
                     break
@@ -74,6 +95,10 @@ export const Avatar = ({
 
             avatarProps = {
                 source,
+                avatarStyle: {
+                    width: width,
+                    height: width,
+                },
             }
             break
         default:

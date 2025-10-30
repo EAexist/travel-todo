@@ -17,7 +17,7 @@ import { useHeader } from '@/utils/useHeader'
 import { useLingui } from '@lingui/react/macro'
 import { useFocusEffect } from '@react-navigation/native'
 import { Divider, ListItem, useTheme } from '@rneui/themed'
-import { observer } from 'mobx-react-lite'
+import { Observer, observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 import { useLoadingScreen, useRequireConnection } from '../Loading'
@@ -175,6 +175,9 @@ export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
                         <Fab.Button
                             title={'확인'}
                             onPress={() => {
+                                userStore.deleteTrip(
+                                    userStore.tripSummary[0].id,
+                                )
                                 createTrip()
                                 maxNumberOfTripHandleBottomSheetRef.current?.close()
                             }}

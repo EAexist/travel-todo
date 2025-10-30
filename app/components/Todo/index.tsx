@@ -4,7 +4,7 @@ import { useNavigate } from '@/navigators'
 import { Trans } from '@lingui/react/macro'
 import { ListItem, ListItemProps, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { FC, ReactNode, useCallback, useState } from 'react'
+import { FC, ReactNode, useCallback, useEffect, useState } from 'react'
 import {
     GestureResponderEvent,
     StyleProp,
@@ -71,47 +71,57 @@ export type TodoProps = { id: string } & Pick<
     'icon' | 'title' | 'subtitle'
 >
 
+export const useHandleConfirmTodo = (todo: Todo) => {
+    const { navigateWithTrip } = useNavigate()
+    const handleConfirm = useCallback(() => {
+        switch (todo.type) {
+            case 'PASSPORT':
+                navigateWithTrip('ConfirmPassport', { todoId: todo.id })
+                return false
+            case 'FLIGHT_OUTBOUND':
+            case 'FLIGHT_RETURN':
+                navigateWithTrip('ConfirmFlight', { todoId: todo.id })
+                return false
+            case 'FLIGHT_TICKET':
+                navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
+                return false
+            case 'VISIT_JAPAN':
+                navigateWithTrip('ConfirmVisitJapan', { todoId: todo.id })
+                return false
+            default:
+                return true
+        }
+    }, [todo.type])
+    return { handleConfirm }
+}
+
 export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
     const { navigateWithTrip } = useNavigate()
     const tripStore = useTripStore()
 
     const [displayComplete, setDisplayComplete] = useState(todo.isCompleted)
 
+    const { handleConfirm } = useHandleConfirmTodo(todo)
     const {
         theme: { colors },
     } = useTheme()
 
     const handleCompletePress = useCallback(() => {
         if (!todo.isCompleted) {
-            switch (todo.type) {
-                case 'passport':
-                    navigateWithTrip('ConfirmPassport', { todoId: todo.id })
-                    //   tripStore.completeAndPatchTodo(todo).then(() => {
-                    //     navigateWithTrip('ConfirmPassport', {todoId: todo.id})
-                    //   })
-                    break
-                case 'flight':
-                    navigateWithTrip('ConfirmFlight', { todoId: todo.id })
-                    //   tripStore.completeAndPatchTodo(todo).then(() => {
-                    //     navigateWithTrip('ConfirmFlight', {todoId: todo.id})
-                    //   })
-                    break
-                case 'flightTicket':
-                    navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
-                    //   tripStore.completeAndPatchTodo(todo).then(() => {
-                    //     navigateWithTrip('ConfirmFlight', {todoId: todo.id})
-                    //   })
-                    break
-                default:
-                    setDisplayComplete(prev => !prev)
-                    todo.toggleIsCompletedDelayed()
-                    break
+            const isConfirmed = handleConfirm()
+            if (isConfirmed) {
+                setDisplayComplete(prev => !prev)
+                todo.toggleIsCompletedDelayed()
             }
         } else {
             setDisplayComplete(prev => !prev)
             todo.toggleIsCompletedDelayed()
         }
     }, [])
+
+    useEffect(() => {
+        setDisplayComplete(todo.isCompleted)
+    }, [todo.isCompleted])
 
     const handlePress = useCallback(
         (e: GestureResponderEvent) => {
@@ -129,7 +139,7 @@ export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
             rightContent={
                 <ListItem.CheckBox
                     onPress={handleCompletePress}
-                    checked={todo.isCompleted || displayComplete}
+                    checked={displayComplete}
                     checkedIcon="radio-button-checked"
                     uncheckedIcon="radio-button-unchecked"
                     uncheckedColor={colors.grey2}
@@ -138,13 +148,7 @@ export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
                     }
                 />
             }
-            subtitle={
-                todo.type == 'flight' || todo.type == 'flightTicket'
-                    ? todo.flightTitle
-                    : todo.note !== ''
-                      ? todo.note
-                      : undefined
-            }
+            subtitle={todo.subtitle}
             onPress={handlePress}
             title={todo.title}
             icon={todo.icon}
@@ -183,7 +187,7 @@ export const CompleteTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
 //   )
 // }
 
-export const AccomodationTodo: FC<{ todo: Todo }> = ({ todo }) => {
+export const AccomodationTodo: FC<{ todo: Todo }> = observer(({ todo }) => {
     const { navigateWithTrip } = useNavigate()
     const handlePress = useCallback(() => {
         navigateWithTrip('AccomodationPlan')
@@ -200,18 +204,12 @@ export const AccomodationTodo: FC<{ todo: Todo }> = ({ todo }) => {
             icon={todo.icon}
         />
     )
-}
+})
 
 export const ReorderTodo: FC<{ todo: Todo }> = ({ todo }) => {
     return (
         <TodoBase
-            subtitle={
-                todo.type == 'flight' || todo.type == 'flightTicket'
-                    ? todo.flightTitle
-                    : todo.note !== ''
-                      ? todo.note
-                      : undefined
-            }
+            subtitle={todo.subtitle}
             rightContent={
                 <ListItem.Chevron name="drag-handle" type="material" />
             }

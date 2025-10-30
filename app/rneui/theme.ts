@@ -275,12 +275,6 @@ const theme = createTheme({
                 flexGrow: 0,
                 flexBasis: 'auto',
             },
-            // iconContainerStyle: (active: boolean) => ({
-            //     aspectRatio: 1,
-            //     marginHorizontal: 0,
-            //     justifyContent: 'center',
-            //     ...(icon ? { width: 32, height: 32 } : {}),
-            // }),
             // icon: {
             //     // ...(icon as Partial<IconProps>),
             //     color: active ? colors.primary : colors.contrastText.secondary,
@@ -288,7 +282,7 @@ const theme = createTheme({
             // },
             buttonStyle: (active: boolean) => ({
                 // backgroundColor: active ? colors.white : 'transparent',
-                minWidth: 84,
+                minWidth: 96,
                 flexDirection: iconRight ? 'row-reverse' : 'row',
                 backgroundColor: active
                     ? variant === 'primary'
@@ -300,7 +294,7 @@ const theme = createTheme({
                 ...(size === 'md'
                     ? {
                           paddingVertical: 0,
-                          paddingHorizontal: 0,
+                          paddingHorizontal: 8,
                           borderRadius: 24,
                       }
                     : {
@@ -311,7 +305,7 @@ const theme = createTheme({
             }),
             titleStyle: (active: boolean) => ({
                 letterSpacing: 0.5,
-                paddingHorizontal: 8,
+                paddingHorizontal: 0,
                 paddingVertical: 8,
                 color: active
                     ? color === 'primary'

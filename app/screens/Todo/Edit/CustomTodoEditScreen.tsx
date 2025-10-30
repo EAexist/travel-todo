@@ -10,6 +10,7 @@ import ContentTitle from '@/components/Layout/Content'
 import { Screen } from '@/components/Screen'
 import StyledSwitch from '@/components/StyledSwitch'
 import { TextInfoListItem } from '@/components/TextInfoListItem'
+import { useHandleConfirmTodo } from '@/components/Todo'
 import { TransText } from '@/components/TransText'
 import { useTripStore } from '@/models'
 import {
@@ -189,6 +190,18 @@ export const CustomTodoEditScreen: FC<{
 
     useHeader({ onBackPressBeforeNavigate: handleBackPressBeforeNavigate })
 
+    const { handleConfirm } = useHandleConfirmTodo(todo)
+    const handleToggleConfirm = useCallback(() => {
+        if (!todo.isCompleted) {
+            const isConfirmed = handleConfirm()
+            if (isConfirmed) {
+                todo.toggleIsCompleted()
+            }
+        } else {
+            todo.toggleIsCompleted()
+        }
+    }, [todo.isCompleted])
+
     const [isFocused, setIsFocused] = useState(false)
     return (
         <Screen>
@@ -233,7 +246,7 @@ export const CustomTodoEditScreen: FC<{
                 rightContent={
                     <StyledSwitch
                         isActive={todo.isCompleted}
-                        onChange={todo.toggleIsCompleted}
+                        onChange={handleToggleConfirm}
                         iconProps={{
                             true: {
                                 name: 'check',
@@ -248,16 +261,20 @@ export const CustomTodoEditScreen: FC<{
                 }>
                 <Text>{todo.isCompleted ? '완료' : '미완료'}</Text>
             </TextInfoListItem>
-            {!todo.content.isStock && (
-                <TextInfoListItem
-                    title={'카테고리'}
-                    rightContent={<ListItem.Chevron />}
-                    onPress={handleCategoryPress}>
-                    <TransText>
-                        {todo.categoryTitle || '카테고리 선택'}
-                    </TransText>
-                </TextInfoListItem>
-            )}
+            {!todo.content.isStock &&
+                !(
+                    todo.type === 'FLIGHT_OUTBOUND' ||
+                    todo.type === 'FLIGHT_RETURN'
+                ) && (
+                    <TextInfoListItem
+                        title={'카테고리'}
+                        rightContent={<ListItem.Chevron />}
+                        onPress={handleCategoryPress}>
+                        <TransText>
+                            {todo.categoryTitle || '카테고리 선택'}
+                        </TransText>
+                    </TextInfoListItem>
+                )}
             <TextInfoListItem
                 onPress={handleNotePress}
                 title={'메모'}

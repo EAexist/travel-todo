@@ -160,9 +160,7 @@ export const ReservationDetailListItem: FC<{
         case 'category':
             if (reservation.category === 'ACCOMODATION') {
                 customElement = (
-                    <TextInfoListItem
-                        onPress={handleLinkPress}
-                        title={'숙소 타입'}>
+                    <TextInfoListItem title={'숙소 타입'}>
                         <Label
                             title={reservation.accomodation?.categoryText}
                             leftContent={

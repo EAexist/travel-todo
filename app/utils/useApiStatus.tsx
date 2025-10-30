@@ -218,17 +218,17 @@ export const useActionsWithApiStatus = () => {
               }),
         ...(tripStore
             ? {
-                  fetchPresetWithApiStatus: _useWithApiStatus<
+                  fetchTodoPresetWithApiStatus: _useWithApiStatus<
                       {},
                       TodoPresetItemSnapshotIn[]
-                  >(tripStore.fetchPreset),
+                  >(tripStore.fetchTodoPreset),
                   createReservationFromTextWithApiStatus: _useWithApiStatus<
                       string,
                       ReservationSnapshot[]
                   >(tripStore?.createReservationFromText),
               }
             : {
-                  fetchPresetWithApiStatus: async () => {},
+                  fetchTodoPresetWithApiStatus: async () => {},
                   createReservationFromTextWithApiStatus: async () => {},
               }),
     }

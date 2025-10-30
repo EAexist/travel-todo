@@ -42,16 +42,15 @@ import {
     GoogleUserDTO,
     PatchReservationProps,
     PatchTodoProps,
-    PresetDTO,
+    TodoPresetDTO,
     ReservationDTO,
     TodoDTO,
-    type TripDTO,
     TripFetchDTO,
     TripPatchDTO,
     UserAccountDTO,
     mapToDestination,
     mapToDestinationDTO,
-    mapToPreset,
+    mapToTodoPreset,
     mapToReservation,
     mapToTodo,
     mapToTrip,
@@ -59,7 +58,6 @@ import {
 } from './api.types'
 import { GeneralApiProblem, getGeneralApiProblem } from './apiProblem'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
-import { List } from 'lodash'
 
 export type ApiResult<T> =
     | { kind: 'ok'; data: T; location?: string }
@@ -76,7 +74,9 @@ function _handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
         if (!response.data || !response.headers) {
             throw Error
         }
-        console.log(`_handleResponse] response=${JSON.stringify(response)}`)
+        console.log(
+            `_handleResponse] status:${response.status} data:${JSON.stringify(response.data)}`,
+        )
         return {
             kind: 'ok',
             data: response.data,
@@ -439,19 +439,14 @@ export class Api {
      * @returns {kind} - Response Status.
      * @returns {id} - Trip Id.
      */
-    async deleteTrip({
-        tripId,
-    }: DeleteTripProps): Promise<ApiResult<UserStoreSnapshot>> {
-        const response: ApiResponse<UserAccountDTO> =
-            await this.apisauce.delete(`/trip/${tripId}`)
+    async deleteTrip({ tripId }: DeleteTripProps): Promise<ApiResult<null>> {
+        const response: ApiResponse<void> = await this.apisauce.delete(
+            `/trip/${tripId}`,
+        )
 
-        const userAccountDTO = _handleResponse<UserAccountDTO>(response)
-        return userAccountDTO.kind === 'ok'
-            ? {
-                  ...userAccountDTO,
-                  data: mapToUserAccount(userAccountDTO.data),
-              }
-            : userAccountDTO
+        console.log(`[deleteTrip] response:${JSON.stringify(response)}`)
+
+        return handleDeleteResponse(response)
     }
 
     /**
@@ -718,15 +713,15 @@ export class Api {
     async getTodoPreset(
         tripId: string,
     ): Promise<ApiResult<TodoPresetItemSnapshotIn[]>> {
-        const response: ApiResponse<PresetDTO[]> = await this.apisauce.get(
+        const response: ApiResponse<TodoPresetDTO[]> = await this.apisauce.get(
             `/trip/${tripId}/todoPreset`,
         )
-        const presetResponse = _handleResponse<PresetDTO[]>(response)
+        const presetResponse = _handleResponse<TodoPresetDTO[]>(response)
         return presetResponse.kind === 'ok'
             ? {
                   ...presetResponse,
                   data: presetResponse.data.map(presetDTO =>
-                      mapToPreset(presetDTO),
+                      mapToTodoPreset(presetDTO),
                   ),
               }
             : presetResponse

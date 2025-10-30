@@ -1,10 +1,4 @@
-import {
-    AuthenticatedStackParamList,
-    goBack,
-    navigate,
-    NavigateProps,
-    useNavigate,
-} from '@/navigators'
+import { goBack, navigate, NavigateProps, useNavigate } from '@/navigators'
 import { ButtonProps } from '@rneui/themed'
 import {
     createContext,
@@ -19,7 +13,6 @@ import {
 } from 'react'
 import { LayoutChangeEvent, View, ViewStyle } from 'react-native'
 import { Button as ButtonBase } from '../Button'
-import { MainTabParamList } from '@/navigators/MainTabNavigator'
 
 interface FabHeightContextType {
     height: number

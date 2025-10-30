@@ -1,8 +1,6 @@
 import { Screen } from '@/components'
-import { Avatar, AvatarProps } from '@/components/Avatar'
-import BottomSheetModal, {
-    useNavigationBottomSheet,
-} from '@/components/BottomSheetModal'
+import BottomSheetModal from '@/components/BottomSheetModal'
+import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { TodoBase } from '@/components/Todo'
 import {
@@ -21,10 +19,8 @@ import { useNavigate } from '@/navigators'
 import { typography } from '@/rneui/theme'
 import { Icon, ListItem, Text, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
-import { FC, ReactNode, RefObject, useCallback, useRef, useState } from 'react'
+import { FC, useCallback, useRef, useState } from 'react'
 import {
-    FlatList,
-    ListRenderItem,
     SectionList,
     SectionListRenderItem,
     StyleSheet,
@@ -35,10 +31,10 @@ import {
 interface TodolistAddScreenBaseProps {
     title: string
     instruction: string
-    fab: ReactNode
-    tripId: string
-    callerName: 'TodolistSetting' | 'TodolistAdd'
     isInitializingScreen?: boolean
+    // fab: ReactNode
+    // tripId: string
+    // callerName: 'TodolistSetting' | 'TodolistAdd'
 }
 
 export const useAddFlaggedPreset = () => {
@@ -137,12 +133,14 @@ const AddPresetTodo: FC<{
                 />
             }
             onPress={handlePress}
-            {...(useDisabledStyle && {
-                avatarProps: { avatarStyle: styles.disabled },
-                contentStyle: styles.disabled,
-            })}
-            title={preset.todoContent.title}
-            icon={preset.todoContent.icon}
+            {...(useDisabledStyle &&
+                !preset.isFlaggedToAdd && {
+                    avatarProps: { avatarStyle: styles.disabled },
+                    contentStyle: styles.disabled,
+                })}
+            title={preset.content.title}
+            subtitle={preset.content.subtitle}
+            icon={preset.content.icon}
         />
     )
 })
@@ -155,9 +153,6 @@ export const TodolistAddScreenBase = observer(
     ({
         title,
         instruction,
-        fab,
-        tripId,
-        callerName,
         isInitializingScreen = false,
     }: TodolistAddScreenBaseProps) => {
         const tripStore = useTripStore()
@@ -175,38 +170,26 @@ export const TodolistAddScreenBase = observer(
         const renderItem: SectionListRenderItem<
             { todo?: Todo; preset?: TodoPresetItem },
             TodolistSectionT
-        > = ({ item: { preset, todo } }) => (
-            <Observer
-                render={() =>
-                    preset ? (
-                        <AddPresetTodo
-                            preset={preset}
-                            key={preset?.todoContent.id}
-                            useDisabledStyle={isInitializingScreen}
-                        />
-                    ) : (
-                        <AddedTodo
-                            todo={todo as Todo}
-                            key={todo?.id}
-                            useDisabledStyle={!isInitializingScreen}
-                        />
-                    )
-                }
-            />
-        )
+        > = ({ item: { preset, todo } }) =>
+            // <Observer
+            //     render={() =>
+            preset ? (
+                <AddPresetTodo
+                    preset={preset}
+                    key={preset?.content.id}
+                    useDisabledStyle={isInitializingScreen}
+                />
+            ) : (
+                <AddedTodo
+                    todo={todo as Todo}
+                    key={todo?.id}
+                    useDisabledStyle={!isInitializingScreen}
+                />
+            )
+        // }
+        // />
         /* BottomSheet */
         const bottomSheetRef = useRef<BottomSheetModal>(null)
-        const renderTabIcon = useCallback((isTodo: boolean) => {
-            const numberOfAddFlag = isTodo
-                ? tripStore.numOfTodoToAdd
-                : tripStore.numOfGoodsToAdd
-
-            return numberOfAddFlag > 0 ? (
-                <Text style={{ ...typography.pretendard.medium }} primary>
-                    {`  ${numberOfAddFlag}`}
-                </Text>
-            ) : null
-        }, [])
 
         const renderTabViewItem = useCallback(
             (isSupply: boolean) => {
@@ -226,40 +209,19 @@ export const TodolistAddScreenBase = observer(
                                 }}
                             />
                         ) : (
-                            <View>
-                                <TodoBase
-                                    avatarProps={{
-                                        icon: { name: 'add', type: 'material' },
-                                    }}
-                                    titleStyle={$titleStyleHighlighted}
-                                    {...{
-                                        title: '직접 추가하기',
-                                        subtitle: '',
-                                        onPress: () =>
-                                            handleAddCutomTodo(
-                                                'WORK',
-                                                'custom',
-                                            ),
-                                    }}
-                                    rightContent={<ListItem.Chevron />}
-                                />
-                                <TodoBase
-                                    avatarProps={{
-                                        icon: { name: '✈️' },
-                                    }}
-                                    titleStyle={$titleStyleHighlighted}
-                                    {...{
-                                        title: '항공권 예약 할 일 추가하기',
-                                        subtitle: '',
-                                        onPress: () =>
-                                            handleAddCutomTodo(
-                                                'SUPPLY',
-                                                'custom',
-                                            ),
-                                    }}
-                                    rightContent={<ListItem.Chevron />}
-                                />
-                            </View>
+                            <TodoBase
+                                avatarProps={{
+                                    icon: { name: 'add', type: 'material' },
+                                }}
+                                titleStyle={$titleStyleHighlighted}
+                                {...{
+                                    title: '직접 추가하기',
+                                    subtitle: '',
+                                    onPress: () =>
+                                        handleAddCutomTodo('WORK', 'custom'),
+                                }}
+                                rightContent={<ListItem.Chevron />}
+                            />
                         )}
 
                         <SectionList
@@ -271,120 +233,179 @@ export const TodolistAddScreenBase = observer(
                             keyExtractor={({ todo, preset }) =>
                                 todo
                                     ? `todo-${todo.id}`
-                                    : `preset-${preset?.todoContent.id}` || ''
+                                    : `preset-${preset?.content.id}` || ''
                             }
                         />
                     </View>
                 )
             },
-            [handleAddCutomTodo, bottomSheetRef.current],
+            [
+                handleAddCutomTodo,
+                bottomSheetRef.current,
+                supplySections,
+                workSections,
+            ],
         )
+
+        const handlePressNext = async () => {
+            tripStore.addFlaggedPreset()
+            if (isInitializingScreen) {
+                tripStore.initialize()
+            }
+        }
 
         return (
             <Screen>
                 <ContentTitle title={title} subtitle={instruction} />
-                <TodolistEditContent renderTabViewItem={renderTabViewItem} />
-                {fab}
-                <ReservationTypeDropDownBottomSheet
+                <TodolistEditContent
+                    renderTabViewItem={renderTabViewItem}
+                    toggleSwitchTabProps={{
+                        tabItemProps: {
+                            false: {
+                                icon:
+                                    tripStore.numOfWorkToAdd > 0 ? (
+                                        <Text
+                                            style={{
+                                                ...typography.pretendard.medium,
+                                                fontSize: 13,
+                                                paddingLeft: 8,
+                                            }}
+                                            primary>
+                                            {`${tripStore.numOfWorkToAdd}`}
+                                        </Text>
+                                    ) : undefined,
+                            },
+                            true: {
+                                icon:
+                                    tripStore.numOfSupplyToAdd > 0 ? (
+                                        <Text
+                                            style={{
+                                                ...typography.pretendard.medium,
+                                                fontSize: 13,
+                                                paddingLeft: 8,
+                                            }}
+                                            primary>
+                                            {`${tripStore.numOfSupplyToAdd}`}
+                                        </Text>
+                                    ) : undefined,
+                            },
+                        },
+                    }}
+                />
+                <Fab.Container>
+                    <Fab.NextButton
+                        navigateProps={{
+                            name: 'Main',
+                            params: { screen: 'Todolist' },
+                        }}
+                        promiseBeforeNavigate={handlePressNext}
+                        title={
+                            tripStore.numOfAddFlags > 0
+                                ? `${tripStore.numOfAddFlags}개 할 일 추가`
+                                : '확인'
+                        }
+                    />
+                </Fab.Container>
+                {/* <ReservationTypeDropDownBottomSheet
                     ref={bottomSheetRef}
                     callerName={callerName}
-                />
+                /> */}
             </Screen>
         )
     },
 )
 
-const ReservationTypeDropDownBottomSheet = ({
-    ref,
-    callerName,
-}: {
-    ref: RefObject<BottomSheetModal | null>
-    callerName: 'TodolistSetting' | 'TodolistAdd'
-}) => {
-    const { handleAddCutomTodo } = useHandleAddCutomTodo({ callerName })
+// const ReservationTypeDropDownBottomSheet = ({
+//     ref,
+//     callerName,
+// }: {
+//     ref: RefObject<BottomSheetModal | null>
+//     callerName: 'TodolistSetting' | 'TodolistAdd'
+// }) => {
+//     const { handleAddCutomTodo } = useHandleAddCutomTodo({ callerName })
 
-    const { useActiveKey, handleBottomSheetModalChange, activate } =
-        useNavigationBottomSheet(ref)
+//     const { useActiveKey, handleBottomSheetModalChange, activate } =
+//         useNavigationBottomSheet(ref)
 
-    useActiveKey(activeKey => handleAddCutomTodo('RESERVATION', activeKey))
+//     useActiveKey(activeKey => handleAddCutomTodo('RESERVATION', activeKey))
 
-    interface ReservationTypeOptionData {
-        type: string
-        title: string
-        avatarProps: AvatarProps
-        isManaged?: boolean
-    }
+//     interface ReservationTypeOptionData {
+//         type: string
+//         title: string
+//         avatarProps: AvatarProps
+//         isManaged?: boolean
+//     }
 
-    const options: ReservationTypeOptionData[] = [
-        {
-            type: 'flight',
-            title: '항공권',
-            avatarProps: {
-                icon: { name: '✈️' },
-                containerStyle: { backgroundColor: 'bisque' },
-            },
-        },
-        // {
-        //   type: 'train',
-        //   title: '열차',
-        //   avatarProps: {icon: {name: '🚅'}, containerStyle: {backgroundColor: 'bisque'}},
-        // },
-        {
-            type: 'custom',
-            title: '직접 입력',
-            avatarProps: {
-                icon: { name: '✏️' },
-                containerStyle: { backgroundColor: 'bisque' },
-            },
-        },
-        // {
-        //     type: 'accomodation',
-        //     title: '숙박 예약',
-        //     avatarProps: { icon: {name:'🛌'}, containerStyle: { backgroundColor: 'bisque' } },
-        //     isManaged: true,
-        // },
-    ]
+//     const options: ReservationTypeOptionData[] = [
+//         {
+//             type: 'flight',
+//             title: '항공권',
+//             avatarProps: {
+//                 icon: { name: '✈️' },
+//                 containerStyle: { backgroundColor: 'bisque' },
+//             },
+//         },
+//         // {
+//         //   type: 'train',
+//         //   title: '열차',
+//         //   avatarProps: {icon: {name: '🚅'}, containerStyle: {backgroundColor: 'bisque'}},
+//         // },
+//         {
+//             type: 'custom',
+//             title: '직접 입력',
+//             avatarProps: {
+//                 icon: { name: '✏️' },
+//                 containerStyle: { backgroundColor: 'bisque' },
+//             },
+//         },
+//         // {
+//         //     type: 'accomodation',
+//         //     title: '숙박 예약',
+//         //     avatarProps: { icon: {name:'🛌'}, containerStyle: { backgroundColor: 'bisque' } },
+//         //     isManaged: true,
+//         // },
+//     ]
 
-    const renderReservationTypeListItem: ListRenderItem<ReservationTypeOptionData> =
-        useCallback(
-            ({ item }) => {
-                const handlePress = () => activate(item.type)
+//     const renderReservationTypeListItem: ListRenderItem<ReservationTypeOptionData> =
+//         useCallback(
+//             ({ item }) => {
+//                 const handlePress = () => activate(item.type)
 
-                return (
-                    <ListItem
-                        onPress={handlePress}
-                        disabled={item.isManaged}
-                        useDisabledStyle={item.isManaged}>
-                        <Avatar
-                            //   size="medium"
-                            {...item.avatarProps}
-                        />
-                        <ListItem.Content>
-                            <ListItem.Title>{item.title}</ListItem.Title>
-                        </ListItem.Content>
-                        <ListItem.Chevron
-                            iconProps={
-                                item.isManaged ? { name: 'check' } : undefined
-                            }
-                        />
-                    </ListItem>
-                )
-            },
-            [activate],
-        )
+//                 return (
+//                     <ListItem
+//                         onPress={handlePress}
+//                         disabled={item.isManaged}
+//                         useDisabledStyle={item.isManaged}>
+//                         <Avatar
+//                             //   size="medium"
+//                             {...item.avatarProps}
+//                         />
+//                         <ListItem.Content>
+//                             <ListItem.Title>{item.title}</ListItem.Title>
+//                         </ListItem.Content>
+//                         <ListItem.Chevron
+//                             iconProps={
+//                                 item.isManaged ? { name: 'check' } : undefined
+//                             }
+//                         />
+//                     </ListItem>
+//                 )
+//             },
+//             [activate],
+//         )
 
-    return (
-        <BottomSheetModal ref={ref} onChange={handleBottomSheetModalChange}>
-            <ContentTitle title={'에약 할 일 추가하기'} />
-            <FlatList
-                data={options}
-                renderItem={renderReservationTypeListItem}
-                keyExtractor={item => item.title}
-            />
-        </BottomSheetModal>
-    )
-}
+//     return (
+//         <BottomSheetModal ref={ref} onChange={handleBottomSheetModalChange}>
+//             <ContentTitle title={'에약 할 일 추가하기'} />
+//             <FlatList
+//                 data={options}
+//                 renderItem={renderReservationTypeListItem}
+//                 keyExtractor={item => item.title}
+//             />
+//         </BottomSheetModal>
+//     )
+// }
 
 const $titleStyleHighlighted: TextStyle = {
-    fontWeight: 700,
+    ...typography.pretendard.bold,
 }
