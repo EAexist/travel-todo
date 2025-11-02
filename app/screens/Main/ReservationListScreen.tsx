@@ -10,9 +10,10 @@ import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
-import { useReservationStore, useTripStore } from '@/models'
+import { useReservationStore } from '@/models'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { MainTabScreenProps, useNavigate } from '@/navigators'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 import { useMainScreenHeader } from '@/utils/useHeader'
 import { FAB, ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
@@ -71,9 +72,12 @@ const ReservationListItem: FC<{ reservation: Reservation }> = observer(
 )
 export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
     observer(() => {
-        const tripStore = useTripStore()
         const { navigateWithTrip } = useNavigate()
         const reservationStore = useReservationStore()
+
+        const {
+            theme: { colors },
+        } = useTheme()
 
         const handleAddReservation = useCallback(() => {
             navigateWithTrip('ReservationCreate')
@@ -123,12 +127,21 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
             settingsMenuBottomSheetRef.current?.present()
         }, [settingsMenuBottomSheetRef])
 
+        const { maxReservations, hasReachedReservationNumberLimit } =
+            useResourceQuota()
+
         const settingsOption: NavigateListItemProp[] = [
             {
                 title: '예약 추가',
                 path: 'ReservationCreate',
                 icon: { name: 'add', type: 'material' },
-                primary: true,
+                primary: !hasReachedReservationNumberLimit,
+                subtitle: hasReachedReservationNumberLimit
+                    ? `예약 개수 제한에 도달했어요 (${reservationStore.reservationList.length}/${maxReservations})`
+                    : undefined,
+                disabled: hasReachedReservationNumberLimit,
+                useDisabledStyle: hasReachedReservationNumberLimit,
+                subtitleStyle: { color: colors.error },
             },
             // {
             //     title: '예약 편집',
@@ -141,10 +154,6 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
                 icon: { name: 'delete', type: 'material' },
             },
         ]
-
-        const {
-            theme: { colors },
-        } = useTheme()
 
         useMainScreenHeader({
             title: '예약',
@@ -160,26 +169,38 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
             ),
         })
 
-        const [showHelp, setShowHelp] = useState(false)
-
-        const handlePressHelpTravelMode = useCallback(() => {
-            setShowHelp(true)
-        }, [])
-
+        // const tripStore = useTripStore()
+        // useEffect(() => {
+        //     for (let i = 0; i < 64; i++) {
+        //         tripStore.createCustomReservation('ACCOMODATION')
+        //     }
+        // }, [])
         return (
             <Screen backgroundColor={'secondary'}>
                 <ReservationList renderItem={renderItem} />
                 <FAB
                     onPress={handleAddReservation}
-                    icon={{ name: 'add', color: 'white' }}
+                    icon={
+                        !hasReachedReservationNumberLimit
+                            ? { name: 'add', color: 'white' }
+                            : undefined
+                    }
                     placement="right"
+                    disabled={hasReachedReservationNumberLimit}
+                    title={
+                        hasReachedReservationNumberLimit
+                            ? `${reservationStore.reservationList.length} / ${maxReservations}`
+                            : undefined
+                    }
+                    titleStyle={{
+                        fontSize: 15,
+                        marginHorizontal: 0,
+                    }}
                 />
                 <NavigateMenuBottomSheet
                     data={settingsOption}
                     ref={settingsMenuBottomSheetRef}
-                    onDismiss={() =>
-                        setShowHelp(false)
-                    }></NavigateMenuBottomSheet>
+                />
             </Screen>
         )
     })

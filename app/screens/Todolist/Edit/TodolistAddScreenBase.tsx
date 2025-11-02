@@ -17,8 +17,9 @@ import {
 } from '@/models/Todo'
 import { useNavigate } from '@/navigators'
 import { typography } from '@/rneui/theme'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 import { Icon, ListItem, Text, useTheme } from '@rneui/themed'
-import { Observer, observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import {
     SectionList,
@@ -51,6 +52,7 @@ export const useHandleAddCutomTodo = ({
     callerName?: 'TodolistSetting' | 'TodolistAdd'
 }) => {
     const { createCustomTodo } = useTripStore()
+    const { hasReachedTodoNumberLimit } = useResourceQuota()
     const { navigateWithTrip } = useNavigate()
     const handleAddCutomTodo = useCallback(
         (category: TodoCategory, type: string) => {

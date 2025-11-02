@@ -1,13 +1,8 @@
-import { api, GoogleUserDTO } from '@/services/api'
-import {
-    APIAction,
-    enqueueAction,
-    sync_db,
-    withDbSync,
-} from '@/tasks/BackgroundTask'
-import { KakaoProfile } from '@react-native-seoul/kakao-login'
-import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { api } from '@/services/api'
+import { APIAction, enqueueAction, withDbSync } from '@/tasks/BackgroundTask'
+import { Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { withSetPropAction } from '../helpers/withSetPropAction'
+import { ResourceQuotaStoreModel } from './ResourceQuotaStore'
 import {
     TripStoreModel,
     TripStoreSnapshot,
@@ -25,7 +20,7 @@ export const UserStoreModel = types
     })
     .actions(withSetPropAction)
     .actions(store => ({
-        setUser(user: UserStoreSnapshot) {
+        setUser(user: UserStoreSnapshotIn) {
             store.setProp('id', user.id)
             store.setProp('nickname', user.nickname)
             store.setProp('tripSummary', user.tripSummary || [])
@@ -194,11 +189,6 @@ export const UserStoreModel = types
         // },
     }))
     .views(store => ({
-        get maxNumberOfTrip() {
-            return 5
-        },
-    }))
-    .views(store => ({
         get currentTrip() {
             return store.tripSummary[store.tripSummary.length - 1]
         },
@@ -223,10 +213,8 @@ export const UserStoreModel = types
                 t => t.id === store.activeTrip?.id,
             )[0]
         },
-        get hasReachedTripNumberLimit() {
-            return store.tripSummary.length == store.maxNumberOfTrip
-        },
     }))
 
 export interface UserStore extends Instance<typeof UserStoreModel> {}
-export interface UserStoreSnapshot extends SnapshotOut<typeof UserStoreModel> {}
+export interface UserStoreSnapshotIn
+    extends SnapshotIn<typeof UserStoreModel> {}

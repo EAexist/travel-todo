@@ -25,6 +25,7 @@ import {
 import { useTripStore } from '@/models'
 import { Todo } from '@/models/Todo'
 import { MainTabScreenProps } from '@/navigators'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 import { useMainScreenHeader } from '@/utils/useHeader'
 import { ListItem, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
@@ -96,13 +97,28 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
                 </View>
             ),
         })
+        const { maxTodos, hasReachedTodoNumberLimit } = useResourceQuota()
+
+        // useEffect(() => {
+        //     for (let i = 0; i < 64; i++) {
+        //         tripStore.createCustomTodo('RESERVATION', 'custom')
+        //     }
+        // }, [])
 
         const settingsOption: NavigateListItemProp[] = [
             {
                 title: '할 일 추가',
                 path: 'TodolistAdd',
                 icon: { name: 'add', type: 'material' },
-                primary: true,
+                primary: !hasReachedTodoNumberLimit,
+                subtitle: hasReachedTodoNumberLimit
+                    ? `할 일 개수 제한에 도달했어요 (${tripStore.todos.length}/${maxTodos})`
+                    : undefined,
+                disabled: hasReachedTodoNumberLimit,
+                useDisabledStyle: hasReachedTodoNumberLimit,
+                subtitleStyle: hasReachedTodoNumberLimit
+                    ? { color: colors.error }
+                    : undefined,
             },
             {
                 title: '순서 변경',

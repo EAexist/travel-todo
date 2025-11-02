@@ -23,6 +23,8 @@ import { FlatList, ListRenderItem } from 'react-native'
 import { useLoadingScreen, useRequireConnection } from '../Loading'
 import { TripListItem } from './TripListitem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
+import { View } from 'react-native'
 
 export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
     observer(({}) => {
@@ -76,8 +78,10 @@ export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
             })
         }, [])
 
+        const { maxTrips, hasReachedTripNumberLimit } = useResourceQuota()
+
         const handlePressCreateTrip = useCallback(() => {
-            if (userStore.hasReachedTripNumberLimit) {
+            if (hasReachedTripNumberLimit) {
                 maxNumberOfTripHandleBottomSheetRef.current?.present()
             } else {
                 createTrip()
@@ -164,13 +168,16 @@ export const TripListScreen: FC<AuthenticatedStackScreenProps<'TripList'>> =
                 <BottomSheetModal ref={maxNumberOfTripHandleBottomSheetRef}>
                     <ContentTitle
                         title={'다음 여행을 삭제하고\n새 여행을 만들까요?'}
-                        subtitle={`여행은 최대 ${userStore.maxNumberOfTrip}개 까지 관리할 수 있어요`}
+                        subtitle={`여행은 최대 ${maxTrips}개 까지 만들 수 있어요`}
                     />
-                    <ListSubheader title={'가장 오래된 여행'} />
-                    <TripListItem
-                        item={userStore.tripSummary[0]}
-                        asCard={false}
-                    />
+                    {/* <ListSubheader title={'가장 오래된 여행'} /> */}
+                    <View style={{ paddingVertical: 24 }}>
+                        <TripListItem
+                            item={userStore.tripSummary[0]}
+                            asCard={false}
+                            showCreateDate
+                        />
+                    </View>
                     <Fab.Container fixed={false} dense>
                         <Fab.Button
                             title={'확인'}

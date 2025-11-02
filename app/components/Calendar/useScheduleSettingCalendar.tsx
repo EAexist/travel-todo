@@ -6,7 +6,7 @@ import {
     toLocaleDateMonthString,
 } from '@/utils/date'
 import { Text, useTheme } from '@rneui/themed'
-import { eachDayOfInterval } from 'date-fns'
+import { eachDayOfInterval, isSameDay, startOfDay } from 'date-fns'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { TextStyle, View, ViewStyle } from 'react-native'
 import { DateData } from 'react-native-calendars'
@@ -54,12 +54,15 @@ export const useScheduleSettingCalendar = ({
 }: useScheduleSettingCalendarProps) => {
     const onDayPress = useCallback(
         (dateData: DateData) => {
-            const date = new Date(dateData.dateString)
+            const date = startOfDay(new Date(dateData.dateString))
+            console.log(date, startDate)
             if (endDate) {
                 setStartDate(date)
                 setEndDate(null)
             } else if (startDate) {
-                if (date > startDate) {
+                if (isSameDay(startDate, date)) {
+                    setStartDate(null)
+                } else if (date > startDate) {
                     setEndDate(date)
                 } else {
                     setStartDate(date)
@@ -102,6 +105,8 @@ export const useScheduleSettingCalendar = ({
                     color: colors.light1,
                     textColor: colors.contrastText.primary,
                     customContainerStyle,
+                    disabled: false,
+                    disableTouchEvent: false,
                 }
             }
             if (endDate) {
@@ -110,6 +115,8 @@ export const useScheduleSettingCalendar = ({
                     color: colors.light1,
                     textColor: colors.contrastText.primary,
                     customContainerStyle,
+                    disabled: false,
+                    disableTouchEvent: false,
                 }
             }
             if (intervalDays) {
@@ -134,15 +141,24 @@ export const useScheduleSettingCalendar = ({
     }
 }
 
-export const useScheduleSettingCalendarWithAccomodation = (
-    props: useScheduleSettingCalendarProps,
-) => {
+export const useScheduleSettingCalendarWithAccomodation = ({
+    disableTouchEventOnAccomodation = false,
+    disabledOnAccomodation = false,
+    ...props
+}: useScheduleSettingCalendarProps & {
+    disableTouchEventOnAccomodation?: boolean
+    disabledOnAccomodation?: boolean
+}) => {
     const reservationStore = useReservationStore()
     const { markedDates, onDayPress } = useScheduleSettingCalendar(props)
     return {
         markedDates: _.merge(
             {},
-            reservationStore.accomodationMarkedDatesMultiDotMarking,
+            disabledOnAccomodation
+                ? reservationStore.accomodationMarkedDatesMultiDotMarkingDisabled
+                : disableTouchEventOnAccomodation
+                  ? reservationStore.accomodationMarkedDatesMultiDotMarkingDisableTouchEvent
+                  : reservationStore.accomodationMarkedDatesMultiDotMarking,
             markedDates,
         ),
         onDayPress,

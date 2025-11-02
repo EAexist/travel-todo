@@ -5,15 +5,11 @@
  * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
  * documentation for more details.
  */
-import { AccomodationSnapshotIn } from '@/models/Reservation/Accomodation'
 import { Destination } from '@/models/Destination'
-import { ReservationStoreSnapshot } from '@/models/stores/ReservationStore'
-import {
-    TripStore,
-    TripStoreSnapshot,
-    TripSummary,
-} from '@/models/stores/TripStore'
-import { UserStoreSnapshot } from '@/models/stores/UserStore'
+import { ReservationSnapshot } from '@/models/Reservation/Reservation'
+import { ResourceQuotaStoreSnapshotIn } from '@/models/stores/ResourceQuotaStore'
+import { TripStoreSnapshot, TripSummary } from '@/models/stores/TripStore'
+import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import {
     Flight,
     FlightRoute,
@@ -42,22 +38,20 @@ import {
     GoogleUserDTO,
     PatchReservationProps,
     PatchTodoProps,
-    TodoPresetDTO,
     ReservationDTO,
     TodoDTO,
+    TodoPresetDTO,
     TripFetchDTO,
     TripPatchDTO,
     UserAccountDTO,
     mapToDestination,
-    mapToDestinationDTO,
-    mapToTodoPreset,
     mapToReservation,
     mapToTodo,
+    mapToTodoPreset,
     mapToTrip,
     mapToUserAccount,
 } from './api.types'
 import { GeneralApiProblem, getGeneralApiProblem } from './apiProblem'
-import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 
 export type ApiResult<T> =
     | { kind: 'ok'; data: T; location?: string }
@@ -203,7 +197,7 @@ export class Api {
     async kakaoLogin(
         idToken: string,
         profile: KakaoProfile,
-    ): Promise<ApiResult<UserStoreSnapshot>> {
+    ): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `auth/kakao`,
             { idToken, profile },
@@ -224,7 +218,7 @@ export class Api {
      */
     async googleLogin(
         googleUser: GoogleUserDTO,
-    ): Promise<ApiResult<UserStoreSnapshot>> {
+    ): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `auth/google`,
             googleUser,
@@ -245,7 +239,7 @@ export class Api {
      */
     async googleLoginWithIdToken(
         idToken: string,
-    ): Promise<ApiResult<UserStoreSnapshot>> {
+    ): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `auth/google`,
             undefined,
@@ -269,7 +263,7 @@ export class Api {
      * @returns {kind} - Response Status.
      * @returns {...Trip} - Trip.
      */
-    async guestLogin(): Promise<ApiResult<UserStoreSnapshot>> {
+    async guestLogin(): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> =
             await this.apisauce.post(`auth/guest`)
 
@@ -297,7 +291,7 @@ export class Api {
      * @returns {kind} - Response Status.
      * @returns {...Trip} - Trip.
      */
-    async getUserAccount(): Promise<ApiResult<UserStoreSnapshot>> {
+    async getUserAccount(): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> =
             await this.apisauce.get(``)
 
@@ -308,6 +302,18 @@ export class Api {
                   data: mapToUserAccount(userDTO.data),
               }
             : userDTO
+    }
+
+    /**
+     * Gets a Trip data with given id.
+     * @returns {kind} - Response Status.
+     * @returns {...Trip} - Trip.
+     */
+    async getResourceQuota(): Promise<ApiResult<ResourceQuotaStoreSnapshotIn>> {
+        const response: ApiResponse<ResourceQuotaStoreSnapshotIn> =
+            await this.apisauce.get(`resourceQuota`)
+
+        return _handleResponse<ResourceQuotaStoreSnapshotIn>(response)
     }
 
     /**
@@ -420,7 +426,7 @@ export class Api {
         userId,
     }: {
         userId: string
-    }): Promise<ApiResult<UserStoreSnapshot>> {
+    }): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `user/${userId}/trip`,
         )
