@@ -1,6 +1,6 @@
 import { useStores, useTripStore, useUserStore } from '@/models'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
-import { UserStoreSnapshot } from '@/models/stores/UserStore'
+import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import { TodoPresetItemSnapshotIn } from '@/models/Todo'
 import { ApiResponseKind } from '@/services/api/apiProblem'
 import { ApiResponse } from 'apisauce'
@@ -195,7 +195,7 @@ export const useActionsWithApiStatus = () => {
     const userStore = useUserStore()
     const tripStore = useTripStore()
     return {
-        guestLoginWithApiStatus: _useWithApiStatus<{}, UserStoreSnapshot>(
+        guestLoginWithApiStatus: _useWithApiStatus<{}, UserStoreSnapshotIn>(
             rootStore.guestLogin,
         ),
         logoutWithApiStatus: _useWithApiStatus<{}>(rootStore.logout),

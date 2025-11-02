@@ -10,6 +10,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { setupRootStore } from './setupRootStore'
 import { ReservationStore } from '../stores/ReservationStore'
 import { UserStore } from '../stores/UserStore'
+import { ResourceQuotaStoreModel } from '../stores/ResourceQuotaStore'
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -24,7 +25,10 @@ import { UserStore } from '../stores/UserStore'
  * instantiating it, although that should be rare.
  */
 
-const defaultRootStore: Partial<RootStoreSnapshot> = {}
+const defaultRootStore: RootStoreSnapshot = {
+    userStore: null,
+    resourceQuotaStore: ResourceQuotaStoreModel.create({}),
+}
 
 const _rootStore = RootStoreModel.create(defaultRootStore)
 

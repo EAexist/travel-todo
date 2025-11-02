@@ -16,6 +16,10 @@ import { DestinationListItemBase } from '../CreateTrip/DestinationSettingScreen'
 import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
 import { ScheduleViewerCalendar } from '@/components/Calendar/ScheduleViewerCalendar'
 import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
+import { Avatar } from '@/components/Avatar'
+import { Icon } from '@/components/Icon'
+import { colors } from 'theme'
+import { useTheme } from '@rneui/themed'
 
 export const EditTripScreen: FC<{}> = observer(({}) => {
     const tripStore = useTripStore()
@@ -42,6 +46,10 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
         centerContainerStyle: $headerCenterTitleContainerStyle,
     })
 
+    const {
+        theme: { colors },
+    } = useTheme()
+
     return (
         <Screen>
             <ScrollView>
@@ -56,7 +64,7 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
                 <Divider />
                 {/* <EditTripSubheader title={'여행지'} path={'DestinationSetting'} /> */}
                 <ListSubheader title={'여행지'} />
-                {tripStore.destinations.length > 0 ? (
+                {tripStore.isDestinationSet ? (
                     <FlatList
                         data={tripStore.destinations}
                         renderItem={renderDestinationText}
@@ -71,6 +79,26 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
                         <ListItem.Chevron />
                     </ListItem>
                 )}
+                <ListItem onPress={handleEditDestination}>
+                    {!tripStore.isDestinationSet && (
+                        <ListItem.Chevron name={'error'} />
+                    )}
+                    <Avatar
+                        icon={{
+                            name: 'edit',
+                            type: 'material',
+                            color: colors.text.secondary,
+                        }}
+                    />
+                    <ListItem.Content>
+                        <ListItem.Title>
+                            {tripStore.isDestinationSet
+                                ? '여행지 수정'
+                                : '설정 안함'}
+                        </ListItem.Title>
+                    </ListItem.Content>
+                    <ListItem.Chevron />
+                </ListItem>
                 <Divider />
                 {/* <EditTripSubheader title={'일정'} path={'ScheduleSetting'} /> */}
                 <ListSubheader title={'일정'} />

@@ -1,10 +1,10 @@
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
-import { api, ApiResult, GoogleUserDTO } from '@/services/api'
-import { Instance, SnapshotOut, types } from 'mobx-state-tree'
-import { TripStoreModel, TripStoreSnapshot } from './TripStore'
-import { UserStoreModel, UserStoreSnapshot } from './UserStore'
-import { sync_db, withDbSync } from '@/tasks/BackgroundTask'
+import { api, GoogleUserDTO } from '@/services/api'
+import { withDbSync } from '@/tasks/BackgroundTask'
 import { KakaoProfile } from '@react-native-seoul/kakao-login'
+import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { UserStoreModel, UserStoreSnapshotIn } from './UserStore'
+import { ResourceQuotaStoreModel } from './ResourceQuotaStore'
 
 // const GeneralApiProblemType = types.custom<
 //   GeneralApiProblem,
@@ -24,6 +24,7 @@ export const RootStoreModel = types
     .model('RootStore')
     .props({
         userStore: types.maybeNull(UserStoreModel),
+        resourceQuotaStore: ResourceQuotaStoreModel,
     })
     .actions(withSetPropAction)
     .views(store => ({
@@ -32,7 +33,7 @@ export const RootStoreModel = types
         },
     }))
     .actions(store => ({
-        setUser: (userStore: UserStoreSnapshot) => {
+        setUser: (userStore: UserStoreSnapshotIn) => {
             store.setProp('userStore', UserStoreModel.create(userStore))
         },
     }))
@@ -80,15 +81,19 @@ export const RootStoreModel = types
                 console.log(
                     `[api.guestLogin] response=${JSON.stringify(response)}`,
                 )
-                if (response.kind == 'ok') {
+                if (response.kind === 'ok') {
+                    // applySnapshot(store.userStore, response.data)
                     store.setUser(response.data)
-                    return store.userStore
-                        ?.fetchActiveTrip({})
-                        .then(response => {
-                            return response
-                        })
-                }
-                return { kind: response.kind }
+                    return store.resourceQuotaStore.fetch().then(response => {
+                        if (response.kind === 'ok') {
+                            return store.userStore
+                                ?.fetchActiveTrip({})
+                                .then(response => {
+                                    return response
+                                })
+                        } else return { kind: response.kind }
+                    })
+                } else return { kind: response.kind }
             })
         },
         logout: withDbSync(() => {

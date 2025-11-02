@@ -77,7 +77,7 @@ export const ReservationList: FC<ReservationListProps> = observer(
         } = useTheme()
 
         return (
-            <View>
+            <View style={{ flex: 1 }}>
                 <SwitchTab.Container>
                     <SwitchTab.Tab
                         variant="default"
@@ -125,21 +125,19 @@ export const ReservationList: FC<ReservationListProps> = observer(
                         }
                     />
                 </View>
-                <ScrollView>
-                    {tripStore.reservationSections ? (
-                        <SectionList
-                            sections={tripStore.reservationSections}
-                            keyExtractor={item => item.id}
-                            renderItem={renderItem_}
-                            renderSectionHeader={renderSectionHeader}
-                            renderSectionFooter={renderSectionFooter}
-                        />
-                    ) : (
-                        <Text style={{ padding: 24, textAlign: 'center' }}>
-                            {`예약 내역을 추가하고,\n여행 중 필요할 때 간편하게 꺼내보세요.`}
-                        </Text>
-                    )}
-                </ScrollView>
+                {tripStore.reservationSections ? (
+                    <SectionList
+                        sections={tripStore.reservationSections}
+                        keyExtractor={item => item.id}
+                        renderItem={renderItem_}
+                        renderSectionHeader={renderSectionHeader}
+                        renderSectionFooter={renderSectionFooter}
+                    />
+                ) : (
+                    <Text style={{ padding: 24, textAlign: 'center' }}>
+                        {`예약 내역을 추가하고,\n여행 중 필요할 때 간편하게 꺼내보세요.`}
+                    </Text>
+                )}
             </View>
         )
     },

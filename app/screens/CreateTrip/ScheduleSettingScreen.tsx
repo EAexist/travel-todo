@@ -6,15 +6,16 @@ import {
     useScheduleSettingCalendarWithAccomodation,
 } from '@/components/Calendar/useScheduleSettingCalendar'
 import * as Fab from '@/components/Fab'
+import { Icon } from '@/components/Icon'
 import ContentTitle from '@/components/Layout/Content'
 import { useReservationStore, useTripStore } from '@/models'
 import { DateInterval, toCalendarString } from '@/utils/date'
-import { useTheme } from '@rneui/themed'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
+import { Text, useTheme } from '@rneui/themed'
+import { addDays } from 'date-fns'
 import { FC, useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { EditScreenBaseProps } from '.'
-import { Text } from '@rneui/themed'
-import { Icon } from '@/components/Icon'
 
 export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     isInitialSettingScreen,
@@ -68,11 +69,18 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
             setEndDate: (date: Date | null) => {
                 setDateInterval(prev => ({ ...prev, end: date || undefined }))
             },
+            disableTouchEventOnAccomodation: true,
+            disabledOnAccomodation: !(dateInterval.start && dateInterval.end),
         })
 
     const {
         theme: { colors },
     } = useTheme()
+
+    const { maxTripDurationDays } = useResourceQuota()
+
+    const [showWhyCannotSelectDate, setShowWhyCannotSelectDate] =
+        useState(false)
 
     return (
         <Screen>
@@ -80,14 +88,40 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
                 title={'언제 떠나시나요?'}
                 subtitle={'여행 일정을 알려주세요'}
             />
-            <View style={{ paddingHorizontal: 24 }}>
+            <View
+                style={{
+                    paddingHorizontal: 24,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                }}>
                 <ScheduleText
                     startDate={dateInterval.start}
                     endDate={dateInterval.end}
                 />
+                {/* <TouchableOpacity
+                    style={{ paddingLeft: 8 }}
+                    onPress={() => {
+                        setDateInterval({
+                            start: tripStore.startDateIsoString
+                                ? new Date(tripStore.startDateIsoString)
+                                : undefined,
+                            end: tripStore.endDateIsoString
+                                ? new Date(tripStore.endDateIsoString)
+                                : undefined,
+                        })
+                    }}>
+                    <Icon
+                        name="undo"
+                        type="font-awesome"
+                        color={colors.text.secondary}
+                        size={16}
+                    />
+                </TouchableOpacity> */}
             </View>
             <CalendarContainer>
                 <Calendar
+                    disableAllTouchEventsForDisabledDays={false}
+                    disableAllTouchEventsForInactiveDays={false}
                     initialDate={
                         dateInterval.start &&
                         toCalendarString(dateInterval.start)
@@ -100,63 +134,77 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
                     }}
                     hideExtraDays={dateInterval.end == undefined}
                     maxDate={
-                        (dateInterval.start == undefined ||
-                            dateInterval.end !== undefined) &&
+                        dateInterval.start === undefined &&
                         reservationStore.firstCheckinDate
                             ? toCalendarString(
                                   reservationStore.firstCheckinDate,
                               )
-                            : undefined
+                            : dateInterval.start !== undefined &&
+                                dateInterval.end == undefined
+                              ? toCalendarString(
+                                    addDays(
+                                        dateInterval.start,
+                                        maxTripDurationDays,
+                                    ),
+                                )
+                              : undefined
                     }
-                    minDate={
-                        dateInterval.start !== undefined &&
-                        dateInterval.end == undefined &&
-                        reservationStore.lastCheckoutDate
-                            ? toCalendarString(
-                                  reservationStore.lastCheckoutDate,
-                              )
-                            : undefined
-                    }
+                    // minDate={
+                    //     dateInterval.start !== undefined &&
+                    //     dateInterval.end == undefined &&
+                    //     reservationStore.lastCheckoutDate
+                    //         ? toCalendarString(
+                    //               reservationStore.lastCheckoutDate,
+                    //           )
+                    //         : undefined
+                    // }
                 />
-                {reservationStore.hasScheduledAccomodation && (
+                {
                     <View
                         style={{
-                            paddingTop: 4,
-                            flexDirection: 'row',
-                            gap: 16,
-                            justifyContent: 'flex-end',
-                            alignItems: 'center',
+                            // paddingTop: 4,
+                            // flexDirection: 'row',
+                            // gap: 4,
+                            // justifyContent: 'flex-end',
+                            alignItems: 'flex-end',
                         }}>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 4,
-                            }}>
-                            <Icon
-                                name="dot"
-                                type="octicon"
-                                color={colors.text.primary}
-                            />
-                            <Text style={{ fontSize: 12 }}>{'선택 가능'}</Text>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 4,
-                            }}>
-                            <Icon
-                                name="dot"
-                                type="octicon"
-                                color={colors.disabled}
-                            />
-                            <Text style={{ fontSize: 12 }}>
-                                {'선택 불가능 (숙박 예약을 포함해야 해요)'}
-                            </Text>
-                        </View>
+                        {reservationStore.hasScheduledAccomodation && (
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                }}>
+                                <Icon
+                                    name="dot-single"
+                                    type="entypo"
+                                    color={colors.primary}
+                                />
+                                <Text style={{ fontSize: 12 }}>
+                                    {'숙박 예약을 포함해야해요'}
+                                </Text>
+                            </View>
+                        )}
+                        {dateInterval.start &&
+                            dateInterval.end === undefined && (
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: 4,
+                                    }}>
+                                    <Icon
+                                        name="dot-single"
+                                        type="entypo"
+                                        color={colors.text.primary}
+                                    />
+                                    <Text style={{ fontSize: 12 }}>
+                                        {`최대 ${maxTripDurationDays}일까지 설정 가능해요`}
+                                    </Text>
+                                </View>
+                            )}
                     </View>
-                )}
+                }
             </CalendarContainer>
             <Fab.Container>
                 {isInitialSettingScreen ? (

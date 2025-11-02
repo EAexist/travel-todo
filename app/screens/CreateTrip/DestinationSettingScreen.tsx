@@ -4,7 +4,7 @@ import * as Input from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
-import { useTripStore } from '@/models'
+import { useTripStore, useUserStore } from '@/models'
 import { Destination, DestinationSnapshotIn } from '@/models/Destination'
 import { useNavigate } from '@/navigators'
 import { getFlagEmoji } from '@/utils/nation'
@@ -16,6 +16,8 @@ import { FlatList, ListRenderItem, TouchableOpacity, View } from 'react-native'
 import { EditScreenBaseProps } from '.'
 import { useRequireConnection } from '../Loading'
 import { ListItemBase, ListItemBaseProps } from '@/components/ListItem/ListItem'
+import { UserStoreModel } from '@/models/stores/UserStore'
+import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
@@ -116,6 +118,7 @@ const DestinationListItem: FC<DestinationListItemProps> = ({ destination }) => {
 }
 export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
     ({ isInitialSettingScreen }) => {
+        const userStore = useUserStore()
         const tripStore = useTripStore()
         const { t } = useLingui()
 
@@ -157,21 +160,33 @@ export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
         // const {isConnected} = useNetInfo()
         const showScreen = useRequireConnection({ title: '여행지 설정' })
 
+        const { maxDestinations, hasReachedDestinationNumberLimit } =
+            useResourceQuota()
+
         return (
             showScreen && (
                 <Screen>
                     <ContentTitle title={titleText} subtitle={subtitlteText} />
                     <View style={{ paddingVertical: 16, flex: 1 }}>
-                        <TouchableOpacity onPress={handleSearchPress}>
+                        <TouchableOpacity
+                            onPress={handleSearchPress}
+                            disabled={hasReachedDestinationNumberLimit}>
                             <Input.SearchBase
-                                placeholder={t`도시 또는 국가 검색`}
+                                editable={false}
+                                pointerEvents="none"
+                                placeholder={
+                                    hasReachedDestinationNumberLimit
+                                        ? `여행지 개수 제한에 도달했어요 (${tripStore.destinations.length}/${maxDestinations})`
+                                        : `도시 또는 국가 검색`
+                                }
+                                disabled={hasReachedDestinationNumberLimit}
                             />
                         </TouchableOpacity>
                     </View>
                     {tripStore.isDestinationSet && (
                         <View>
                             <ListSubheader
-                                title={`선택한 여행지 (${tripStore.destinations.length})`}
+                                title={`여행지 (${tripStore.destinations.length}/${maxDestinations})`}
                             />
                             <FlatList
                                 data={tripStore.destinations}

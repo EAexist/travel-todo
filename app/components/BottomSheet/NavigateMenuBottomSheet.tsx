@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactNode, RefObject, useCallback } from 'react'
+import { FC, PropsWithChildren, RefObject, useCallback } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 //
 import {
@@ -8,14 +8,21 @@ import {
 import { Icon } from '@/models/Icon'
 import { useNavigate } from '@/navigators'
 import { BottomSheetModalProps } from '@gorhom/bottom-sheet'
-import { ListItemBase } from '../ListItem/ListItem'
+import { ListItemBase, ListItemBaseProps } from '../ListItem/ListItem'
 
-export type NavigateListItemProp = {
+export interface NavigateListItemProp
+    extends Pick<
+        ListItemBaseProps,
+        | 'subtitle'
+        | 'rightContent'
+        | 'disabled'
+        | 'subtitleStyle'
+        | 'useDisabledStyle'
+    > {
     title: string
-    path?: string
+    path: string
     icon?: Icon
     primary?: boolean
-    rightContent?: ReactNode
 }
 export const NavigateMenuBottomSheet: FC<
     PropsWithChildren<
@@ -32,19 +39,18 @@ export const NavigateMenuBottomSheet: FC<
 
     const renderSettingsListItem: ListRenderItem<NavigateListItemProp> =
         useCallback(
-            ({ item }) => {
+            ({ item: { path, icon, ...props } }) => {
                 const handlePress = () => {
-                    if (item.path) {
-                        activate(item.path)
+                    if (path) {
+                        activate(path)
                     }
                 }
 
                 return (
                     <ListItemBase
                         onPress={handlePress}
-                        avatarProps={{ icon: item.icon }}
-                        title={item.title}
-                        rightContent={item.rightContent}
+                        avatarProps={{ icon: icon }}
+                        {...props}
                     />
                 )
             },
@@ -59,7 +65,7 @@ export const NavigateMenuBottomSheet: FC<
             <FlatList
                 data={data}
                 renderItem={renderSettingsListItem}
-                keyExtractor={item => item.title}
+                keyExtractor={item => item.path}
             />
             {children}
         </BottomSheetModal>

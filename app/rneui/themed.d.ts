@@ -2,7 +2,7 @@ import '@rneui/themed'
 import { ListSubheaderProps } from '@/components/ListItem/ListSubheader'
 import { SectionHeaderProps } from '@/components/SectionHeader'
 import { TabItemProps, TabProps, IconProps as RNEIconProps } from '@rneui/themed'
-import { PressableProps, TouchableOpacityProps } from 'react-native'
+import { ColorValue, PressableProps, TouchableOpacityProps } from 'react-native'
 
 declare module '@rneui/themed' {
   export interface Colors {
@@ -47,9 +47,9 @@ declare module '@rneui/themed' {
   // export interface ListItemInputProps {
   //     primary?: boolean
   // }
-  // export interface ListItemTitleProps extends Partial<TextProps> {
-  //     primary?: boolean
-  // }
+  export interface ListItemSubtitleProps extends Partial<TextProps> {
+      color?: ColorValue
+  }
   export interface SwitchTabProps extends Partial<TabProps> {
     size?: 'md' | 'lg'
         // variant?: 'primary' | 'secondary'
@@ -73,6 +73,7 @@ declare module '@rneui/themed' {
   export interface ComponentTheme {
     ListSubheader: Partial<ListSubheaderProps>
     SectionHeader: Partial<SectionHeaderProps>
+    ListItemSubTitle: Partial<ListItemSubtitleProps>
     // ListItem: Partial<ListItemProps> & {
     //     Title: Partial<ListItemTitleProps>,
     //     Input: Partial<ListItemInputProps>

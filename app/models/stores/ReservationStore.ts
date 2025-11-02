@@ -25,6 +25,7 @@ import {
     SectionListData,
     SectionListRenderItem,
 } from 'react-native'
+import { colors } from 'theme'
 
 const ConfirmRequiringReservationModel = types
     .model('ConfirmRequiringReservation')
@@ -138,8 +139,11 @@ export const ReservationStoreModel = types
         // },
     }))
     .views(store => ({
+        get reservationList() {
+            return [...store.reservations.values()]
+        },
         get reservationSorted() {
-            return [...store.reservations.values()].sort(
+            return this.reservationList.sort(
                 (
                     { isCompleted: isCompletedA },
                     { isCompleted: isCompletedB },
@@ -157,7 +161,7 @@ export const ReservationStoreModel = types
     }))
     .views(store => ({
         get accomodation(): Reservation[] {
-            return [...store.reservations.values()].filter(
+            return store.reservationList.filter(
                 r => r.category === 'ACCOMODATION',
             )
         },
@@ -373,6 +377,51 @@ export const ReservationStoreModel = types
                         markedDates[dateString] = {
                             marked: true,
                             dotColor: getPaletteColor(accIndex),
+                        }
+                    }
+                })
+            })
+            return markedDates
+        },
+        get accomodationMarkedDatesMultiDotMarkingDisableTouchEvent(): MarkedDates {
+            const markedDates: MarkedDates = {}
+            store.orderedAccomodations.forEach((a, accIndex) => {
+                const start = a.checkinDate
+                const end = a.checkoutDate
+                const intervalDays =
+                    start && end
+                        ? eachDayOfInterval({ start, end }).slice(0, -1)
+                        : []
+                intervalDays.forEach(date => {
+                    const dateString = toCalendarString(date)
+                    if (!Object.keys(markedDates).includes(dateString)) {
+                        markedDates[dateString] = {
+                            marked: true,
+                            dotColor: getPaletteColor(accIndex),
+                            disableTouchEvent: true,
+                        }
+                    }
+                })
+            })
+            return markedDates
+        },
+        get accomodationMarkedDatesMultiDotMarkingDisabled(): MarkedDates {
+            const markedDates: MarkedDates = {}
+            store.orderedAccomodations.forEach((a, accIndex) => {
+                const start = a.checkinDate
+                const end = a.checkoutDate
+                const intervalDays =
+                    start && end
+                        ? eachDayOfInterval({ start, end }).slice(0, -1)
+                        : []
+                intervalDays.forEach(date => {
+                    const dateString = toCalendarString(date)
+                    if (!Object.keys(markedDates).includes(dateString)) {
+                        markedDates[dateString] = {
+                            marked: true,
+                            dotColor: getPaletteColor(accIndex),
+                            disableTouchEvent: true,
+                            disabled: true,
                         }
                     }
                 })

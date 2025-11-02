@@ -13,6 +13,7 @@ export interface TripListItemProps {
     subtitle?: string
     asCard?: boolean
     disabled?: boolean
+    showCreateDate?: boolean
 }
 
 export const TripListItem: FC<TripListItemProps> = observer(
@@ -24,6 +25,7 @@ export const TripListItem: FC<TripListItemProps> = observer(
         subtitle,
         asCard = true,
         disabled = false,
+        showCreateDate = false,
     }) => {
         const tripStore = useTripStore()
         const isActive = tripStore !== null && item.id === tripStore.id
@@ -62,7 +64,7 @@ export const TripListItem: FC<TripListItemProps> = observer(
                                     .join('ㆍ')}
                             </ListItem.Subtitle>
                         )}
-                    {!item.isInitialized && (
+                    {(!item.isInitialized || showCreateDate) && (
                         <ListItem.Subtitle>
                             {`${new Date(item.createDateIsoString).toLocaleString()} 생성`}
                         </ListItem.Subtitle>

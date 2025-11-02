@@ -486,29 +486,28 @@ const theme = createTheme({
                                             ? 34
                                             : props.avatarSize,
                           color: props.icon.color || colors.primary,
-                          ...props.icon,
                       },
                   }
                 : {}),
-            iconStyle: {
-                // color: props.iconStyle?.color || colors.primary
-                // ...(props.size === 'medium'
-                //   ? {
-                //       width: 20,
-                //       height: 20,
-                //     }
-                //   : props.size === 'xlarge'
-                //     ? {
-                //         width: 40,
-                //         height: 40,
-                //       }
-                //     : {
-                //         // width: 32,
-                //         // height: 32,
-                //       }),
-                // min-width: 32,
-                // min-height: 32,
-            },
+            // iconStyle: {
+            //     // color: props.iconStyle?.color || colors.primary
+            //     // ...(props.size === 'medium'
+            //     //   ? {
+            //     //       width: 20,
+            //     //       height: 20,
+            //     //     }
+            //     //   : props.size === 'xlarge'
+            //     //     ? {
+            //     //         width: 40,
+            //     //         height: 40,
+            //     //       }
+            //     //     : {
+            //     //         // width: 32,
+            //     //         // height: 32,
+            //     //       }),
+            //     // min-width: 32,
+            //     // min-height: 32,
+            // },
             titleStyle: {
                 borderRadius: 10,
                 ...(props.size === 'medium'
@@ -537,7 +536,7 @@ const theme = createTheme({
                 letterSpacing: 0.15,
                 // textDecoration: 'none',
                 textTransform: 'none',
-                ...(props.disabled ? { opacity: 0.4 } : {}),
+                ...(props.disabled ? { opacity: 0.5 } : {}),
             },
             h2Style: {
                 ...typography.pretendard.bold,
@@ -781,7 +780,7 @@ const theme = createTheme({
         }),
         ListItem: (props, { colors }) => ({
             style: {
-                ...(props.useDisabledStyle ? { opacity: 0.4 } : {}),
+                ...(props.useDisabledStyle ? { opacity: 0.5 } : {}),
             },
             containerStyle: {
                 height: props.dense === false ? 64 : 52,
@@ -816,7 +815,7 @@ const theme = createTheme({
             numberOfLines: 1,
             ellipsizeMode: 'tail',
         }),
-        ListItemSubtitle: (_, { colors }) => ({
+        ListItemSubtitle: ({ style }, { colors }) => ({
             style: {
                 ...typography.pretendard.regular,
                 color: colors.text.secondary,

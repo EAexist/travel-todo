@@ -30,7 +30,7 @@ import {
     TripStoreModel,
     TripStoreSnapshot,
 } from '@/models/stores/TripStore'
-import { UserStoreSnapshot } from '@/models/stores/UserStore'
+import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import { User } from '@react-native-google-signin/google-signin'
 import { ApisauceConfig } from 'apisauce'
 import { getSnapshot } from 'mobx-state-tree'
@@ -63,8 +63,8 @@ export type WithStatus<T> = T & {
 
 export type GoogleUserDTO = User['user']
 
-export interface UserAccountDTO extends UserStoreSnapshot {}
-// export interface UserAccountDTO extends Omit<UserStoreSnapshot, 'id'> {
+export interface UserAccountDTO extends UserStoreSnapshotIn {}
+// export interface UserAccountDTO extends Omit<UserStoreSnapshotIn, 'id'> {
 //   id?: number
 // }
 
@@ -211,13 +211,13 @@ export interface DeleteReservationProps {
 /* UserAccount */
 export const mapToUserAccount: (
     userAccountDTO: UserAccountDTO,
-) => UserStoreSnapshot = userAccountDTO => {
+) => UserStoreSnapshotIn = userAccountDTO => {
     if (userAccountDTO.id)
         return {
             ...userAccountDTO,
             id: userAccountDTO.id?.toString(),
             //   trip: userAccountDTO.trip.map(trip => trip.toString()),
-        } as UserStoreSnapshot
+        } as UserStoreSnapshotIn
     else throw Error
 }
 

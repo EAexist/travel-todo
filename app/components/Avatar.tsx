@@ -108,7 +108,7 @@ export const Avatar = ({
             break
     }
     return (
-        <RNEAvatar avatarSize={avatarSize} {...props} {...avatarProps}>
+        <RNEAvatar avatarSize={avatarSize} {...avatarProps} {...props}>
             {children}
         </RNEAvatar>
     )
