@@ -100,10 +100,16 @@ export function useHeader(
                                 backgroundColor:
                                     backgroundColor === 'secondary'
                                         ? colors.secondaryBg
-                                        : undefined,
+                                        : // : 'red',
+                                          undefined,
                             },
                         ]}
                         {...props}
+                        centerContainerStyle={
+                            !!props.centerComponent
+                                ? $headerCenterTitleContainerStyle
+                                : undefined
+                        }
                     />
                 </BlurView>
             ),
@@ -176,7 +182,7 @@ const styles = StyleSheet.create({
     },
 })
 
-export const $headerCenterTitleContainerStyle: ViewStyle = {
+const $headerCenterTitleContainerStyle: ViewStyle = {
     flexGrow: 1,
     flexBasis: 'auto',
     justifyContent: 'center',

@@ -5,10 +5,10 @@ import { Screen } from '@/components/Screen'
 import { useTripStore } from '@/models'
 import { FC, useCallback } from 'react'
 import { View } from 'react-native'
-import { useSetValueScreen } from './useSetValueScreen'
 import { EditScreenBaseProps } from '.'
+import { useSetValueScreen } from './useSetValueScreen'
 
-export const TripTitleEditScreenBase: FC<EditScreenBaseProps> = ({
+const TripTitleEditScreenBase: FC<EditScreenBaseProps> = ({
     isInitialSettingScreen,
 }) => {
     const tripStore = useTripStore()

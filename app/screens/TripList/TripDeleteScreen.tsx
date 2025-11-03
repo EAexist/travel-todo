@@ -10,7 +10,12 @@ import { useLingui } from '@lingui/react/macro'
 import { Divider, ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, ListRenderItem, TouchableOpacity } from 'react-native'
+import {
+    FlatList,
+    ListRenderItem,
+    ScrollView,
+    TouchableOpacity,
+} from 'react-native'
 import { TripListItem, TripListItemProps } from './TripListitem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 
@@ -75,7 +80,7 @@ export const TripDeleteScreen: FC<AuthenticatedStackScreenProps<'TripDelete'>> =
         return (
             <Screen backgroundColor={'secondary'}>
                 <ContentTitle title={t`여행 삭제하기`} />
-                <>
+                <ScrollView>
                     <ListSubheader
                         title={'사용 중인 여행은 삭제할 수 없어요.'}
                         dense
@@ -89,13 +94,14 @@ export const TripDeleteScreen: FC<AuthenticatedStackScreenProps<'TripDelete'>> =
                         <>
                             <Divider />
                             <FlatList
+                                scrollEnabled={false}
                                 data={userStore.otherTripSummaryList}
                                 renderItem={renderTripDeleteItem}
                                 keyExtractor={item => item.id}
                             />
                         </>
                     )}
-                </>
+                </ScrollView>
                 <BottomSheetModal ref={confirmDeleteBottomSheetRef}>
                     <ContentTitle title={'여행을 삭제할까요?'} />
                     {itemToDelete && (

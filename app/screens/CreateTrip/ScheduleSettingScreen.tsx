@@ -85,9 +85,10 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
     return (
         <Screen>
             <ContentTitle
-                title={'언제 떠나시나요?'}
-                subtitle={'여행 일정을 알려주세요'}
+                title={'여행 일정을 알려주세요'}
+                // subtitle={'여행 일정을 알려주세요'}
             />
+            {/* <ScrollView></ScrollView> */}
             <View
                 style={{
                     paddingHorizontal: 24,

@@ -89,10 +89,10 @@ export async function setupRootStore(rootStore: RootStore) {
         // )
 
         // load the last known state from AsyncStorage
-        restoredState = ((await storage.load(ROOT_STATE_STORAGE_KEY)) ?? {
-            apiStatus: ApiStatus.IDLE,
-        }) as RootStoreSnapshot
-        applySnapshot(rootStore, restoredState)
+        restoredState = await storage.load(ROOT_STATE_STORAGE_KEY)
+        if (!!restoredState) {
+            applySnapshot(rootStore, restoredState)
+        }
 
         // if(restoredState=={})
     } catch (e) {

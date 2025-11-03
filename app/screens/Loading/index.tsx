@@ -163,7 +163,6 @@ export const RequireConnectionScreen: FC<
         params.title
             ? {
                   centerComponent: <HeaderCenterTitle title={params.title} />,
-                  centerContainerStyle: $headerCenterTitleContainerStyle,
               }
             : {},
     )

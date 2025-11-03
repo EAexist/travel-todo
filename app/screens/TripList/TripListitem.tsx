@@ -4,6 +4,7 @@ import { Chip, ListItem, useTheme } from '@rneui/themed'
 import { BookmarkCheck } from 'lucide-react-native'
 import { observer } from 'mobx-react-lite'
 import { FC, ReactElement } from 'react'
+import { View } from 'react-native'
 
 export interface TripListItemProps {
     item: TripSummary
@@ -40,42 +41,58 @@ export const TripListItem: FC<TripListItemProps> = observer(
                 onPress={onPress ? () => onPress(item) : undefined}
                 disabled={disabled || !onPress}
                 asCard={asCard}>
-                {leftContent && leftContent}
-                {isActive && <BookmarkCheck color={colors.primary} size={28} />}
-                <ListItem.Content>
-                    <ListItem.Title>{item.title || '새 여행'}</ListItem.Title>
-                    {item.isInitialized &&
-                        (item.destinationTitles.length > 0 ||
-                            item.scheduleText.length > 0) && (
-                            <ListItem.Subtitle>
-                                {(item.destinationTitles.length > 0
-                                    ? [
-                                          item.destinationTitles
-                                              .slice(0, 2)
-                                              .join(' '),
-                                      ]
-                                    : []
-                                )
-                                    .concat(
-                                        item.scheduleText.length > 0
-                                            ? [item.scheduleText]
-                                            : [],
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                        gap: 16,
+                    }}>
+                    {leftContent && leftContent}
+                    {isActive && (
+                        <BookmarkCheck color={colors.primary} size={28} />
+                    )}
+                    <ListItem.Content style={{ flex: 1 }}>
+                        <ListItem.Title>
+                            {item.title || '새 여행'}
+                        </ListItem.Title>
+                        {item.isInitialized &&
+                            (item.destinationTitles.length > 0 ||
+                                item.scheduleText.length > 0) && (
+                                <ListItem.Subtitle key={'metadata'}>
+                                    {(item.destinationTitles.length > 0
+                                        ? [
+                                              item.destinationTitles
+                                                  .slice(0, 2)
+                                                  .join(' '),
+                                          ]
+                                        : []
                                     )
-                                    .join('ㆍ')}
+                                        .concat(
+                                            item.scheduleText.length > 0
+                                                ? [item.scheduleText]
+                                                : [],
+                                        )
+                                        .join('ㆍ')}
+                                </ListItem.Subtitle>
+                            )}
+                        {(!item.isInitialized || showCreateDate) && (
+                            <ListItem.Subtitle key={'createDateIsoString'}>
+                                {`${new Date(item.createDateIsoString).toLocaleString()} 생성`}
                             </ListItem.Subtitle>
                         )}
-                    {(!item.isInitialized || showCreateDate) && (
-                        <ListItem.Subtitle>
-                            {`${new Date(item.createDateIsoString).toLocaleString()} 생성`}
-                        </ListItem.Subtitle>
+                        {subtitle && (
+                            <ListItem.Subtitle key={'subtitle'}>
+                                {subtitle}
+                            </ListItem.Subtitle>
+                        )}
+                    </ListItem.Content>
+                    {!item.isInitialized && (
+                        <Chip title={'설정 중'} size="sm" />
                     )}
-                    {subtitle && (
-                        <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>
-                    )}
-                </ListItem.Content>
-                {!item.isInitialized && <Chip title={'설정 중'} size="sm" />}
-                {item.isCompleted && <Chip title={'종료'} size="sm" />}
-                {renderRightContent && renderRightContent(item)}
+                    {item.isCompleted && <Chip title={'종료'} size="sm" />}
+                    {renderRightContent && renderRightContent(item)}
+                </View>
             </ListItem>
         )
     },

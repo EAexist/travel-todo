@@ -20,6 +20,9 @@ export const useCalendarTheme: () => { theme: Theme } = () => {
             dotColor: theme.colors.primary,
             selectedDotColor: theme.colors.primary,
             todayTextColor: theme.colors.primary,
+            arrowStyle: {
+                color: theme.colors.secondary,
+            },
             //   stylesheet: {
             //     day: {
             //       basic: {
