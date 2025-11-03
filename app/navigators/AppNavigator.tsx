@@ -8,15 +8,15 @@ import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
 import * as Screens from '@/screens'
+import { ErrorBoundary } from '@/screens/ErrorScreen/ErrorBoundary'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
-import { useThemeProvider } from '@/utils/useAppTheme'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ThemeProvider, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
-import { Platform, View, ViewStyle } from 'react-native'
+import { Platform, ViewStyle } from 'react-native'
 import Config from '../config'
 import { useStores } from '../models'
 import { AuthenticatedNavigator } from './AuthenticatedNavigator'
@@ -84,49 +84,39 @@ const AppStackNavigator = observer(function AppStackNavigator() {
 export const AppNavigator = observer(function AppNavigator(
     props: NavigationProps,
 ) {
-    const {
-        themeScheme,
-        navigationTheme,
-        setThemeContextOverride,
-        ThemeProvider: AppThemeProvider,
-    } = useThemeProvider()
-
     useBackButtonHandler(routeName => exitRoutes.includes(routeName))
 
     return (
-        <AppThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-            <ThemeProvider theme={theme}>
-                <View style={$outerContainerStyle}>
-                    <View style={$innerContainerStyle}>
-                        <GestureHandlerRootViewWrapper>
-                            <BottomSheetModalProvider>
-                                <NavigationContainer
-                                    ref={navigationRef}
-                                    theme={{
-                                        ...navigationTheme,
-                                        colors: {
-                                            ...navigationTheme.colors,
-                                            background: 'white',
-                                        },
-                                    }}
-                                    {...props}>
-                                    <ApiStatusProvider>
-                                        <FabProvider>
-                                            <Screens.ErrorBoundary
-                                                catchErrors={
-                                                    Config.catchErrors
-                                                }>
-                                                <AppStackNavigator />
-                                            </Screens.ErrorBoundary>
-                                        </FabProvider>
-                                    </ApiStatusProvider>
-                                </NavigationContainer>
-                            </BottomSheetModalProvider>
-                        </GestureHandlerRootViewWrapper>
-                    </View>
-                </View>
-            </ThemeProvider>
-        </AppThemeProvider>
+        // <AppThemeProvider value={{ themeScheme, setThemeContextOverride }}>
+        <ThemeProvider theme={theme}>
+            {/* <View style={$outerContainerStyle}> */}
+            {/* <View style={$innerContainerStyle}> */}
+            <GestureHandlerRootViewWrapper>
+                <BottomSheetModalProvider>
+                    <ApiStatusProvider>
+                        <FabProvider>
+                            <NavigationContainer
+                                ref={navigationRef}
+                                // theme={{
+                                //     ...navigationTheme,
+                                //     colors: {
+                                //         ...navigationTheme.colors,
+                                //         background: 'white',
+                                //     },
+                                // }}
+                                {...props}>
+                                <ErrorBoundary catchErrors={Config.catchErrors}>
+                                    <AppStackNavigator />
+                                </ErrorBoundary>
+                            </NavigationContainer>
+                        </FabProvider>
+                    </ApiStatusProvider>
+                </BottomSheetModalProvider>
+            </GestureHandlerRootViewWrapper>
+            {/* </View> */}
+            {/* </View> */}
+        </ThemeProvider>
+        // </AppThemeProvider>
     )
 })
 

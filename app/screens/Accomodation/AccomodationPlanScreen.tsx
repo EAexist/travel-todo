@@ -7,12 +7,8 @@ import { useReservationStore, useTripStore } from '@/models'
 import { Accomodation } from '@/models/Reservation/Accomodation'
 import { Reservation } from '@/models/Reservation/Reservation'
 import { useNavigate } from '@/navigators'
-import {
-    $headerCenterTitleContainerStyle,
-    HeaderCenterTitle,
-    useHeader,
-} from '@/utils/useHeader'
-import { ListItem, useTheme } from '@rneui/themed'
+import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
+import { ListItem } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
@@ -80,7 +76,6 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
                 //   icon={{name: '🛌'}}
             />
         ),
-        centerContainerStyle: $headerCenterTitleContainerStyle,
     })
 
     return (

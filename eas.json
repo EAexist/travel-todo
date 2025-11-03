@@ -4,26 +4,31 @@
         "appVersionSource": "local"
     },
     "build": {
+        "production": {
+            "node": "24.11.0",
+            "environment": "production",
+            "env": {
+                "NODE_ENV": "production"
+            },
+            "android": {}
+        },
         "development": {
+            "environment": "development",
+            "env": {
+                "NODE_ENV": "development"
+            },
             "extends": "production",
             "distribution": "internal",
             "android": {
-                "gradleCommand": ":app:assembleDebug"
+                "gradleCommand": ":app:assembleDebug --stacktrace"
             },
             "ios": {
                 "buildConfiguration": "Debug",
                 "simulator": true
             }
         },
-        "development:device": {
-            "extends": "development",
-            "distribution": "internal",
-            "ios": {
-                "buildConfiguration": "Debug",
-                "simulator": false
-            }
-        },
         "preview": {
+            "environment": "preview",
             "extends": "production",
             "distribution": "internal",
             "ios": {
@@ -34,13 +39,11 @@
             }
         },
         "preview:device": {
+            "environment": "preview",
             "extends": "preview",
             "ios": {
                 "simulator": false
             }
-        },
-        "production": {
-            "android": {}
         }
     },
     "submit": {

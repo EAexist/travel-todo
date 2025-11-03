@@ -1,17 +1,9 @@
-import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewerCalendar'
-import * as Fab from '@/components/Fab'
-import { Screen } from '@/components/Screen'
-import { useReservationStore, useTripStore } from '@/models'
+import { useReservationStore } from '@/models'
 import { toCalendarString } from '@/utils/date'
-import {
-    $headerCenterTitleContainerStyle,
-    HeaderCenterTitle,
-    useHeader,
-} from '@/utils/useHeader'
 import { eachDayOfInterval } from 'date-fns'
 import { observer } from 'mobx-react-lite'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { MarkedDates } from 'react-native-calendars/src/types'
 
 const AccomodationDateEditCalendar: FC = observer(() => {

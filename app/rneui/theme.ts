@@ -227,9 +227,11 @@ const theme = createTheme({
                 ...(size === 'md'
                     ? {
                           borderRadius: 24,
+                          overflow: 'hidden',
                       }
                     : {
                           borderRadius: 48,
+                          overflow: 'hidden',
                       }),
             },
         }),
@@ -296,11 +298,13 @@ const theme = createTheme({
                           paddingVertical: 0,
                           paddingHorizontal: 8,
                           borderRadius: 24,
+                          overflow: 'hidden',
                       }
                     : {
                           paddingVertical: 0,
                           paddingHorizontal: 0,
                           borderRadius: 24,
+                          overflow: 'hidden',
                       }),
             }),
             titleStyle: (active: boolean) => ({
@@ -350,10 +354,12 @@ const theme = createTheme({
                         ? {
                               width: 56,
                               borderRadius: 24,
+                              overflow: 'hidden',
                           }
                         : {
                               width: 64,
                               borderRadius: 48,
+                              overflow: 'hidden',
                           }),
                 },
                 props.style,
@@ -510,6 +516,7 @@ const theme = createTheme({
             // },
             titleStyle: {
                 borderRadius: 10,
+                overflow: 'hidden',
                 ...(props.size === 'medium'
                     ? {
                           fontSize: 20,
@@ -567,6 +574,7 @@ const theme = createTheme({
             },
             buttonStyle: {
                 borderRadius: 16,
+                overflow: 'hidden',
                 height: 56,
             },
         }),
@@ -586,6 +594,7 @@ const theme = createTheme({
             },
             containerStyle: {
                 borderRadius: 0,
+                overflow: 'hidden',
             },
             buttonStyle: {
                 backgroundColor:
@@ -593,6 +602,7 @@ const theme = createTheme({
                 height: 36,
                 padding: 4,
                 borderRadius: 8,
+                overflow: 'hidden',
                 // height: 56,
             },
         }),
@@ -785,6 +795,7 @@ const theme = createTheme({
             containerStyle: {
                 height: props.dense === false ? 64 : 52,
                 borderRadius: 16,
+                overflow: 'hidden',
                 alignItems: 'center',
                 paddingHorizontal: 24, // 1.5rem
                 paddingVertical: 24, // ListItem has default vertical padding, overriding here
@@ -797,6 +808,7 @@ const theme = createTheme({
                           marginTop: 15,
                           height: 82,
                           borderRadius: 24,
+                          overflow: 'hidden',
                       }
                     : {}),
             },

@@ -5,7 +5,7 @@ import {
     NavigateMenuBottomSheet,
     NavigateListItemProp,
 } from '@/components/BottomSheet/NavigateMenuBottomSheet'
-import { useTripStore } from '@/models'
+import { useStores, useTripStore } from '@/models'
 import {
     AuthenticatedStackScreenProps,
     navigationRef,
@@ -13,12 +13,12 @@ import {
 } from '@/navigators'
 import { useLoadingScreen } from '@/screens/Loading'
 import { useActionsWithApiStatus } from '@/utils/useApiStatus'
-import { useHeader } from '@/utils/useHeader'
+import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
 import { useFocusEffect } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { TripListScreen } from '../TripList/TripListScreen'
+import { TripListScreenBase } from '@/screens/TripList/TripListScreenBase'
 
 export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
     props => {
@@ -29,35 +29,38 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
         const [isInitialRedirectComplete, setIsInitialRedirectComplete] =
             useState(false)
 
-        useFocusEffect(
-            useCallback(() => {
-                console.log(
-                    !isInitialRedirectComplete,
-                    navigationRef.isReady(),
-                    tripStore != null,
-                )
-                if (
-                    !isInitialRedirectComplete &&
-                    navigationRef.isReady() &&
-                    tripStore != null
-                ) {
-                    if (tripStore.isInitialized)
-                        navigateWithTrip('Main', {
-                            screen: tripStore.settings.isTripMode
-                                ? 'ReservationList'
-                                : 'Todolist',
-                        })
-                    else {
-                        navigateWithTrip('DestinationSetting')
-                    }
-                    setIsInitialRedirectComplete(true)
-                }
-            }, [
-                navigationRef.isReady(),
-                tripStore?.isInitialized,
-                isInitialRedirectComplete,
-            ]),
-        )
+        const { isAuthenticated } = useStores()
+
+        // useFocusEffect(
+        //     useCallback(() => {
+        //         console.log(
+        //             !isInitialRedirectComplete,
+        //             navigationRef.isReady(),
+        //             tripStore != null,
+        //         )
+        //         if (
+        //             !isInitialRedirectComplete &&
+        //             navigationRef.isReady() &&
+        //             tripStore != null
+        //         ) {
+        //             if (tripStore.isInitialized)
+        //                 navigateWithTrip('Main', {
+        //                     screen: tripStore.settings.isTripMode
+        //                         ? 'ReservationList'
+        //                         : 'Todolist',
+        //                 })
+        //             else if (isAuthenticated) {
+        //                 navigateWithTrip('DestinationSetting')
+        //                 setIsInitialRedirectComplete(true)
+        //             }
+        //         }
+        //     }, [
+        //         navigationRef.isReady(),
+        //         tripStore?.isInitialized,
+        //         isInitialRedirectComplete,
+        //         isAuthenticated,
+        //     ]),
+        // )
 
         useLoadingScreen({})
 
@@ -87,13 +90,14 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
                         <HeaderIcon name="gear" type="octicon" />
                     </TouchableOpacity>
                 ),
+                centerComponent: <HeaderCenterTitle title={'여행 목록'} />,
             },
             [],
         )
 
         return (
             <>
-                <TripListScreen {...props} />
+                <TripListScreenBase />
                 <NavigateMenuBottomSheet
                     data={settingsOption}
                     ref={settingsMenuBottomSheetRef}>

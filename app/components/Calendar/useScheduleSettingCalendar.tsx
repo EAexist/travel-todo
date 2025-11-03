@@ -86,7 +86,8 @@ export const useScheduleSettingCalendar = ({
         height: 42,
         aspectRatio: 1,
         backgroundColor: colors.primary,
-        borderRadius: '100%',
+        borderRadius: 21,
+        overflow: 'hidden',
         alignSelf: 'center',
     }
 

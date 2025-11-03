@@ -1,25 +1,18 @@
-import { FC, useCallback } from 'react'
-import { FlatList, ListRenderItem, ScrollView } from 'react-native'
+import { Avatar } from '@/components/Avatar'
+import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
+import { ScheduleViewerCalendar } from '@/components/Calendar/ScheduleViewerCalendar'
+import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen'
 import { useTripStore } from '@/models'
 import { Destination } from '@/models/Destination'
 import { useNavigate } from '@/navigators'
-import {
-    $headerCenterTitleContainerStyle,
-    HeaderCenterTitle,
-    useHeader,
-} from '@/utils/useHeader'
-import { Divider, ListItem } from '@rneui/themed'
+import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
+import { Divider, ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
+import { FC, useCallback } from 'react'
+import { FlatList, ListRenderItem, ScrollView } from 'react-native'
 import { DestinationListItemBase } from '../CreateTrip/DestinationSettingScreen'
-import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
-import { ScheduleViewerCalendar } from '@/components/Calendar/ScheduleViewerCalendar'
-import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
-import { Avatar } from '@/components/Avatar'
-import { Icon } from '@/components/Icon'
-import { colors } from 'theme'
-import { useTheme } from '@rneui/themed'
 
 export const EditTripScreen: FC<{}> = observer(({}) => {
     const tripStore = useTripStore()
@@ -43,7 +36,6 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
 
     useHeader({
         centerComponent: <HeaderCenterTitle title="여행 정보 수정" />,
-        centerContainerStyle: $headerCenterTitleContainerStyle,
     })
 
     const {
@@ -53,7 +45,6 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
     return (
         <Screen>
             <ScrollView>
-                {/* <EditTripSubheader title={'여행 이름'} path={'TitleSetting'} /> */}
                 <ListSubheader title={'여행 이름'} />
                 <ListItem onPress={handleEditTitle}>
                     <ListItem.Content>
@@ -62,7 +53,6 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
                     <ListItem.Chevron />
                 </ListItem>
                 <Divider />
-                {/* <EditTripSubheader title={'여행지'} path={'DestinationSetting'} /> */}
                 <ListSubheader title={'여행지'} />
                 {tripStore.isDestinationSet ? (
                     <FlatList
