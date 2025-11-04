@@ -82,6 +82,7 @@
     "react-i18next": "^15.0.1",
     "react-native": "0.79.4",
     "react-native-calendars": "^1.1312.1",
+    "react-native-config": "^1.5.9",
     "react-native-date-picker": "^5.0.13",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-get-random-values": "^1.11.0",
@@ -90,12 +91,12 @@
     "react-native-mmkv": "^2.12.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.11.1",
     "react-native-sortables": "^1.7.0",
     "react-native-svg": "15.11.2",
     "react-native-ui-datepicker": "^3.1.2",
-    "uuid": "^11.1.0",
     "react-native-web": "^0.20.0",
-    "react-native-screens": "~4.11.1"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
