@@ -19,12 +19,15 @@ import {
 } from '@/models/Todo'
 import { KakaoProfile } from '@react-native-seoul/kakao-login'
 import { ApiResponse, ApisauceInstance, create } from 'apisauce'
+import Constants from 'expo-constants'
 import {
     FileSystemUploadOptions,
     FileSystemUploadResult,
     FileSystemUploadType,
     uploadAsync,
 } from 'expo-file-system'
+import { Platform } from 'react-native'
+import Config from 'react-native-config'
 import {
     type ApiConfig,
     CreateDestinationProps,
@@ -138,8 +141,12 @@ function handleDeleteResponse(response: ApiResponse<void>): ApiResult<null> {
 /**
  * Configuring the apisauce instance.
  */
+
 export const DEFAULT_API_CONFIG: ApiConfig = {
-    baseURL: process.env.API_URL,
+    baseURL:
+        Platform.OS === 'web'
+            ? Constants.expoConfig?.extra?.API_URL
+            : Config.API_URL,
     // baseURL: 'http://192.168.0.29:8080',
     //   withCredentials: true,
     timeout: 10000,
@@ -166,6 +173,7 @@ export class Api {
                 Accept: 'application/json',
             },
         })
+        console.log('Web API URL:', process.env.API_URL)
         // function getCookie(name: String) {
         //   const value = `; ${document.cookie}`
         //   const parts = value.split(`; ${name}=`)
@@ -248,6 +256,27 @@ export class Api {
                     idToken: idToken,
                 },
             },
+        )
+        const userAccountResponse = _handleResponse<UserAccountDTO>(response)
+        return userAccountResponse.kind === 'ok'
+            ? {
+                  kind: 'ok',
+                  data: mapToUserAccount(userAccountResponse.data),
+              }
+            : userAccountResponse
+    }
+
+    /**
+     * Gets a Trip data with given id.
+     * @returns {kind} - Response Status.
+     * @returns {...Trip} - Trip.
+     */
+    async webBrowserLogin(): Promise<ApiResult<UserStoreSnapshotIn>> {
+        const response: ApiResponse<UserAccountDTO> =
+            await this.apisauce.post(`auth/web-browser`)
+
+        console.log(
+            `[api.webBrowserLogin] response: ${JSON.stringify(response)}`,
         )
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'

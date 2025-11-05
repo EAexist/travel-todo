@@ -3,8 +3,8 @@ import { api, GoogleUserDTO } from '@/services/api'
 import { withDbSync } from '@/tasks/BackgroundTask'
 import { KakaoProfile } from '@react-native-seoul/kakao-login'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
-import { UserStoreModel, UserStoreSnapshotIn } from './UserStore'
 import { ResourceQuotaStoreModel } from './ResourceQuotaStore'
+import { UserStoreModel, UserStoreSnapshotIn } from './UserStore'
 
 // const GeneralApiProblemType = types.custom<
 //   GeneralApiProblem,
@@ -80,6 +80,26 @@ export const RootStoreModel = types
             return api.guestLogin().then(response => {
                 console.log(
                     `[api.guestLogin] response=${JSON.stringify(response)}`,
+                )
+                if (response.kind === 'ok') {
+                    // applySnapshot(store.userStore, response.data)
+                    store.setUser(response.data)
+                    return store.resourceQuotaStore.fetch().then(response => {
+                        if (response.kind === 'ok') {
+                            return store.userStore
+                                ?.fetchActiveTrip({})
+                                .then(response => {
+                                    return response
+                                })
+                        } else return { kind: response.kind }
+                    })
+                } else return { kind: response.kind }
+            })
+        },
+        async webBrowserLogin() {
+            return api.webBrowserLogin().then(response => {
+                console.log(
+                    `[api.webBrowserLogin] response=${JSON.stringify(response)}`,
                 )
                 if (response.kind === 'ok') {
                     // applySnapshot(store.userStore, response.data)

@@ -1,6 +1,6 @@
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { TransText } from '@/components/TransText'
 import { useTripStore } from '@/models'
 import { withTodo } from '@/utils/withTodo'

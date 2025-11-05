@@ -1,9 +1,9 @@
-import { LoginScreen } from '@/screens/Login/LoginScreen'
+import { BackButton } from '@/components/Header'
+import LoginScreen from '@/screens/Login'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { AuthStackParamList } from './navigationTypes'
-import { BackButton } from '@/components/Header'
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>()
 

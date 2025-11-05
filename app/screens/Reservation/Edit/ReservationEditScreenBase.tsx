@@ -10,17 +10,14 @@ import { DatePicker } from '@/components/DatePicker'
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
 import { ControlledListItemInput } from '@/components/Input'
-import { Label } from '@/components/Label'
 import ContentTitle from '@/components/Layout/Content'
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
-import { Screen } from '@/components/Screen'
-import { TextInfoListItem, TitleSizeType } from '@/components/TextInfoListItem'
-import { TextInfoListItemInput } from '@/components/TextInfoListItemInput'
+import { Screen } from '@/components/Screen/Screen'
+import { TextInfoListItem } from '@/components/TextInfoListItem'
 import { TransText } from '@/components/TransText'
 import { useReservationStore } from '@/models'
 import {
-    Accomodation,
     ACCOMODATION_CATEGORY_TO_ICONOBJECT,
     ACCOMODATION_CATEGORY_TO_TITLE,
     AccomodationCategory,
@@ -34,13 +31,11 @@ import {
     ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
 import { goBack, useNavigate } from '@/navigators'
-import { AccomodationAvatar } from '@/screens/Accomodation/AccomodationAvatar'
 import { filterAlphaNumericUppercase, filterNumeric } from '@/utils/inputFilter'
 import { useHeader } from '@/utils/useHeader'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { ListItemInputProps } from '@rneui/base/dist/ListItem/ListItem.Input'
-import { useTheme } from '@rneui/themed'
-import { Divider, Input, ListItem, Text } from '@rneui/themed'
+import { Divider, Input, ListItem, Text, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { getSnapshot } from 'mobx-state-tree'
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'

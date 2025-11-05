@@ -2,24 +2,15 @@ import { ActivityIndicator } from '@/components/ActivityIndicator'
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { TransText } from '@/components/TransText'
-import {
-    AppStackScreenProps,
-    AuthenticatedStackScreenProps,
-    goBack,
-    navigate,
-} from '@/navigators'
+import { AppStackScreenProps, goBack, navigate } from '@/navigators'
 import {
     ApiStatus,
     useApiStatus,
     useApiStatusDispatch,
 } from '@/utils/useApiStatus'
-import {
-    $headerCenterTitleContainerStyle,
-    HeaderCenterTitle,
-    useHeader,
-} from '@/utils/useHeader'
+import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
 import { useNetInfo } from '@react-native-community/netinfo'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'

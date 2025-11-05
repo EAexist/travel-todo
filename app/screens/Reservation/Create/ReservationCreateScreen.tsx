@@ -1,7 +1,7 @@
 import { Avatar } from '@/components/Avatar'
 import ContentTitle from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListItem/ListSubheader'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { useTripStore } from '@/models'
 import { ReservationCategory } from '@/models/Reservation/Reservation'
 import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'

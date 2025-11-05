@@ -182,12 +182,9 @@ export function App() {
     useDevLogger(navigationRef)
 
     useEffect(() => {
-        console.log('[app] rehydrated: ', rehydrated)
         console.log(
-            '[app] isNavigationStateRestored: ',
-            isNavigationStateRestored,
+            `[app] rehydrated: ${rehydrated}, isNavigationStateRestored: ${isNavigationStateRestored}, isI18nInitialized: ${isI18nInitialized}`,
         )
-        console.log('[app] isI18nInitialized: ', isI18nInitialized)
     }, [rehydrated, isNavigationStateRestored, isI18nInitialized])
 
     // Before we show the app, we have to wait for our state to be ready.

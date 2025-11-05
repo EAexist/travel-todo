@@ -1,7 +1,8 @@
 import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import ListSubheader from '@/components/ListItem/ListSubheader'
+import { Screen } from '@/components/Screen/Screen'
 import { useUserStore } from '@/models'
 import { TripSummary } from '@/models/stores/TripStore'
 import { AuthenticatedStackScreenProps, goBack } from '@/navigators'
@@ -17,7 +18,6 @@ import {
     TouchableOpacity,
 } from 'react-native'
 import { TripListItem, TripListItemProps } from './TripListitem'
-import ListSubheader from '@/components/ListItem/ListSubheader'
 
 const TripDeleteListItem: FC<Omit<TripListItemProps, 'renderRightContent'>> =
     observer(({ item, onPress, ...props }) => {
