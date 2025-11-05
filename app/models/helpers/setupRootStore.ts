@@ -10,14 +10,9 @@
  * @refresh reset
  */
 import { RootStore, RootStoreSnapshot } from '@/models/stores/RootStore'
-import { autorun } from 'mobx'
-import {
-    applySnapshot,
-    getSnapshot,
-    IDisposer,
-    onSnapshot,
-} from 'mobx-state-tree'
+import { applySnapshot, IDisposer, onSnapshot } from 'mobx-state-tree'
 import * as storage from '../../utils/storage'
+import { logRootStore } from './autoruns'
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -108,24 +103,14 @@ export async function setupRootStore(rootStore: RootStore) {
     _disposer = onSnapshot(rootStore, snapshot =>
         storage.save(ROOT_STATE_STORAGE_KEY, snapshot),
     )
-    autorun(() => {
-        console.log(
-            '[Preset changed:]',
-            rootStore?.userStore
-                ? JSON.stringify(
-                      rootStore.userStore.activeTrip?.todoPreset && {
-                          ...getSnapshot(
-                              rootStore.userStore.activeTrip?.todoPreset,
-                          ),
-                      },
-                  )
-                : '',
-        )
-    })
 
     const unsubscribe = () => {
         _disposer?.()
         _disposer = undefined
     }
+
+    /* Autorun */
+    logRootStore(rootStore)
+
     return { rootStore, restoredState, unsubscribe }
 }

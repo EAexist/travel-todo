@@ -21,12 +21,12 @@ export const LoadingScreenBase: FC<{
     variant?: 'simple' | 'article'
     onProblem?: () => void
     pendingIndicatorTitle?: string[]
-    onSuccess?: () => void
+    // onSuccess?: () => void
     successContent?: ReactNode
 }> = observer(
     ({
         pendingIndicatorTitle,
-        onSuccess = goBack,
+        // onSuccess = goBack,
         onProblem = () => {},
         successContent,
         variant = 'simple',
@@ -47,7 +47,7 @@ export const LoadingScreenBase: FC<{
         // }, [isConnected])
 
         useEffect(() => {
-            if (apiStatus === ApiStatus.SUCCESS) onSuccess()
+            if (apiStatus === ApiStatus.SUCCESS) goBack()
         }, [apiStatus])
 
         useHeader({ backButtonShown: false })
@@ -115,7 +115,7 @@ export const LoadingScreenBase: FC<{
 )
 
 export const LoadingScreen: FC<AppStackScreenProps<'Loading'>> = observer(
-    ({ route: { params } }) => {
+    ({ route: { params }, navigation }) => {
         return <LoadingScreenBase {...params} />
     },
 )

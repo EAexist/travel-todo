@@ -1,3 +1,19 @@
+import { autorun } from 'mobx'
+import { getSnapshot } from 'mobx-state-tree'
+import { RootStore } from '../stores/RootStore'
+
+export const logRootStore = (rootStore: RootStore) =>
+    autorun(() => {
+        console.log(
+            '[RootStore changed:]',
+            rootStore?.userStore
+                ? JSON.stringify({
+                      ...getSnapshot(rootStore),
+                      userStore: null,
+                  })
+                : '',
+        )
+    })
 // autorun(() => {
 //     console.log(
 //         '[UserStore changed:]',
