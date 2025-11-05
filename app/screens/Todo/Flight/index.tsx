@@ -1,35 +1,19 @@
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
+import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
-import { Screen } from '@/components/Screen'
-import { TransText } from '@/components/TransText'
+import { Screen } from '@/components/Screen/Screen'
 import { useStores, useTripStore } from '@/models'
-import { Flight, Location, LocationPair, Todo } from '@/models/Todo'
-import {
-    AuthenticatedStackScreenProps,
-    goBack,
-    useNavigate,
-} from '@/navigators'
-import { useTodo } from '@/utils/useTodo'
+import { Flight, Location, Todo } from '@/models/Todo'
+import { goBack, useNavigate } from '@/navigators'
 import { withTodo } from '@/utils/withTodo'
-import { useLingui } from '@lingui/react/macro'
+import { useFocusEffect } from '@react-navigation/native'
+import { ListItemChevron } from '@rneui/base/dist/ListItem/ListItem.Chevron'
 import { Chip } from '@rneui/themed'
-import {
-    FC,
-    ReactNode,
-    use,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useState,
-} from 'react'
+import { Observer } from 'mobx-react-lite'
+import { useCallback, useEffect } from 'react'
 import { FlatList, ListRenderItem, View } from 'react-native'
 import { AirportAutocomplete } from './AirportAutocomplete'
-import { ListItemBase } from '@/components/ListItem/ListItem'
-import { ListItemChevron } from '@rneui/base/dist/ListItem/ListItem.Chevron'
-import { useFocusEffect } from '@react-navigation/native'
-import { getSnapshot } from 'mobx-state-tree'
-import { Observer } from 'mobx-react-lite'
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
  * ERROR  Warning: TypeError: Cannot read property 'getFlagEmoji' of undefined
@@ -297,8 +281,10 @@ const ArrivalAirportEditScreen = withTodo(({ todo }: { todo: Todo }) => {
 //   return !!todo ? <RoundTripSettingScreenBase todo={todo} /> : <></>
 // }
 
-export { RoundTripSettingScreen as RoundTripSetting }
-export { DepartureAirportSettingScreen as DepartureAirportSetting }
-export { DepartureAirportEditScreen as DepartureAirportEdit }
-export { ArrivalAirportSettingScreen as ArrivalAirportSetting }
-export { ArrivalAirportEditScreen as ArrivalAirportEdit }
+export {
+    ArrivalAirportEditScreen as ArrivalAirportEdit,
+    ArrivalAirportSettingScreen as ArrivalAirportSetting,
+    DepartureAirportEditScreen as DepartureAirportEdit,
+    DepartureAirportSettingScreen as DepartureAirportSetting,
+    RoundTripSettingScreen as RoundTripSetting,
+}

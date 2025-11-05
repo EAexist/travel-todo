@@ -1,7 +1,7 @@
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { AuthenticatedStackScreenProps, goBack } from '@/navigators'
 import { FC, useCallback } from 'react'
 

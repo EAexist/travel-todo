@@ -1,7 +1,7 @@
 import ContentTitle, { ContentTitleProps } from '@/components/Layout/Content'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Note_ } from '@/components/Note'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { goBack } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { FC, useCallback, useState } from 'react'

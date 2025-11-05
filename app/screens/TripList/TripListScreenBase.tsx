@@ -1,7 +1,7 @@
 import BottomSheetModal from '@/components/BottomSheetModal'
 import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { useTripStore, useUserStore } from '@/models'
 import { TripSummary } from '@/models/stores/TripStore'
 import { goBack, navigate, useNavigate } from '@/navigators'

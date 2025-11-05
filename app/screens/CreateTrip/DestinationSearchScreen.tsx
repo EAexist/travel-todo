@@ -1,19 +1,23 @@
+import { Avatar } from '@/components/Avatar'
 import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
 import { GooglePlacesSearchBarInput, InputIcon } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import { LoadingScreen } from '@/screens/Loading'
-import { Screen } from '@/components/Screen'
+import { ListItemBase } from '@/components/ListItem/ListItem'
+import ListSubheader from '@/components/ListItem/ListSubheader'
+import { Screen } from '@/components/Screen/Screen'
 import { TransText } from '@/components/TransText'
-import { useStores, useTripStore } from '@/models'
+import { useTripStore } from '@/models'
 import {
     DestinationCreateDTO,
     DestinationSnapshotIn,
 } from '@/models/Destination'
 import { goBack } from '@/navigators'
-import { getGwaWa, rtrim } from '@/utils'
+import { getGwaWa } from '@/utils'
 import { countryNameKrToIso } from '@/utils/nation'
 import { useLingui } from '@lingui/react/macro'
-import { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { ListItem, useTheme } from '@rneui/themed'
+import { FC, useCallback, useRef, useState } from 'react'
+import { View } from 'react-native'
 import {
     AutocompleteRequestType,
     GooglePlaceData,
@@ -22,15 +26,6 @@ import {
     Query,
 } from 'react-native-google-places-autocomplete'
 import { DestinationListItemBase } from './DestinationSettingScreen'
-import {
-    NativeSyntheticEvent,
-    TextInputChangeEventData,
-    View,
-} from 'react-native'
-import { ListItemBase } from '@/components/ListItem/ListItem'
-import ListSubheader from '@/components/ListItem/ListSubheader'
-import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
-import { Avatar } from '@/components/Avatar'
 
 /* https://github.com/FaridSafi/react-native-google-places-autocomplete */
 

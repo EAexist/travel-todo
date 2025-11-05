@@ -1,9 +1,10 @@
-import BottomSheet, {
-    BottomSheetModal as GorhomBottomSheetModal,
+import { isMobile } from '@/utils/platform'
+import {
     BottomSheetBackdropProps,
     BottomSheetModalProps,
     BottomSheetView,
     BottomSheetBackdrop as GorhomBottomSheetBackdrop,
+    BottomSheetModal as GorhomBottomSheetModal,
 } from '@gorhom/bottom-sheet'
 import { useFocusEffect } from '@react-navigation/native'
 import { useTheme } from '@rneui/themed'
@@ -15,7 +16,7 @@ import {
     useEffect,
     useState,
 } from 'react'
-import { StyleSheet, Platform } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView as RNGestureHandlerRootView } from 'react-native-gesture-handler'
 import { GestureHandlerRootViewProps } from 'react-native-gesture-handler/lib/typescript/components/GestureHandlerRootView'
 
@@ -133,8 +134,15 @@ BottomSheetModal.displayName = 'BottomSheetModal'
 
 const styles = StyleSheet.create({
     gestureHandlerRootView: {
-        flex: 1,
-        ...(Platform.OS === 'web' ? { maxWidth: 480 } : {}),
+        ...(isMobile
+            ? {
+                  flex: 1,
+              }
+            : {
+                  height: 852,
+                  width: 383,
+                  alignSelf: 'center',
+              }),
     },
     containerStyle: {},
     style: {

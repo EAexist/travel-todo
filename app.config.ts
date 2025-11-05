@@ -1,10 +1,26 @@
-import { ExpoConfig, ConfigContext } from '@expo/config'
+import { ConfigContext, ExpoConfig } from '@expo/config'
 
 /**
  * Use ts-node here so we can use TypeScript for our Config Plugins
  * and not have to compile them to JavaScript
  */
 require('ts-node/register')
+
+// const dotenv = require('dotenv')
+// const path = require('path')
+
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+
+const env =
+    dotenv.config({
+        path: path.resolve(
+            __dirname,
+            process.env.NODE_ENV === 'production'
+                ? '.env.production'
+                : '.env.development',
+        ),
+    }).parsed || {}
 
 /**
  * @param config ExpoConfig coming from the static config app.json if it exists
@@ -41,5 +57,9 @@ module.exports = ({ config }: ConfigContext): Partial<ExpoConfig> => {
             // require('./plugins/withSplashScreen').withSplashScreen,
             // require('./plugins/withComposeCompiler').withComposeCompiler,
         ],
+        // extra: {
+        //     ...config.extra,
+        //     ...env,
+        // },
     }
 }

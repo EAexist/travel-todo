@@ -11,7 +11,7 @@ import * as Screens from '@/screens'
 import { ErrorBoundary } from '@/screens/ErrorScreen/ErrorBoundary'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import { NavigationContainer } from '@react-navigation/native'
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ThemeProvider, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
@@ -87,7 +87,6 @@ export const AppNavigator = observer(function AppNavigator(
     useBackButtonHandler(routeName => exitRoutes.includes(routeName))
 
     return (
-        // <AppThemeProvider value={{ themeScheme, setThemeContextOverride }}>
         <ThemeProvider theme={theme}>
             {/* <View style={$outerContainerStyle}> */}
             {/* <View style={$innerContainerStyle}> */}
@@ -97,6 +96,13 @@ export const AppNavigator = observer(function AppNavigator(
                         <FabProvider>
                             <NavigationContainer
                                 ref={navigationRef}
+                                theme={{
+                                    ...DefaultTheme,
+                                    colors: {
+                                        ...DefaultTheme.colors,
+                                        background: '#FFFFFF',
+                                    },
+                                }}
                                 // theme={{
                                 //     ...navigationTheme,
                                 //     colors: {
@@ -116,7 +122,6 @@ export const AppNavigator = observer(function AppNavigator(
             {/* </View> */}
             {/* </View> */}
         </ThemeProvider>
-        // </AppThemeProvider>
     )
 })
 

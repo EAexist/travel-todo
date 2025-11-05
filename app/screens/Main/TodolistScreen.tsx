@@ -14,7 +14,7 @@ import { BottomSheetModal } from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import { Label } from '@/components/Label'
 import { ListItemBase } from '@/components/ListItem/ListItem'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { AccomodationTodo, CompleteTodo } from '@/components/Todo'
 import {
     DoShowSupplyTodosFirstToggleSwitch,

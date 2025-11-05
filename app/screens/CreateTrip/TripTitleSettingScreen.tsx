@@ -1,7 +1,7 @@
 import * as Fab from '@/components/Fab'
 import { ControlledInput } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
-import { Screen } from '@/components/Screen'
+import { Screen } from '@/components/Screen/Screen'
 import { useTripStore } from '@/models'
 import { FC, useCallback } from 'react'
 import { View } from 'react-native'

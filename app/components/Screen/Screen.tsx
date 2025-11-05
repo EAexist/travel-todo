@@ -1,6 +1,6 @@
 import { useScrollToTop } from '@react-navigation/native'
 import { StatusBarProps, StatusBarStyle } from 'expo-status-bar'
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
     KeyboardAvoidingView,
     KeyboardAvoidingViewProps,
@@ -15,11 +15,11 @@ import {
 import {
     ExtendedEdge,
     useSafeAreaInsetsStyle,
-} from '../utils/useSafeAreaInsetsStyle'
+} from '../../utils/useSafeAreaInsetsStyle'
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { useTheme } from '@rneui/themed'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
-import { useFabHeight } from './Fab'
+import { useFabHeight } from '../Fab'
 
 export const DEFAULT_BOTTOM_OFFSET = 50
 
@@ -280,12 +280,12 @@ export function Screen(props: ScreenProps) {
         theme: { colors },
     } = useTheme()
 
-    //   useEffect(() => {
-    //     console.log(
-    //       '[Screen] isNonScrolling(props.preset):',
-    //       isNonScrolling(props.preset),
-    //     )
-    //   }, [isNonScrolling(props.preset)])
+    useEffect(() => {
+        console.log(
+            '[Screen] navigator.userAgent:',
+            navigator.userAgent.toLowerCase(),
+        )
+    }, [navigator.userAgent.toLowerCase()])
 
     return (
         <View
@@ -320,13 +320,29 @@ export function Screen(props: ScreenProps) {
         </View>
     )
 }
-
 const $containerStyle: ViewStyle = {
     flex: 1,
     height: '100%',
     width: '100%',
-    // backgroundColor: 'transparent',
 }
+// const $containerStyle: ViewStyle =
+//     Platform.OS === 'android' || Platform.OS === 'ios'
+//         ? {
+//               flex: 1,
+//               height: '100%',
+//               width: '100%',
+//           }
+//         : true
+//           ? {
+//                 flex: 1,
+//                 height: '100%',
+//                 width: '100%',
+//             }
+//           : {
+//                 flex: 1,
+//                 height: 852,
+//                 width: 383,
+//             }
 
 const $outerStyle: ViewStyle = {
     flex: 1,
