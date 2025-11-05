@@ -51,65 +51,76 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 const prefix = Linking.createURL('/')
 const config = {
     screens: {
-        Main: {
-            path: 'trip/:tripId?',
+        Loading: 'loading',
+        Auth: {
             screens: {
-                Todolist: '/',
-                Reservation: '/reservation',
+                Login: 'auth/login',
+                Admin: 'auth/_admin',
             },
         },
-        // Main: {
-        //   screens: {
-        //     Todolist: 'trip/:tripId?/todolist',
-        //     Reservation: 'trip/:tripId?/reservation',
-        //   },
-        // },
+        App: {
+            screens: {
+                Main: {
+                    path: 'trip/:tripId?',
+                    screens: {
+                        Todolist: '/',
+                        Reservation: '/reservation',
+                    },
+                },
+                // Main: {
+                //   screens: {
+                //     Todolist: 'trip/:tripId?/todolist',
+                //     Reservation: 'trip/:tripId?/reservation',
+                //   },
+                // },
 
-        Loading: 'loading',
+                Home: 'welcome',
+                DestinationSetting: 'new/:tripId/destination',
+                DestinationSearch: 'new/:tripId/destination/search',
+                ScheduleSetting: 'new/:tripId/schedule',
+                TitleSetting: 'new/:tripId/title',
+                TodolistSetting: 'new/:tripId/trip',
 
-        Login: 'login',
-        Home: 'welcome',
-        DestinationSetting: 'new/:tripId/destination',
-        DestinationSearch: 'new/:tripId/destination/search',
-        ScheduleSetting: 'new/:tripId/schedule',
-        TitleSetting: 'new/:tripId/title',
-        TodolistSetting: 'new/:tripId/trip',
+                /*  */
+                TripMeta: 'trip/:tripId?/meta',
+                TodolistAdd: 'trip/:tripId?/add',
+                TodolistDelete: 'trip/:tripId?/delete',
+                TodolistReorder: 'trip/:tripId?/reorder',
 
-        /*  */
-        TripMeta: 'trip/:tripId?/meta',
-        TodolistAdd: 'trip/:tripId?/add',
-        TodolistDelete: 'trip/:tripId?/delete',
-        TodolistReorder: 'trip/:tripId?/reorder',
+                /*  */
+                CreateCustomTodo: 'trip/:tripId?/todo/:todoId?/createCustom',
+                CreateFlightTodo: 'trip/:tripId?/todo/:todoId?/createFlight',
+                CreateFlightTicketTodo:
+                    'trip/:tripId?/todo/:todoId?/createFlightTicket',
+                TodoEdit: 'trip/:tripId?/todo/:todoId?/edit',
+                TodoNote: 'trip/:tripId?/todo/:todoId?/note',
 
-        /*  */
-        CreateCustomTodo: 'trip/:tripId?/todo/:todoId?/createCustom',
-        CreateFlightTodo: 'trip/:tripId?/todo/:todoId?/createFlight',
-        CreateFlightTicketTodo:
-            'trip/:tripId?/todo/:todoId?/createFlightTicket',
-        TodoEdit: 'trip/:tripId?/todo/:todoId?/edit',
-        TodoNote: 'trip/:tripId?/todo/:todoId?/note',
+                /*  */
+                DepartureAirportSetting:
+                    'trip/:tripId?/todo/:todoId?/departure',
+                ArrivalAirportSetting: 'trip/:tripId?/todo/:todoId?/arrival',
+                RoundTripSetting: 'trip/:tripId?/todo/:todoId?/roundTrip',
 
-        /*  */
-        DepartureAirportSetting: 'trip/:tripId?/todo/:todoId?/departure',
-        ArrivalAirportSetting: 'trip/:tripId?/todo/:todoId?/arrival',
-        RoundTripSetting: 'trip/:tripId?/todo/:todoId?/roundTrip',
+                /*  */
+                ConfirmPassport: 'trip/:tripId?/todo/:todoId?/confirmPassport',
+                ConfirmFlight: 'trip/:tripId?/todo/:todoId?/confirmFlight',
+                ConfirmFlightTicket:
+                    'trip/:tripId?/todo/:todoId?/confirmFlightTicket',
 
-        /*  */
-        ConfirmPassport: 'trip/:tripId?/todo/:todoId?/confirmPassport',
-        ConfirmFlight: 'trip/:tripId?/todo/:todoId?/confirmFlight',
-        ConfirmFlightTicket: 'trip/:tripId?/todo/:todoId?/confirmFlightTicket',
+                /*  */
+                AccomodationPlan: 'trip/:tripId?/accomodationPlan',
+                Accomodation: 'trip/:tripId?/accomodation/:accomodationId?',
+                AccomodationNote:
+                    'trip/:tripId?/accomodation/:accomodationId?/note',
+                CreateAccomodation: 'trip/:tripId?/createAccomodation',
 
-        /*  */
-        AccomodationPlan: 'trip/:tripId?/accomodationPlan',
-        Accomodation: 'trip/:tripId?/accomodation/:accomodationId?',
-        AccomodationNote: 'trip/:tripId?/accomodation/:accomodationId?/note',
-        CreateAccomodation: 'trip/:tripId?/createAccomodation',
+                /* Reservation */
+                ReservationCreate: 'trip/:tripId?/reservation/create',
 
-        /* Reservation */
-        ReservationCreate: 'trip/:tripId?/reservation/create',
-
-        FullScreenImage:
-            'trip/:tripId?/reservation/:reservationId?/fullScreenImage',
+                FullScreenImage:
+                    'trip/:tripId?/reservation/:reservationId?/fullScreenImage',
+            },
+        },
     },
 }
 const customFontsToLoad = {

@@ -5,6 +5,7 @@
  * and a "main" flow which the user will use once logged in.
  */
 import { ReservationCategory } from '@/models/Reservation/Reservation'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import {
     CompositeScreenProps,
     NavigationContainer,
@@ -12,7 +13,6 @@ import {
 } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { ComponentProps } from 'react'
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 
 export type AppStackParamList = {
     /* Common */
@@ -25,6 +25,7 @@ export type AppStackParamList = {
 /* Auth */
 export type AuthStackParamList = {
     Login: {}
+    Admin: {}
 }
 
 /* Authenticated */

@@ -25,11 +25,12 @@ export const RootStoreModel = types
     .props({
         userStore: types.maybeNull(UserStoreModel),
         resourceQuotaStore: ResourceQuotaStoreModel,
+        _isAuthenticated: types.optional(types.boolean, false),
     })
     .actions(withSetPropAction)
     .views(store => ({
         get isAuthenticated() {
-            return store.userStore !== null
+            return store._isAuthenticated && store.userStore !== null
         },
     }))
     .actions(store => ({
@@ -54,9 +55,6 @@ export const RootStoreModel = types
         },
         async googleLogin(googleUser: GoogleUserDTO) {
             return api.googleLogin(googleUser).then(response => {
-                console.log(
-                    `[api.googleLogin] response=${JSON.stringify(response)}`,
-                )
                 if (response.kind == 'ok') {
                     store.setUser(response.data)
                     return response
@@ -66,12 +64,27 @@ export const RootStoreModel = types
         },
         async googleLoginWithIdToken(idToken: string) {
             api.googleLoginWithIdToken(idToken).then(response => {
-                console.log(
-                    `[api.googleLogin] response=${JSON.stringify(response)}`,
-                )
                 if (response.kind == 'ok') {
                     store.setUser(response.data)
                     return response
+                }
+                return response
+            })
+        },
+        async adminGoogleLoginWithIdToken({ idToken }: { idToken: string }) {
+            return api.adminGoogleLoginWithIdToken(idToken).then(response => {
+                if (response.kind == 'ok') {
+                    store.setUser(response.data)
+                    return { kind: response.kind }
+                    return store.resourceQuotaStore.fetch().then(response => {
+                        if (response.kind === 'ok') {
+                            return store.userStore
+                                ?.fetchActiveTrip({})
+                                .then(response => {
+                                    return response
+                                })
+                        } else return { kind: response.kind }
+                    })
                 }
                 return response
             })

@@ -1,5 +1,6 @@
 import { BackButton } from '@/components/Header'
 import LoginScreen from '@/screens/Login'
+import { AdminScreen } from '@/screens/Login/AdminScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
@@ -22,6 +23,7 @@ export const AuthNavigator = observer(function AuthenicatedStack() {
             }}
             initialRouteName={'Login'}>
             <AuthStack.Screen name="Login" component={LoginScreen} />
+            <AuthStack.Screen name="Admin" component={AdminScreen} />
         </AuthStack.Navigator>
     )
 })

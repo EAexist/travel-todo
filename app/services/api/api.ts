@@ -173,7 +173,6 @@ export class Api {
                 Accept: 'application/json',
             },
         })
-        console.log('Web API URL:', process.env.API_URL)
         // function getCookie(name: String) {
         //   const value = `; ${document.cookie}`
         //   const parts = value.split(`; ${name}=`)
@@ -230,6 +229,32 @@ export class Api {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `auth/google`,
             googleUser,
+        )
+        const userAccountResponse = _handleResponse<UserAccountDTO>(response)
+        return userAccountResponse.kind === 'ok'
+            ? {
+                  kind: 'ok',
+                  data: mapToUserAccount(userAccountResponse.data),
+              }
+            : userAccountResponse
+    }
+
+    /**
+     * Gets a Trip data with given id.
+     * @returns {kind} - Response Status.
+     * @returns {...Trip} - Trip.
+     */
+    async adminGoogleLoginWithIdToken(
+        idToken: string,
+    ): Promise<ApiResult<UserStoreSnapshotIn>> {
+        const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
+            `auth/admin`,
+            undefined,
+            {
+                params: {
+                    idToken: idToken,
+                },
+            },
         )
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'

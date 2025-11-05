@@ -3,13 +3,10 @@ import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import { TodoPresetItemSnapshotIn } from '@/models/Todo'
 import { ApiResponseKind } from '@/services/api/apiProblem'
-import { ApiResponse } from 'apisauce'
 import {
     ActionDispatch,
-    Context,
     createContext,
     PropsWithChildren,
-    useCallback,
     useContext,
     useEffect,
     useReducer,
@@ -150,6 +147,46 @@ const apiStatusReducer = (
     }
 }
 
+export function useActionWithApiStatus<T extends {}, K = void>(
+    action: (props: T) => Promise<ApiResponseKind & { data?: K }>,
+    onSuccess?: () => void,
+) {
+    const dispatch = useApiStatusDispatch()
+
+    return (props: T) => {
+        dispatch({
+            type: 'setApiStatus',
+            props: { apiStatus: ApiStatus.PENDING },
+        })
+        dispatch({
+            type: 'setOnSuccess',
+            props: { onSuccess: onSuccess || null },
+        })
+        return action(props).then(({ kind, data }) => {
+            console.log(`[_useWithApiStatus] kind=${kind}`)
+            switch (kind) {
+                case 'ok':
+                    dispatch({
+                        type: 'set_SUCCESS',
+                    })
+                    break
+                case 'timeout':
+                case 'cannot-connect':
+                    dispatch({
+                        type: 'set_NO_CONNECTION',
+                    })
+                    break
+                default:
+                    dispatch({
+                        type: 'set_ERROR',
+                    })
+                    break
+            }
+            return { kind, data }
+        })
+    }
+}
+
 export function _useWithApiStatus<T extends {}, K = void>(
     action: (args: T) => Promise<ApiResponseKind & { data?: K }>,
 ) {
@@ -197,6 +234,9 @@ export const useActionsWithApiStatus = () => {
     return {
         guestLoginWithApiStatus: _useWithApiStatus<{}, UserStoreSnapshotIn>(
             rootStore.guestLogin,
+        ),
+        adminGoogleLoginWithIdToken: _useWithApiStatus<{ idToken: string }>(
+            rootStore.adminGoogleLoginWithIdToken,
         ),
         logoutWithApiStatus: _useWithApiStatus<{}>(rootStore.logout),
         ...(userStore
