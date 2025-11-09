@@ -170,10 +170,15 @@ export function App() {
     // https://lingui.dev/tutorials/react-native#internationalization-in-react-native
     //   i18n.loadAndActivate({ locale: 'ko', messages })
     // otherwise, we're ready to render the app
-
     /* Run Background Sync Actions when network connectivity is restored */
     useEffect(() => {
         console.log('HI')
+        if (Platform.OS === 'web') {
+            console.log(
+                'Skipping background task register as the app is running on web.',
+            )
+            return () => {}
+        }
         const unsubscribe = addEventListener(state => {
             console.log('Connection type', state.type)
             console.log('Is connected?', state.isConnected)
