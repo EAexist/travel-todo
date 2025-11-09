@@ -1,13 +1,9 @@
-import { FC, ReactElement, useEffect, useLayoutEffect } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import {
-    Platform,
-    StyleSheet,
-    TextStyle,
-    TouchableOpacity,
-    View,
-    ViewStyle,
-} from 'react-native'
+import { BackButton, RightActionButton } from '@/components/Header'
+import { IconProps } from '@/components/Icon'
+import { TransText } from '@/components/TransText'
+import { NavigateProps } from '@/navigators'
+import { typography } from '@/rneui/theme'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import {
     Header,
     HeaderProps as RNEHeaderProps,
@@ -15,12 +11,16 @@ import {
     TextProps,
     useTheme,
 } from '@rneui/themed'
-import { BackButton, HeaderIcon, RightActionButton } from '@/components/Header'
-import { NavigateProps } from '@/navigators'
-import { TransText } from '@/components/TransText'
-import { IconProps } from '@/components/Icon'
 import { BlurView } from 'expo-blur'
-import { typography } from '@/rneui/theme'
+import {
+    FC,
+    ReactElement,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+} from 'react'
+import { Platform, StyleSheet, TextStyle, ViewStyle } from 'react-native'
+import { ApiStatus, useApiStatus } from './useApiStatus'
 
 interface HeaderProps extends RNEHeaderProps {
     backgroundColor?: 'primary' | 'secondary'
@@ -55,6 +55,8 @@ export function useHeader(
 ) {
     const navigation = useNavigation()
 
+    const { apiStatus } = useApiStatus()
+
     /**
      * We need to have multiple implementations of this hook for web and mobile.
      * Web needs to use useEffect to avoid a rendering loop.
@@ -62,7 +64,11 @@ export function useHeader(
      * `useLayoutEffect`, which will apply the settings before the screen renders.
      */
     const usePlatformEffect =
-        Platform.OS === 'web' ? useEffect : useLayoutEffect
+        Platform.OS === 'web'
+            ? useEffect
+            : // ? (effect: EffectCallback, deps?: DependencyList) =>
+              //       useFocusEffect(useCallback(effect, deps || []))
+              useLayoutEffect
 
     const {
         theme: { colors },
@@ -116,7 +122,94 @@ export function useHeader(
         })
         // intentionally created API to have user set when they want to update the header via `deps`
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [...deps, navigation])
+    }, [...deps, navigation, apiStatus === ApiStatus.IDLE])
+}
+
+export function useHeaderOnFocus(
+    {
+        headerShown = true,
+        backButtonShown = true,
+        rightActionTitle,
+        onRightPress,
+        backNavigateProps,
+        onBackPressBeforeNavigate,
+        leftComponent,
+        containerStyle,
+        backgroundColor = 'primary',
+        ...props
+    }: HeaderProps,
+    deps: Parameters<typeof useLayoutEffect>[1] = [],
+) {
+    const navigation = useNavigation()
+
+    /**
+     * We need to have multiple implementations of this hook for web and mobile.
+     * Web needs to use useEffect to avoid a rendering loop.
+     * In mobile and also to avoid a visible header jump when navigating between screens, we use
+     * `useLayoutEffect`, which will apply the settings before the screen renders.
+     */
+    const usePlatformEffect =
+        Platform.OS === 'web'
+            ? useFocusEffect
+            : // ? (effect: EffectCallback, deps?: DependencyList) =>
+              //       useFocusEffect(useCallback(effect, deps || []))
+              useFocusEffect
+
+    const {
+        theme: { colors },
+    } = useTheme()
+
+    // To avoid a visible header jump when navigating between screens, we use
+    // `useLayoutEffect`, which will apply the settings before the screen renders.
+    usePlatformEffect(
+        useCallback(() => {
+            navigation.setOptions({
+                headerShown,
+                header: () => (
+                    <BlurView intensity={1}>
+                        <Header
+                            leftComponent={
+                                backButtonShown ? (
+                                    <BackButton
+                                        navigateProps={backNavigateProps}
+                                        onBackPressBeforeNavigate={
+                                            onBackPressBeforeNavigate
+                                        }
+                                    />
+                                ) : (
+                                    leftComponent
+                                )
+                            }
+                            rightComponent={
+                                <RightActionButton
+                                    onPress={onRightPress}
+                                    title={rightActionTitle}
+                                />
+                            }
+                            containerStyle={[
+                                containerStyle,
+                                {
+                                    backgroundColor:
+                                        backgroundColor === 'secondary'
+                                            ? colors.secondaryBg
+                                            : // : 'red',
+                                              undefined,
+                                },
+                            ]}
+                            {...props}
+                            centerContainerStyle={
+                                !!props.centerComponent
+                                    ? $headerCenterTitleContainerStyle
+                                    : undefined
+                            }
+                        />
+                    </BlurView>
+                ),
+            })
+            // intentionally created API to have user set when they want to update the header via `deps`
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [...deps, navigation]),
+    )
 }
 
 export const useMainScreenHeader = (

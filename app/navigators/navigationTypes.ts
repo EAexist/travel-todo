@@ -30,6 +30,7 @@ export type AuthStackParamList = {
 
 /* Authenticated */
 export type AuthenticatedStackParamList = {
+    DemoHome: {}
     Home: {}
     TripList: {}
     TripDelete: {}

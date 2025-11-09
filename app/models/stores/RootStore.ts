@@ -25,12 +25,11 @@ export const RootStoreModel = types
     .props({
         userStore: types.maybeNull(UserStoreModel),
         resourceQuotaStore: ResourceQuotaStoreModel,
-        _isAuthenticated: types.optional(types.boolean, false),
     })
     .actions(withSetPropAction)
     .views(store => ({
         get isAuthenticated() {
-            return store._isAuthenticated && store.userStore !== null
+            return store.userStore !== null
         },
     }))
     .actions(store => ({
@@ -75,7 +74,6 @@ export const RootStoreModel = types
             return api.adminGoogleLoginWithIdToken(idToken).then(response => {
                 if (response.kind == 'ok') {
                     store.setUser(response.data)
-                    return { kind: response.kind }
                     return store.resourceQuotaStore.fetch().then(response => {
                         if (response.kind === 'ok') {
                             return store.userStore
@@ -89,10 +87,10 @@ export const RootStoreModel = types
                 return response
             })
         },
-        async guestLogin() {
-            return api.guestLogin().then(response => {
+        async webBrowserLogin() {
+            return api.webBrowserLogin().then(response => {
                 console.log(
-                    `[api.guestLogin] response=${JSON.stringify(response)}`,
+                    `[api.webBrowserLogin] response=${JSON.stringify(response)}`,
                 )
                 if (response.kind === 'ok') {
                     // applySnapshot(store.userStore, response.data)
@@ -109,10 +107,10 @@ export const RootStoreModel = types
                 } else return { kind: response.kind }
             })
         },
-        async webBrowserLogin() {
-            return api.webBrowserLogin().then(response => {
+        async guestLogin() {
+            return api.guestLogin().then(response => {
                 console.log(
-                    `[api.webBrowserLogin] response=${JSON.stringify(response)}`,
+                    `[api.guestLogin] response=${JSON.stringify(response)}`,
                 )
                 if (response.kind === 'ok') {
                     // applySnapshot(store.userStore, response.data)

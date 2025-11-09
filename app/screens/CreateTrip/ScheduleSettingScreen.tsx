@@ -11,6 +11,7 @@ import ContentTitle from '@/components/Layout/Content'
 import { useReservationStore, useTripStore } from '@/models'
 import { DateInterval, toCalendarString } from '@/utils/date'
 import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
+import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import { addDays } from 'date-fns'
 import { FC, useCallback, useState } from 'react'
@@ -235,6 +236,12 @@ export const EditTripScheduleScreenBase: FC<EditScreenBaseProps> = ({
 }
 
 export const TripScheduleSettingScreen: FC = () => {
+    useHeader({
+        backButtonShown: true,
+        backNavigateProps: {
+            name: 'DestinationSetting',
+        },
+    })
     return <EditTripScheduleScreenBase isInitialSettingScreen={true} />
 }
 

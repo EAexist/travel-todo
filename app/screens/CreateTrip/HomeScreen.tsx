@@ -1,24 +1,19 @@
+import {
+    NavigateListItemProp,
+    NavigateMenuBottomSheet,
+} from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import BottomSheetModal from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import { ListItemBase } from '@/components/ListItem/ListItem'
-import {
-    NavigateMenuBottomSheet,
-    NavigateListItemProp,
-} from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import { useStores, useTripStore } from '@/models'
-import {
-    AuthenticatedStackScreenProps,
-    navigationRef,
-    useNavigate,
-} from '@/navigators'
-import { useLoadingScreen } from '@/screens/Loading'
+import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'
+import { LoadingBoundary } from '@/screens/Loading/LoadingBoundary'
+import { TripListScreenBase } from '@/screens/TripList/TripListScreenBase'
 import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
-import { useFocusEffect } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-import { TripListScreenBase } from '@/screens/TripList/TripListScreenBase'
 
 export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
     props => {
@@ -62,8 +57,6 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
         //     ]),
         // )
 
-        useLoadingScreen({})
-
         /* Menu */
         const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)
 
@@ -79,24 +72,21 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
             },
         ]
 
-        useHeader(
-            {
-                backButtonShown: false,
-                backgroundColor: 'secondary',
-                rightComponent: (
-                    <TouchableOpacity
-                        onPress={handleSettingsButtonPress}
-                        style={$headerRightButtonStyle}>
-                        <HeaderIcon name="gear" type="octicon" />
-                    </TouchableOpacity>
-                ),
-                centerComponent: <HeaderCenterTitle title={'여행 목록'} />,
-            },
-            [],
-        )
+        useHeader({
+            backButtonShown: false,
+            backgroundColor: 'secondary',
+            rightComponent: (
+                <TouchableOpacity
+                    onPress={handleSettingsButtonPress}
+                    style={$headerRightButtonStyle}>
+                    <HeaderIcon name="gear" type="octicon" />
+                </TouchableOpacity>
+            ),
+            centerComponent: <HeaderCenterTitle title={'여행 목록'} />,
+        })
 
         return (
-            <>
+            <LoadingBoundary>
                 <TripListScreenBase />
                 <NavigateMenuBottomSheet
                     data={settingsOption}
@@ -109,7 +99,7 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
                         onPress={() => logoutWithApiStatus()}
                     />
                 </NavigateMenuBottomSheet>
-            </>
+            </LoadingBoundary>
         )
     },
 )

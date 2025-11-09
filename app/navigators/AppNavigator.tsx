@@ -7,7 +7,6 @@
 import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
-import * as Screens from '@/screens'
 import { ErrorBoundary } from '@/screens/ErrorScreen/ErrorBoundary'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -50,11 +49,13 @@ const AppStackNavigator = observer(function AppStackNavigator() {
     const {
         theme: { colors },
     } = useTheme()
-    const { isAuthenticated } = useStores()
+    const rootStore = useStores()
 
     useEffect(() => {
-        console.log('[AppStackNavigator] isAuthenticated:', isAuthenticated)
-    }, [isAuthenticated])
+        console.log(
+            `[AppStackNavigator] isAuthenticated: ${rootStore.isAuthenticated}\nuserStore: ${rootStore.userStore}`,
+        )
+    }, [rootStore.isAuthenticated, rootStore.userStore])
 
     return (
         <AppStack.Navigator
@@ -63,14 +64,8 @@ const AppStackNavigator = observer(function AppStackNavigator() {
                 contentStyle: {
                     backgroundColor: colors.background,
                 },
-            }}
-            initialRouteName={isAuthenticated ? 'App' : 'Auth'}>
-            <AppStack.Screen name="Loading" component={Screens.Loading} />
-            <AppStack.Screen
-                name="RequireConnection"
-                component={Screens.RequireConnection}
-            />
-            {isAuthenticated ? (
+            }}>
+            {rootStore.isAuthenticated ? (
                 <AppStack.Screen
                     name="App"
                     component={AuthenticatedNavigator}

@@ -2,30 +2,17 @@ import { withSetPropAction } from '@/models/helpers/withSetPropAction'
 import {
     Reservation,
     RESERVATION_CATEGORY_TO_TITLE,
-    ReservationCategory,
     ReservationModel,
-    ReservationSnapshot,
 } from '@/models/Reservation/Reservation'
 import { colorTheme, getPaletteColor } from '@/rneui/theme'
-import {
-    api,
-    CreateReservationProps,
-    DeleteReservationProps,
-    mapToReservation,
-} from '@/services/api'
+import { DeleteReservationProps } from '@/services/api'
 import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 import { parseDate, toCalendarString } from '@/utils/date'
 import { differenceInDays, eachDayOfInterval, startOfDay } from 'date-fns'
 import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { DefaultSectionT, SectionListData } from 'react-native'
 import { MarkedDates } from 'react-native-calendars/src/types'
 import { Accomodation } from '../Reservation/Accomodation'
-import {
-    DefaultSectionT,
-    ListRenderItem,
-    SectionListData,
-    SectionListRenderItem,
-} from 'react-native'
-import { colors } from 'theme'
 
 const ConfirmRequiringReservationModel = types
     .model('ConfirmRequiringReservation')
@@ -455,6 +442,42 @@ export const ReservationStoreModel = types
                         endingDay: index === intervalDays.length - 1,
                         color: getPaletteColor(accIndex),
                         //   selected: true,
+                    })
+                })
+            })
+            return markedDates
+        },
+        get accomodationMarkedDatesMultiPeriodMarkingDisableTouchEvent() {
+            const markedDates: {
+                [key: string]: {
+                    periods: {
+                        startingDay: boolean
+                        endingDay: boolean
+                        color: string
+                        disableTouchEvent?: boolean
+                    }[]
+                    disableTouchEvent?: boolean
+                }
+            } = {}
+            store.orderedAccomodations.forEach((a, accIndex) => {
+                const start = a.checkinDate
+                const end = a.checkoutDate
+                const intervalDays =
+                    start && end
+                        ? eachDayOfInterval({ start, end }).slice(0, -1)
+                        : []
+                intervalDays.forEach((date, index) => {
+                    const dateString = toCalendarString(date)
+                    if (!Object.keys(markedDates).includes(dateString)) {
+                        markedDates[dateString] = {
+                            periods: [],
+                            disableTouchEvent: true,
+                        }
+                    }
+                    markedDates[dateString].periods.push({
+                        startingDay: index === 0,
+                        endingDay: index === intervalDays.length - 1,
+                        color: getPaletteColor(accIndex),
                     })
                 })
             })

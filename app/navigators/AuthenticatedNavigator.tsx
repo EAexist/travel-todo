@@ -4,15 +4,16 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
+import { BackButton } from '@/components/Header'
 import * as Screens from '@/screens'
 import { EditTripScreen } from '@/screens/EditTrip/EditTripScreen'
 import { ReservationCreateScreen } from '@/screens/Reservation/Create/ReservationCreateScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
+import { Platform } from 'react-native'
 import { MainTabNavigator } from './MainTabNavigator'
 import { AuthenticatedStackParamList } from './navigationTypes'
-import { BackButton } from '@/components/Header'
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const AuthenticatedStack =
@@ -31,7 +32,15 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
                     backgroundColor: colors.background,
                 },
             }}
-            initialRouteName={'Home'}>
+            initialRouteName={Platform.OS === 'web' ? 'DemoHome' : 'Home'}>
+            <AuthenticatedStack.Screen
+                name="DemoHome"
+                component={Screens.Login.DemoHome}
+            />
+            <AuthenticatedStack.Screen
+                name="Home"
+                component={Screens.CreateTrip.Home}
+            />
             <AuthenticatedStack.Screen
                 name="TripList"
                 component={Screens.TripList.List}
@@ -39,10 +48,6 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
             <AuthenticatedStack.Screen
                 name="TripDelete"
                 component={Screens.TripList.Delete}
-            />
-            <AuthenticatedStack.Screen
-                name="Home"
-                component={Screens.CreateTrip.Home}
             />
             <AuthenticatedStack.Group>
                 <AuthenticatedStack.Screen

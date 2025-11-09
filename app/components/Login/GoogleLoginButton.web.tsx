@@ -7,7 +7,6 @@ import {
     GoogleOAuthProvider,
 } from '@react-oauth/google'
 import { ButtonProps } from '@rneui/themed'
-import Constants from 'expo-constants'
 import { FC, useCallback, useState } from 'react'
 import { LayoutChangeEvent, View } from 'react-native'
 
@@ -42,7 +41,8 @@ export const GoogleLoginButton: FC<
         <View onLayout={handleLayout}>
             <GoogleOAuthProvider
                 clientId={
-                    Constants.expoConfig?.extra?.GOOGLE_OAUTH_CLIENT_ID_WEB
+                    // Constants.expoConfig?.extra?.GOOGLE_OAUTH_CLIENT_ID_WEB
+                    process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_WEB as string
                 }>
                 <GoogleLogin
                     onSuccess={onSuccess}

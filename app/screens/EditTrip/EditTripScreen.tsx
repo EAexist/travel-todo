@@ -54,32 +54,25 @@ export const EditTripScreen: FC<{}> = observer(({}) => {
                 </ListItem>
                 <Divider />
                 <ListSubheader title={'여행지'} />
-                {tripStore.isDestinationSet ? (
+                {tripStore.isDestinationSet && (
                     <FlatList
                         data={tripStore.destinations}
                         renderItem={renderDestinationText}
                         keyExtractor={item => item.title}
                     />
-                ) : (
-                    <ListItem onPress={handleEditDestination}>
-                        <ListItem.Chevron name={'error'} />
-                        <ListItem.Content>
-                            <ListItem.Title>설정 안함</ListItem.Title>
-                        </ListItem.Content>
-                        <ListItem.Chevron />
-                    </ListItem>
                 )}
                 <ListItem onPress={handleEditDestination}>
-                    {!tripStore.isDestinationSet && (
+                    {tripStore.isDestinationSet ? (
+                        <Avatar
+                            icon={{
+                                name: 'edit',
+                                type: 'material',
+                                color: colors.text.secondary,
+                            }}
+                        />
+                    ) : (
                         <ListItem.Chevron name={'error'} />
                     )}
-                    <Avatar
-                        icon={{
-                            name: 'edit',
-                            type: 'material',
-                            color: colors.text.secondary,
-                        }}
-                    />
                     <ListItem.Content>
                         <ListItem.Title>
                             {tripStore.isDestinationSet

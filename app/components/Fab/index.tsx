@@ -35,6 +35,16 @@ export const FabProvider = ({ children }: PropsWithChildren) => {
 }
 export const useFabHeight = () => useContext(FabHeightContext)
 
+const fabHeight = 108
+
+export const useFabLayout = () => {
+    const { setHeight } = useFabHeight()
+
+    useEffect(() => {
+        setHeight(fabHeight)
+    }, [])
+}
+
 /**
  * Fab.Container
  * @param {ButtonProps}

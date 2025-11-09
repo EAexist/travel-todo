@@ -16,8 +16,8 @@ const $googlePlaceSearchBarStyle: Partial<Styles> = {
 export const googlePlacesAutocompleteConfig: Partial<GooglePlacesAutocompleteProps> =
     {
         requestUrl: {
-            useOnPlatform: 'web', // or "all"
-            url: `${process.env.API_URL}/proxy`, // or any proxy server that hits https://maps.googleapis.com/maps/api
+            useOnPlatform: 'all',
+            url: `${process.env.EXPO_PUBLIC_API_URL}/proxy`, // or any proxy server that hits https://maps.googleapis.com/maps/api
             //   headers: {
             //     Accept: 'application/json',
             //   },

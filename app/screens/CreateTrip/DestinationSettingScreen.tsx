@@ -9,13 +9,14 @@ import { Destination, DestinationSnapshotIn } from '@/models/Destination'
 import { useNavigate } from '@/navigators'
 import { getFlagEmoji } from '@/utils/nation'
 import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
+import { useHeader } from '@/utils/useHeader'
 import { useLingui } from '@lingui/react/macro'
 import { ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback } from 'react'
 import { FlatList, ListRenderItem, TouchableOpacity, View } from 'react-native'
 import { EditScreenBaseProps } from '.'
-import { useRequireConnection } from '../Loading'
+import { NetworkConnectionRequiringBoundary } from '../Loading/NetworkConnectionRequiringBoundary'
 
 /* @TODO Import of getFlagEmoji fires
  * ERROR  TypeError: Cannot read property 'prototype' of undefined, js engine: hermes [Component Stack]
@@ -147,22 +148,15 @@ export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
                   subtitlteText: `여행 중 여행할 도시를 모두 추가해주세요.`,
               }
 
-        //   const handleBackPressBeforeNavigate = useCallback(async () => {}, [])
-
-        // useHeader({
-        //   // backButtonShown: false,
-        //   // backNavigateProps: {name: 'Login', ignoreTrip: true},
-        //   // onBackPressBeforeNavigate: handleBackPressBeforeNavigate,
-        // })
-
-        // const {isConnected} = useNetInfo()
-        const showScreen = useRequireConnection({ title: '여행지 설정' })
+        useHeader({
+            centerComponent: undefined,
+        })
 
         const { maxDestinations, hasReachedDestinationNumberLimit } =
             useResourceQuota()
 
         return (
-            showScreen && (
+            <NetworkConnectionRequiringBoundary title="여행지 설정">
                 <Screen>
                     <ContentTitle title={titleText} subtitle={subtitlteText} />
                     <View style={{ paddingVertical: 16, flex: 1 }}>
@@ -210,7 +204,7 @@ export const EditTripDestinationScreenBase: FC<EditScreenBaseProps> = observer(
                         )}
                     </Fab.Container>
                 </Screen>
-            )
+            </NetworkConnectionRequiringBoundary>
         )
     },
 )

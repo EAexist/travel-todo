@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react'
+import { FC, useState } from 'react'
 //
 import { Container } from '@/components/Fab'
 import { GoogleLoginButton } from '@/components/Login/GoogleLoginButton.web'
@@ -8,13 +8,13 @@ import { AuthStackScreenProps } from '@/navigators'
 import { loadString, saveString } from '@/utils/storage'
 import { useActionWithApiStatus } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { CredentialResponse } from '@react-oauth/google'
 import { Image, Text } from '@rneui/themed'
 import * as appLogo from 'assets/images/app/logo.png'
 import { observer } from 'mobx-react-lite'
 import { View } from 'react-native'
-import { useLoadingScreen } from '../Loading'
+import { LoadingBoundary } from '../Loading/LoadingBoundary'
 
 export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
     const rootStore = useStores()
@@ -26,7 +26,6 @@ export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
     const navigation = useNavigation()
 
     useHeader({ backButtonShown: false })
-    useLoadingScreen({})
 
     const [isLoginSuccess, setIsLoginSuccess] = useState(false)
 
@@ -44,45 +43,38 @@ export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
             })
         }
     }
-
-    useFocusEffect(
-        useCallback(() => {
-            if (isLoginSuccess) {
-                rootStore.setProp('_isAuthenticated', true)
-            }
-        }, [isLoginSuccess]),
-    )
-
     return (
-        <Screen>
-            <View
-                style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16,
-                    flex: 1,
-                }}>
-                <Image source={appLogo} style={{ width: 96, height: 96 }} />
-                <Text
+        <LoadingBoundary>
+            <Screen>
+                <View
                     style={{
-                        fontWeight: 700,
-                        fontSize: 36,
-                        letterSpacing: -1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 16,
+                        flex: 1,
                     }}>
-                    TRIP TODO
-                </Text>
-            </View>
-            {/* </View> */}
-            <View style={{ alignItems: 'center' }}>
-                <View style={{ width: '100%', maxWidth: 440 }}>
-                    <Container fixed={false}>
-                        <GoogleLoginButton
-                            onSuccess={handleGoogleLoginSuccess}
-                        />
-                    </Container>
+                    <Image source={appLogo} style={{ width: 96, height: 96 }} />
+                    <Text
+                        style={{
+                            fontWeight: 700,
+                            fontSize: 36,
+                            letterSpacing: -1,
+                        }}>
+                        TRIP TODO
+                    </Text>
                 </View>
-            </View>
-        </Screen>
+                {/* </View> */}
+                <View style={{ alignItems: 'center' }}>
+                    <View style={{ width: '100%', maxWidth: 440 }}>
+                        <Container fixed={false}>
+                            <GoogleLoginButton
+                                onSuccess={handleGoogleLoginSuccess}
+                            />
+                        </Container>
+                    </View>
+                </View>
+            </Screen>
+        </LoadingBoundary>
     )
 })
 
