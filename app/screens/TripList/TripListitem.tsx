@@ -1,6 +1,6 @@
 import { useTripStore } from '@/models'
 import { TripSummary } from '@/models/stores/TripStore'
-import { Chip, ListItem, useTheme } from '@rneui/themed'
+import { Chip, ListItem, Text, useTheme } from '@rneui/themed'
 import { BookmarkCheck } from 'lucide-react-native'
 import { observer } from 'mobx-react-lite'
 import { FC, ReactElement } from 'react'
@@ -53,6 +53,18 @@ export const TripListItem: FC<TripListItemProps> = observer(
                         <BookmarkCheck color={colors.primary} size={28} />
                     )}
                     <ListItem.Content style={{ flex: 1 }}>
+                        {item.isSample && (
+                            <Text
+                                style={{
+                                    color: colors.warning,
+                                    textAlignVertical: 'center',
+                                    paddingRight: 8,
+                                    fontSize: 14,
+                                    lineHeight: 14,
+                                }}>
+                                sample
+                            </Text>
+                        )}
                         <ListItem.Title>
                             {item.title || '새 여행'}
                         </ListItem.Title>

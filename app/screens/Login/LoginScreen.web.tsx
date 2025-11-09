@@ -1,4 +1,5 @@
 import { useFabLayout } from '@/components/Fab'
+import { Lottie } from '@/components/Lottie'
 import { Screen } from '@/components/Screen/Screen'
 import { useStores } from '@/models'
 import { AuthStackScreenProps } from '@/navigators'
@@ -6,7 +7,6 @@ import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
 import { FC, useEffect } from 'react'
-import Lottie from 'react-lottie'
 import { View, ViewStyle } from 'react-native'
 
 export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
@@ -30,7 +30,11 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
         <Screen>
             <View style={$statusViewStyle}>
                 <View>
-                    <Lottie options={defaultOptions} height={64} width={64} />
+                    <Lottie
+                        options={{ animationData: myAnimationData }}
+                        height={64}
+                        width={64}
+                    />
                 </View>
                 <View
                     style={{
@@ -50,15 +54,6 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
         </Screen>
     )
 }
-const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: myAnimationData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice',
-    },
-}
-
 const $statusViewStyle: ViewStyle = {
     flex: 1,
     alignItems: 'center',

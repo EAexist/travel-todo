@@ -2,18 +2,19 @@ import { FC, useState } from 'react'
 //
 import { Container } from '@/components/Fab'
 import { GoogleLoginButton } from '@/components/Login/GoogleLoginButton.web'
+import { Lottie } from '@/components/Lottie'
 import { Screen } from '@/components/Screen/Screen'
 import { useStores } from '@/models'
 import { AuthStackScreenProps } from '@/navigators'
-import { loadString, saveString } from '@/utils/storage'
+import { saveString } from '@/utils/storage'
 import { useActionWithApiStatus } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
 import { useNavigation } from '@react-navigation/native'
 import { CredentialResponse } from '@react-oauth/google'
-import { Image, Text } from '@rneui/themed'
-import * as appLogo from 'assets/images/app/logo.png'
+import { Text, useTheme } from '@rneui/themed'
+import myAnimationData from 'assets/lottie/todo.json'
 import { observer } from 'mobx-react-lite'
-import { View } from 'react-native'
+import { View, ViewStyle } from 'react-native'
 import { LoadingBoundary } from '../Loading/LoadingBoundary'
 
 export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
@@ -43,27 +44,42 @@ export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
             })
         }
     }
+    const {
+        theme: { colors },
+    } = useTheme()
+
     return (
         <LoadingBoundary>
             <Screen>
-                <View
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 16,
-                        flex: 1,
-                    }}>
-                    <Image source={appLogo} style={{ width: 96, height: 96 }} />
+                <View style={$statusViewStyle}>
+                    <View>
+                        <Lottie
+                            options={{
+                                loop: false,
+                                autoplay: false,
+                                animationData: myAnimationData,
+                            }}
+                            height={64}
+                            width={64}
+                        />
+                    </View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 4,
+                        }}>
+                        <Text h1 h1Style={{ color: colors.brand }}>
+                            트레블
+                        </Text>
+                        <Text h1>투두</Text>
+                    </View>
                     <Text
                         style={{
-                            fontWeight: 700,
-                            fontSize: 36,
-                            letterSpacing: -1,
-                        }}>
-                        TRIP TODO
-                    </Text>
+                            fontSize: 14,
+                            textAlign: 'center',
+                        }}>{` `}</Text>
                 </View>
-                {/* </View> */}
                 <View style={{ alignItems: 'center' }}>
                     <View style={{ width: '100%', maxWidth: 440 }}>
                         <Container fixed={false}>
@@ -78,10 +94,8 @@ export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
     )
 })
 
-const saveIdToken = async (idToken: string) => {
-    saveString('googleIdToken', idToken)
-}
-
-const getIdToken = async () => {
-    return loadString('googleIdToken')
+const $statusViewStyle: ViewStyle = {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
 }

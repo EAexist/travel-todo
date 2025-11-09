@@ -9,13 +9,23 @@ import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import { useLingui } from '@lingui/react/macro'
 import { useFocusEffect } from '@react-navigation/native'
-import { Divider, ListItem, useTheme } from '@rneui/themed'
+import { Divider, ListItem, Skeleton, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback, useRef, useState } from 'react'
 import { FlatList, ListRenderItem, ScrollView, View } from 'react-native'
 import { LoadingBoundary } from '../Loading/LoadingBoundary'
 import { NetworkConnectionRequiringBoundary } from '../Loading/NetworkConnectionRequiringBoundary'
 import { TripListItem } from './TripListitem'
+
+const TripListItemSkeleton: FC = () => (
+    <ListItem asCard>
+        <Skeleton width={32} height={32} style={{ borderRadius: 12 }} />
+        <ListItem.Content style={{ gap: 8 }}>
+            <Skeleton width={64} height={17} />
+            <Skeleton width={196} height={12} />
+        </ListItem.Content>
+    </ListItem>
+)
 
 export const TripListScreenBase: FC = observer(({}) => {
     const userStore = useUserStore()
@@ -32,15 +42,23 @@ export const TripListScreenBase: FC = observer(({}) => {
 
     const maxNumberOfTripHandleBottomSheetRef = useRef<BottomSheetModal>(null)
 
-    const handlePressTripListItem = useCallback(
-        (item: TripSummary) => {
-            setActiveTripWithApiStatus({
-                args: item.id,
-                onSuccess: () => setIsActiveTripChanged(true),
+    const handleSuccess = useCallback(() => {
+        setIsActiveTripChanged(true)
+        if (tripStore.isInitialized)
+            navigateWithTrip('Main', {
+                screen: 'TripDashboard',
             })
-        },
-        [setActiveTripWithApiStatus],
-    )
+        else {
+            navigateWithTrip('DestinationSetting')
+        }
+    }, [setActiveTripWithApiStatus, tripStore.isInitialized])
+
+    const handlePressTripListItem = useCallback((item: TripSummary) => {
+        setActiveTripWithApiStatus({
+            args: item.id,
+            onSuccess: handleSuccess,
+        })
+    }, [])
 
     // useFocusEffect(
     //     useCallback(() => {
@@ -95,7 +113,8 @@ export const TripListScreenBase: FC = observer(({}) => {
             // fetchTripSummaryWithApiStatus({}).then(() => {
             //     setIsTripSummaryLoaded(true)
             // })
-            userStore.fetchTripSummary({}).then(() => {
+            setIsTripSummaryLoaded(false)
+            userStore.fetchTripSummary().then(() => {
                 setIsTripSummaryLoaded(true)
             })
         }, []),
@@ -110,7 +129,7 @@ export const TripListScreenBase: FC = observer(({}) => {
             <LoadingBoundary onProblem={() => goBack()}>
                 <Screen backgroundColor={'secondary'}>
                     <ScrollView>
-                        {isTripSummaryLoaded && (
+                        {isTripSummaryLoaded ? (
                             <>
                                 {userStore.activeTripSumamry && (
                                     <TripListItem
@@ -142,6 +161,12 @@ export const TripListScreenBase: FC = observer(({}) => {
                                         />
                                     </>
                                 )}
+                            </>
+                        ) : (
+                            <>
+                                <TripListItemSkeleton />
+                                <TripListItemSkeleton />
+                                <TripListItemSkeleton />
                             </>
                         )}
                     </ScrollView>
