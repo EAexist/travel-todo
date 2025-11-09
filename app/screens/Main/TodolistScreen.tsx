@@ -107,6 +107,7 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
 
         const settingsOption: NavigateListItemProp[] = [
             {
+                id: 'create-todo',
                 title: '할 일 추가',
                 path: 'TodolistAdd',
                 icon: { name: 'add', type: 'material' },
@@ -121,11 +122,13 @@ export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
                     : undefined,
             },
             {
+                id: 'reorder-todo',
                 title: '순서 변경',
                 path: 'TodolistReorder',
                 icon: { name: 'swap-vert', type: 'material' },
             },
             {
+                id: 'delete-todo',
                 title: '할 일 삭제',
                 path: 'TodolistDelete',
                 icon: { name: 'delete', type: 'material' },

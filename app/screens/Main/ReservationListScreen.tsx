@@ -132,6 +132,7 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
 
         const settingsOption: NavigateListItemProp[] = [
             {
+                id: 'create-reservation',
                 title: '예약 추가',
                 path: 'ReservationCreate',
                 icon: { name: 'add', type: 'material' },
@@ -149,6 +150,7 @@ export const ReservationListScreen: FC<MainTabScreenProps<'ReservationList'>> =
             //     icon: { name: 'edit', type: 'material' },
             // },
             {
+                id: 'delete-reservation',
                 title: '예약 삭제',
                 path: 'ReservationDelete',
                 icon: { name: 'delete', type: 'material' },

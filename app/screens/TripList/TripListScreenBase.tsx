@@ -163,11 +163,16 @@ export const TripListScreenBase: FC = observer(({}) => {
                                 )}
                             </>
                         ) : (
-                            <>
-                                <TripListItemSkeleton />
-                                <TripListItemSkeleton />
-                                <TripListItemSkeleton />
-                            </>
+                            <FlatList
+                                scrollEnabled={false}
+                                data={[
+                                    'skeleton-0',
+                                    'skeleton-1',
+                                    'skeleton-2',
+                                ]}
+                                renderItem={() => <TripListItemSkeleton />}
+                                keyExtractor={item => item}
+                            />
                         )}
                     </ScrollView>
                     <Fab.Container>
