@@ -1,4 +1,5 @@
 import * as Fab from '@/components/Fab'
+import { Lottie } from '@/components/Lottie'
 import { Screen } from '@/components/Screen/Screen'
 import { useStores } from '@/models'
 import { AuthenticatedStackScreenProps } from '@/navigators'
@@ -6,7 +7,6 @@ import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
 import { FC, useEffect } from 'react'
-import Lottie from 'react-lottie'
 import { View, ViewStyle } from 'react-native'
 
 export const DemoHomeScreen: FC<
@@ -30,7 +30,15 @@ export const DemoHomeScreen: FC<
         <Screen>
             <View style={$statusViewStyle}>
                 <View>
-                    <Lottie options={defaultOptions} height={64} width={64} />
+                    <Lottie
+                        options={{
+                            loop: false,
+                            autoplay: false,
+                            animationData: myAnimationData,
+                        }}
+                        height={64}
+                        width={64}
+                    />
                 </View>
                 <View
                     style={{
@@ -57,15 +65,6 @@ export const DemoHomeScreen: FC<
             </Fab.Container>
         </Screen>
     )
-}
-
-const defaultOptions = {
-    loop: false,
-    autoplay: false,
-    animationData: myAnimationData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice',
-    },
 }
 
 const $statusViewStyle: ViewStyle = {

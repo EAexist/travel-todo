@@ -114,7 +114,7 @@ export function useHeader(
                         centerContainerStyle={
                             !!props.centerComponent
                                 ? $headerCenterTitleContainerStyle
-                                : undefined
+                                : {}
                         }
                     />
                 </BlurView>
@@ -196,12 +196,12 @@ export function useHeaderOnFocus(
                                               undefined,
                                 },
                             ]}
-                            {...props}
                             centerContainerStyle={
                                 !!props.centerComponent
                                     ? $headerCenterTitleContainerStyle
                                     : undefined
                             }
+                            {...props}
                         />
                     </BlurView>
                 ),

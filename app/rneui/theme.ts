@@ -214,6 +214,12 @@ export const colorTheme_ = createTheme(colorTheme)
 const theme = createTheme({
     ...colorTheme_,
     components: {
+        Skeleton: (_, { colors }) => ({
+            skeletonStyle: {
+                backgroundColor: colors.secondary,
+            },
+            // animation: 'wave',
+        }),
         SwitchTab: ({ variant = 'primary', size = 'md' }, { colors }) => ({
             variant: variant,
             disableIndicator: true,

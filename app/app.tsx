@@ -55,7 +55,7 @@ const config = {
         Auth: {
             screens: {
                 Login: 'auth/login',
-                Admin: 'auth/_admin',
+                Admin: 'auth/admin',
             },
         },
         App: {
