@@ -41,16 +41,19 @@ export const TripDashboardScreen: FC<MainTabScreenProps<'TripDashboard'>> =
 
         const settingsOption: NavigateListItemProp[] = [
             {
+                id: 'edit-trip',
                 title: '여행 정보 수정',
                 path: 'EditTrip',
                 icon: { name: 'edit', type: 'material' },
             },
             {
+                id: 'create-trip',
                 title: '새 여행 만들기',
                 path: 'TripList',
                 icon: { name: 'add', type: 'material' },
             },
             {
+                id: 'trip-list',
                 title: '지난 여행 보기',
                 path: 'TripList',
                 icon: { name: 'list', type: 'material' },

@@ -19,6 +19,7 @@ export interface NavigateListItemProp
         | 'subtitleStyle'
         | 'useDisabledStyle'
     > {
+    id: string
     title: string
     path: string
     icon?: Icon
@@ -65,7 +66,7 @@ export const NavigateMenuBottomSheet: FC<
             <FlatList
                 data={data}
                 renderItem={renderSettingsListItem}
-                keyExtractor={item => item.path}
+                keyExtractor={item => item.id}
             />
             {children}
         </BottomSheetModal>

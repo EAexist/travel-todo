@@ -66,6 +66,7 @@ export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
 
         const settingsOption: NavigateListItemProp[] = [
             {
+                id: 'delete-trip',
                 title: '여행 삭제',
                 path: 'TripDelete',
                 icon: { name: 'delete', type: 'material' },
