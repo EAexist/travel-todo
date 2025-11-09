@@ -1,8 +1,5 @@
-import { IconNode } from '@rneui/base'
-import { createTheme, IconProps } from '@rneui/themed'
-import { Icon } from 'lucide-react-native'
+import { createTheme } from '@rneui/themed'
 import { Platform, StyleProp, TextStyle, ViewStyle } from 'react-native'
-import { colors } from 'theme'
 
 type Font = {
     thin?: TextStyle
@@ -173,6 +170,7 @@ export const colorTheme = {
         light0: '#2272EB',
         light1: '#E2EEFF',
         secondary: '#F2F3F5',
+        brand: '#55bbea',
         secondaryBg: '#F2F4F6',
         black: '#333D4B',
         active: '#191E28',
@@ -544,6 +542,13 @@ const theme = createTheme({
                 // textDecoration: 'none',
                 textTransform: 'none',
                 ...(props.disabled ? { opacity: 0.5 } : {}),
+            },
+            h1Style: {
+                ...typography.pretendard.bold,
+                fontSize: 28,
+                lineHeight: 1.6 * 28,
+                letterSpacing: 0,
+                textTransform: 'none',
             },
             h2Style: {
                 ...typography.pretendard.bold,

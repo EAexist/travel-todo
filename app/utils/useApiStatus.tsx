@@ -147,8 +147,8 @@ const apiStatusReducer = (
     }
 }
 
-export function useActionWithApiStatus<T extends {}, K = void>(
-    action: (props: T) => Promise<ApiResponseKind & { data?: K }>,
+export function useActionWithApiStatus<T extends {}>(
+    action: (props: T) => Promise<ApiResponseKind & { data?: any }>,
     onSuccess?: () => void,
 ) {
     const dispatch = useApiStatusDispatch()
@@ -234,9 +234,6 @@ export const useActionsWithApiStatus = () => {
     return {
         guestLoginWithApiStatus: _useWithApiStatus<{}, UserStoreSnapshotIn>(
             rootStore.guestLogin,
-        ),
-        adminGoogleLoginWithIdToken: _useWithApiStatus<{ idToken: string }>(
-            rootStore.adminGoogleLoginWithIdToken,
         ),
         logoutWithApiStatus: _useWithApiStatus<{}>(rootStore.logout),
         ...(userStore

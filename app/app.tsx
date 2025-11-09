@@ -43,6 +43,7 @@ import * as storage from './utils/storage'
 import 'dayjs'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
+import { useRenewSessionAndRetryMonitor } from './services/api/monitorUnauthroized'
 import { useDevLogger } from './utils/useDevLogger'
 
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
@@ -51,7 +52,6 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 const prefix = Linking.createURL('/')
 const config = {
     screens: {
-        Loading: 'loading',
         Auth: {
             screens: {
                 Login: 'auth/login',
@@ -197,6 +197,8 @@ export function App() {
             `[app] rehydrated: ${rehydrated}, isNavigationStateRestored: ${isNavigationStateRestored}, isI18nInitialized: ${isI18nInitialized}`,
         )
     }, [rehydrated, isNavigationStateRestored, isI18nInitialized])
+
+    useRenewSessionAndRetryMonitor()
 
     // Before we show the app, we have to wait for our state to be ready.
     // In the meantime, don't render anything. This will be the background

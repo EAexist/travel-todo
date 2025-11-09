@@ -182,17 +182,28 @@ const runAPIAction = async ({ action, data }: AsyncAPIWriteAction) => {
     }
     return result
 }
+type GenericCallback<T> = ((args: T) => any) | (() => any)
 
-export function withDbSync<T>(callbackfn: (args: T) => any) {
-    return async (args: T) => {
-        const syncResult = await sync_db()
-        if (syncResult == true) {
-            return callbackfn(args)
-        } else {
-            return callbackfn(args)
-            return syncResult
-        }
-    }
+export function withDbSync<T>(callbackFn: () => any): () => Promise<void>
+export function withDbSync<T>(callbackFn: (args: T) => any): () => Promise<void>
+export function withDbSync<T>(callbackFn: GenericCallback<T>) {
+    return callbackFn.length > 0
+        ? async (args: T) => {
+              const syncResult = await sync_db()
+              if (syncResult == true) {
+                  return (callbackFn as (args: T) => any)(args)
+              } else {
+                  return syncResult
+              }
+          }
+        : async () => {
+              const syncResult = await sync_db()
+              if (syncResult == true) {
+                  return (callbackFn as () => any)()
+              } else {
+                  return syncResult
+              }
+          }
 }
 
 export const sync_db = async () => {

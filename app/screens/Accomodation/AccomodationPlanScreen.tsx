@@ -2,6 +2,7 @@ import { Calendar } from '@/components/Calendar/Calendar'
 import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import { ScheduleViewerCalendarBase } from '@/components/Calendar/ScheduleViewerCalendar'
 import * as Fab from '@/components/Fab'
+import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Screen } from '@/components/Screen/Screen'
 import { useReservationStore, useTripStore } from '@/models'
 import { Accomodation } from '@/models/Reservation/Accomodation'
@@ -20,7 +21,7 @@ const AccomodationPlanCalendar: FC = observer(() => {
     const tripStore = useTripStore()
 
     const markedDates =
-        reservationStore.accomodationMarkedDatesMultiPeriodMarking
+        reservationStore.accomodationMarkedDatesMultiPeriodMarkingDisableTouchEvent
 
     return tripStore.isScheduleSet ? (
         <ScheduleViewerCalendarBase
@@ -60,6 +61,7 @@ const AccomodationListItem: FC<{
 }
 
 export const AccomodationPlanScreen: FC = observer(({}) => {
+    const tripStore = useTripStore()
     const reservationStore = useReservationStore()
 
     const renderListItem: ListRenderItem<{
@@ -83,6 +85,7 @@ export const AccomodationPlanScreen: FC = observer(({}) => {
             <CalendarContainer>
                 <AccomodationPlanCalendar />
             </CalendarContainer>
+            <ListSubheader title={tripStore.accomodationTodoStatusText} />
             <FlatList
                 data={reservationStore.orderedAccomodationReservations.map(
                     (reservation, index) => ({

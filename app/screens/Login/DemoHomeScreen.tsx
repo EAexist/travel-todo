@@ -1,7 +1,7 @@
-import { useFabLayout } from '@/components/Fab'
+import * as Fab from '@/components/Fab'
 import { Screen } from '@/components/Screen/Screen'
 import { useStores } from '@/models'
-import { AuthStackScreenProps } from '@/navigators'
+import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
@@ -9,7 +9,9 @@ import { FC, useEffect } from 'react'
 import Lottie from 'react-lottie'
 import { View, ViewStyle } from 'react-native'
 
-export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
+export const DemoHomeScreen: FC<
+    AuthenticatedStackScreenProps<'DemoHome'>
+> = ({}) => {
     const rootStore = useStores()
 
     useEffect(() => {
@@ -23,8 +25,6 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
     const {
         theme: { colors },
     } = useTheme()
-
-    useFabLayout()
 
     return (
         <Screen>
@@ -43,16 +43,25 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
                     </Text>
                     <Text h1>투두</Text>
                 </View>
-                <Text style={{ fontSize: 14, textAlign: 'center' }}>
-                    {`여행 준비중...`}
-                </Text>
+                <Text style={{ fontSize: 14, textAlign: 'center' }}>{` `}</Text>
             </View>
+            <Fab.Container>
+                <Fab.NextButton
+                    color={colors.brand}
+                    title={'앱 미리보기'}
+                    navigateProps={{
+                        name: 'Main',
+                        params: { screen: 'Todolist' },
+                    }}
+                />
+            </Fab.Container>
         </Screen>
     )
 }
+
 const defaultOptions = {
-    loop: true,
-    autoplay: true,
+    loop: false,
+    autoplay: false,
     animationData: myAnimationData,
     rendererSettings: {
         preserveAspectRatio: 'xMidYMid slice',

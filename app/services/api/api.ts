@@ -26,8 +26,8 @@ import {
     FileSystemUploadType,
     uploadAsync,
 } from 'expo-file-system'
+import qs from 'qs'
 import { Platform } from 'react-native'
-import Config from 'react-native-config'
 import {
     type ApiConfig,
     CreateDestinationProps,
@@ -61,79 +61,6 @@ export type ApiResult<T> =
     | GeneralApiProblem
 // type ApiLocationResult = { kind: 'ok'; location: string } | GeneralApiProblem
 // export type ApiStatus = {kind: 'ok'} | GeneralApiProblem
-
-function _handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
-    if (!response.ok) {
-        const problem = getGeneralApiProblem(response)
-        if (problem) return problem
-    }
-    try {
-        if (!response.data || !response.headers) {
-            throw Error
-        }
-        console.log(
-            `_handleResponse] status:${response.status} data:${JSON.stringify(response.data)}`,
-        )
-        return {
-            kind: 'ok',
-            data: response.data,
-            location: response.headers['location'],
-        }
-    } catch (e) {
-        if (__DEV__ && e instanceof Error) {
-            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
-        }
-        return { kind: 'bad-data' }
-    }
-}
-function handleResponse<T, K>(
-    response: ApiResponse<T>,
-    mapper: (dto: T) => K,
-): ApiResult<K> {
-    if (!response.ok) {
-        const problem = getGeneralApiProblem(response)
-        if (problem) return problem
-    }
-    try {
-        if (!response.data) {
-            throw Error
-        }
-        return {
-            kind: 'ok',
-            data: mapper(response.data),
-        }
-    } catch (e) {
-        if (__DEV__ && e instanceof Error) {
-            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
-        }
-        return { kind: 'bad-data' }
-    }
-}
-
-function handleDeleteResponse(response: ApiResponse<void>): ApiResult<null> {
-    if (!response.ok) {
-        const problem = getGeneralApiProblem(response)
-        if (problem) return problem
-    }
-    console.log(
-        `[handleDeleteResponse] response.status=${response.status} response=${response}`,
-    )
-    try {
-        if (response.status !== 204) {
-            throw Error
-        }
-        return {
-            kind: 'ok',
-            data: null,
-        }
-    } catch (e) {
-        if (__DEV__ && e instanceof Error) {
-            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
-        }
-        return { kind: 'bad-data' }
-    }
-}
-
 /**
  * Manages all requests to the API. You can use this class to build out
  * various requests that you need to call from your backend API.
@@ -143,12 +70,11 @@ function handleDeleteResponse(response: ApiResponse<void>): ApiResult<null> {
  */
 
 export const DEFAULT_API_CONFIG: ApiConfig = {
-    baseURL:
-        Platform.OS === 'web'
-            ? Constants.expoConfig?.extra?.API_URL
-            : Config.API_URL,
-    // baseURL: 'http://192.168.0.29:8080',
-    //   withCredentials: true,
+    baseURL: process.env.EXPO_PUBLIC_API_URL,
+    // Platform.OS === 'web'
+    //     ? Constants.expoConfig?.extra?.API_URL
+    //     : Config.API_URL,
+    withCredentials: Platform.OS === 'web' ? true : false, // Enable Cookie in web demo.
     timeout: 10000,
     tripBaseURL: null,
 }
@@ -169,10 +95,12 @@ export class Api {
         this.apisauce = create({
             baseURL: this.config.baseURL,
             timeout: this.config.timeout,
+            withCredentials: this.config.withCredentials,
             headers: {
                 Accept: 'application/json',
             },
         })
+        console.log(Constants.expoConfig?.extra?.API_URL, this.config.baseURL)
         // function getCookie(name: String) {
         //   const value = `; ${document.cookie}`
         //   const parts = value.split(`; ${name}=`)
@@ -249,7 +177,7 @@ export class Api {
     ): Promise<ApiResult<UserStoreSnapshotIn>> {
         const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
             `auth/admin`,
-            undefined,
+            null,
             {
                 params: {
                     idToken: idToken,
@@ -297,8 +225,12 @@ export class Api {
      * @returns {...Trip} - Trip.
      */
     async webBrowserLogin(): Promise<ApiResult<UserStoreSnapshotIn>> {
-        const response: ApiResponse<UserAccountDTO> =
-            await this.apisauce.post(`auth/web-browser`)
+        const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
+            `auth/web-browser`,
+            qs.stringify({
+                _spring_security_remember_me: 'true',
+            }),
+        )
 
         console.log(
             `[api.webBrowserLogin] response: ${JSON.stringify(response)}`,
@@ -339,25 +271,6 @@ export class Api {
         const response: ApiResponse<void> = await this.apisauce.get(`csrf`)
         return _handleResponse<void>(response)
     }
-
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
-    async getUserAccount(): Promise<ApiResult<UserStoreSnapshotIn>> {
-        const response: ApiResponse<UserAccountDTO> =
-            await this.apisauce.get(``)
-
-        const userDTO = _handleResponse<UserAccountDTO>(response)
-        return userDTO.kind === 'ok'
-            ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userDTO.data),
-              }
-            : userDTO
-    }
-
     /**
      * Gets a Trip data with given id.
      * @returns {kind} - Response Status.
@@ -368,6 +281,25 @@ export class Api {
             await this.apisauce.get(`resourceQuota`)
 
         return _handleResponse<ResourceQuotaStoreSnapshotIn>(response)
+    }
+
+    /**
+     * Gets a Trip data with given id.
+     * @returns {kind} - Response Status.
+     * @returns {...Trip} - Trip.
+     */
+    async getUserAccount(userId: string): Promise<ApiResult<UserAccountDTO>> {
+        const response: ApiResponse<UserAccountDTO> = await this.apisauce.get(
+            `user/${userId}`,
+        )
+
+        const userDTO = _handleResponse<UserAccountDTO>(response)
+        return userDTO.kind === 'ok'
+            ? {
+                  kind: 'ok',
+                  data: mapToUserAccount(userDTO.data),
+              }
+            : userDTO
     }
 
     /**
@@ -1016,6 +948,79 @@ export class Api {
     //         }
     //       : handledResponse
     //   }
+}
+
+function _handleResponse<T>(response: ApiResponse<T>): ApiResult<T> {
+    if (!response.ok) {
+        const problem = getGeneralApiProblem(response)
+        console.log(`[_handleResponse] response: ${JSON.stringify(response)}`)
+        if (problem) return problem
+    }
+    try {
+        if (!response.data || !response.headers) {
+            throw Error
+        }
+        console.log(
+            `[_handleResponse] status: ${response.status} data: ${JSON.stringify(response.data)}`,
+        )
+        return {
+            kind: 'ok',
+            data: response.data,
+            location: response.headers['location'],
+        }
+    } catch (e) {
+        if (__DEV__ && e instanceof Error) {
+            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+        }
+        return { kind: 'bad-data' }
+    }
+}
+function handleResponse<T, K>(
+    response: ApiResponse<T>,
+    mapper: (dto: T) => K,
+): ApiResult<K> {
+    if (!response.ok) {
+        const problem = getGeneralApiProblem(response)
+        if (problem) return problem
+    }
+    try {
+        if (!response.data) {
+            throw Error
+        }
+        return {
+            kind: 'ok',
+            data: mapper(response.data),
+        }
+    } catch (e) {
+        if (__DEV__ && e instanceof Error) {
+            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+        }
+        return { kind: 'bad-data' }
+    }
+}
+
+function handleDeleteResponse(response: ApiResponse<void>): ApiResult<null> {
+    if (!response.ok) {
+        const problem = getGeneralApiProblem(response)
+        if (problem) return problem
+    }
+    console.log(
+        `[handleDeleteResponse] response.status: ${response.status} response: ${response}`,
+    )
+    try {
+        if (response.status !== 204) {
+            throw Error
+        }
+        return {
+            kind: 'ok',
+            data: null,
+        }
+    } catch (e) {
+        if (__DEV__ && e instanceof Error) {
+            console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+        }
+        return { kind: 'bad-data' }
+    }
 }
 
 // Singleton instance of the API for convenience

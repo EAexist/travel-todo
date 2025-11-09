@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/Avatar'
 import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
+import { Icon } from '@/components/Icon'
 import { GooglePlacesSearchBarInput, InputIcon } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
 import { ListItemBase } from '@/components/ListItem/ListItem'
@@ -31,8 +32,8 @@ import { DestinationListItemBase } from './DestinationSettingScreen'
 
 const lang = 'ko'
 
-const PlacesAutoCompleteQuery: Query<AutocompleteRequestType> = {
-    key: process.env.GOOGLE_PLACES_API_KEY,
+const PlacesAutoCompleteQuery: Omit<Query<AutocompleteRequestType>, 'key'> = {
+    // key: process.env.GOOGLE_PLACES_API_KEY,
     language: lang, // language of the results
     type: '(cities)',
 }
@@ -139,6 +140,8 @@ const GooglePlacesSearchBar = () => {
         dest => dest.title === inputText && dest.region === null,
     )
 
+    const isInputNotValidHangul = !containsHangul(inputText)
+
     return (
         <View>
             <GooglePlacesAutocomplete
@@ -164,6 +167,20 @@ const GooglePlacesSearchBar = () => {
                 onFail={error => {
                     console.log(error)
                 }}
+                listEmptyComponent={
+                    isInputNotValidHangul && (
+                        <ListItem>
+                            <Icon
+                                name="error"
+                                type="material"
+                                color={colors.text.secondary}
+                            />
+                            <ListItem.Title>
+                                {'한글만 검색할 수 있어요'}
+                            </ListItem.Title>
+                        </ListItem>
+                    )
+                }
             />
             {inputText ? (
                 <View style={{ paddingTop: 24 }}>
@@ -230,4 +247,14 @@ export const DestinationSearchScreen: FC = () => {
             <GooglePlacesSearchBar />
         </Screen>
     )
+}
+
+const containsHangul = (text: string): boolean => {
+    // Regex matches the Unicode range for:
+    // 1. Hangul Syllables (가-힣: U+AC00 - U+D7A3)
+    // 2. Hangul Compatibility Jamo (ㄱ-ㅎ, ㅏ-ㅣ: U+3130 - U+318F)
+    const koreanRegex = /[\uAC00-\uD7AF\u3130-\u318F]/g
+
+    // The .test() method returns true if the regex finds a match in the string.
+    return koreanRegex.test(text)
 }

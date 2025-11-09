@@ -3,7 +3,7 @@ import ContentTitle from '@/components/Layout/Content'
 import { Note_ } from '@/components/Note'
 import { Screen } from '@/components/Screen/Screen'
 import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'
-import { useLoadingScreen } from '@/screens/Loading'
+import { LoadingBoundary } from '@/screens/Loading/LoadingBoundary'
 import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
 import { FC, useCallback, useLayoutEffect, useRef, useState } from 'react'
@@ -46,8 +46,6 @@ export const ReservationCreateFromTextScreen: FC<
         inputRef.current?.focus()
     }, [inputRef.current])
 
-    useLoadingScreen({ pendingIndicatorTitle: ['예약 내역을 읽는 중이에요'] })
-
     useLayoutEffect(() => {
         inputRef.current?.focus()
     }, [inputRef.current])
@@ -69,38 +67,40 @@ export const ReservationCreateFromTextScreen: FC<
         params.category,
     )
     return (
-        <Screen>
-            <ContentTitle
-                // title={'새 예약'}
-                subtitle={instruction}
-            />
-            <Note_
-                autoFocus
-                onBlur={() => {
-                    setIsFocused(false)
-                }}
-                onFocus={() => {
-                    setIsFocused(true)
-                }}
-                value={value}
-                onChangeText={(text: string) => {
-                    setIsTextChanged(true)
-                    setValue(text)
-                }}
-                placeholder={placeholder}
-                ref={inputRef}
-            />
-            <Fab.Container>
-                <Fab.Button
-                    onPress={handlePressReservationCreateButton}
-                    disabled={isTextTooShort}
-                    title={
-                        isTextTooShort
-                            ? '10자 이상 입력해주세요'
-                            : '예약 추가하기'
-                    }
+        <LoadingBoundary pendingIndicatorTitle={['예약 내역을 읽는 중이에요']}>
+            <Screen>
+                <ContentTitle
+                    // title={'새 예약'}
+                    subtitle={instruction}
                 />
-            </Fab.Container>
-        </Screen>
+                <Note_
+                    autoFocus
+                    onBlur={() => {
+                        setIsFocused(false)
+                    }}
+                    onFocus={() => {
+                        setIsFocused(true)
+                    }}
+                    value={value}
+                    onChangeText={(text: string) => {
+                        setIsTextChanged(true)
+                        setValue(text)
+                    }}
+                    placeholder={placeholder}
+                    ref={inputRef}
+                />
+                <Fab.Container>
+                    <Fab.Button
+                        onPress={handlePressReservationCreateButton}
+                        disabled={isTextTooShort}
+                        title={
+                            isTextTooShort
+                                ? '10자 이상 입력해주세요'
+                                : '예약 추가하기'
+                        }
+                    />
+                </Fab.Container>
+            </Screen>
+        </LoadingBoundary>
     )
 }

@@ -1,5 +1,5 @@
 import { BackButton } from '@/components/Header'
-import LoginScreen from '@/screens/Login'
+import { Login as LoginScreen } from '@/screens/Login'
 import { AdminScreen } from '@/screens/Login/AdminScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Header, useTheme } from '@rneui/themed'

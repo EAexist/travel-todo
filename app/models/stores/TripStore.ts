@@ -28,7 +28,6 @@ import {
     mapToTripPatchDTO,
 } from '@/services/api'
 import { APIAction, enqueueAction, sync_db } from '@/tasks/BackgroundTask'
-import { IconObject } from '@rneui/base'
 import { differenceInDays, isAfter, startOfDay } from 'date-fns'
 import {
     applySnapshot,
@@ -39,12 +38,12 @@ import {
 } from 'mobx-state-tree'
 import { SectionListData } from 'react-native'
 import { v4 as uuidv4 } from 'uuid'
+import { Icon } from '../Icon'
 import {
     ReservationCategory,
     ReservationModel,
 } from '../Reservation/Reservation'
 import { ReservationStoreModel } from './ReservationStore'
-import { Icon } from '../Icon'
 import { TripSettingsModel } from './TripSettings'
 
 export const TripSummaryModel = types
@@ -60,6 +59,7 @@ export const TripSummaryModel = types
         startDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         endDateIsoString: types.maybeNull(types.string), // Ex: 2022-08-12 21:05:36
         destinationTitles: types.array(types.string),
+        isSample: types.optional(types.boolean, false),
     })
     .views(store => ({
         get scheduleText() {
@@ -238,16 +238,12 @@ export const TripStoreModel = types
         async fetchTodoPreset() {
             console.log('[Tripstore.fetchTodoPreset]')
             await sync_db()
-            if (store.todoPreset.values.length > 0) {
-                return
-            } else {
-                return api.getTodoPreset(store.id).then(response => {
-                    if (response.kind == 'ok') {
-                        applySnapshot(store.todoPreset, response.data)
-                    }
-                    return response
-                })
-            }
+            return api.getTodoPreset(store.id).then(response => {
+                if (response.kind == 'ok') {
+                    applySnapshot(store.todoPreset, response.data)
+                }
+                return response
+            })
         },
         // async fetchRecommendedFlight() {
         //   console.log('[fetchRecommendedFlight]')

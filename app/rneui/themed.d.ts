@@ -1,8 +1,8 @@
-import '@rneui/themed'
 import { ListSubheaderProps } from '@/components/ListItem/ListSubheader'
 import { SectionHeaderProps } from '@/components/SectionHeader'
-import { TabItemProps, TabProps, IconProps as RNEIconProps } from '@rneui/themed'
-import { ColorValue, PressableProps, TouchableOpacityProps } from 'react-native'
+import '@rneui/themed'
+import { IconProps as RNEIconProps, TabItemProps, TabProps } from '@rneui/themed'
+import { ColorValue, PressableProps } from 'react-native'
 
 declare module '@rneui/themed' {
   export interface Colors {
@@ -24,6 +24,7 @@ declare module '@rneui/themed' {
     inactive: string
     secondaryBg: string
     palette: string[]
+    brand: string
   }
   export interface ListItemProps {
     dense?: boolean
