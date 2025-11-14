@@ -124,9 +124,8 @@ const config = {
     },
 }
 const customFontsToLoad = {
-    'Pretendard Variable': require('assets/fonts/pretendard/PretendardVariable.ttf'),
-    Tossface: require('assets/fonts/tossface/Tossface.ttf'),
-    //   Pretendard: require('assets/fonts/pretendard/PretendardVariable.woff2'),
+    'Pretendard Variable': require('./assets/fonts/pretendard/PretendardVariable.ttf'),
+    Tossface: require('./assets/fonts/tossface/Tossface.ttf'),
 }
 /**
  * This is the root component of our app.
@@ -215,7 +214,7 @@ export function App() {
         !rehydrated ||
         !isNavigationStateRestored ||
         !isI18nInitialized ||
-        // (!areFontsLoaded && !fontLoadError)
+        (!areFontsLoaded && !fontLoadError) ||
         false
     ) {
         return null
