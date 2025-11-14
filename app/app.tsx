@@ -124,8 +124,8 @@ const config = {
     },
 }
 const customFontsToLoad = {
-    'Pretendard Variable': require('./assets/fonts/pretendard/PretendardVariable.ttf'),
-    Tossface: require('./assets/fonts/tossface/Tossface.ttf'),
+    'Pretendard Variable': require('assets/fonts/pretendard/PretendardVariable.ttf'),
+    Tossface: require('assets/fonts/tossface/Tossface.ttf'),
 }
 /**
  * This is the root component of our app.
