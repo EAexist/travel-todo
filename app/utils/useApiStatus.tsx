@@ -1,5 +1,4 @@
 import { useStores, useTripStore, useUserStore } from '@/models'
-import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import { TodoPresetItemSnapshotIn } from '@/models/Todo'
 import { ApiResponseKind } from '@/services/api/apiProblem'
@@ -19,6 +18,7 @@ export enum ApiStatus {
     PENDING = 'pending',
     SUCCESS = 'success',
     ERROR = 'error',
+    TOO_MANY_REQUESTS = 'too-many-requests',
     NO_CONNECTION = 'no_onnection',
 }
 
@@ -85,6 +85,7 @@ type ApiStatusActionType =
     | { type: 'set_IDLE' }
     | { type: 'set_SUCCESS' }
     | { type: 'set_NO_CONNECTION' }
+    | { type: 'set_TOO_MANY_REQUESTS' }
     | { type: 'set_ERROR' }
     | { type: 'setOnSuccess'; props: { onSuccess: (() => void) | null } }
     | { type: 'handleResponseStatus'; props: { onSuccess: () => void } }
@@ -122,6 +123,15 @@ const apiStatusReducer = (
                 apiStatus:
                     state.apiStatus === ApiStatus.PENDING
                         ? ApiStatus.NO_CONNECTION
+                        : state.apiStatus,
+            }
+        }
+        case 'set_TOO_MANY_REQUESTS': {
+            return {
+                ...state,
+                apiStatus:
+                    state.apiStatus === ApiStatus.PENDING
+                        ? ApiStatus.TOO_MANY_REQUESTS
                         : state.apiStatus,
             }
         }
@@ -174,6 +184,11 @@ export function useActionWithApiStatus<T extends {}>(
                 case 'cannot-connect':
                     dispatch({
                         type: 'set_NO_CONNECTION',
+                    })
+                    break
+                case 'too-many-requests':
+                    dispatch({
+                        type: 'set_TOO_MANY_REQUESTS',
                     })
                     break
                 default:
@@ -259,10 +274,10 @@ export const useActionsWithApiStatus = () => {
                       {},
                       TodoPresetItemSnapshotIn[]
                   >(tripStore.fetchTodoPreset),
-                  createReservationFromTextWithApiStatus: _useWithApiStatus<
-                      string,
-                      ReservationSnapshot[]
-                  >(tripStore?.createReservationFromText),
+                  createReservationFromTextWithApiStatus:
+                      useActionWithApiStatus<string>(
+                          tripStore?.createReservationFromText,
+                      ),
               }
             : {
                   fetchTodoPresetWithApiStatus: async () => {},
