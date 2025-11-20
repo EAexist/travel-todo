@@ -69,10 +69,21 @@ export const LoadingBoundary: FC<
                 fabTitle = '확인'
                 onPressFab = handleError
                 break
+            case ApiStatus.TOO_MANY_REQUESTS:
+                title = '이번 달 API 사용량을 모두 사용했어요'
+                subtitle = ''
+                activityIndicator = (
+                    <Icon name="😥" textProps={{ style: { fontSize: 36 } }} />
+                )
+                fabTitle = '확인'
+                onPressFab = handleError
+                break
             case ApiStatus.ERROR:
                 title = '오류가 발생했어요'
                 subtitle = '다시 시도해 주세요.'
-                activityIndicator = <Icon name="😫" size={36} />
+                activityIndicator = (
+                    <Icon name="😫" textProps={{ style: { fontSize: 36 } }} />
+                )
                 fabTitle = '확인'
                 onPressFab = handleError
                 break

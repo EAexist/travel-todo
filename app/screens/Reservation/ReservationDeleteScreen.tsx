@@ -7,7 +7,7 @@ import { Reservation } from '@/models/Reservation/Reservation'
 import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useCheckedList } from '@/utils/useCheckedList'
 import { useHeader } from '@/utils/useHeader'
-import { ListItem } from '@rneui/themed'
+import { ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { FC, useCallback } from 'react'
 import { ScrollView } from 'react-native'
@@ -23,6 +23,9 @@ const ReservationDeleteItem: FC<ReservationDeleteItemProps> = ({
     isChecked,
     onPress,
 }) => {
+    const {
+        theme: { colors },
+    } = useTheme()
     return (
         <ListItemBase
             avatarProps={{ icon: reservation.icon }}
@@ -32,7 +35,7 @@ const ReservationDeleteItem: FC<ReservationDeleteItemProps> = ({
                 <ListItem.CheckBox
                     checked={isChecked}
                     onPress={onPress}
-                    checkedColor={'red'}
+                    checkedColor={colors.text.secondary}
                 />
             }
         />

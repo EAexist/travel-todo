@@ -98,9 +98,6 @@ web-build/
 !.yarn/sdks
 !.yarn/versions
 
-.vercel
-vercel.json
-
 dist/
 
 app/.deprecated

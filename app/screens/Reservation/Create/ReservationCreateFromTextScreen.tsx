@@ -2,9 +2,10 @@ import * as Fab from '@/components/Fab'
 import ContentTitle from '@/components/Layout/Content'
 import { Note_ } from '@/components/Note'
 import { Screen } from '@/components/Screen/Screen'
+import { useTripStore } from '@/models'
 import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'
 import { LoadingBoundary } from '@/screens/Loading/LoadingBoundary'
-import { useActionsWithApiStatus } from '@/utils/useApiStatus'
+import { useActionWithApiStatus } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
 import { FC, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { TextInput } from 'react-native'
@@ -13,8 +14,13 @@ import { useReservationCreateTexts } from './ReservationCreateScreen'
 export const ReservationCreateFromTextScreen: FC<
     AuthenticatedStackScreenProps<'ReservationCreateFromText'>
 > = ({ route: { params } }) => {
-    const { createReservationFromTextWithApiStatus } = useActionsWithApiStatus()
+    const tripStore = useTripStore()
 
+    const createReservationFromTextWithApiStatus =
+        useActionWithApiStatus<string>(
+            tripStore?.createReservationFromText,
+            () => navigateWithTrip('ReservationConfirmFromText'),
+        )
     const { navigateWithTrip } = useNavigate()
     const [value, setValue] = useState('')
     const [isTextChanged, setIsTextChanged] = useState(false)
@@ -27,10 +33,7 @@ export const ReservationCreateFromTextScreen: FC<
     const handlePressReservationCreateButton = useCallback(async () => {
         setIsTextChanged(false)
         if (!isTextTooShort) {
-            await createReservationFromTextWithApiStatus({
-                args: value,
-                onSuccess: () => navigateWithTrip('ReservationConfirmFromText'),
-            })
+            await createReservationFromTextWithApiStatus(value)
             //   if (kind === 'ok') {
             //     if (reservationIdList && reservationIdList?.length > 0) {
             //       navigateWithTrip('ReservationConfirmFromText', { reservationIdList })
