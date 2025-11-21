@@ -31,7 +31,8 @@
         "https-proxy": "npx local-ssl-proxy --source 443 --target 8081 --cert localhost.pem --key localhost-key.pem",
         "bundle:web": "npx expo export --platform web",
         "serve:web": "npx serve dist",
-        "prebuild:clean": "npx expo prebuild --platform android --clean"
+        "prebuild:clean": "npx expo prebuild --platform android --clean",
+        "lingui:compile": "lingui compile"
     },
     "dependencies": {
         "-": "^0.0.1",
