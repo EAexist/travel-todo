@@ -26,7 +26,15 @@ config.resolver.unstable_conditionNames = ['browser', 'require', 'react-native']
 // https://github.com/lingui/js-lingui/blob/main/examples/react-native/metro.config.js
 config.transformer = {
     ...config.transformer,
-    babelTransformerPath: require.resolve('@lingui/metro-transformer/expo'),
+    // babelTransformerPath: require.resolve('@lingui/metro-transformer/expo'),
+    // !!Vercel Path Resolution Error
+    babelTransformerPath: path.join(
+        __dirname,
+        'node_modules',
+        '@lingui',
+        'metro-transformer',
+        'expo.js',
+    ),
 }
 config.resolver.sourceExts.push('po', 'pot')
 
