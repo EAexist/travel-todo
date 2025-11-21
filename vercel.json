@@ -1,5 +1,5 @@
 {
-    "buildCommand": "npx expo export -p web",
+    "buildCommand": "npm run lingui:compile && npx expo export -p web",
     "outputDirectory": "dist",
     "framework": null,
     "rewrites": [
