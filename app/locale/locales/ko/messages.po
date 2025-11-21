@@ -6,15 +6,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: ko\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
-#. placeholder {0}: todo.categoryTitle
-#. placeholder {0}: item.title
-#. placeholder {0}: item.region
+#. placeholder {0}: item?.nightsParsed
+#. placeholder {0}: titles[provider]
 #: app/components/ThirdpartyAvatar.tsx:63
 #: app/screens/Accomodation/AccomodationNoteScreen.tsx:44
-#: app/screens/New/DestinationSettingScreen.tsx:56
-#: app/screens/New/DestinationSettingScreen.tsx:60
-#: app/screens/Todo/TodoNoteScreen.tsx:35
 msgid "{0}"
 msgstr "{0}"
 
@@ -22,33 +24,43 @@ msgstr "{0}"
 msgid "{children}"
 msgstr "{children}"
 
-#: app/components/ListItem.tsx:28
-#: app/components/TextInfoListItem.tsx:43
-#: app/components/Todo/index.tsx:55
+#: app/components/ListItem/ListItem.tsx:56
+#: app/components/TextInfoListItem.tsx:48
+#: app/components/Todo/index.tsx:60
 msgid "{subtitle}"
 msgstr "{subtitle}"
 
 #: app/components/Button.tsx:8
-#: app/components/ListItem.tsx:25
-#: app/components/TextInfoListItem.tsx:38
-#: app/components/Todo/index.tsx:50
-#: app/screens/Main/TodolistScreen.tsx:204
+#: app/components/ListItem/ListItem.tsx:51
+#: app/components/TextInfoListItem.tsx:40
+#: app/components/Todo/index.tsx:51
 msgid "{title}"
 msgstr "{title}"
 
-#. placeholder {0}: props.title
 #: app/components/ListSubheader.tsx:22
-msgid "<0>{0}</0>"
-msgstr "<0>{0}</0>"
+#~ msgid "<0>{0}</0>"
+#~ msgstr "<0>{0}</0>"
 
-#: app/screens/Todo/Flight/AirportAutocomplete.tsx:107
+#: app/components/ListItem/ListSubheader.tsx:29
+msgid "<0>{title}</0>"
+msgstr "<0>{title}</0>"
+
+#: app/screens/Login/LoginScreen.web.tsx:88
+msgid "<0>lingui 텍스트 테스트</0>"
+msgstr "<0>lingui 텍스트 테스트</0>"
+
+#: app/screens/Todo/Flight/AirportAutocomplete.tsx:119
 msgid "공항 또는 도시 이름 검색"
 msgstr "공항 또는 도시 이름 검색"
 
-#: app/screens/New/DestinationSettingScreen.tsx:144
+#: app/screens/CreateTrip/DestinationSearchScreen.tsx:164
 msgid "도시 또는 국가 검색"
 msgstr "도시 또는 국가 검색"
 
 #: app/screens/New/DestinationSearchScreen.tsx:85
-msgid "도시 또는 나라 이름 검색"
-msgstr "도시 또는 나라 이름 검색"
+#~ msgid "도시 또는 나라 이름 검색"
+#~ msgstr "도시 또는 나라 이름 검색"
+
+#: app/screens/TripList/TripDeleteScreen.tsx:82
+msgid "여행 삭제하기"
+msgstr "여행 삭제하기"
