@@ -146,7 +146,7 @@ export function App() {
     const [isI18nInitialized, setIsI18nInitialized] = useState(false)
 
     useEffect(() => {
-        i18n.loadAndActivate({ locale: 'en', messages })
+        i18n.loadAndActivate({ locale: 'ko', messages })
         setIsI18nInitialized(true)
         // initI18n()
         //   .then(() => setIsI18nInitialized(true))
