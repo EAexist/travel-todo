@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: ko\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #. placeholder {0}: item?.nightsParsed
 #. placeholder {0}: titles[provider]
@@ -36,8 +42,8 @@ msgid "<0>{title}</0>"
 msgstr "<0>{title}</0>"
 
 #: app/screens/Login/LoginScreen.web.tsx:88
-msgid "<0>lingui 텍스트 테스트</0>"
-msgstr "<0>lingui 텍스트 테스트</0>"
+#~ msgid "<0>lingui 텍스트 테스트</0>"
+#~ msgstr "<0>lingui 텍스트 테스트</0>"
 
 #: app/screens/Todo/Flight/AirportAutocomplete.tsx:119
 msgid "공항 또는 도시 이름 검색"
