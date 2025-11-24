@@ -9,7 +9,6 @@ import {
     useApiStatus,
 } from '@/utils/useApiStatus'
 import { useHeader } from '@/utils/useHeader'
-import { Trans } from '@lingui/react/macro'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
 import { FC, useEffect } from 'react'
@@ -85,9 +84,6 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
                         </Text>
                     )}
                 </View>
-                <Trans>
-                    <Text>lingui 텍스트 테스트</Text>
-                </Trans>
             </View>
         </Screen>
     )
