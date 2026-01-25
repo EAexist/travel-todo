@@ -8,7 +8,7 @@ module.exports = function (api) {
             //   ['module:react-native-dotenv'],
         ], env: {
             production: {
-                plugins: ['transform-remove-console'],
+                // plugins: ['transform-remove-console'],
             },
         }
     }
