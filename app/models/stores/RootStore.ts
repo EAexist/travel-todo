@@ -61,15 +61,6 @@ export const RootStoreModel = types
                 return response
             })
         },
-        async googleLoginWithIdToken(idToken: string) {
-            api.googleLoginWithIdToken(idToken).then(response => {
-                if (response.kind == 'ok') {
-                    store.setUser(response.data)
-                    return response
-                }
-                return response
-            })
-        },
         async adminGoogleLoginWithIdToken({ idToken }: { idToken: string }) {
             return api.adminGoogleLoginWithIdToken(idToken).then(response => {
                 if (response.kind == 'ok') {
@@ -135,8 +126,8 @@ export const RootStoreModel = types
 /**
  * The RootStore instance.
  */
-export interface RootStore extends Instance<typeof RootStoreModel> {}
+export interface RootStore extends Instance<typeof RootStoreModel> { }
 /**
  * The data of a RootStore.
  */
-export interface RootStoreSnapshot extends SnapshotOut<typeof RootStoreModel> {}
+export interface RootStoreSnapshot extends SnapshotOut<typeof RootStoreModel> { }
