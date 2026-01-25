@@ -1,13 +1,11 @@
 import {
     RootStore,
-    RootStoreModel,
-    RootStoreSnapshot,
+    RootStoreModel
 } from '@/models/stores/RootStore'
 import { TripStore } from '@/models/stores/TripStore'
 import { persist } from "mst-persist"
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ReservationStore } from '../stores/ReservationStore'
-import { ResourceQuotaStoreModel } from '../stores/ResourceQuotaStore'
 import { UserStore } from '../stores/UserStore'
 import { setupRootStore } from './setupRootStore'
 
@@ -24,12 +22,9 @@ import { setupRootStore } from './setupRootStore'
  * instantiating it, although that should be rare.
  */
 
-const defaultRootStore: RootStoreSnapshot = {
+const _rootStore = RootStoreModel.create({
     userStore: null,
-    resourceQuotaStore: ResourceQuotaStoreModel.create({}),
-}
-
-const _rootStore = RootStoreModel.create(defaultRootStore)
+})
 
 /**
  * The RootStoreContext provides a way to access
@@ -124,5 +119,5 @@ const asyncLocalStorage = {
 persist("RootStore", _rootStore, {
     storage: asyncLocalStorage,
     jsonify: true,
-    whitelist: ["userStore"]
+    whitelist: ["userStore", "resourceQuotaStore"]
 }).then(() => console.log("Store has been hydrated"));
