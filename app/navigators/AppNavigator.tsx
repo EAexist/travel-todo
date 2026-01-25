@@ -97,6 +97,8 @@ export const AppNavigator = observer(function AppNavigator(
                                         ...DefaultTheme.colors,
                                         background: '#FFFFFF',
                                     },
+                                }} documentTitle={{
+                                    enabled: false, // Prevents automatic title updates
                                 }}
                                 // theme={{
                                 //     ...navigationTheme,
@@ -128,15 +130,15 @@ const $outerContainerStyle: ViewStyle = {
 const $innerContainerStyle: ViewStyle = {
     ...(Platform.OS === 'web'
         ? {
-              // width: 480,
-              width: '100%',
-              // maxWidth: 480,
-              flex: 1,
-              // backgroundColor: 'red',
-              // boxShadow: '0 0 20px #0000000d',
-          }
+            // width: 480,
+            width: '100%',
+            // maxWidth: 480,
+            flex: 1,
+            // backgroundColor: 'red',
+            // boxShadow: '0 0 20px #0000000d',
+        }
         : {
-              width: '100%',
-              flex: 1,
-          }),
+            width: '100%',
+            flex: 1,
+        }),
 }
