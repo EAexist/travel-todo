@@ -17,7 +17,7 @@ import { observer } from 'mobx-react-lite'
 import { View, ViewStyle } from 'react-native'
 import { LoadingBoundary } from '../Loading/LoadingBoundary'
 
-export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
+export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({ }) => {
     const rootStore = useStores()
 
     const adminGoogleLoginWithIdToken = useActionWithApiStatus<{
@@ -41,7 +41,7 @@ export const AdminScreen: FC<AuthStackScreenProps<'Admin'>> = observer(({}) => {
                     'googleIdToken',
                     credentialResponse.credential as string,
                 )
-            })
+            }).catch(error => console.error(error))
         }
     }
     const {
