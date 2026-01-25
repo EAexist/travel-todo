@@ -176,12 +176,11 @@ export function App() {
     // otherwise, we're ready to render the app
     /* Run Background Sync Actions when network connectivity is restored */
     useEffect(() => {
-        console.log('HI')
         if (Platform.OS === 'web') {
             console.log(
                 'Skipping background task register as the app is running on web.',
             )
-            return () => { }
+            return
         }
         const unsubscribe = addEventListener(state => {
             console.log('Connection type', state.type)
@@ -207,7 +206,9 @@ export function App() {
         )
     }, [rehydrated, isNavigationStateRestored, isI18nInitialized])
 
-    useRenewSessionAndRetryMonitor()
+    if (rehydrated && isI18nInitialized) {
+        useRenewSessionAndRetryMonitor();
+    }
 
     // Before we show the app, we have to wait for our state to be ready.
     // In the meantime, don't render anything. This will be the background
