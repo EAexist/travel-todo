@@ -24,7 +24,7 @@ export const RootStoreModel = types
     .model('RootStore')
     .props({
         userStore: types.maybeNull(UserStoreModel),
-        resourceQuotaStore: ResourceQuotaStoreModel,
+        resourceQuotaStore: types.optional(ResourceQuotaStoreModel, {}),
     })
     .actions(withSetPropAction)
     .views(store => ({
