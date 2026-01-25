@@ -79,24 +79,24 @@ export const RootStoreModel = types
             })
         },
         async webBrowserLogin() {
-            return api.webBrowserLogin().then(response => {
-                console.log(
-                    `[api.webBrowserLogin] response=${JSON.stringify(response)}`,
-                )
-                if (response.kind === 'ok') {
-                    // applySnapshot(store.userStore, response.data)
-                    store.setUser(response.data)
-                    return store.resourceQuotaStore.fetch().then(response => {
-                        if (response.kind === 'ok') {
-                            return store.userStore
-                                ?.fetchActiveTrip({})
-                                .then(response => {
-                                    return response
-                                })
-                        } else return { kind: response.kind }
-                    })
-                } else return { kind: response.kind }
-            })
+            try {
+                const response = await api.webBrowserLogin()
+                if (response.kind !== 'ok') return { kind: response.kind }
+
+                store.setUser(response.data)
+
+                const quotaResponse = await store.resourceQuotaStore.fetch()
+                if (quotaResponse.kind !== 'ok') return { kind: quotaResponse.kind }
+
+                if (!store.userStore) {
+                    throw new Error("UserStore not initialized after login")
+                }
+
+                return await store.userStore.fetchActiveTrip()
+            } catch (error) {
+                console.error("[webBrowserLogin] Critical Failure:", error)
+                throw error // Let useActionWithApiStatus catch it
+            }
         },
         async guestLogin() {
             return api.guestLogin().then(response => {
@@ -109,7 +109,7 @@ export const RootStoreModel = types
                     return store.resourceQuotaStore.fetch().then(response => {
                         if (response.kind === 'ok') {
                             return store.userStore
-                                ?.fetchActiveTrip({})
+                                ?.fetchActiveTrip()
                                 .then(response => {
                                     return response
                                 })
