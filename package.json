@@ -54,6 +54,7 @@
         "@types/lodash": "^4.17.20",
         "@types/react-native-get-random-values": "^1.8.2",
         "apisauce": "^3.2.0",
+        "babel-plugin-transform-remove-console": "^6.9.4",
         "date-fns": "^4.1.0",
         "date-fns-tz": "^3.2.0",
         "expo": "^53.0.12",
