@@ -158,8 +158,13 @@ export function App() {
 
         // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
         // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
-        setTimeout(SplashScreen.hideAsync, 500)
-    })
+        setTimeout(() => {
+            SplashScreen.hideAsync().catch((err) => {
+                // Log it or ignore it, but catching it stops the crash
+                console.warn("SplashScreen.hideAsync failed:", err);
+            });
+        }, 500);
+    });
 
     const linking = {
         prefixes: [prefix],
@@ -176,7 +181,7 @@ export function App() {
             console.log(
                 'Skipping background task register as the app is running on web.',
             )
-            return () => {}
+            return () => { }
         }
         const unsubscribe = addEventListener(state => {
             console.log('Connection type', state.type)
