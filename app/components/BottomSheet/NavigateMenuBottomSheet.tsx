@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, RefObject, useCallback, useRef } from 'react'
+import { FC, PropsWithChildren, RefObject, useCallback, useRef, useState } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 //
 import {
@@ -34,6 +34,7 @@ export const NavigateMenuBottomSheet: FC<
 > = ({ data, children, ref, ...props }) => {
 
     const { navigateWithTrip } = useNavigate();
+    const [pendingPath, setPendingPath] = useState<string | null>(null);
     const pendingPathRef = useRef<string | null>(null);
 
     const handleInternalChange = useCallback((index: number) => {
