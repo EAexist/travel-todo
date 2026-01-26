@@ -1,5 +1,5 @@
 import { Avatar } from '@/components/Avatar'
-import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
+import { GooglePlacesAutocomplete } from '@/components/GooglePlacesAutocomplete/GooglePlacesAutocomplete'
 import { Icon } from '@/components/Icon'
 import { GooglePlacesSearchBarInput, InputIcon } from '@/components/Input'
 import ContentTitle from '@/components/Layout/Content'
@@ -17,14 +17,12 @@ import { getGwaWa } from '@/utils'
 import { countryNameKrToIso } from '@/utils/nation'
 import { useLingui } from '@lingui/react/macro'
 import { ListItem, useTheme } from '@rneui/themed'
-import { FC, useCallback, useRef, useState } from 'react'
+import { FC, useCallback, useState } from 'react'
 import { View } from 'react-native'
 import {
     AutocompleteRequestType,
     GooglePlaceData,
-    GooglePlacesAutocomplete,
-    GooglePlacesAutocompleteRef,
-    Query,
+    Query
 } from 'react-native-google-places-autocomplete'
 import { DestinationListItemBase } from './DestinationSettingScreen'
 
@@ -32,8 +30,8 @@ import { DestinationListItemBase } from './DestinationSettingScreen'
 
 const lang = 'ko'
 
-const PlacesAutoCompleteQuery: Omit<Query<AutocompleteRequestType>, 'key'> = {
-    // key: process.env.GOOGLE_PLACES_API_KEY,
+const PlacesAutoCompleteQuery: Query<AutocompleteRequestType> = {
+    key: "dummy_key",
     language: lang, // language of the results
     type: '(cities)',
 }
@@ -55,7 +53,7 @@ const mapGooglePlaceDataToDestination: (
 > = data => {
     const iso =
         countryNameKrToIso[
-            data.structured_formatting.secondary_text.split(' ')[0]
+        data.structured_formatting.secondary_text.split(' ')[0]
         ]
     return {
         title:
@@ -69,7 +67,7 @@ const mapGooglePlaceDataToDestination: (
 }
 
 const GooglePlacesSearchBar = () => {
-    const ref = useRef<GooglePlacesAutocompleteRef>(null)
+    // const ref = useRef<GooglePlacesAutocompleteRef>(null)
 
     const {
         theme: { colors },
@@ -111,7 +109,7 @@ const GooglePlacesSearchBar = () => {
         return (
             <DestinationListItemBase
                 onPress={() => handlePressAdd(destination)}
-                key={data.id}
+                key={data.place_id}
                 item={destination}
                 rightContent={
                     isAlreadyAdded ? (
@@ -140,14 +138,11 @@ const GooglePlacesSearchBar = () => {
         dest => dest.title === inputText && dest.region === null,
     )
 
-    const isInputNotValidHangul = !containsHangul(inputText)
+    const isInputNotValidHangul = (inputText.length > 0) && !containsHangul(inputText)
 
     return (
         <View>
             <GooglePlacesAutocomplete
-                {...googlePlacesAutocompleteConfig}
-                ref={ref}
-                onPress={() => {}}
                 textInputProps={{
                     InputComp: GooglePlacesSearchBarInput,
                     leftIcon: (

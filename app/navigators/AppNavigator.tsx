@@ -7,6 +7,7 @@
 import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
+import { ErrorBoundary } from '@/screens'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
@@ -82,39 +83,37 @@ export const AppNavigator = observer(function AppNavigator(
 
     return (
         <ThemeProvider theme={theme}>
-            {/* <View style={$outerContainerStyle}> */}
-            {/* <View style={$innerContainerStyle}> */}
-            <GestureHandlerRootViewWrapper>
-                <BottomSheetModalProvider>
-                    <ApiStatusProvider>
-                        <FabProvider>
-                            <NavigationContainer
-                                ref={navigationRef}
-                                theme={{
-                                    ...DefaultTheme,
-                                    colors: {
-                                        ...DefaultTheme.colors,
-                                        background: '#FFFFFF',
-                                    },
-                                }} documentTitle={{
-                                    enabled: false, // Prevents automatic title updates
-                                }}
-                                // theme={{
-                                //     ...navigationTheme,
-                                //     colors: {
-                                //         ...navigationTheme.colors,
-                                //         background: 'white',
-                                //     },
-                                // }}
-                                {...props}>
-                                <AppStackNavigator />
-                            </NavigationContainer>
-                        </FabProvider>
-                    </ApiStatusProvider>
-                </BottomSheetModalProvider>
-            </GestureHandlerRootViewWrapper>
-            {/* </View> */}
-            {/* </View> */}
+            <ErrorBoundary catchErrors={Config.catchErrors}>
+                <GestureHandlerRootViewWrapper>
+                    <BottomSheetModalProvider>
+                        <ApiStatusProvider>
+                            <FabProvider>
+                                <NavigationContainer
+                                    ref={navigationRef}
+                                    theme={{
+                                        ...DefaultTheme,
+                                        colors: {
+                                            ...DefaultTheme.colors,
+                                            background: '#FFFFFF',
+                                        },
+                                    }} documentTitle={{
+                                        enabled: false, // Prevents automatic title updates
+                                    }}
+                                    // theme={{
+                                    //     ...navigationTheme,
+                                    //     colors: {
+                                    //         ...navigationTheme.colors,
+                                    //         background: 'white',
+                                    //     },
+                                    // }}
+                                    {...props}>
+                                    <AppStackNavigator />
+                                </NavigationContainer>
+                            </FabProvider>
+                        </ApiStatusProvider>
+                    </BottomSheetModalProvider>
+                </GestureHandlerRootViewWrapper>
+            </ErrorBoundary>
         </ThemeProvider>
     )
 })
