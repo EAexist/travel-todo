@@ -7,7 +7,6 @@
 import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
-import { ErrorBoundary } from '@/screens/ErrorScreen/ErrorBoundary'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
@@ -108,9 +107,7 @@ export const AppNavigator = observer(function AppNavigator(
                                 //     },
                                 // }}
                                 {...props}>
-                                <ErrorBoundary catchErrors={Config.catchErrors}>
-                                    <AppStackNavigator />
-                                </ErrorBoundary>
+                                <AppStackNavigator />
                             </NavigationContainer>
                         </FabProvider>
                     </ApiStatusProvider>
