@@ -3,10 +3,9 @@ import {
     RootStoreModel
 } from '@/models/stores/RootStore'
 import { TripStore } from '@/models/stores/TripStore'
-import { persist } from "mst-persist"
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ReservationStore } from '../stores/ReservationStore'
-import { UserStore } from '../stores/UserStore'
+import { ApplicationEnv } from './ApplicationEnv'
 import { setupRootStore } from './setupRootStore'
 
 /**
@@ -21,10 +20,11 @@ import { setupRootStore } from './setupRootStore'
  * very large), you may want to use a different strategy than immediately
  * instantiating it, although that should be rare.
  */
+const env: ApplicationEnv = {
+    ensureSync: () => _rootStore.ensureSync(),
+};
 
-const _rootStore = RootStoreModel.create({
-    userStore: null,
-})
+const _rootStore = RootStoreModel.create({}, env)
 
 /**
  * The RootStoreContext provides a way to access
@@ -54,16 +54,22 @@ export const useStores = (): RootStore => {
     return useContext(RootStoreContext)
 }
 
-export const useUserStore = (): UserStore => {
-    return useContext(RootStoreContext).userStore as UserStore
+export const useUserStore = () => {
+    const store = useStores().userStore
+    if (!store) throw new Error("UserStore accessed before initialization")
+    return store;
 }
 
 export const useTripStore = (): TripStore => {
-    return useUserStore()?.activeTrip as TripStore
+    const store = useUserStore().activeTrip
+    if (!store) throw new Error("TripStore accessed before initialization")
+    return store;
 }
 
 export const useReservationStore = (): ReservationStore => {
-    return useTripStore().reservationStore as ReservationStore
+    const store = useTripStore().reservationStore
+    if (!store) throw new Error("TripStore accessed before initialization")
+    return store;
 }
 
 /**
@@ -108,16 +114,3 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
 
     return { rootStore, rehydrated }
 }
-
-/* Persist */
-const asyncLocalStorage = {
-    getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
-    setItem: (key: string, data: any) => Promise.resolve(localStorage.setItem(key, data)),
-    removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
-};
-
-persist("RootStore", _rootStore, {
-    storage: asyncLocalStorage,
-    jsonify: true,
-    whitelist: ["userStore", "resourceQuotaStore"]
-}).then(() => console.log("Store has been hydrated"));

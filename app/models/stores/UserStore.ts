@@ -1,8 +1,8 @@
 import { api } from '@/services/api'
-import { APIAction, enqueueAction, withDbSync } from '@/tasks/BackgroundTask'
-import { Instance, SnapshotIn, types } from 'mobx-state-tree'
+import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
+import { flow, Instance, SnapshotIn, types } from 'mobx-state-tree'
+import { withDbSync } from '../helpers/withDbSync'
 import { withSetPropAction } from '../helpers/withSetPropAction'
-import { ResourceQuotaStoreModel } from './ResourceQuotaStore'
 import {
     TripStoreModel,
     TripStoreSnapshot,
@@ -19,23 +19,23 @@ export const UserStoreModel = types
         tripSummary: types.array(TripSummaryModel),
     })
     .actions(withSetPropAction)
-    .actions(store => ({
+    .actions((self) => ({
         setUser(user: UserStoreSnapshotIn) {
-            store.setProp('id', user.id)
-            store.setProp('nickname', user.nickname)
-            store.setProp('tripSummary', user.tripSummary || [])
+            self.setProp('id', user.id)
+            self.setProp('nickname', user.nickname)
+            self.setProp('tripSummary', user.tripSummary || [])
         },
         setTrip(trip: TripStoreSnapshot | null) {
-            store.setProp('activeTrip', trip)
+            self.setProp('activeTrip', trip)
         },
         setTripSummary(tripSummary: TripSummary[]) {
-            store.tripSummary.clear()
-            store.tripSummary.push(...tripSummary)
+            self.tripSummary.clear()
+            self.tripSummary.push(...tripSummary)
         },
     }))
-    .actions(store => ({
+    .actions((self) => ({
         // setAuthToken(value?: string) {
-        //   store.authToken = value
+        //   self.authToken = value
         // },
         // fetchUserAccount: async () => {
         //     if ((await sync_db()) > 0) {
@@ -44,7 +44,7 @@ export const UserStoreModel = types
         //             console.log(
         //                 `[UserStore.fetchUserAccount] response=${JSON.stringify(response.data)}`,
         //             )
-        //             store.setUser(response.data)
+        //             self.setUser(response.data)
         //         } else {
         //             console.error(
         //                 `Error fetching User: ${JSON.stringify(response)}`,
@@ -52,150 +52,102 @@ export const UserStoreModel = types
         //         }
         //     }
         // },
-        fetchActiveTrip: withDbSync(async () => {
-            console.log(`[UserStore.fetchActiveTrip]`)
-            const response = await api.getActiveTrip(store.id)
-            if (response.kind === 'ok') {
-                console.log(
-                    `[UserStore.fetchActiveTrip] ok, response.data=${JSON.stringify(response.data)}`,
-                )
-                store.setTrip(response.data)
-            } else {
-                console.error(
-                    `Error fetching Trip: ${JSON.stringify(response)}`,
-                )
-            }
-            return { kind: response.kind }
-        }),
-        fetchTripSummary: withDbSync(async () => {
-            const response = await api.getTripSummary(store.id)
-            if (response.kind === 'ok') {
-                console.log(
-                    `[UserStore.fetchTripSummary] ok, response.data=${JSON.stringify(response.data)}`,
-                )
-                store.setTripSummary(response.data.tripSummary)
-            } else {
-                console.error(
-                    `Error fetching User: ${JSON.stringify(response)}`,
-                )
-            }
-            return { kind: response.kind }
-        }),
-        // fetchTripByLocation: async (location: string) => {
-        //     console.log(`[UserStore.fetchTripByLocation] location=${location}`)
-        //     const response = await api.getTripByLocation(location)
-        //     if (response.kind === 'ok') {
-        //         store.setProp('tripStore', response.data as TripStoreSnapshot)
-        //     } else {
-        //         console.error(
-        //             `Error fetching Trip: ${JSON.stringify(response)}`,
-        //         )
-        //     }
-        //     return response
-        // },
-    }))
-    .actions(store => ({
-        setActiveTrip: withDbSync(async (tripId: string) => {
-            console.log('[UserStore.setActiveTrip]')
-            return api.setActiveTrip(store.id, tripId).then(async response => {
-                console.log(
-                    `[UserStore.setActiveTrip] response=${JSON.stringify(response)}`,
-                )
+        fetchActiveTrip: flow(function* () {
+            return yield withDbSync(self, async () => {
+
+                console.log(`[UserStore.fetchActiveTrip]`)
+
+                const response = await api.getActiveTrip(self.id)
                 if (response.kind === 'ok') {
-                    store.setTrip(
-                        response.data,
-                        // TripStoreModel.create(response.data),
+                    console.log(
+                        `[UserStore.fetchActiveTrip] ok, response.data=${JSON.stringify(response.data)}`,
+                    )
+                    self.setTrip(response.data)
+                } else {
+                    console.error(
+                        `Error fetching Trip: ${JSON.stringify(response)}`,
                     )
                 }
                 return { kind: response.kind }
             })
         }),
-    }))
-    .actions(store => ({
-        createTrip: withDbSync(async () => {
-            console.log('[UserStore.createTrip]')
-            return api.createTrip({ userId: store.id }).then(async response => {
-                console.log(
-                    `[UserStore.createTrip] response=${JSON.stringify(response)}`,
-                )
+        fetchTripSummary: flow(function* () {
+            return yield withDbSync(self, async () => {
+
+                const response = await api.getTripSummary(self.id)
+
                 if (response.kind === 'ok') {
-                    store.setProp('tripSummary', response.data.tripSummary)
-                    return store.fetchActiveTrip({}).then(response => {
-                        return response
-                    })
+                    console.log(
+                        `[UserStore.fetchTripSummary] ok, response.data=${JSON.stringify(response.data)}`,
+                    )
+                    self.setTripSummary(response.data.tripSummary)
+                } else {
+                    console.error(
+                        `Error fetching User: ${JSON.stringify(response)}`,
+                    )
                 }
-                return response
+                return { kind: response.kind }
+            })
+        })
+    }))
+    .actions((self) => ({
+        setActiveTrip: flow(function* (tripId: string) {
+            return yield withDbSync(self, async () => {
+
+                console.log('[UserStore.setActiveTrip]')
+
+                return api.setActiveTrip(self.id, tripId).then(async response => {
+                    console.log(
+                        `[UserStore.setActiveTrip] response=${JSON.stringify(response)}`,
+                    )
+                    if (response.kind === 'ok') {
+                        self.setTrip(
+                            response.data,
+                            // TripStoreModel.create(response.data),
+                        )
+                    }
+                    return { kind: response.kind }
+                })
+            })
+        })
+    }))
+    .actions((self) => ({
+        createTrip: flow(function* () {
+            return yield withDbSync(self, async () => {
+
+                console.log('[UserStore.createTrip]')
+
+                return api.createTrip({ userId: self.id }).then(async response => {
+                    console.log(
+                        `[UserStore.createTrip] response=${JSON.stringify(response)}`,
+                    )
+                    if (response.kind === 'ok') {
+                        self.setProp('tripSummary', response.data.tripSummary)
+                        return self.fetchActiveTrip({}).then(response => {
+                            return response
+                        })
+                    }
+                    return response
+                })
             })
         }),
         deleteTrip: (tripId: string) => {
             console.log('[UserStore.deleteTrip]')
-            const trip = store.tripSummary.find(t => t.id === tripId)
+            const trip = self.tripSummary.find(t => t.id === tripId)
             if (trip) {
-                store.tripSummary.remove(trip)
+                self.tripSummary.remove(trip)
                 enqueueAction(APIAction.DELETE_TRIP, { tripId })
             }
         },
-        // async kakaoLogin(idToken: string, profile: KakaoProfile) {
-        //     console.log(
-        //         `[UserStore.kakaoLogin] idToken=${idToken} profile=${JSON.stringify(profile)}`,
-        //     )
-        //     return api.kakaoLogin(idToken, profile).then(response => {
-        //         console.log(
-        //             `[UserStore.kakaoLogin] response=${response.kind} ${JSON.stringify(response)}`,
-        //         )
-        //         if (response.kind === 'ok') {
-        //             store.setUser(response.data)
-        //             return response
-        //         }
-        //     })
-        // },
-        // async googleLogin(googleUser: GoogleUserDTO) {
-        //     return api.googleLogin(googleUser).then(response => {
-        //         console.log(
-        //             `[api.googleLogin] response=${JSON.stringify(response)}`,
-        //         )
-        //         if (response.kind == 'ok') {
-        //             store.setUser(response.data)
-        //             return response
-        //         }
-        //         return response
-        //     })
-        // },
-        // async googleLoginWithIdToken(idToken: string) {
-        //     api.googleLoginWithIdToken(idToken).then(response => {
-        //         console.log(
-        //             `[api.googleLogin] response=${JSON.stringify(response)}`,
-        //         )
-        //         if (response.kind == 'ok') {
-        //             store.setUser(response.data)
-        //             return response
-        //         }
-        //         return response
-        //     })
-        // },
-        // async guestLogin() {
-        //     return api.guestLogin().then(response => {
-        //         console.log(
-        //             `[api.guestLogin] response=${JSON.stringify(response)}`,
-        //         )
-        //         if (response.kind == 'ok') {
-        //             store.setUser(response.data)
-        //             return store.fetchActiveTrip().then(response => {
-        //                 return response
-        //             })
-        //         }
-        //         return response
-        //     })
-        // },
     }))
-    .views(store => ({
+    .views((self) => ({
         get currentTrip() {
-            return store.tripSummary[store.tripSummary.length - 1]
+            return self.tripSummary[self.tripSummary.length - 1]
         },
         get otherTripSummaryList() {
             return [
-                ...store.tripSummary
-                    .filter(t => t.id !== store.activeTrip?.id)
+                ...self.tripSummary
+                    .filter(t => t.id !== self.activeTrip?.id)
                     .sort(),
             ].sort(
                 (
@@ -209,12 +161,12 @@ export const UserStoreModel = types
             )
         },
         get activeTripSumamry() {
-            return store.tripSummary.filter(
-                t => t.id === store.activeTrip?.id,
+            return self.tripSummary.filter(
+                t => t.id === self.activeTrip?.id,
             )[0]
         },
     }))
 
-export interface UserStore extends Instance<typeof UserStoreModel> {}
+export interface UserStore extends Instance<typeof UserStoreModel> { }
 export interface UserStoreSnapshotIn
-    extends SnapshotIn<typeof UserStoreModel> {}
+    extends SnapshotIn<typeof UserStoreModel> { }
