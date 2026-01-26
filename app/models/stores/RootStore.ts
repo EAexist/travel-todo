@@ -1,22 +1,12 @@
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
-import { api, GoogleUserDTO } from '@/services/api'
-import { withDbSync } from '@/tasks/BackgroundTask'
+import { api, ApiResult, GoogleUserDTO } from '@/services/api'
+import { sync_db } from '@/tasks/BackgroundTask'
 import { KakaoProfile } from '@react-native-seoul/kakao-login'
-import { Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { flow, Instance, SnapshotOut, types } from 'mobx-state-tree'
+import { withDbSync } from '../helpers/withDbSync'
 import { ResourceQuotaStoreModel } from './ResourceQuotaStore'
 import { UserStoreModel, UserStoreSnapshotIn } from './UserStore'
 
-// const GeneralApiProblemType = types.custom<
-//   GeneralApiProblem,
-//   GeneralApiProblem
-// >({
-//   fromSnapshot(value: GeneralApiProblem): GeneralApiProblem {
-//     return value
-//   },
-//   toSnapshot(value: GeneralApiProblem): GeneralApiProblem {
-//     return value
-//   },
-// })
 /**
  * A RootStore model.
  */
@@ -25,101 +15,82 @@ export const RootStoreModel = types
     .props({
         userStore: types.maybeNull(UserStoreModel),
         resourceQuotaStore: types.optional(ResourceQuotaStoreModel, {}),
+        isSynced: types.optional(types.boolean, true),
     })
     .actions(withSetPropAction)
-    .views(store => ({
+    .views((self) => ({
         get isAuthenticated() {
-            return store.userStore !== null
+            return self.userStore !== null
         },
     }))
-    .actions(store => ({
+    .actions((self) => ({
+        ensureSync: flow(function* () {
+            if (self.isSynced) return { success: true }
+            const result = yield sync_db()
+            if (result === true) {
+                self.isSynced = true
+                return { success: true }
+            }
+            return { success: true }
+        }) as () => Promise<{
+            success: boolean
+        }>
+    }))
+    .actions((self) => ({
         setUser: (userStore: UserStoreSnapshotIn) => {
-            store.setProp('userStore', UserStoreModel.create(userStore))
+            self.setProp('userStore', UserStoreModel.create(userStore))
         },
     }))
-    .actions(store => ({
-        async kakaoLogin(idToken: string, profile: KakaoProfile) {
-            console.log(
-                `[UserStore.kakaoLogin] idToken=${idToken} profile=${JSON.stringify(profile)}`,
-            )
+    .actions((self) => ({
+        kakaoLogin: flow(function* ({ idToken, profile }: { idToken: string, profile: KakaoProfile }) {
             return api.kakaoLogin(idToken, profile).then(response => {
-                console.log(
-                    `[UserStore.kakaoLogin] response=${response.kind} ${JSON.stringify(response)}`,
-                )
                 if (response.kind === 'ok') {
-                    store.setUser(response.data)
-                    return response
+                    self.setUser(response.data)
                 }
+                return response
             })
-        },
-        async googleLogin(googleUser: GoogleUserDTO) {
+        }),
+        googleLogin: flow(function* ({ googleUser }: { googleUser: GoogleUserDTO }) {
             return api.googleLogin(googleUser).then(response => {
                 if (response.kind == 'ok') {
-                    store.setUser(response.data)
-                    return response
+                    self.setUser(response.data)
                 }
                 return response
             })
-        },
-        async adminGoogleLoginWithIdToken({ idToken }: { idToken: string }) {
-            return api.adminGoogleLoginWithIdToken(idToken).then(response => {
-                if (response.kind == 'ok') {
-                    store.setUser(response.data)
-                    return store.resourceQuotaStore.fetch().then(response => {
-                        if (response.kind === 'ok') {
-                            return store.userStore
-                                ?.fetchActiveTrip({})
-                                .then(response => {
-                                    return response
-                                })
-                        } else return { kind: response.kind }
-                    })
-                }
-                return response
-            })
-        },
-        async webBrowserLogin() {
-            try {
-                const response = await api.webBrowserLogin()
-                if (response.kind !== 'ok') return { kind: response.kind }
+        }),
+        adminGoogleLoginWithIdToken: flow(function* ({ idToken }: { idToken: string }) {
+            const authRes: ApiResult<UserStoreSnapshotIn> = yield api.adminGoogleLoginWithIdToken(idToken)
+            if (authRes.kind !== 'ok') return authRes
 
-                store.setUser(response.data)
+            self.setUser(authRes.data)
 
-                const quotaResponse = await store.resourceQuotaStore.fetch()
-                if (quotaResponse.kind !== 'ok') return { kind: quotaResponse.kind }
-
-                if (!store.userStore) {
-                    throw new Error("UserStore not initialized after login")
-                }
-
-                return await store.userStore.fetchActiveTrip()
-            } catch (error) {
-                console.error("[webBrowserLogin] Critical Failure:", error)
-                throw error // Let useActionWithApiStatus catch it
+            if (self.userStore === null) {
+                throw new Error("Failed to initialize UserStore")
             }
-        },
-        async guestLogin() {
-            return api.guestLogin().then(response => {
-                console.log(
-                    `[api.guestLogin] response=${JSON.stringify(response)}`,
-                )
-                if (response.kind === 'ok') {
-                    // applySnapshot(store.userStore, response.data)
-                    store.setUser(response.data)
-                    return store.resourceQuotaStore.fetch().then(response => {
-                        if (response.kind === 'ok') {
-                            return store.userStore
-                                ?.fetchActiveTrip()
-                                .then(response => {
-                                    return response
-                                })
-                        } else return { kind: response.kind }
-                    })
-                } else return { kind: response.kind }
+
+            const quotaRes: ApiResult<void> = yield self.resourceQuotaStore.fetch()
+            if (quotaRes.kind !== 'ok') return quotaRes
+            return yield self.userStore.fetchActiveTrip()
+        }),
+        webBrowserLogin: flow(function* () {
+            const authRes: ApiResult<UserStoreSnapshotIn> = yield api.webBrowserLogin()
+            if (authRes.kind !== 'ok') return authRes
+
+            self.setUser(authRes.data)
+
+            if (self.userStore === null) {
+                throw new Error("Failed to initialize UserStore")
+            }
+
+            const quotaResponse: ApiResult<VoidFunction> = yield self.resourceQuotaStore.fetch()
+            if (quotaResponse.kind !== 'ok') return quotaResponse
+
+            return yield self.userStore.fetchActiveTrip()
+        }),
+        logout: flow(function* () {
+            return yield withDbSync(self, async () => {
+                self.setProp('userStore', null)
             })
-        },
-        logout: withDbSync(() => {
-            store.setProp('userStore', null)
         }),
     }))
 

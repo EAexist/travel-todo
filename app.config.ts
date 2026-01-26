@@ -1,4 +1,4 @@
-import { ConfigContext, ExpoConfig } from '@expo/config'
+import { ConfigContext, ExpoConfig } from '@expo/config';
 
 /**
  * Use ts-node here so we can use TypeScript for our Config Plugins
@@ -9,18 +9,24 @@ require('ts-node/register')
 // const dotenv = require('dotenv')
 // const path = require('path')
 
-import * as dotenv from 'dotenv'
-import * as path from 'path'
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
-const env =
-    dotenv.config({
-        path: path.resolve(
-            __dirname,
-            process.env.NODE_ENV === 'production'
-                ? '.env.production'
-                : '.env.development',
-        ),
-    }).parsed || {}
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+dotenv.config({
+    path: path.resolve(__dirname, `.env.${nodeEnv}`),
+});
+
+// const env =
+//     dotenv.config({
+//         path: path.resolve(
+//             __dirname,
+//             process.env.NODE_ENV === 'production'
+//                 ? '.env.production'
+//                 : '.env.development',
+//         ),
+//     }).parsed || {}
 
 /**
  * @param config ExpoConfig coming from the static config app.json if it exists

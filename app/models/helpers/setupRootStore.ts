@@ -29,59 +29,6 @@ export async function setupRootStore(rootStore: RootStore) {
     try {
         // storage.clear()
 
-        /**
-         * !!Test Only
-         * Create a sample state of logined user and initialized trip
-         */
-        // console.log('[setupRootStore]')
-        // storage.save(
-        //   ROOT_STATE_STORAGE_KEY,
-        //   RootStoreModel.create({
-        //     userStore: UserStoreModel.create({
-        //       id: 'mocked-logged-in-user_id',
-        //       tripSummary: [
-        //         TripSummaryModel.create({
-        //           id: 'mocked-created-trip_id',
-        //         }),
-        //       ],
-        //     }),
-        //     tripStore: TripStoreModel.create({
-        //       id: 'mocked-created-trip_id',
-        //       isInitialized: true,
-        //       title: '여행',
-        //       startDateIsoString: '2025-09-25 00:00:00',
-        //       endDateIsoString: '2025-10-06 00:00:00',
-        //       destination: [
-        //         DestinationModel.create({
-        //           description: '',
-        //           iso2DigitNationCode: 'JP',
-        //           title: '교토',
-        //           region: '간사이',
-        //         }),
-        //       ],
-        //     }),
-        //     reservationStore: ReservationStoreModel.create({
-        //       tripStore: 'mocked-created-trip_id',
-        //       reservation: {
-        //         'mocked-reservation-id_0': ReservationModel.create({
-        //           id: 'mocked-reservation-id_0',
-        //           accomodation: AccomodationModel.create({
-        //             checkinDateIsoString: '2025-09-25 00:00:00',
-        //             checkoutDateIsoString: '2025-09-27 00:00:00',
-        //           }),
-        //         }),
-        //         'mocked-reservation-id_1': ReservationModel.create({
-        //           id: 'mocked-reservation-id_1',
-        //           accomodation: AccomodationModel.create({
-        //             checkinDateIsoString: '2025-09-28 00:00:00',
-        //             checkoutDateIsoString: '2025-10-01 00:00:00',
-        //           }),
-        //         }),
-        //       },
-        //     }),
-        //   }),
-        // )
-
         // load the last known state from AsyncStorage
         restoredState = await storage.load(ROOT_STATE_STORAGE_KEY)
         if (!!restoredState) {

@@ -223,33 +223,6 @@ export class Api {
      * @returns {kind} - Response Status.
      * @returns {...Trip} - Trip.
      */
-    async guestLogin(): Promise<ApiResult<UserStoreSnapshotIn>> {
-        const response: ApiResponse<UserAccountDTO> =
-            await this.apisauce.post(`auth/guest`)
-
-        console.log(`[api.guestLogin] response: ${JSON.stringify(response)}`)
-        const userAccountResponse = _handleResponse<UserAccountDTO>(response)
-        return userAccountResponse.kind === 'ok'
-            ? {
-                kind: 'ok',
-                data: mapToUserAccount(userAccountResponse.data),
-            }
-            : userAccountResponse
-    }
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
-    async getCsrf(): Promise<ApiResult<void>> {
-        const response: ApiResponse<void> = await this.apisauce.get(`csrf`)
-        return _handleResponse<void>(response)
-    }
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
     async getResourceQuota(): Promise<ApiResult<ResourceQuotaStoreSnapshotIn>> {
         const response: ApiResponse<ResourceQuotaStoreSnapshotIn> =
             await this.apisauce.get(`resourceQuota`)
