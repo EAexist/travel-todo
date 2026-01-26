@@ -6,6 +6,7 @@ import {
     NavigateMenuBottomSheet,
 } from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import BottomSheetModal from '@/components/BottomSheetModal'
+import { FAB } from "@/components/Fab/FAB"
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
@@ -15,7 +16,7 @@ import { Reservation } from '@/models/Reservation/Reservation'
 import { MainTabScreenProps, useNavigate } from '@/navigators'
 import { useResourceQuota } from '@/utils/resourceQuota/useResourceQuota'
 import { useMainScreenHeader } from '@/utils/useHeader'
-import { FAB, ListItem, useTheme } from '@rneui/themed'
+import { ListItem, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { ReservationList } from '../../components/Reservation/ReservationList'
 
