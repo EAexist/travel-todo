@@ -43,8 +43,6 @@ import * as storage from './utils/storage'
 import 'dayjs'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
-import Config from './config'
-import { ErrorBoundary } from './screens'
 import { useRenewSessionAndRetryMonitor } from './services/api/monitorUnauthroized'
 import { useDevLogger } from './utils/useDevLogger'
 
@@ -230,17 +228,15 @@ export function App() {
     return (
         <StrictMode>
             <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-                <ErrorBoundary catchErrors={Config.catchErrors}>
-                    <KeyboardProvider>
-                        <I18nProvider i18n={i18n}>
-                            <AppNavigator
-                                linking={linking}
-                                initialState={initialNavigationState}
-                                onStateChange={onNavigationStateChange}
-                            />
-                        </I18nProvider>
-                    </KeyboardProvider>
-                </ErrorBoundary>
+                <KeyboardProvider>
+                    <I18nProvider i18n={i18n}>
+                        <AppNavigator
+                            linking={linking}
+                            initialState={initialNavigationState}
+                            onStateChange={onNavigationStateChange}
+                        />
+                    </I18nProvider>
+                </KeyboardProvider>
             </SafeAreaProvider>
         </StrictMode>
     )

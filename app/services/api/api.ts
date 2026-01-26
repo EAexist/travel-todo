@@ -5,6 +5,7 @@
  * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
  * documentation for more details.
  */
+import { GooglePlaceAutoCompleteResponse } from '@/components/GooglePlacesAutocomplete/GooglePlacesAutocomplete.web'
 import { Destination } from '@/models/Destination'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import { ResourceQuotaStoreSnapshotIn } from '@/models/stores/ResourceQuotaStore'
@@ -764,6 +765,27 @@ export class Api {
         )
 
         return handleDeleteResponse(response)
+    }
+
+    async googlePlaceAutocomplete({
+        input,
+        language,
+        type,
+    }: {
+        input: string,
+        language?: string,
+        type?: string,
+    }): Promise<ApiResult<GooglePlaceAutoCompleteResponse>> {
+        const response: ApiResponse<GooglePlaceAutoCompleteResponse> = await this.apisauce.get(
+            `/proxy/place/autocomplete/json`,
+            {
+                input,
+                language,
+                type,
+            }
+        )
+
+        return _handleResponse<GooglePlaceAutoCompleteResponse>(response)
     }
 
     /*
