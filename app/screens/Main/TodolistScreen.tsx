@@ -8,7 +8,7 @@ import {
 //
 import {
     NavigateListItemProp,
-    NavigateMenuBottomSheet,
+    NavigateMenuBottomSheet
 } from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import { BottomSheetModal } from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'

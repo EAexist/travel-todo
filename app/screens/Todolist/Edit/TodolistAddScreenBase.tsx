@@ -137,9 +137,9 @@ const AddPresetTodo: FC<{
             onPress={handlePress}
             {...(useDisabledStyle &&
                 !preset.isFlaggedToAdd && {
-                    avatarProps: { avatarStyle: styles.disabled },
-                    contentStyle: styles.disabled,
-                })}
+                avatarProps: { avatarStyle: styles.disabled },
+                contentStyle: styles.disabled,
+            })}
             title={preset.content.title}
             subtitle={preset.content.subtitle}
             icon={preset.content.icon}
@@ -173,21 +173,21 @@ export const TodolistAddScreenBase = observer(
             { todo?: Todo; preset?: TodoPresetItem },
             TodolistSectionT
         > = ({ item: { preset, todo } }) =>
-            // <Observer
-            //     render={() =>
-            preset ? (
-                <AddPresetTodo
-                    preset={preset}
-                    key={preset?.content.id}
-                    useDisabledStyle={isInitializingScreen}
-                />
-            ) : (
-                <AddedTodo
-                    todo={todo as Todo}
-                    key={todo?.id}
-                    useDisabledStyle={!isInitializingScreen}
-                />
-            )
+                // <Observer
+                //     render={() =>
+                preset ? (
+                    <AddPresetTodo
+                        preset={preset}
+                        key={preset?.content.id}
+                        useDisabledStyle={isInitializingScreen}
+                    />
+                ) : (
+                    <AddedTodo
+                        todo={todo as Todo}
+                        key={todo?.id}
+                        useDisabledStyle={!isInitializingScreen}
+                    />
+                )
         // }
         // />
         /* BottomSheet */
@@ -327,7 +327,7 @@ export const TodolistAddScreenBase = observer(
 //     const { handleAddCutomTodo } = useHandleAddCutomTodo({ callerName })
 
 //     const { useActiveKey, handleBottomSheetModalChange, activate } =
-//         useNavigationBottomSheet(ref)
+//         useNavigationMenuBottomSheet(ref)
 
 //     useActiveKey(activeKey => handleAddCutomTodo('RESERVATION', activeKey))
 
