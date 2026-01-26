@@ -1,9 +1,8 @@
-import { FC, PropsWithChildren, RefObject, useCallback } from 'react'
+import { FC, PropsWithChildren, RefObject, useCallback, useRef } from 'react'
 import { FlatList, ListRenderItem } from 'react-native'
 //
 import {
     BottomSheetModal,
-    useNavigationBottomSheet,
 } from '@/components/BottomSheetModal'
 import { Icon } from '@/models/Icon'
 import { useNavigate } from '@/navigators'
@@ -33,17 +32,26 @@ export const NavigateMenuBottomSheet: FC<
         }
     >
 > = ({ data, children, ref, ...props }) => {
-    const { useActiveKey, handleBottomSheetModalChange, activate } =
-        useNavigationBottomSheet(ref)
-    const { navigateWithTrip } = useNavigate()
-    useActiveKey(activeKey => navigateWithTrip(activeKey))
+
+    const { navigateWithTrip } = useNavigate();
+    const pendingPathRef = useRef<string | null>(null);
+
+    const handleInternalChange = useCallback((index: number) => {
+        console.log(`[handleInternalChange] index: ${index} pendingPathRef.current: ${pendingPathRef.current}`)
+        if (index <= -1 && pendingPathRef.current) {
+            navigateWithTrip(pendingPathRef.current);
+            pendingPathRef.current = null;
+        }
+    }, [navigateWithTrip]);
 
     const renderSettingsListItem: ListRenderItem<NavigateListItemProp> =
         useCallback(
             ({ item: { path, icon, ...props } }) => {
                 const handlePress = () => {
+                    console.log(`[renderSettingsListItem.handlePress] path: ${path}`)
                     if (path) {
-                        activate(path)
+                        pendingPathRef.current = path
+                        ref?.current?.dismiss()
                     }
                 }
 
@@ -55,13 +63,13 @@ export const NavigateMenuBottomSheet: FC<
                     />
                 )
             },
-            [activate],
+            [ref],
         )
 
     return (
         <BottomSheetModal
             ref={ref}
-            onChange={handleBottomSheetModalChange}
+            onChange={handleInternalChange}
             {...props}>
             <FlatList
                 data={data}
