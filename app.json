@@ -1,8 +1,9 @@
 {
     "expo": {
-        "name": "trip-todo",
-        "slug": "trip-todo",
-        "scheme": "trip-todo",
+        "name": "Travel Todo",
+        "description": "여행의 시작은 설레는 준비부터, 트레블 투두",
+        "slug": "travel-todo",
+        "scheme": "travel-todo",
         "version": "1.0.0",
         "orientation": "portrait",
         "userInterfaceStyle": "automatic",
@@ -18,17 +19,18 @@
         ],
         "android": {
             "icon": "./assets/images/app/app-icon-android-legacy.png",
-            "package": "com.trip_todo",
+            "package": "com.travel_todo",
             "allowBackup": false
         },
         "ios": {
             "icon": "./assets/images/app/app-icon-ios.png",
             "supportsTablet": true,
-            "bundleIdentifier": "com.trip_todo"
+            "bundleIdentifier": "com.travel_todo"
         },
         "web": {
-            "favicon": "./assets/images/app/app-icon-web-favicon.png",
-            "bundler": "metro"
+            "bundler": "metro",
+            "output": "single",
+            "favicon": "./assets/images/app/app-icon-web-favicon.png"
         },
         "plugins": [
             "expo-localization",

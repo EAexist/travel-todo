@@ -1,10 +1,8 @@
 import { useStores } from '@/models'
-import { saveString } from '@/utils/storage'
 import {
-    CredentialResponse,
     GoogleLogin,
     GoogleLoginProps,
-    GoogleOAuthProvider,
+    GoogleOAuthProvider
 } from '@react-oauth/google'
 import { ButtonProps } from '@rneui/themed'
 import { FC, useCallback, useState } from 'react'
@@ -16,20 +14,20 @@ export const GoogleLoginButton: FC<
     const rootStore = useStores()
     const [width, setWidth] = useState(0)
 
-    const handlegoogleLoginSuccess = (
-        credentialResponse: CredentialResponse,
-    ) => {
-        if (credentialResponse.credential) {
-            rootStore
-                .googleLoginWithIdToken(credentialResponse.credential)
-                .then(() => {
-                    saveString(
-                        'googleIdToken',
-                        credentialResponse.credential as string,
-                    )
-                })
-        }
-    }
+    // const handlegoogleLoginSuccess = (
+    //     credentialResponse: CredentialResponse,
+    // ) => {
+    //     if (credentialResponse.credential) {
+    //         rootStore
+    //             .googleLoginWithIdToken(credentialResponse.credential)
+    //             .then(() => {
+    //                 saveString(
+    //                     'googleIdToken',
+    //                     credentialResponse.credential as string,
+    //                 )
+    //             })
+    //     }
+    // }
     const handleLayout = useCallback(
         (event: LayoutChangeEvent) => {
             setWidth(event.nativeEvent.layout.width)
@@ -52,8 +50,8 @@ export const GoogleLoginButton: FC<
                     size="large"
                     shape="pill"
                     width={width}
-                    // width={400}
-                    // width={width.toString()}
+                // width={400}
+                // width={width.toString()}
                 />
             </GoogleOAuthProvider>
         </View>

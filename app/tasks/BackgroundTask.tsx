@@ -184,26 +184,26 @@ const runAPIAction = async ({ action, data }: AsyncAPIWriteAction) => {
 }
 type GenericCallback<T> = ((args: T) => any) | (() => any)
 
-export function withDbSync<T>(callbackFn: () => any): () => Promise<void>
-export function withDbSync<T>(callbackFn: (args: T) => any): () => Promise<void>
-export function withDbSync<T>(callbackFn: GenericCallback<T>) {
+export function withDbSync<R>(callbackFn: () => R): () => Promise<R>
+export function withDbSync<T, R>(callbackFn: (args: T) => R): () => Promise<R>
+export function withDbSync<T, R>(callbackFn: any) {
     return callbackFn.length > 0
         ? async (args: T) => {
-              const syncResult = await sync_db()
-              if (syncResult == true) {
-                  return (callbackFn as (args: T) => any)(args)
-              } else {
-                  return syncResult
-              }
-          }
+            const syncResult = await sync_db()
+            if (syncResult == true) {
+                return (callbackFn as (args: T) => any)(args)
+            } else {
+                return syncResult
+            }
+        }
         : async () => {
-              const syncResult = await sync_db()
-              if (syncResult == true) {
-                  return (callbackFn as () => any)()
-              } else {
-                  return syncResult
-              }
-          }
+            const syncResult = await sync_db()
+            if (syncResult == true) {
+                return (callbackFn as () => any)()
+            } else {
+                return syncResult
+            }
+        }
 }
 
 export const sync_db = async () => {

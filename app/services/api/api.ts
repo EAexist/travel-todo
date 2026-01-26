@@ -140,9 +140,9 @@ export class Api {
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userAccountResponse.data),
+            }
             : userAccountResponse
     }
 
@@ -161,9 +161,9 @@ export class Api {
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userAccountResponse.data),
+            }
             : userAccountResponse
     }
 
@@ -179,43 +179,17 @@ export class Api {
             `auth/admin`,
             null,
             {
-                params: {
-                    idToken: idToken,
+                headers: {
+                    Authorization: `Bearer ${idToken}`,
                 },
             },
         )
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
-            : userAccountResponse
-    }
-
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
-    async googleLoginWithIdToken(
-        idToken: string,
-    ): Promise<ApiResult<UserStoreSnapshotIn>> {
-        const response: ApiResponse<UserAccountDTO> = await this.apisauce.post(
-            `auth/google`,
-            undefined,
-            {
-                params: {
-                    idToken: idToken,
-                },
-            },
-        )
-        const userAccountResponse = _handleResponse<UserAccountDTO>(response)
-        return userAccountResponse.kind === 'ok'
-            ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userAccountResponse.data),
+            }
             : userAccountResponse
     }
 
@@ -238,9 +212,9 @@ export class Api {
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userAccountResponse.data),
+            }
             : userAccountResponse
     }
 
@@ -257,9 +231,9 @@ export class Api {
         const userAccountResponse = _handleResponse<UserAccountDTO>(response)
         return userAccountResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userAccountResponse.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userAccountResponse.data),
+            }
             : userAccountResponse
     }
     /**
@@ -296,9 +270,9 @@ export class Api {
         const userDTO = _handleResponse<UserAccountDTO>(response)
         return userDTO.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToUserAccount(userDTO.data),
-              }
+                kind: 'ok',
+                data: mapToUserAccount(userDTO.data),
+            }
             : userDTO
     }
 
@@ -332,9 +306,9 @@ export class Api {
         const tripDTO = _handleResponse<TripFetchDTO>(response)
         return tripDTO.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToTrip(tripDTO.data),
-              }
+                kind: 'ok',
+                data: mapToTrip(tripDTO.data),
+            }
             : tripDTO
     }
 
@@ -354,9 +328,9 @@ export class Api {
         const tripDTO = _handleResponse<TripFetchDTO>(response)
         return tripDTO.kind === 'ok'
             ? {
-                  ...tripDTO,
-                  data: mapToTrip(tripDTO.data),
-              }
+                ...tripDTO,
+                data: mapToTrip(tripDTO.data),
+            }
             : tripDTO
     }
 
@@ -420,9 +394,9 @@ export class Api {
         const userAccountDTO = _handleResponse<UserAccountDTO>(response)
         return userAccountDTO.kind === 'ok'
             ? {
-                  ...userAccountDTO,
-                  data: mapToUserAccount(userAccountDTO.data),
-              }
+                ...userAccountDTO,
+                data: mapToUserAccount(userAccountDTO.data),
+            }
             : userAccountDTO
     }
 
@@ -458,9 +432,9 @@ export class Api {
         const patchedTripDTO = _handleResponse<TripFetchDTO>(response)
         return patchedTripDTO.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToTrip(patchedTripDTO.data),
-              }
+                kind: 'ok',
+                data: mapToTrip(patchedTripDTO.data),
+            }
             : patchedTripDTO
     }
     /*
@@ -505,11 +479,11 @@ export class Api {
         const reservationDTOResponse = _handleResponse<ReservationDTO>(response)
         return reservationDTOResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToReservation(
-                      reservationDTOResponse.data,
-                  ) as ReservationSnapshot,
-              }
+                kind: 'ok',
+                data: mapToReservation(
+                    reservationDTOResponse.data,
+                ) as ReservationSnapshot,
+            }
             : reservationDTOResponse
     }
 
@@ -530,11 +504,11 @@ export class Api {
         const reservationDTOResponse = _handleResponse<ReservationDTO>(response)
         return reservationDTOResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToReservation(
-                      reservationDTOResponse.data,
-                  ) as ReservationSnapshot,
-              }
+                kind: 'ok',
+                data: mapToReservation(
+                    reservationDTOResponse.data,
+                ) as ReservationSnapshot,
+            }
             : reservationDTOResponse
     }
 
@@ -659,9 +633,9 @@ export class Api {
         const todoDTOResponse = _handleResponse<TodoDTO>(response)
         return todoDTOResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToTodo(todoDTOResponse.data) as TodoSnapshotIn,
-              }
+                kind: 'ok',
+                data: mapToTodo(todoDTOResponse.data) as TodoSnapshotIn,
+            }
             : todoDTOResponse
     }
 
@@ -681,9 +655,9 @@ export class Api {
         const todoDTOResponse = _handleResponse<TodoDTO>(response)
         return todoDTOResponse.kind === 'ok'
             ? {
-                  kind: 'ok',
-                  data: mapToTodo(todoDTOResponse.data) as TodoSnapshotIn,
-              }
+                kind: 'ok',
+                data: mapToTodo(todoDTOResponse.data) as TodoSnapshotIn,
+            }
             : todoDTOResponse
     }
 
@@ -711,11 +685,11 @@ export class Api {
         const presetResponse = _handleResponse<TodoPresetDTO[]>(response)
         return presetResponse.kind === 'ok'
             ? {
-                  ...presetResponse,
-                  data: presetResponse.data.map(presetDTO =>
-                      mapToTodoPreset(presetDTO),
-                  ),
-              }
+                ...presetResponse,
+                data: presetResponse.data.map(presetDTO =>
+                    mapToTodoPreset(presetDTO),
+                ),
+            }
             : presetResponse
     }
 
@@ -777,11 +751,11 @@ export class Api {
         const handledResponse = _handleResponse<DestinationDTO[]>(response)
         return handledResponse.kind === 'ok'
             ? {
-                  ...handledResponse,
-                  data: handledResponse.data.map(destinationDTO =>
-                      mapToDestination(destinationDTO),
-                  ),
-              }
+                ...handledResponse,
+                data: handledResponse.data.map(destinationDTO =>
+                    mapToDestination(destinationDTO),
+                ),
+            }
             : handledResponse
     }
 

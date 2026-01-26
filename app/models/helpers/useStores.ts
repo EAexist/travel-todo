@@ -1,16 +1,13 @@
 import {
     RootStore,
-    RootStoreModel,
-    RootStoreSnapshot,
+    RootStoreModel
 } from '@/models/stores/RootStore'
 import { TripStore } from '@/models/stores/TripStore'
-import { load, remove, save } from '@/utils/storage'
-import { configurePersistable, makePersistable } from 'mobx-persist-store'
+import { persist } from "mst-persist"
 import { createContext, useContext, useEffect, useState } from 'react'
-import { setupRootStore } from './setupRootStore'
 import { ReservationStore } from '../stores/ReservationStore'
 import { UserStore } from '../stores/UserStore'
-import { ResourceQuotaStoreModel } from '../stores/ResourceQuotaStore'
+import { setupRootStore } from './setupRootStore'
 
 /**
  * Create the initial (empty) global RootStore instance here.
@@ -25,12 +22,9 @@ import { ResourceQuotaStoreModel } from '../stores/ResourceQuotaStore'
  * instantiating it, although that should be rare.
  */
 
-const defaultRootStore: RootStoreSnapshot = {
+const _rootStore = RootStoreModel.create({
     userStore: null,
-    resourceQuotaStore: ResourceQuotaStoreModel.create({}),
-}
-
-const _rootStore = RootStoreModel.create(defaultRootStore)
+})
 
 /**
  * The RootStoreContext provides a way to access
@@ -86,23 +80,23 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
     // Kick off initial async loading actions, like loading fonts and rehydrating RootStore
     useEffect(() => {
         let _unsubscribe: () => void | undefined
-        ;(async () => {
-            // set up the RootStore (returns the state restored from AsyncStorage)
-            const { unsubscribe } = await setupRootStore(rootStore)
-            _unsubscribe = unsubscribe
+            ; (async () => {
+                // set up the RootStore (returns the state restored from AsyncStorage)
+                const { unsubscribe } = await setupRootStore(rootStore)
+                _unsubscribe = unsubscribe
 
-            // reactotron integration with the MST root store (DEV only)
-            if (__DEV__) {
-                // @ts-ignore
-                console.tron.trackMstNode(rootStore)
-            }
+                // reactotron integration with the MST root store (DEV only)
+                if (__DEV__) {
+                    // @ts-ignore
+                    console.tron.trackMstNode(rootStore)
+                }
 
-            // let the app know we've finished rehydrating
-            setRehydrated(true)
+                // let the app know we've finished rehydrating
+                setRehydrated(true)
 
-            // invoke the callback, if provided
-            if (callback) callback()
-        })()
+                // invoke the callback, if provided
+                if (callback) callback()
+            })()
 
         return () => {
             // cleanup
@@ -116,19 +110,14 @@ export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
 }
 
 /* Persist */
-configurePersistable({
-    storage: {
-        setItem: (key, data) => {
-            save(key, data)
-        },
-        getItem: key => load(key),
-        removeItem: key => {
-            remove(key)
-        },
-    },
-})
+const asyncLocalStorage = {
+    getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
+    setItem: (key: string, data: any) => Promise.resolve(localStorage.setItem(key, data)),
+    removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
+};
 
-makePersistable(_rootStore, {
-    name: 'RootStore',
-    properties: ['userStore'],
-})
+persist("RootStore", _rootStore, {
+    storage: asyncLocalStorage,
+    jsonify: true,
+    whitelist: ["userStore", "resourceQuotaStore"]
+}).then(() => console.log("Store has been hydrated"));
