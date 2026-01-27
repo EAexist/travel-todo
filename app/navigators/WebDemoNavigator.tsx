@@ -1,6 +1,6 @@
 import FakeReservationSourceScreen from '@/screens/WebDemo/FakeReservationSourceScreen'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { useTheme } from '@rneui/themed'
+import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
 import { WebDemoStackParamList } from './WebDemoStackTypes'
 
@@ -14,7 +14,7 @@ export const WebDemoNavigator = observer(function WebDemoenicatedStack() {
     return (
         <WebDemoStack.Navigator
             screenOptions={{
-                // header: () => <Header leftComponent={<BackButton />} />,
+                header: () => <Header />,
                 contentStyle: {
                     backgroundColor: colors.background,
                 },
