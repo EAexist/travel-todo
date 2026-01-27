@@ -52,6 +52,12 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 const prefix = Linking.createURL('/')
 const config = {
     screens: {
+        WebDemo: {
+            screens: {
+                /* Fake Reservation Pages */
+                FakeReservationSource: 'fake-reservation-source/:type',
+            }
+        },
         Auth: {
             screens: {
                 Login: 'auth/login',

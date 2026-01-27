@@ -22,6 +22,7 @@ import { AuthenticatedNavigator } from './AuthenticatedNavigator'
 import { AuthNavigator } from './AuthNavigator'
 import { AppStackParamList, NavigationProps } from './navigationTypes'
 import { navigationRef, useBackButtonHandler } from './navigationUtilities'
+import { WebDemoNavigator } from './WebDemoNavigator'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -64,7 +65,12 @@ const AppStackNavigator = observer(function AppStackNavigator() {
                 contentStyle: {
                     backgroundColor: colors.background,
                 },
-            }}>
+            }}
+            initialRouteName={rootStore.isAuthenticated ? "App" : "Auth"}
+        >
+            {Platform.OS === 'web' && (
+                <AppStack.Screen name="WebDemo" component={WebDemoNavigator} />
+            )}
             {rootStore.isAuthenticated ? (
                 <AppStack.Screen
                     name="App"

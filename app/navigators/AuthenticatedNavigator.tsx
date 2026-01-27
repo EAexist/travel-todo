@@ -11,7 +11,6 @@ import { ReservationCreateScreen } from '@/screens/Reservation/Create/Reservatio
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Header, useTheme } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
-import { Platform } from 'react-native'
 import { MainTabNavigator } from './MainTabNavigator'
 import { AuthenticatedStackParamList } from './navigationTypes'
 
@@ -32,7 +31,8 @@ export const AuthenticatedNavigator = observer(function AuthenicatedStack() {
                     backgroundColor: colors.background,
                 },
             }}
-            initialRouteName={Platform.OS === 'web' ? 'DemoHome' : 'Home'}>
+        // initialRouteName={Platform.OS === 'web' ? 'DemoHome' : 'Home'}
+        >
             <AuthenticatedStack.Screen
                 name="DemoHome"
                 component={Screens.Login.DemoHome}
