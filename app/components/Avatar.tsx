@@ -1,7 +1,6 @@
 import {
     Avatar as RNEAvatar,
-    AvatarProps as RNEAvatarProps,
-    Text,
+    AvatarProps as RNEAvatarProps
 } from '@rneui/themed'
 import * as charger from 'assets/images/icon/charger.png'
 import * as pajamas from 'assets/images/icon/pajamas.png'
@@ -57,14 +56,10 @@ export const Avatar = ({
 
     switch (icon?.type || 'tossface') {
         case 'tossface':
-            renderCustomContent =
-                <Text
-                    style={{
-                        ...styles.titleStyle,
-                        fontSize,
-                    }}>
-                    {icon?.name}
-                </Text>
+            avatarProps = {
+                title: icon?.name,
+                titleStyle: { fontFamily: 'Tossface', fontSize }
+            }
             break
         case 'image':
             let source: ImageSourcePropType | undefined = undefined
