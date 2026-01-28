@@ -85,9 +85,9 @@ export const useHandleConfirmTodo = (todo: Todo) => {
             case 'FLIGHT_TICKET':
                 navigateWithTrip('ConfirmFlightTicket', { todoId: todo.id })
                 return false
-            case 'VISIT_JAPAN':
-                navigateWithTrip('ConfirmVisitJapan', { todoId: todo.id })
-                return false
+            // case 'VISIT_JAPAN':
+            //     navigateWithTrip('ConfirmVisitJapan', { todoId: todo.id })
+            //     return false
             default:
                 return true
         }
