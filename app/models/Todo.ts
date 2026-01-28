@@ -1,4 +1,4 @@
-import { mapToTodoPatchDTO, PatchTodoProps, TodoPatchDTO } from '@/services/api'
+import { mapToTodoPatchDTO } from '@/services/api'
 import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 import {
     flow,
@@ -130,7 +130,7 @@ export const TodoContentModel = types
     .props({
         id: types.optional(types.identifier, () => uuidv4()),
         category: createEnumType<TodoCategory>('TodoCategory'),
-        type: types.string,
+        type: types.maybe(types.string),
         title: types.string,
         subtitle: types.maybe(types.string),
         icon: IconModel,
@@ -143,11 +143,11 @@ export const TodoContentModel = types
         },
     }))
 
-export interface TodoContent extends Instance<typeof TodoContentModel> {}
+export interface TodoContent extends Instance<typeof TodoContentModel> { }
 export interface TodoContentSnapshotOut
-    extends SnapshotOut<typeof TodoContentModel> {}
+    extends SnapshotOut<typeof TodoContentModel> { }
 export interface TodoContentSnapshotIn
-    extends SnapshotIn<typeof TodoContentModel> {}
+    extends SnapshotIn<typeof TodoContentModel> { }
 
 // export const PresetTodoContentModel = types.model('PresetTodoContent').props({
 //   id: types.identifier,
@@ -165,7 +165,7 @@ export const PresetTodoContentModel = TodoContentModel.named(
     })
     .actions(withSetPropAction)
 export interface PresetTodoContentSnapshotIn
-    extends SnapshotIn<typeof PresetTodoContentModel> {}
+    extends SnapshotIn<typeof PresetTodoContentModel> { }
 /**
  * TodoPresetItem
  */
@@ -182,9 +182,9 @@ export const TodoPresetItemModel = types
         },
     }))
 
-export interface TodoPresetItem extends Instance<typeof TodoPresetItemModel> {}
+export interface TodoPresetItem extends Instance<typeof TodoPresetItemModel> { }
 export interface TodoPresetItemSnapshotIn
-    extends SnapshotIn<typeof TodoPresetItemModel> {}
+    extends SnapshotIn<typeof TodoPresetItemModel> { }
 
 /**
  * Todo
@@ -253,9 +253,9 @@ export const TodoModel = types
                 todoDTO: mapToTodoPatchDTO(
                     todoDTO
                         ? {
-                              id: item.id,
-                              ...todoDTO,
-                          }
+                            id: item.id,
+                            ...todoDTO,
+                        }
                         : getSnapshot(item),
                 ),
             })
@@ -339,12 +339,12 @@ export const FlightTodoModel = types.compose(
         })),
 )
 
-export interface Todo extends Instance<typeof TodoModel> {}
-export interface TodoSnapshotOut extends SnapshotOut<typeof TodoModel> {}
-export interface TodoSnapshotIn extends SnapshotIn<typeof TodoModel> {}
+export interface Todo extends Instance<typeof TodoModel> { }
+export interface TodoSnapshotOut extends SnapshotOut<typeof TodoModel> { }
+export interface TodoSnapshotIn extends SnapshotIn<typeof TodoModel> { }
 
-export interface FlightTodo extends Instance<typeof FlightTodoModel> {}
+export interface FlightTodo extends Instance<typeof FlightTodoModel> { }
 export interface FlightTodoSnapshotOut
-    extends SnapshotOut<typeof FlightTodoModel> {}
+    extends SnapshotOut<typeof FlightTodoModel> { }
 export interface FlightTodoSnapshotIn
-    extends SnapshotIn<typeof FlightTodoModel> {}
+    extends SnapshotIn<typeof FlightTodoModel> { }
