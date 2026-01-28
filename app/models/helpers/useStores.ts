@@ -68,7 +68,7 @@ export const useTripStore = (): TripStore => {
 
 export const useReservationStore = (): ReservationStore => {
     const store = useTripStore().reservationStore
-    if (!store) throw new Error("TripStore accessed before initialization")
+    if (!store) throw new Error("ReservationStore accessed before initialization")
     return store;
 }
 
