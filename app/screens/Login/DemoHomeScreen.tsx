@@ -1,7 +1,6 @@
 import * as Fab from '@/components/Fab'
 import { Lottie } from '@/components/Lottie'
 import { Screen } from '@/components/Screen/Screen'
-import { useStores } from '@/models'
 import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
@@ -12,11 +11,6 @@ import { View, ViewStyle } from 'react-native'
 export const DemoHomeScreen: FC<
     AuthenticatedStackScreenProps<'DemoHome'>
 > = ({ }) => {
-    const rootStore = useStores()
-
-    // useEffect(() => {
-    //     rootStore.webBrowserLogin()
-    // }, [])
 
     useHeader({
         backButtonShown: false,

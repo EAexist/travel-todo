@@ -73,10 +73,10 @@ export const RootStoreModel = types
             return yield self.userStore.fetchActiveTrip()
         }),
         webBrowserLogin: flow(function* () {
-            const authRes: ApiResult<UserStoreSnapshotIn> = yield api.webBrowserLogin()
-            if (authRes.kind !== 'ok') return authRes
+            const authResponse: ApiResult<UserStoreSnapshotIn> = yield api.webBrowserLogin()
+            if (authResponse.kind !== 'ok') return authResponse
 
-            self.setUser(authRes.data)
+            self.setUser(authResponse.data)
 
             if (self.userStore === null) {
                 throw new Error("Failed to initialize UserStore")
@@ -85,7 +85,9 @@ export const RootStoreModel = types
             const quotaResponse: ApiResult<VoidFunction> = yield self.resourceQuotaStore.fetch()
             if (quotaResponse.kind !== 'ok') return quotaResponse
 
-            return yield self.userStore.fetchActiveTrip()
+            const activeTripResponse = yield self.userStore.fetchActiveTrip()
+            if (activeTripResponse.kind !== 'ok') return activeTripResponse
+            return
         }),
         logout: flow(function* () {
             return yield withDbSync(self, async () => {
