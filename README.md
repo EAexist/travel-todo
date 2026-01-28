@@ -2,13 +2,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/EAexist/travel-todo">
-    <img src="assets/images/app/app-icon-all.png" alt="Logo" width="80" height="80">
+    <img src="assets/images/app/app-icon.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Travel Todo</h3>
 
   <p align="center">
-    Next.js Web App
+    Expo Universal Mobile App
     <br />
     <br />
     <a href="https://travel-todo-git-staging-matchalab-project.vercel.app">View Demo</a>
