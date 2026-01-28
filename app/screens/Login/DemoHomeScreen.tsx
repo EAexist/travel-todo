@@ -58,8 +58,7 @@ export const DemoHomeScreen: FC<
                     color={colors.brand}
                     title={'앱 미리보기'}
                     navigateProps={{
-                        name: 'Main',
-                        params: { screen: 'Todolist' },
+                        name: 'TripList',
                     }}
                 />
             </Fab.Container>

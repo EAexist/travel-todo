@@ -33,6 +33,7 @@ import {
     applySnapshot,
     getSnapshot,
     Instance,
+    SnapshotIn,
     SnapshotOut,
     types,
 } from 'mobx-state-tree'
@@ -873,5 +874,6 @@ export const TripStoreModel = types
     }))
 
 export interface TripStore extends Instance<typeof TripStoreModel> { }
+export interface TripStoreSnapshotIn extends SnapshotIn<typeof TripStoreModel> { }
 export interface TripStoreSnapshot extends SnapshotOut<typeof TripStoreModel> { }
 // export type TripStoreProps = keyof TripStoreSnapshot

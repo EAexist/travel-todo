@@ -123,7 +123,7 @@ export const UserStoreModel = types
                     )
                     if (response.kind === 'ok') {
                         self.setProp('tripSummary', response.data.tripSummary)
-                        return self.fetchActiveTrip({}).then(response => {
+                        return self.fetchActiveTrip().then(response => {
                             return response
                         })
                     }

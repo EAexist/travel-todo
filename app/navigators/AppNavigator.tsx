@@ -8,6 +8,7 @@ import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
 import { ErrorBoundary } from '@/screens'
+import { NotFoundScreen } from '@/screens/NotFound/NotFoundScreen'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
@@ -79,7 +80,7 @@ const AppStackNavigator = observer(function AppStackNavigator() {
             ) : (
                 <AppStack.Screen name="Auth" component={AuthNavigator} />
             )}
-            <AppStack.Screen name="NotFound" component={AuthNavigator} />
+            <AppStack.Screen name="NotFound" component={NotFoundScreen} />
             {Platform.OS === 'web' && (
                 <AppStack.Screen name="WebDemo" component={WebDemoNavigator} />
             )}
