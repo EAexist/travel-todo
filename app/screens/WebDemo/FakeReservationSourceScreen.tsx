@@ -18,7 +18,7 @@ const FAKE_RESERVATION_SOURCES: { [key: string]: { title: string, icon?: IconTyp
 
 const FakeReservationSourceScreen: FC<WebDemoStackScreenProps<'FakeReservationSource'>> = ({ route }) => {
 
-    const { type } = route.params || { type: 'park' };
+    const { type } = route.params || { type: 'hotel' };
     const data = FAKE_RESERVATION_SOURCES[type];
 
     return (
