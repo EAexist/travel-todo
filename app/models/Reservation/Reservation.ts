@@ -22,7 +22,6 @@ import { createEnumType } from '../helpers/createEnumtype'
 import { wait } from '../helpers/wait'
 import { withSetPropAction } from '../helpers/withSetPropAction'
 import { Icon } from '../Icon'
-import { AirportModel } from '../Todo'
 import { FlightBookingModel } from './FlightBookingModel'
 import { FlightModel } from './FlightModel'
 import { FlightTicketModel } from './FlightTicketModel'
@@ -389,44 +388,44 @@ export const ReservationModel = types
                         item.setFlightProp('flightNumber', text)
                     },
                 },
-                {
-                    id: 'departureAirport',
-                    title: '출발 공항',
-                    value: flight?.departureAirport
-                        ? // ? `${flight?.departureAirport.airportName}(${flight?.departureAirport.iataCode})`
-                        `${flight?.departureAirport.airportName}`
-                        : null,
-                    setValue: (text: string) => {
-                        item.setFlightProp(
-                            'departureAirport',
-                            AirportModel.create({
-                                airportName: text,
-                                iataCode: '',
-                                iso2DigitNationCode: '',
-                                cityName: '',
-                            }),
-                        )
-                    },
-                },
-                {
-                    id: 'arrivalAirport',
-                    title: '도착 공항',
-                    value: flight?.arrivalAirport
-                        ? // ? `${flight?.arrivalAirport.airportName}(${flight?.arrivalAirport.iataCode})`
-                        `${flight?.arrivalAirport.airportName}`
-                        : null,
-                    setValue: (text: string) => {
-                        item.setFlightProp(
-                            'arrivalAirport',
-                            AirportModel.create({
-                                airportName: text,
-                                iataCode: '',
-                                iso2DigitNationCode: '',
-                                cityName: '',
-                            }),
-                        )
-                    },
-                },
+                // {
+                //     id: 'departureAirport',
+                //     title: '출발 공항',
+                //     value: flight?.departureAirport
+                //         ? // ? `${flight?.departureAirport.airportName}(${flight?.departureAirport.iataCode})`
+                //         `${flight?.departureAirport.airportName}`
+                //         : null,
+                //     setValue: (text: string) => {
+                //         item.setFlightProp(
+                //             'departureAirport',
+                //             AirportModel.create({
+                //                 airportName: text,
+                //                 iataCode: '',
+                //                 iso2DigitNationCode: '',
+                //                 cityName: '',
+                //             }),
+                //         )
+                //     },
+                // },
+                // {
+                //     id: 'arrivalAirport',
+                //     title: '도착 공항',
+                //     value: flight?.arrivalAirport
+                //         ? // ? `${flight?.arrivalAirport.airportName}(${flight?.arrivalAirport.iataCode})`
+                //         `${flight?.arrivalAirport.airportName}`
+                //         : null,
+                //     setValue: (text: string) => {
+                //         item.setFlightProp(
+                //             'arrivalAirport',
+                //             AirportModel.create({
+                //                 airportName: text,
+                //                 iataCode: '',
+                //                 iso2DigitNationCode: '',
+                //                 cityName: '',
+                //             }),
+                //         )
+                //     },
+                // },
             ]
         },
         get commonData(): ReservationDataItemType[] {
