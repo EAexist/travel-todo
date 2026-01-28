@@ -197,14 +197,18 @@ export const ReservationEditScreenBase: FC<{
                                         reservation.accomodation?.checkinDate ||
                                         new Date(),
                                     setDate: (date: Date) => {
-                                        reservation.setDateTime(
+                                        item.setValue && item.setValue(
                                             date.toISOString(),
                                         )
                                     },
                                 })
                             }
                             title={
-                                item.value ? item.value : '시간을 선택하세요'
+                                item.value ? new Date(item.value).toLocaleString('ko-KR', {
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true
+                                }) : '시간을 선택하세요'
                             }
                             titleColor="secondary"
                             rightContent={
