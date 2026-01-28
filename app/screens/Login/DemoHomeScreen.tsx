@@ -6,17 +6,17 @@ import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { View, ViewStyle } from 'react-native'
 
 export const DemoHomeScreen: FC<
     AuthenticatedStackScreenProps<'DemoHome'>
-> = ({}) => {
+> = ({ }) => {
     const rootStore = useStores()
 
-    useEffect(() => {
-        rootStore.webBrowserLogin()
-    }, [])
+    // useEffect(() => {
+    //     rootStore.webBrowserLogin()
+    // }, [])
 
     useHeader({
         backButtonShown: false,

@@ -51,26 +51,31 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 // Web linking configuration
 const prefix = Linking.createURL('/')
 const config = {
+    initialRouteName: 'Auth',
     screens: {
+        NotFound: '*',
         WebDemo: {
+            path: 'demo',
             screens: {
                 /* Fake Reservation Pages */
                 FakeReservationSource: 'fake-reservation-source/:type',
             }
         },
         Auth: {
+            path: 'auth',
             screens: {
-                Login: 'auth/login',
-                Admin: 'auth/admin',
+                Login: 'login',
+                Admin: 'admin',
             },
         },
         App: {
+            path: 'app',
             screens: {
                 Main: {
                     path: 'trip/:tripId?',
                     screens: {
-                        Todolist: '/',
-                        Reservation: '/reservation',
+                        Todolist: '',
+                        Reservation: 'reservation',
                     },
                 },
                 // Main: {
