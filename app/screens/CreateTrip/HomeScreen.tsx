@@ -5,57 +5,18 @@ import {
 import BottomSheetModal from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
 import { ListItemBase } from '@/components/ListItem/ListItem'
-import { useStores, useTripStore } from '@/models'
-import { AuthenticatedStackScreenProps, useNavigate } from '@/navigators'
+import { AuthenticatedStackScreenProps } from '@/navigators'
 import { LoadingBoundary } from '@/screens/Loading/LoadingBoundary'
 import { TripListScreenBase } from '@/screens/TripList/TripListScreenBase'
 import { useActionsWithApiStatus } from '@/utils/useApiStatus'
 import { HeaderCenterTitle, useHeader } from '@/utils/useHeader'
 import { observer } from 'mobx-react-lite'
-import { FC, useCallback, useRef, useState } from 'react'
+import { FC, useCallback, useRef } from 'react'
 import { TouchableOpacity } from 'react-native'
 
 export const HomeScreen: FC<AuthenticatedStackScreenProps<'Home'>> = observer(
     props => {
-        const tripStore = useTripStore()
-        const { navigateWithTrip } = useNavigate()
         const { logoutWithApiStatus } = useActionsWithApiStatus()
-
-        const [isInitialRedirectComplete, setIsInitialRedirectComplete] =
-            useState(false)
-
-        const { isAuthenticated } = useStores()
-
-        // useFocusEffect(
-        //     useCallback(() => {
-        //         console.log(
-        //             !isInitialRedirectComplete,
-        //             navigationRef.isReady(),
-        //             tripStore != null,
-        //         )
-        //         if (
-        //             !isInitialRedirectComplete &&
-        //             navigationRef.isReady() &&
-        //             tripStore != null
-        //         ) {
-        //             if (tripStore.isInitialized)
-        //                 navigateWithTrip('Main', {
-        //                     screen: tripStore.settings.isTripMode
-        //                         ? 'ReservationList'
-        //                         : 'Todolist',
-        //                 })
-        //             else if (isAuthenticated) {
-        //                 navigateWithTrip('DestinationSetting')
-        //                 setIsInitialRedirectComplete(true)
-        //             }
-        //         }
-        //     }, [
-        //         navigationRef.isReady(),
-        //         tripStore?.isInitialized,
-        //         isInitialRedirectComplete,
-        //         isAuthenticated,
-        //     ]),
-        // )
 
         /* Menu */
         const settingsMenuBottomSheetRef = useRef<BottomSheetModal>(null)

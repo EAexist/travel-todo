@@ -43,8 +43,12 @@ export function getActiveRouteName(
 
     // Found the active route -- return the name
     if (!route.state) return route.name as keyof AuthenticatedStackParamList
+    if (!route.state) return route.name as keyof AuthenticatedStackParamList
 
     // Recursive call to deal with nested routers
+    return getActiveRouteName(
+        route.state as NavigationState<AuthenticatedStackParamList>,
+    )
     return getActiveRouteName(
         route.state as NavigationState<AuthenticatedStackParamList>,
     )
@@ -160,6 +164,8 @@ export function useNavigationPersistence(
             // Save the current route name for later comparison
             routeNameRef.current =
                 currentRouteName as keyof AuthenticatedStackParamList
+            routeNameRef.current =
+                currentRouteName as keyof AuthenticatedStackParamList
 
             // Persist state to storage
             storage.save(persistenceKey, state)
@@ -195,6 +201,9 @@ export function useNavigationPersistence(
         initialNavigationState,
     }
 }
+
+// export function useNavigation
+// navigation.dispatch(StackActions.replace('RequireConnection', {title}))
 
 // export function useNavigation
 // navigation.dispatch(StackActions.replace('RequireConnection', {title}))

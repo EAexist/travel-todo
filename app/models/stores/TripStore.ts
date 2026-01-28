@@ -33,6 +33,7 @@ import {
     applySnapshot,
     getSnapshot,
     Instance,
+    SnapshotIn,
     SnapshotOut,
     types,
 } from 'mobx-state-tree'
@@ -76,7 +77,7 @@ export const TripSummaryModel = types
         },
     }))
 
-export interface TripSummary extends Instance<typeof TripSummaryModel> {}
+export interface TripSummary extends Instance<typeof TripSummaryModel> { }
 
 export const TripStoreModel = types
     .model('TripStore')
@@ -338,6 +339,7 @@ export const TripStoreModel = types
             switch (type) {
                 case 'FLIGHT_TICKET':
                     title = '탑승 수속'
+                    icon = { name: "✈️", type: "tossface" }
                     break
                 default:
                     switch (category) {
@@ -587,13 +589,13 @@ export const TripStoreModel = types
                     ) => {
                         if (
                             dataA.filter(todo => !todo.isCompleted).length ==
-                                0 &&
+                            0 &&
                             dataB.filter(todo => !todo.isCompleted).length > 0
                         ) {
                             return 1
                         } else if (
                             dataA.filter(todo => !todo.isCompleted).length >
-                                0 &&
+                            0 &&
                             dataB.filter(todo => !todo.isCompleted).length == 0
                         ) {
                             return -1
@@ -660,9 +662,9 @@ export const TripStoreModel = types
             console.log('today: ', today, store.startDate)
             const dday = store.startDate
                 ? Math.floor(
-                      (store.startDate.getTime() - today.getTime()) /
-                          (1000 * 60 * 60 * 24),
-                  )
+                    (store.startDate.getTime() - today.getTime()) /
+                    (1000 * 60 * 60 * 24),
+                )
                 : null
             return dday
         },
@@ -835,7 +837,7 @@ export const TripStoreModel = types
             })
         },
         addFlaggedPreset() {
-            ;(store.todoPreset.flat() as TodoPresetItem[])
+            ; (store.todoPreset.flat() as TodoPresetItem[])
                 .filter(preset => preset.isFlaggedToAdd)
                 .forEach(preset => {
                     const todo = store.addTodo(
@@ -871,6 +873,7 @@ export const TripStoreModel = types
         // },
     }))
 
-export interface TripStore extends Instance<typeof TripStoreModel> {}
-export interface TripStoreSnapshot extends SnapshotOut<typeof TripStoreModel> {}
+export interface TripStore extends Instance<typeof TripStoreModel> { }
+export interface TripStoreSnapshotIn extends SnapshotIn<typeof TripStoreModel> { }
+export interface TripStoreSnapshot extends SnapshotOut<typeof TripStoreModel> { }
 // export type TripStoreProps = keyof TripStoreSnapshot

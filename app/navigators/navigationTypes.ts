@@ -21,6 +21,7 @@ export type AppStackParamList = {
     RequireConnection: { title?: string }
     Auth: NavigatorScreenParams<AuthStackParamList>
     App: NavigatorScreenParams<AuthenticatedStackParamList>
+    NotFound: {}
     WebDemo?: NavigatorScreenParams<WebDemoStackParamList>
 }
 

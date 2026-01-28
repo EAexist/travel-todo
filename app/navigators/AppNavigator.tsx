@@ -8,6 +8,7 @@ import { GestureHandlerRootViewWrapper } from '@/components/BottomSheetModal'
 import { FabProvider } from '@/components/Fab'
 import theme from '@/rneui/theme'
 import { ErrorBoundary } from '@/screens'
+import { NotFoundScreen } from '@/screens/NotFound/NotFoundScreen'
 import { ApiStatusProvider } from '@/utils/useApiStatus'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
@@ -18,7 +19,7 @@ import { useEffect } from 'react'
 import { Platform, ViewStyle } from 'react-native'
 import Config from '../config'
 import { useStores } from '../models'
-import { AuthenticatedNavigator } from './AuthenticatedNavigator'
+import { GatedAuthenticatedNavigator } from './AuthenticatedNavigator'
 import { AuthNavigator } from './AuthNavigator'
 import { AppStackParamList, NavigationProps } from './navigationTypes'
 import { navigationRef, useBackButtonHandler } from './navigationUtilities'
@@ -66,22 +67,28 @@ const AppStackNavigator = observer(function AppStackNavigator() {
                     backgroundColor: colors.background,
                 },
             }}
-            initialRouteName={rootStore.isAuthenticated ? "App" : "Auth"}
+            key={rootStore.isAuthenticated ? 'app' : 'auth'}
+            initialRouteName={
+                rootStore.isAuthenticated ? 'App' : 'Auth'
+            }
         >
-            {Platform.OS === 'web' && (
-                <AppStack.Screen name="WebDemo" component={WebDemoNavigator} />
-            )}
             {rootStore.isAuthenticated ? (
                 <AppStack.Screen
                     name="App"
-                    component={AuthenticatedNavigator}
+                    component={GatedAuthenticatedNavigator}
                 />
             ) : (
                 <AppStack.Screen name="Auth" component={AuthNavigator} />
             )}
+            <AppStack.Screen name="NotFound" component={NotFoundScreen} />
+            {Platform.OS === 'web' && (
+                <AppStack.Screen name="WebDemo" component={WebDemoNavigator} />
+            )}
+
         </AppStack.Navigator>
     )
 })
+
 export const AppNavigator = observer(function AppNavigator(
     props: NavigationProps,
 ) {

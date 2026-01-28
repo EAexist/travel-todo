@@ -1,6 +1,7 @@
 /* eslint-disable import/first */
 /**
  * Home to the main entry point of the app. In this file, we'll
+ * Home to the main entry point of the app. In this file, we'll
  * be kicking off our app.
  *
  * Most of this file is boilerplate and you shouldn't need to modify
@@ -11,6 +12,10 @@
  * if you're interested in adding screens and navigators.
  */
 if (__DEV__) {
+    // Load Reactotron in development only.
+    // Note that you must be using metro's `inlineRequires` for this to work.
+    // If you turn it off in metro.config.js, you'll have to manually import it.
+    require('./devtools/ReactotronConfig.ts')
     // Load Reactotron in development only.
     // Note that you must be using metro's `inlineRequires` for this to work.
     // If you turn it off in metro.config.js, you'll have to manually import it.
@@ -51,26 +56,31 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 // Web linking configuration
 const prefix = Linking.createURL('/')
 const config = {
+    initialRouteName: 'Auth',
     screens: {
+        NotFound: '*',
         WebDemo: {
+            path: 'demo',
             screens: {
                 /* Fake Reservation Pages */
                 FakeReservationSource: 'fake-reservation-source/:type',
             }
         },
         Auth: {
+            path: 'auth',
             screens: {
-                Login: 'auth/login',
-                Admin: 'auth/admin',
+                Login: 'login',
+                Admin: 'admin',
             },
         },
         App: {
+            path: 'app',
             screens: {
                 Main: {
                     path: 'trip/:tripId?',
                     screens: {
-                        Todolist: '/',
-                        Reservation: '/reservation',
+                        Todolist: '',
+                        Reservation: 'reservation',
                     },
                 },
                 // Main: {
