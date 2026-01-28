@@ -9,7 +9,7 @@ import { StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 const FAKE_RESERVATION_SOURCES: { [key: string]: { title: string, icon?: IconType, color: string, qr?: boolean } } = {
-    'unviersal-studio': { title: "Universal Studio Express 예약 내역 페이지", icon: { name: "ferris-wheel", type: "material-community" }, color: "#FDB913" },
+    'universal-studio': { title: "Universal Studio Express 예약 내역 페이지", icon: { name: "ferris-wheel", type: "material-community" }, color: "#FDB913" },
     'flight': { title: "항공권 예약 내역 페이지", icon: { name: "airlines", type: "material" }, color: "#006494" },
     'airbnb': { title: "에어비엔비 예약 내역 페이지", icon: { name: "airbnb", type: "font-awesome-5" }, color: "#f43f5e" },
     'hotel': { title: "호텔 예약 내역 페이지", icon: { name: "hotel", type: "font-awesome-5" }, color: "#37474F" },
