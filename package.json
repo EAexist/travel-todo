@@ -38,7 +38,6 @@
         "lingui:compile": "lingui compile"
     },
     "dependencies": {
-        "-": "^0.0.1",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
         "@expo/metro-runtime": "~5.0.4",
