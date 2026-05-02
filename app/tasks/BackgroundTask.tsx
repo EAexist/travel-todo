@@ -39,9 +39,14 @@ interface AsyncAPIWriteAction {
     action: APIAction
     data: unknown
 }
+
 interface AsyncAPIWriteActionWithSync extends AsyncAPIWriteAction {
     isSynced: boolean
 }
+
+export type SyncResult =
+    | { success: true }
+    | ({ success: false } & GeneralApiProblem)
 
 /**
  * The key we'll be saving our background task queue as within async storage.
@@ -125,102 +130,52 @@ export const enqueueAction = async (
 
 // export const actionQueueApi = new ActionQueueApi()
 
-// Register and create the task so that it is available also when the background task screen
-// (a React component defined later in this example) is not visible.
-// Note: This needs to be called in the global scope, not in a React component.
+const ActionMap: Record<APIAction, (data: any) => Promise<ApiResult<any>>> = {
+    /* Trip CRUD */
+    [APIAction.PATCH_TRIP]: (data: TripPatchDTO) => api.patchTrip(data as TripPatchDTO),
+    [APIAction.DELETE_TRIP]: (data: DeleteTripProps) => api.deleteTrip(data as DeleteTripProps),
 
-const runAPIAction = async ({ action, data }: AsyncAPIWriteAction) => {
-    let result: ApiResult<any>
-    switch (action) {
-        /* Trip CRUD */
-        case APIAction.PATCH_TRIP:
-            result = await api.patchTrip(data as TripPatchDTO)
-            break
-        case APIAction.DELETE_TRIP:
-            result = await api.deleteTrip(data as DeleteTripProps)
+    /* Todo CRUD */
+    [APIAction.CREATE_TODO]: (data: CreateTodoProps) => api.createTodo(data as CreateTodoProps),
+    [APIAction.PATCH_TODO]: (data: PatchTodoProps) => api.patchTodo(data as PatchTodoProps),
+    [APIAction.DELETE_TODO]: (data: DeleteTodoProps) => api.deleteTodo(data as DeleteTodoProps),
 
-            /* Todo CRUD */
-            break
-        case APIAction.CREATE_TODO:
-            result = await api.createTodo(data as CreateTodoProps)
-            break
-        case APIAction.PATCH_TODO:
-            result = await api.patchTodo(data as PatchTodoProps)
-            break
-        case APIAction.DELETE_TODO:
-            result = await api.deleteTodo(data as DeleteTodoProps)
+    /* Destination CRUD */
+    [APIAction.CREATE_DESTINATION]: (data: CreateDestinationProps) => api.createDestination(data as CreateDestinationProps),
+    [APIAction.DELETE_DESTINATION]: (data: DeleteDestinationProps) => api.deleteDestination(data as DeleteDestinationProps),
 
-            /* Destination CRUD */
-            break
-        case APIAction.CREATE_DESTINATION:
-            result = await api.createDestination(data as CreateDestinationProps)
-            break
-        case APIAction.DELETE_DESTINATION:
-            result = await api.deleteDestination(data as DeleteDestinationProps)
+    /* Reservation CRUD */
+    [APIAction.CREATE_RESERVATION]: (data: CreateReservationProps) => api.createReservation(data as CreateReservationProps),
+    [APIAction.PATCH_RESERVATION]: (data: PatchReservationProps) => api.patchReservation(data as PatchReservationProps),
+    [APIAction.DELETE_RESERVATION]: (data: DeleteReservationProps) => api.deleteReservation(data as DeleteReservationProps),
+};
 
-            /* Reservation CRUD */
-            break
-        case APIAction.CREATE_RESERVATION:
-            result = await api.createReservation(data as CreateReservationProps)
-            break
-        case APIAction.PATCH_RESERVATION:
-            result = await api.patchReservation(data as PatchReservationProps)
-            break
-        case APIAction.DELETE_RESERVATION:
-            result = await api.deleteReservation(data as DeleteReservationProps)
-
-        /* Accomodation CRUD */
-        //   case APIAction.CREATE_ACCOMODATION:
-        //     api.createAccomodation(data as string)
-        //   case APIAction.PATCH_ACCOMODATION:
-        //     api.patchAccomodation(data as CreateAccomodationProps)
-        //   case APIAction.DELETE_ACCOMODATION:
-        //     api.deleteAccomodation(data as DeleteAccomodationProps)
-
-        default:
-            return
+const runAPIAction: (asyncAPIWriteAction: AsyncAPIWriteAction) => Promise<ApiResult<any>> = async ({ action, data }) => {
+    const handler = ActionMap[action];
+    if (!handler) {
+        console.error(`No handler for action: ${action}`);
+        return { kind: 'bad-data' };
     }
-    return result
-}
-type GenericCallback<T> = ((args: T) => any) | (() => any)
-
-export function withDbSync<R>(callbackFn: () => R): () => Promise<R>
-export function withDbSync<T, R>(callbackFn: (args: T) => R): () => Promise<R>
-export function withDbSync<T, R>(callbackFn: any) {
-    return callbackFn.length > 0
-        ? async (args: T) => {
-            const syncResult = await sync_db()
-            if (syncResult == true) {
-                return (callbackFn as (args: T) => any)(args)
-            } else {
-                return syncResult
-            }
-        }
-        : async () => {
-            const syncResult = await sync_db()
-            if (syncResult == true) {
-                return (callbackFn as () => any)()
-            } else {
-                return syncResult
-            }
-        }
+    return await handler(data);
 }
 
-export const sync_db = async () => {
+
+export const sync_db: () => Promise<SyncResult> = async () => {
     console.log(`[sync_db]`)
+    const syncSuccess: SyncResult = { success: true }
     const apiActionQueue = getAPIActionQueue() || []
+    if (apiActionQueue.length === 0) return syncSuccess
 
     let apiProblem: GeneralApiProblem = { kind: 'unknown', temporary: true }
 
     for (const actionItem of apiActionQueue) {
-        const { action, data } = actionItem
-        const result = await runAPIAction({ action, data })
-        if (result && result.kind == 'ok') actionItem.isSynced = true
+        const result = await runAPIAction(actionItem)
+        if (result.kind == 'ok') {
+            actionItem.isSynced = true
+        }
         else {
-            if (result) {
-                apiProblem = result
-            }
-            break
+            apiProblem = result
+            break;
         }
     }
 
@@ -231,9 +186,9 @@ export const sync_db = async () => {
     save(BACKROUND_TASK_QUEUE_STORAGE_KEY, newQueue)
 
     if (newQueue.length == 0) {
-        return true
+        return syncSuccess
     } else {
-        return apiProblem
+        return { success: false, ...apiProblem } as SyncResult
     }
 }
 

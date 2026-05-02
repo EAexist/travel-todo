@@ -13,6 +13,7 @@ import {
 } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { ComponentProps } from 'react'
+import { WebDemoStackParamList } from './WebDemoStackTypes'
 
 export type AppStackParamList = {
     /* Common */
@@ -20,6 +21,8 @@ export type AppStackParamList = {
     RequireConnection: { title?: string }
     Auth: NavigatorScreenParams<AuthStackParamList>
     App: NavigatorScreenParams<AuthenticatedStackParamList>
+    NotFound: {}
+    WebDemo?: NavigatorScreenParams<WebDemoStackParamList>
 }
 
 /* Auth */
@@ -159,4 +162,4 @@ export type MainTabScreenProps<T extends keyof MainTabParamList> =
 export interface NavigationProps
     extends Partial<
         ComponentProps<typeof NavigationContainer<AppStackParamList>>
-    > {}
+    > { }

@@ -5,6 +5,7 @@
  * See the [Backend API Integration](https://docs.infinite.red/ignite-cli/boilerplate/app/services/#backend-api-integration)
  * documentation for more details.
  */
+import { GooglePlaceAutoCompleteResponse } from '@/components/GooglePlacesAutocomplete/GooglePlacesAutocomplete.web'
 import { Destination } from '@/models/Destination'
 import { ReservationSnapshot } from '@/models/Reservation/Reservation'
 import { ResourceQuotaStoreSnapshotIn } from '@/models/stores/ResourceQuotaStore'
@@ -218,33 +219,6 @@ export class Api {
             : userAccountResponse
     }
 
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
-    async guestLogin(): Promise<ApiResult<UserStoreSnapshotIn>> {
-        const response: ApiResponse<UserAccountDTO> =
-            await this.apisauce.post(`auth/guest`)
-
-        console.log(`[api.guestLogin] response: ${JSON.stringify(response)}`)
-        const userAccountResponse = _handleResponse<UserAccountDTO>(response)
-        return userAccountResponse.kind === 'ok'
-            ? {
-                kind: 'ok',
-                data: mapToUserAccount(userAccountResponse.data),
-            }
-            : userAccountResponse
-    }
-    /**
-     * Gets a Trip data with given id.
-     * @returns {kind} - Response Status.
-     * @returns {...Trip} - Trip.
-     */
-    async getCsrf(): Promise<ApiResult<void>> {
-        const response: ApiResponse<void> = await this.apisauce.get(`csrf`)
-        return _handleResponse<void>(response)
-    }
     /**
      * Gets a Trip data with given id.
      * @returns {kind} - Response Status.
@@ -791,6 +765,27 @@ export class Api {
         )
 
         return handleDeleteResponse(response)
+    }
+
+    async googlePlaceAutocomplete({
+        input,
+        language,
+        type,
+    }: {
+        input: string,
+        language?: string,
+        type?: string,
+    }): Promise<ApiResult<GooglePlaceAutoCompleteResponse>> {
+        const response: ApiResponse<GooglePlaceAutoCompleteResponse> = await this.apisauce.get(
+            `/proxy/place/autocomplete/json`,
+            {
+                input,
+                language,
+                type,
+            }
+        )
+
+        return _handleResponse<GooglePlaceAutoCompleteResponse>(response)
     }
 
     /*

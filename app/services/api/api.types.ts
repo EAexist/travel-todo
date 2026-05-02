@@ -6,34 +6,25 @@ import {
 } from '@/models/Destination'
 import { AccomodationSnapshotIn } from '@/models/Reservation/Accomodation'
 import {
-    ReservationModel,
-    ReservationSnapshot,
+    ReservationSnapshot
 } from '@/models/Reservation/Reservation'
 import {
     PresetTodoContentModel,
     PresetTodoContentSnapshotIn,
-    Todo,
-    TodoContent,
-    TodoContentModel,
     TodoContentSnapshotIn,
-    TodoModel,
-    TodoPresetItem,
     TodoPresetItemModel,
     TodoPresetItemSnapshotIn,
-    TodoSnapshotIn,
+    TodoSnapshotIn
 } from '@/models/Todo'
 import { ReservationStoreModel } from '@/models/stores/ReservationStore'
 import {
-    TripSettings,
     TripSettingsSnapshot,
-    TripStore,
-    TripStoreModel,
     TripStoreSnapshot,
+    TripStoreSnapshotIn
 } from '@/models/stores/TripStore'
 import { UserStoreSnapshotIn } from '@/models/stores/UserStore'
 import { User } from '@react-native-google-signin/google-signin'
 import { ApisauceConfig } from 'apisauce'
-import { getSnapshot } from 'mobx-state-tree'
 
 /**
  * The options used to configure apisauce.
@@ -63,7 +54,7 @@ export type WithStatus<T> = T & {
 
 export type GoogleUserDTO = User['user']
 
-export interface UserAccountDTO extends UserStoreSnapshotIn {}
+export interface UserAccountDTO extends UserStoreSnapshotIn { }
 // export interface UserAccountDTO extends Omit<UserStoreSnapshotIn, 'id'> {
 //   id?: number
 // }
@@ -71,7 +62,7 @@ export interface UserAccountDTO extends UserStoreSnapshotIn {}
 export interface TripFetchDTO
     extends Omit<
         TripStoreSnapshot,
-        'todoMap' | 'todolist' | 'destinations' | 'reservationStore' | 'preset'
+        'todoMap' | 'todolist' | 'destinations' | 'reservationStore' | 'todoPreset'
     > {
     todolist: TodoDTO[]
     destinations: DestinationDTO[]
@@ -117,7 +108,7 @@ interface PresetTodoContentDTO
     subtitle: string | null
 }
 
-export interface ReservationDTO extends ReservationSnapshot {}
+export interface ReservationDTO extends ReservationSnapshot { }
 
 export interface ReservationPatchDTO extends Partial<ReservationSnapshot> {
     id: string
@@ -232,13 +223,13 @@ export const mapToTripPatchDTO: (
     endDateIsoString: trip.endDateIsoString,
     settings: trip.settings
         ? {
-              isTripMode: trip.settings.isTripMode,
-              categoryKeyToIndex: trip.settings.categoryKeyToIndex,
-          }
+            isTripMode: trip.settings.isTripMode,
+            categoryKeyToIndex: trip.settings.categoryKeyToIndex,
+        }
         : undefined,
 })
 
-export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshot = ({
+export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshotIn = ({
     todolist,
     destinations,
     reservations,
@@ -253,10 +244,10 @@ export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshot = ({
         ...tripDTO,
         todoMap: todolist
             ? todolist.reduce((acc: { [key: string]: any }, todoDTO) => {
-                  if (todoDTO.id)
-                      acc[todoDTO.id?.toString()] = mapToTodo(todoDTO)
-                  return acc
-              }, {})
+                if (todoDTO.id)
+                    acc[todoDTO.id?.toString()] = mapToTodo(todoDTO)
+                return acc
+            }, {})
             : {},
         destinations: destinations.map(dest => mapToDestination(dest)),
         reservationStore: ReservationStoreModel.create({
@@ -270,9 +261,9 @@ export const mapToTrip: (tripFetchDTO: TripFetchDTO) => TripStoreSnapshot = ({
                 {},
             ),
         }),
-        preset: stockTodoContents.map(stockTodoContent => ({
+        todoPreset: stockTodoContents.map(stockTodoContent => TodoPresetItemModel.create({
             isFlaggedToAdd: false,
-            content: mapToTodoContent(stockTodoContent),
+            content: PresetTodoContentModel.create(mapToTodoContent(stockTodoContent) as PresetTodoContentSnapshotIn),
         })),
     }
 }

@@ -1,5 +1,5 @@
 import { withSetPropAction } from '@/models/helpers/withSetPropAction'
-import { api } from '@/services/api'
+import { api, ApiResult } from '@/services/api'
 import { applySnapshot, Instance, SnapshotIn, types } from 'mobx-state-tree'
 
 export const ResourceQuotaStoreModel = types
@@ -12,19 +12,19 @@ export const ResourceQuotaStoreModel = types
         maxReservations: types.optional(types.number, 0),
     })
     .actions(withSetPropAction)
-    .views(store => ({}))
-    .actions(store => ({
+    .views((self) => ({}))
+    .actions((self) => ({
         fetch: async () => {
             return api.getResourceQuota().then(async response => {
                 if (response.kind === 'ok') {
-                    applySnapshot(store, response.data)
+                    applySnapshot(self, response.data)
                 }
                 return { kind: response.kind }
-            })
+            }) as Promise<ApiResult<void>>
         },
     }))
 
 export interface ResourceQuotaStore
-    extends Instance<typeof ResourceQuotaStoreModel> {}
+    extends Instance<typeof ResourceQuotaStoreModel> { }
 export interface ResourceQuotaStoreSnapshotIn
-    extends SnapshotIn<typeof ResourceQuotaStoreModel> {}
+    extends SnapshotIn<typeof ResourceQuotaStoreModel> { }

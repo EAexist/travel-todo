@@ -8,7 +8,7 @@ import {
 //
 import {
     NavigateListItemProp,
-    NavigateMenuBottomSheet,
+    NavigateMenuBottomSheet
 } from '@/components/BottomSheet/NavigateMenuBottomSheet'
 import { BottomSheetModal } from '@/components/BottomSheetModal'
 import { $headerRightButtonStyle, HeaderIcon } from '@/components/Header'
@@ -31,7 +31,7 @@ import { ListItem, useTheme } from '@rneui/themed'
 import { Observer, observer } from 'mobx-react-lite'
 
 export const TodolistScreen: FC<MainTabScreenProps<'Todolist'>> = observer(
-    ({}) => {
+    ({ }) => {
         const tripStore = useTripStore()
 
         const {

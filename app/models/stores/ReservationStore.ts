@@ -28,7 +28,7 @@ const ConfirmRequiringReservationModel = types
     }))
 
 export interface ConfirmRequiringReservation
-    extends Instance<typeof ConfirmRequiringReservationModel> {}
+    extends Instance<typeof ConfirmRequiringReservationModel> { }
 
 export const ReservationStoreModel = types
     .model('ReservationStore')
@@ -132,16 +132,17 @@ export const ReservationStoreModel = types
         get reservationSorted() {
             return this.reservationList.sort(
                 (
-                    { isCompleted: isCompletedA },
-                    { isCompleted: isCompletedB },
+                    a,
+                    b,
                 ) => {
-                    if (isCompletedA === false && isCompletedB === true) {
-                        return -1
-                    }
-                    if (isCompletedA === true && isCompletedB === false) {
-                        return 1
-                    }
-                    return 0
+                    if (a.isCompleted !== b.isCompleted) {
+                        return a.isCompleted ? 1 : -1;
+
+                    } if (!a.dateTimeIsoString && !b.dateTimeIsoString) return 0;
+                    if (!a.dateTimeIsoString) return 1;
+                    if (!b.dateTimeIsoString) return -1;
+
+                    return new Date(a.dateTimeIsoString).getTime() - new Date(b.dateTimeIsoString).getTime();
                 },
             )
         },
@@ -259,7 +260,7 @@ export const ReservationStoreModel = types
                     a.accomodation?.checkinDate
                         ? b.accomodation?.checkinDate
                             ? a.accomodation.checkinDate?.getDate() -
-                              b.accomodation.checkinDate.getDate()
+                            b.accomodation.checkinDate.getDate()
                             : -1
                         : 1,
                 )
@@ -271,7 +272,7 @@ export const ReservationStoreModel = types
                     a.accomodation?.checkinDate
                         ? b.accomodation?.checkinDate
                             ? a.accomodation.checkinDate?.getDate() -
-                              b.accomodation.checkinDate.getDate()
+                            b.accomodation.checkinDate.getDate()
                             : -1
                         : 1,
                 )
@@ -289,11 +290,11 @@ export const ReservationStoreModel = types
                 .map(r => {
                     const d =
                         r.accomodation?.checkinDate &&
-                        r.accomodation?.checkoutDate
+                            r.accomodation?.checkoutDate
                             ? differenceInDays(
-                                  startOfDay(r.accomodation.checkoutDate),
-                                  startOfDay(r.accomodation.checkinDate),
-                              )
+                                startOfDay(r.accomodation.checkoutDate),
+                                startOfDay(r.accomodation.checkinDate),
+                            )
                             : 0
                     console.log('ACC', d)
                     return d
@@ -305,23 +306,23 @@ export const ReservationStoreModel = types
         get firstCheckinDate() {
             return store.hasScheduledAccomodation
                 ? new Date(
-                      Math.min(
-                          ...store.accomodation
-                              .map(r => r.accomodation?.checkinDate?.getTime())
-                              .filter(r => r != undefined),
-                      ),
-                  )
+                    Math.min(
+                        ...store.accomodation
+                            .map(r => r.accomodation?.checkinDate?.getTime())
+                            .filter(r => r != undefined),
+                    ),
+                )
                 : null
         },
         get lastCheckoutDate() {
             return store.hasScheduledAccomodation
                 ? new Date(
-                      Math.max(
-                          ...store.accomodation
-                              .map(r => r.accomodation?.checkoutDate?.getTime())
-                              .filter(r => r != undefined),
-                      ),
-                  )
+                    Math.max(
+                        ...store.accomodation
+                            .map(r => r.accomodation?.checkoutDate?.getTime())
+                            .filter(r => r != undefined),
+                    ),
+                )
                 : null
         },
         get accomodationMarkedDatesDotMarking(): MarkedDates {
@@ -340,8 +341,8 @@ export const ReservationStoreModel = types
                             marked: true,
                             dotColor:
                                 colorTheme.lightColors?.palette[
-                                    accIndex %
-                                        colorTheme.lightColors?.palette?.length
+                                accIndex %
+                                colorTheme.lightColors?.palette?.length
                                 ],
                         }
                     }
@@ -518,6 +519,6 @@ export const ReservationStoreModel = types
     }))
 //   .actions(store => ())
 export interface ReservationStore
-    extends Instance<typeof ReservationStoreModel> {}
+    extends Instance<typeof ReservationStoreModel> { }
 export interface ReservationStoreSnapshot
-    extends SnapshotOut<typeof ReservationStoreModel> {}
+    extends SnapshotOut<typeof ReservationStoreModel> { }

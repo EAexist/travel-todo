@@ -13,6 +13,15 @@ export const AuthNavigator = observer(function AuthenicatedStack() {
         theme: { colors },
     } = useTheme()
 
+    // const navigation = useNavigation()
+    // const rootStore = useStores()
+
+    // useEffect(() => {
+    //     if (rootStore.isAuthenticated) {
+    //         navigation.dispatch(StackActions.replace('App'))
+    //     }
+    // }, [rootStore.isAuthenticated]);
+
     return (
         <AuthStack.Navigator
             screenOptions={{

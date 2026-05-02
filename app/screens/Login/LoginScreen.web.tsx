@@ -14,7 +14,7 @@ import myAnimationData from 'assets/lottie/todo.json'
 import { FC, useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
 
-export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
+export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({ }) => {
     const rootStore = useStores()
 
     const webBrowserLoginWithIdToken = useActionWithApiStatus(
@@ -22,8 +22,10 @@ export const LoginScreen: FC<AuthStackScreenProps<'Login'>> = ({}) => {
     )
 
     useEffect(() => {
-        webBrowserLoginWithIdToken({})
-    }, [])
+        if (!rootStore.isAuthenticated) {
+            webBrowserLoginWithIdToken({})
+        }
+    }, [rootStore.isAuthenticated])
 
     useHeader({
         backButtonShown: false,

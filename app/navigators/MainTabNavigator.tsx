@@ -43,8 +43,6 @@ function TabBar(props: BottomTabBarProps) {
 export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
     route,
 }) => {
-    const { tripId } = route.params
-
     const trip = useTripStore()
 
     const { bottom } = useSafeAreaInsets()
@@ -80,7 +78,7 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                 }}>
                 <Tab.Screen
                     name="Todolist"
-                    initialParams={{ tripId: tripId }}
+                    initialParams={{ tripId: trip.id }}
                     component={MainScreens.Todolist}
                     options={{
                         tabBarLabel: '여행 준비',
@@ -100,7 +98,7 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                 />
                 <Tab.Screen
                     name="ReservationList"
-                    initialParams={{ tripId: tripId }}
+                    initialParams={{ tripId: trip.id }}
                     component={MainScreens.ReservationList}
                     options={{
                         tabBarLabel: '예약',
@@ -120,7 +118,7 @@ export const MainTabNavigator: FC<AuthenticatedStackScreenProps<'Main'>> = ({
                 />
                 <Tab.Screen
                     name="TripDashboard"
-                    initialParams={{ tripId: tripId }}
+                    initialParams={{ tripId: trip.id }}
                     component={MainScreens.TripDashboard}
                     options={{
                         tabBarLabel: '더보기',

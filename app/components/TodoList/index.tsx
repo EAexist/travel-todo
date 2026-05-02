@@ -1,7 +1,6 @@
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { ToggleSwitchTab, ToggleSwitchTabProps } from '@/components/SwitchTab'
-import { useTripStore } from '@/models'
 import { isSupplyCategory, Todo, TodoCategory } from '@/models/Todo'
 import { TabView } from '@rneui/themed'
 import { observer } from 'mobx-react-lite'
@@ -17,7 +16,7 @@ import {
 
 export interface DoShowSupplyTodosFirstToggleSwitchProps
     extends Pick<ToggleSwitchTabProps, 'value' | 'onChange' | 'variant'>,
-        Partial<Pick<ToggleSwitchTabProps, 'tabItemProps'>> {}
+    Partial<Pick<ToggleSwitchTabProps, 'tabItemProps'>> { }
 
 export const DoShowSupplyTodosFirstToggleSwitch: FC<
     DoShowSupplyTodosFirstToggleSwitchProps
@@ -90,8 +89,8 @@ export interface TodolistSectionT extends DefaultSectionT {
 export const TodolistSectionHeader: FC<{
     section: TodolistSectionT
 }> = ({ section: { title, data, category } }) =>
-    // category !== 'WORK' && category !== 'SUPPLY' &&
-    data.length > 0 ? <ListSubheader title={title} /> : null
+        // category !== 'WORK' && category !== 'SUPPLY' &&
+        data.length > 0 ? <ListSubheader title={title} /> : null
 
 export const TodolistTabView_ = observer(
     <T extends {}>({
@@ -110,8 +109,8 @@ export const TodolistTabView_ = observer(
                 section: TodolistSectionT
             }) =>
                 category !== 'WORK' &&
-                category !== 'SUPPLY' &&
-                data.length > 0 ? (
+                    category !== 'SUPPLY' &&
+                    data.length > 0 ? (
                     <ListSubheader title={title} />
                 ) : null,
             [],

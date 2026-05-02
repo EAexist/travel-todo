@@ -3,6 +3,10 @@ import {
     AccomodationCategory,
     AccomodationModel,
 } from '@/models/Reservation/Accomodation'
+import {
+    mapToReservationPatchDTO
+} from '@/services/api'
+import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
 import { parseDateShort, parseTime } from '@/utils/date'
 import {
     applySnapshot,
@@ -15,21 +19,14 @@ import {
 } from 'mobx-state-tree'
 import { v4 as uuidv4 } from 'uuid'
 import { createEnumType } from '../helpers/createEnumtype'
+import { wait } from '../helpers/wait'
 import { withSetPropAction } from '../helpers/withSetPropAction'
 import { Icon } from '../Icon'
-import { AirportModel } from '../Todo'
 import { FlightBookingModel } from './FlightBookingModel'
 import { FlightModel } from './FlightModel'
 import { FlightTicketModel } from './FlightTicketModel'
 import { GeneralReservationModel } from './GeneralReservationModel'
 import { VisitJapanModel } from './VisitJapanModel'
-import { wait } from '../helpers/wait'
-import { APIAction, enqueueAction } from '@/tasks/BackgroundTask'
-import {
-    CreateReservationProps,
-    mapToReservationPatchDTO,
-    PatchReservationProps,
-} from '@/services/api'
 
 export type ReservationCategory =
     | 'GENERAL'
@@ -168,7 +165,7 @@ export const ReservationModel = types
                 case 'VISIT_JAPAN':
                     return item.visitJapan?.dateTimeIsoString ?? null
                 case 'ACCOMODATION':
-                    return item.accomodation?.checkinDateIsoString ?? null
+                    return item.accomodation?.checkinStartTimeIsoString ?? null
                 case 'FLIGHT_BOOKING':
                     return (
                         item.flightBooking?.departureDateTimeIsoString ?? null
@@ -391,44 +388,44 @@ export const ReservationModel = types
                         item.setFlightProp('flightNumber', text)
                     },
                 },
-                {
-                    id: 'departureAirport',
-                    title: '출발 공항',
-                    value: flight?.departureAirport
-                        ? // ? `${flight?.departureAirport.airportName}(${flight?.departureAirport.iataCode})`
-                          `${flight?.departureAirport.airportName}`
-                        : null,
-                    setValue: (text: string) => {
-                        item.setFlightProp(
-                            'departureAirport',
-                            AirportModel.create({
-                                airportName: text,
-                                iataCode: '',
-                                iso2DigitNationCode: '',
-                                cityName: '',
-                            }),
-                        )
-                    },
-                },
-                {
-                    id: 'arrivalAirport',
-                    title: '도착 공항',
-                    value: flight?.arrivalAirport
-                        ? // ? `${flight?.arrivalAirport.airportName}(${flight?.arrivalAirport.iataCode})`
-                          `${flight?.arrivalAirport.airportName}`
-                        : null,
-                    setValue: (text: string) => {
-                        item.setFlightProp(
-                            'arrivalAirport',
-                            AirportModel.create({
-                                airportName: text,
-                                iataCode: '',
-                                iso2DigitNationCode: '',
-                                cityName: '',
-                            }),
-                        )
-                    },
-                },
+                // {
+                //     id: 'departureAirport',
+                //     title: '출발 공항',
+                //     value: flight?.departureAirport
+                //         ? // ? `${flight?.departureAirport.airportName}(${flight?.departureAirport.iataCode})`
+                //         `${flight?.departureAirport.airportName}`
+                //         : null,
+                //     setValue: (text: string) => {
+                //         item.setFlightProp(
+                //             'departureAirport',
+                //             AirportModel.create({
+                //                 airportName: text,
+                //                 iataCode: '',
+                //                 iso2DigitNationCode: '',
+                //                 cityName: '',
+                //             }),
+                //         )
+                //     },
+                // },
+                // {
+                //     id: 'arrivalAirport',
+                //     title: '도착 공항',
+                //     value: flight?.arrivalAirport
+                //         ? // ? `${flight?.arrivalAirport.airportName}(${flight?.arrivalAirport.iataCode})`
+                //         `${flight?.arrivalAirport.airportName}`
+                //         : null,
+                //     setValue: (text: string) => {
+                //         item.setFlightProp(
+                //             'arrivalAirport',
+                //             AirportModel.create({
+                //                 airportName: text,
+                //                 iataCode: '',
+                //                 iso2DigitNationCode: '',
+                //                 cityName: '',
+                //             }),
+                //         )
+                //     },
+                // },
             ]
         },
         get commonData(): ReservationDataItemType[] {
@@ -705,6 +702,6 @@ export type ReservationDataItemType = TextInfoListItemProps & {
     numberOfLines?: number
 }
 
-export interface Reservation extends Instance<typeof ReservationModel> {}
+export interface Reservation extends Instance<typeof ReservationModel> { }
 export interface ReservationSnapshot
-    extends SnapshotOut<typeof ReservationModel> {}
+    extends SnapshotOut<typeof ReservationModel> { }

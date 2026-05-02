@@ -6,7 +6,7 @@ import BottomSheetModal from '@/components/BottomSheetModal'
 import { AccomodationDateEditCalendar } from '@/components/Calendar/AccomodationDateEditCalendar'
 import { CalendarContainer } from '@/components/Calendar/CalendarContainer'
 import { ScheduleText } from '@/components/Calendar/useScheduleSettingCalendar'
-import { DatePicker } from '@/components/DatePicker'
+import { DateTimePicker } from '@/components/DateTimePicker'
 import * as Fab from '@/components/Fab'
 import { Icon } from '@/components/Icon'
 import { ControlledListItemInput } from '@/components/Input'
@@ -130,6 +130,7 @@ export const ReservationEditScreenBase: FC<{
     /* Refs */
     const categoryBottomSheetModalRef = useRef<BottomSheetModal>(null)
     const dateTimePickerBottomSheetModalRef = useRef<BottomSheetModal>(null)
+    const [isDateTimePickerBottomSheetModalOpen, setIsDateTimePickerBottomSheetModalOpen] = useState(false)
     const accomodationScheduleBottomSheetModalRef =
         useRef<BottomSheetModal>(null)
     const accomodationCategoryBottomSheetModalRef =
@@ -196,14 +197,18 @@ export const ReservationEditScreenBase: FC<{
                                         reservation.accomodation?.checkinDate ||
                                         new Date(),
                                     setDate: (date: Date) => {
-                                        reservation.setDateTime(
+                                        item.setValue && item.setValue(
                                             date.toISOString(),
                                         )
                                     },
                                 })
                             }
                             title={
-                                item.value ? item.value : '시간을 선택하세요'
+                                item.value ? new Date(item.value).toLocaleString('ko-KR', {
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true
+                                }) : '시간을 선택하세요'
                             }
                             titleColor="secondary"
                             rightContent={
@@ -288,14 +293,14 @@ export const ReservationEditScreenBase: FC<{
             )
         }, [])
 
-    const [datePickerValue, setDatePickerValue] = useState<Date | undefined>()
+    const [datePickerValue, setDatePickerValue] = useState<Date | undefined>(undefined)
 
     /*
      * BottomSheetModals
      */
 
     /* DateTimePicker BottomSheetModal */
-    const [onDismiss, setOnDismiss] = useState<(date: Date) => void>(date => {})
+    const [onDismiss, setOnDismiss] = useState<(date: Date) => void>(date => { })
 
     const handleTimePress = useCallback(
         ({
@@ -307,9 +312,9 @@ export const ReservationEditScreenBase: FC<{
         }) => {
             setDatePickerValue(initialDate)
             setOnDismiss(() => setDate)
-            dateTimePickerBottomSheetModalRef.current?.present()
+            setIsDateTimePickerBottomSheetModalOpen(true)
         },
-        [dateTimePickerBottomSheetModalRef.current],
+        [],
     )
 
     /* CatgoryMenu BottomSheetModal */
@@ -364,7 +369,7 @@ export const ReservationEditScreenBase: FC<{
                 variant="listItem"
                 title={
                     reservation.category === 'ACCOMODATION' ||
-                    reservation.category === 'GENERAL' ? (
+                        reservation.category === 'GENERAL' ? (
                         <ControlledListItemInput
                             onChangeText={(text: string) => {
                                 reservation.setTitle(text)
@@ -486,8 +491,8 @@ export const ReservationEditScreenBase: FC<{
                         reservation.title.length === 0
                             ? '예약 이름을 입력해주세요'
                             : reservation.isAccomodationWithoutSchedule
-                              ? '체크인 · 체크아웃 날짜를 선택하세요'
-                              : '확인'
+                                ? '체크인 · 체크아웃 날짜를 선택하세요'
+                                : '확인'
                     }
                 />
             </Fab.Container>
@@ -508,19 +513,40 @@ export const ReservationEditScreenBase: FC<{
                     )
                 }}
             />
-            <BottomSheetModal
-                ref={dateTimePickerBottomSheetModalRef}
+            <DateTimePicker
+                title={'예약 날짜 및 시간'}
                 onDismiss={() => {
                     if (datePickerValue) onDismiss(datePickerValue)
                     setDatePickerValue(undefined)
-                    setOnDismiss(() => {})
-                }}>
-                <ContentTitle title={'예약 날짜 및 시간'} />
-                <DatePicker
+                    setOnDismiss(() => { })
+                    setIsDateTimePickerBottomSheetModalOpen(false)
+                }}
+                open={isDateTimePickerBottomSheetModalOpen}
+                date={datePickerValue}
+                onDateChange={setDatePickerValue}
+            />
+            {/* <DatePickerModal
+                    animationType='none'
+                    locale="en"
+                    mode="single"
+                    visible={true}
+                    onDismiss={() => { }}
                     date={datePickerValue}
-                    onDateChange={setDatePickerValue}
+                    onConfirm={(d) => setDatePickerValue(d.date)}
                 />
-            </BottomSheetModal>
+                <BottomSheetModal
+                    ref={dateTimePickerBottomSheetModalRef}
+                    onDismiss={() => {
+                        if (datePickerValue) onDismiss(datePickerValue)
+                        setDatePickerValue(undefined)
+                        setOnDismiss(() => { })
+                    }}>
+                    <ContentTitle title={'예약 날짜 및 시간'} />
+                    <DatePicker
+                        date={datePickerValue}
+                        onDateChange={setDatePickerValue}
+                    />
+                </BottomSheetModal> */}
             {reservation.accomodation && (
                 <BottomSheetModal
                     ref={accomodationScheduleBottomSheetModalRef}
@@ -565,9 +591,9 @@ export const ReservationEditScreenBase: FC<{
                                 !reservation.accomodation.checkinDateIsoString
                                     ? '체크인 날짜를 선택하세요'
                                     : !reservation.accomodation
-                                            .checkoutDateIsoString
-                                      ? '체크아웃 날짜를 선택하세요'
-                                      : '확인'
+                                        .checkoutDateIsoString
+                                        ? '체크아웃 날짜를 선택하세요'
+                                        : '확인'
                             }
                         />
                     </Fab.Container>

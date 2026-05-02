@@ -10,7 +10,7 @@ const config = getDefaultConfig(__dirname)
 // such as Firebase that use the extension cjs.
 const extraExtensions = ['cjs', 'po', 'pot'];
 config.resolver.sourceExts = [...config.resolver.sourceExts, ...extraExtensions];
-
+config.resolver.resolverMainFields = ['sbmodern', 'browser', 'module', 'main'];
 // LinguiJS (i18n)
 // https://github.com/lingui/js-lingui/blob/main/examples/react-native/metro.config.js
 config.transformer = {

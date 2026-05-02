@@ -6,15 +6,10 @@ import {
     BottomSheetBackdrop as GorhomBottomSheetBackdrop,
     BottomSheetModal as GorhomBottomSheetModal,
 } from '@gorhom/bottom-sheet'
-import { useFocusEffect } from '@react-navigation/native'
 import { useTheme } from '@rneui/themed'
 import {
     PropsWithChildren,
-    Ref,
-    RefObject,
-    useCallback,
-    useEffect,
-    useState,
+    Ref
 } from 'react'
 import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView as RNGestureHandlerRootView } from 'react-native-gesture-handler'
@@ -36,56 +31,6 @@ export const GestureHandlerRootViewWrapper = (
             {...props}
         />
     )
-}
-
-export const useNavigationBottomSheet = (
-    ref: RefObject<BottomSheetModal | null>,
-    promiseBeforeNavigate?: () => Promise<any>,
-) => {
-    //   const ref = useRef<BottomSheetMethods>(null)
-    const [activeCandidateKey, setActiveCandidateKey] = useState<
-        string | undefined
-    >(undefined)
-    const [activeKey, setActiveKey] = useState<string | undefined>(undefined)
-
-    useEffect(() => {
-        setActiveKey(undefined)
-    }, [])
-
-    const handleBottomSheetModalChange = useCallback(
-        (index: number) => {
-            console.log(`[onChange] ${index} ${activeCandidateKey}`)
-            if (index < 0 && activeCandidateKey) {
-                console.log(`[onChange] setActiveKey`)
-                setActiveKey(activeCandidateKey)
-            } else {
-                setActiveCandidateKey(undefined)
-            }
-        },
-        [activeCandidateKey, setActiveCandidateKey],
-    )
-    const activate = useCallback((path: string) => {
-        ref?.current?.forceClose()
-        setActiveCandidateKey(path)
-    }, [])
-
-    const useActiveKey = (callback: (activeKey: string) => void) =>
-        useFocusEffect(
-            useCallback(() => {
-                console.log(`activeKey=${activeKey}`)
-                if (activeKey) {
-                    const temp = activeKey
-                    setActiveKey(undefined)
-                    callback(temp)
-                }
-            }, [activeKey]),
-        )
-
-    return {
-        useActiveKey,
-        activate,
-        handleBottomSheetModalChange,
-    }
 }
 
 const BottomSheetBackdrop = (props: BottomSheetBackdropProps) => (
@@ -121,7 +66,7 @@ export const BottomSheetModal = ({
             enablePanDownToClose={true}
             //   index={-1}
             {...props}
-            // snapPoints={snapPoints}
+        // snapPoints={snapPoints}
         >
             <BottomSheetView style={styles.contentContainerStyle}>
                 {children}
@@ -136,13 +81,13 @@ const styles = StyleSheet.create({
     gestureHandlerRootView: {
         ...(isMobile
             ? {
-                  flex: 1,
-              }
+                flex: 1,
+            }
             : {
-                  height: 852,
-                  width: 383,
-                  alignSelf: 'center',
-              }),
+                height: 852,
+                width: 383,
+                alignSelf: 'center',
+            }),
     },
     containerStyle: {},
     style: {

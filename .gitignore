@@ -85,9 +85,7 @@ web-build/
 
 # Configurations
 !env.js
-.env.development
-.env.production
-
+.env*
 /coverage
 
 # Yarn

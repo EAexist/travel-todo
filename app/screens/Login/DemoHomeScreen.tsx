@@ -1,22 +1,16 @@
 import * as Fab from '@/components/Fab'
 import { Lottie } from '@/components/Lottie'
 import { Screen } from '@/components/Screen/Screen'
-import { useStores } from '@/models'
 import { AuthenticatedStackScreenProps } from '@/navigators'
 import { useHeader } from '@/utils/useHeader'
 import { Text, useTheme } from '@rneui/themed'
 import myAnimationData from 'assets/lottie/todo.json'
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { View, ViewStyle } from 'react-native'
 
 export const DemoHomeScreen: FC<
     AuthenticatedStackScreenProps<'DemoHome'>
-> = ({}) => {
-    const rootStore = useStores()
-
-    useEffect(() => {
-        rootStore.webBrowserLogin()
-    }, [])
+> = ({ }) => {
 
     useHeader({
         backButtonShown: false,
@@ -58,8 +52,7 @@ export const DemoHomeScreen: FC<
                     color={colors.brand}
                     title={'앱 미리보기'}
                     navigateProps={{
-                        name: 'Main',
-                        params: { screen: 'Todolist' },
+                        name: 'TripList',
                     }}
                 />
             </Fab.Container>

@@ -1,15 +1,14 @@
 import {
     Avatar as RNEAvatar,
-    AvatarProps as RNEAvatarProps,
-    Text,
+    AvatarProps as RNEAvatarProps
 } from '@rneui/themed'
+import * as charger from 'assets/images/icon/charger.png'
 import * as pajamas from 'assets/images/icon/pajamas.png'
 import * as powerBank from 'assets/images/icon/power-bank.png'
 import * as sandals from 'assets/images/icon/sandals.png'
-import * as charger from 'assets/images/icon/charger.png'
 import * as towel from 'assets/images/icon/towel.png'
 import * as visit_japan_logo from 'assets/images/third-party/visit-japan-logo.png'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import { ImageSourcePropType, StyleSheet } from 'react-native'
 
 export interface AvatarProps extends Omit<RNEAvatarProps, 'avatarSize'> {
@@ -24,7 +23,8 @@ export const Avatar = ({
     size,
     ...props
 }: PropsWithChildren<AvatarProps>) => {
-    let avatarProps: Partial<RNEAvatarProps>
+    let avatarProps: Partial<RNEAvatarProps> = {}
+    let renderCustomContent: ReactNode | undefined = undefined
 
     let fontSize,
         width: number = 16
@@ -57,15 +57,8 @@ export const Avatar = ({
     switch (icon?.type || 'tossface') {
         case 'tossface':
             avatarProps = {
-                renderCustomContent: (
-                    <Text
-                        style={{
-                            ...styles.titleStyle,
-                            fontSize,
-                        }}>
-                        {icon?.name}
-                    </Text>
-                ),
+                title: icon?.name,
+                titleStyle: { fontFamily: 'Tossface', fontSize }
             }
             break
         case 'image':
@@ -109,7 +102,7 @@ export const Avatar = ({
     }
     return (
         <RNEAvatar avatarSize={avatarSize} {...avatarProps} {...props}>
-            {children}
+            {renderCustomContent || children}
         </RNEAvatar>
     )
 }

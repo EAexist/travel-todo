@@ -1,4 +1,4 @@
-import { ApiResponse } from 'apisauce'
+import { ApiResponse } from 'apisauce';
 
 export type ApiResponseKind = { kind: GeneralApiProblem['kind'] | 'ok' }
 

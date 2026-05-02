@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { BackHandler, Linking, Platform } from 'react-native'
 import {
     NavigationState,
     PartialState,
-    createNavigationContainerRef,
+    createNavigationContainerRef
 } from '@react-navigation/native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { BackHandler, Linking, Platform } from 'react-native'
 import Config from '../config'
 import type { PersistNavigationConfig } from '../config/config.base'
 import { useIsMounted } from '../utils/useIsMounted'
 
+import { useTripStore } from '@/models'
 import * as storage from '../utils/storage'
-import { useStores, useTripStore } from '@/models'
 import {
     AppStackParamList,
     AuthenticatedStackParamList,
@@ -43,8 +43,12 @@ export function getActiveRouteName(
 
     // Found the active route -- return the name
     if (!route.state) return route.name as keyof AuthenticatedStackParamList
+    if (!route.state) return route.name as keyof AuthenticatedStackParamList
 
     // Recursive call to deal with nested routers
+    return getActiveRouteName(
+        route.state as NavigationState<AuthenticatedStackParamList>,
+    )
     return getActiveRouteName(
         route.state as NavigationState<AuthenticatedStackParamList>,
     )
@@ -160,6 +164,8 @@ export function useNavigationPersistence(
             // Save the current route name for later comparison
             routeNameRef.current =
                 currentRouteName as keyof AuthenticatedStackParamList
+            routeNameRef.current =
+                currentRouteName as keyof AuthenticatedStackParamList
 
             // Persist state to storage
             storage.save(persistenceKey, state)
@@ -199,6 +205,9 @@ export function useNavigationPersistence(
 // export function useNavigation
 // navigation.dispatch(StackActions.replace('RequireConnection', {title}))
 
+// export function useNavigation
+// navigation.dispatch(StackActions.replace('RequireConnection', {title}))
+
 /**
  * use this to navigate without the navigation
  * prop. If you have access to the navigation prop, do not use this.
@@ -231,51 +240,50 @@ export type NavigateProps = {
  * @param {object} unknown - The params to pass to the route.
  */
 export function useNavigate(todoId?: string) {
-    const tripId = useTripStore()?.id
+
+    let tripId: string | undefined
+
+    try {
+        tripId = useTripStore()?.id
+    }
+    catch (e: unknown) {
+        tripId = undefined
+    }
 
     const navigateWithTrip = useCallback(
-        (
+        async (
             name: string,
-            params?: unknown,
+            params?: object,
             promiseBeforeNavigate?: () => Promise<any>,
             ignoreTrip?: boolean,
         ) => {
-            console.log(
-                `[navigateWithTrip] name:${JSON.stringify(name)}, params:${JSON.stringify(params)}`,
-            )
-            const _params = {
-                tripId: ignoreTrip ? undefined : tripId,
-                todoId,
-            }
-            const _navigate = () =>
-                navigate(
-                    name,
-                    !!params && 'screen' in (params as Object)
-                        ? { ...params, ..._params, params: _params }
-                        : {
-                              ..._params,
-                              ...(params as Object),
-                          },
-                )
-            // navigate(name, {
-            //   ..._params,
-            //   ...(params as Object),
-            // })
+            try {
+                if (promiseBeforeNavigate) {
+                    await promiseBeforeNavigate()
+                }
 
-            if (promiseBeforeNavigate)
-                promiseBeforeNavigate().then(() => {
-                    _navigate()
-                })
-            else _navigate()
+                const context = {
+                    tripId: ignoreTrip ? undefined : tripId,
+                    todoId,
+                }
+
+                const finalParams = params && "screen" in params
+                    ? {
+                        ...params,
+                        params: { ...context, ...(params as any).params }
+                    }
+                    : { ...context, ...params }
+
+                navigate(name, finalParams)
+
+            } catch (error) {
+                console.error(`[Navigation Error] Failed to navigate to ${name}:`, error)
+            }
         },
-        [tripId],
+        [tripId, todoId],
     )
 
-    //   const navigateWithTrip = () => navigateWithTodo()
-
-    return {
-        navigateWithTrip,
-    }
+    return { navigateWithTrip }
 }
 
 /**

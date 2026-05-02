@@ -1,18 +1,17 @@
-import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocompleteConfig'
+import { googlePlacesAutocompleteConfig } from '@/components/GooglePlacesAutocomplete/GooglePlacesAutocompleteConfig'
 import { GooglePlacesSearchBarInput } from '@/components/Input'
 import { ListItemBase } from '@/components/ListItem/ListItem'
 import ListSubheader from '@/components/ListItem/ListSubheader'
 import { Location } from '@/models/Todo'
 import { countryNameKrToIso, getFlagEmoji } from '@/utils/nation'
 import { useLingui } from '@lingui/react/macro'
-import { Observer, observer } from 'mobx-react-lite'
+import { Observer } from 'mobx-react-lite'
 import {
     FC,
     ReactElement,
-    ReactNode,
     useCallback,
     useEffect,
-    useRef,
+    useRef
 } from 'react'
 import {
     AutocompleteRequestType,
@@ -82,7 +81,7 @@ export const AirportAutocomplete: FC<AirportAutocompleteProps> = ({
             iataCode: iataCode || undefined,
             iso2DigitNationCode:
                 countryNameKrToIso[
-                    data.structured_formatting.secondary_text.split(',')[0]
+                data.structured_formatting.secondary_text.split(',')[0]
                 ] || '',
         })
     }, [])
