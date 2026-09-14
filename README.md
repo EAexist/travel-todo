@@ -25,6 +25,14 @@ For introduction of the app, please refer to following repo of the API server.
 
 <a href="https://github.com/EAexist/travel-todo-api" target="_blank" rel="noopener noreferrer">Travel Todo API</a>
 
+
+### Demo & Figma Prototype
+
+- [Demo](https://travel-todo-demo.vercel.app)
+- [Figma Prototype](https://www.figma.com/design/ZagAkw647krEcMbWrTUm7K/Trip-Todo?node-id=10891-35946&t=e8NPkDXypgMGE4nt-1)
+
+
+
 ### Built With
 
 - [![React][React]][React-url]
